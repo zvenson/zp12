@@ -26,10 +26,10 @@
 
 #define UI_PAGE_MS 6000u
 #define UI_HOLD_MS 1300u                        /* REC held 0.7 s, then this much more: the loop cleared */
-#ifndef FELUCCA_ID
-#define FELUCCA_ID "FM-1_970"
+#ifndef ZP12_VER
+#define ZP12_VER "0.0"                          /* build.py --release X.Y */
 #endif
-static const char ZP12_VERSION[4] = {'0', '.', FELUCCA_ID[7], 0};   /* FM-1_97N: zp12 0.N (build.py --release) */                        /* a page untouched this long: back to the faders */
+static const char ZP12_VERSION[] = ZP12_VER;
 
 enum { PG_HOME, PG_WAVE, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_N };
 static const char *const PG_NAME[PG_N] = {"MIX", "WAVE", "SOUND", "TRUNC", "OUT", "SENDS", "CHORUS", "DELAY", "REVERB",
