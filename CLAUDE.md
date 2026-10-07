@@ -29,7 +29,7 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   0xDA000-0xDBFFF, 0xE5000-0xE8FFF, 0xEA000-0xFBFFF (+ sloopDX's bank room 0xA0000-0xC3FFF if chosen), read via the
   plain XIP window; waves KIT_NWAVE + slot; names in sp_ui.c `ui_uname`. Editor: web/editor.html.
 - `sp_link.c`: USB link for the web tools, SysEx F0 pack7(7D 'Z' 'P' cmd addr len data sum) F7: HELLO, READ, ERASE,
-  WRITE (only 0xA0000-0xDBFFF, 0xE5000-0xE8FFF, 0xEA000-0xFBFFF: sloopDX's banks + zp12's rooms), HOLD, REBOOT, RELOAD, ASSIGN. The
+  WRITE (only 0xA0000-0xDBFFF, 0xE5000-0xE8FFF, 0xEA000-0xFBFFF: sloopDX's banks + zp12's rooms), HOLD, REBOOT, RELOAD, ASSIGN, PADS. The
   logic is in `web/zp12link.js` (backup / restore; the sample editor goes on top). Image ~565 of 582 KB (FONT_S cut to ASCII saved 12.9 KB; -Oz would save 4.3 KB more but slows the audio ISR: untried on the device).
 - `sp_ui.c`: panel look (header, big LCD line + 4 columns for KNOB 1-4, faders, pads, LEDs via `ui_leds()`).
   HOME: KNOB 1-4 = pad volumes 1-4, SEL held 5-8. EDIT: WAVE, SOUND, TRUNC, OUT, SENDS. FX: CHORUS, DELAY,
@@ -44,6 +44,7 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   `cc -O2 -w -o build/host/sp_core_test tests/sp_core_test.c -lm && build/host/sp_core_test build/host/core.wav`
   `cc -O2 -Wall -Wno-unused-function -Ifirmware/src -Ibuild/gen -o build/host/sp_seq_test tests/sp_seq_test.c -lm && build/host/sp_seq_test`
   `cc -O2 -w -Ifirmware/src -Ifirmware/gen -Ibuild/gen -o build/host/zp12_ui_test tests/zp12_ui_test.c -lm && build/host/zp12_ui_test`
+- Start animation (sp_ui.c ui_splash, SPLASH_HIT): `cc -O2 -w -Ifirmware/src -Ifirmware/gen -Ibuild/gen -o build/host/zp12_splash tests/zp12_splash_render.c -lm && build/host/zp12_splash build/host/splash` (frames + WAV)
 - Link: `cc -O2 -Wall -Wno-unused-function -Ifirmware/src -o build/host/zp12_link_host tests/zp12_link_host.c && node tests/zp12_link_test.mjs`
 - Site: `python3 tools/make_site.py ../sloopdx build/zp12-X.Y.fwsc X.Y [video.mp4]` -> `docs/` (start page
   web/landing.html with the cheat sheet embedded from web/cheatsheet.html (its scoped `cs-style` and `<!--cs-->` block;
