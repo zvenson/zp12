@@ -6,6 +6,7 @@ Released: 0.9 (FM-1_979). Open, from the user's tests:
       (`sq_lk`, ZS_VER 3). Open: a way to drop a pad's locks again (now: record over them, or erase the hits).
 - [x] PRESETS = the last pad's sample; REC held 2 s = clear the loop, EDIT + OCT- = undo / redo; SAVE held + a
       black key = save the loop into that loop (as sloopDX). Tried on the device (1.0).
+- [x] 1.2: the 8th black key (A#4) is loop 8 again (it and B4 were swapped in white_of).
 - [x] 1.1: SEL held = faders 5-8 on any page; the header says where you are (EDIT > SOUND) and a page shows its
       family's tabs; FX > FILTER: sloopDX's DJ filter on the mix (not saved). Image 576 of 582 KB: nearly full.
 - [ ] Factory hats quieter in the kit (`tools/gen_kit.py`, then bump `ZS_KIT_ID`).

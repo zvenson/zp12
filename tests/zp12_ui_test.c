@@ -50,6 +50,8 @@ int main(int argc, char **argv)
     for (i = 0; i < KIT_NWAVE; i++) { sp_wave[i].d = KIT_DATA + KIT_WAVE[i].off; sp_wave[i].n = KIT_WAVE[i].n; sp_wave[i].rate = 26040; }
     memcpy(sp_sound, KIT_PADS, sizeof sp_sound);
     ui_init();
+    for (i = 0; i < 27u; i++)                               /* the keys F3..G5: black where a piano has them */
+        if ((white_of(i) == 0xFFu) != ((0x54Au >> ((i + 5u) % 12u)) & 1u)) { printf("zp12 ui: key %u black / white wrong FAIL\n", i); return 1; }
     fm1_ms = 1000;
     ui_draw(); ppm("zp12-home");
     key_down(0, 0); key_down(4, 0); fm1_ms += 20; knob(2, -30); ui_draw(); ppm("zp12-hit");

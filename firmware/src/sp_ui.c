@@ -534,7 +534,7 @@ static void pad_hit(uint32_t k, uint32_t vel) { pad_hit_at(k, vel, 0); }
 static uint32_t white_of(uint32_t k)
 {
     static const uint8_t WHITE_OF[27] = {0, 0xFF, 1, 0xFF, 2, 0xFF, 3, 4, 0xFF, 5, 0xFF, 6, 7, 0xFF, 8, 0xFF, 9,
-                                         10, 0xFF, 11, 0xFF, 12, 0xFF, 13, 14, 0xFF, 15};   /* F3 .. G5 */
+                                         0xFF, 10, 11, 0xFF, 12, 0xFF, 13, 14, 0xFF, 15};   /* F3 .. G5 */
     return k < 27u ? WHITE_OF[k] : 0xFFu;
 }
 static uint32_t key_pad(uint32_t k)            /* white keys 1-8: bank A (C), 9-16: B (D) */
