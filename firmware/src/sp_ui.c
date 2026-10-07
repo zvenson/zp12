@@ -24,7 +24,11 @@
 #define P_RULE RGB(120, 140, 180)
 #define P_STEP RGB(240, 200, 60)
 
-#define UI_PAGE_MS 6000u                        /* a page untouched this long: back to the faders */
+#define UI_PAGE_MS 6000u
+#ifndef FELUCCA_ID
+#define FELUCCA_ID "FM-1_970"
+#endif
+static const char ZP12_VERSION[4] = {'0', '.', FELUCCA_ID[7], 0};   /* FM-1_97N: zp12 0.N (build.py --release) */                        /* a page untouched this long: back to the faders */
 
 enum { PG_HOME, PG_WAVE, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_N };
 static const char *const PG_NAME[PG_N] = {"MIX", "WAVE", "SOUND", "TRUNC", "OUT", "SENDS", "CHORUS", "DELAY", "REVERB",
@@ -175,6 +179,7 @@ static void page_cols(char lab[4][8], char val[4][8])
         break;
     case PG_SETUP:
         COL(0, "TEMPO", num(val[0], (int32_t)(sq.bpm10 / 10u), 3, 0)); COL(1, "CLICK", cat(val[1], CLICK_NAME[sq.click % 3u]));
+        COL(2, "VERSION", cat(val[2], ZP12_VERSION));
         COL(3, "FACTORY", cat(val[3], ui.arm == PG_SETUP + 1u ? "AGAIN" : "-->"));
         break;
     default:

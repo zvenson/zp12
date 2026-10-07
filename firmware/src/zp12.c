@@ -218,6 +218,13 @@ static void splash(void)                       /* the wordmark a moment (tools/g
     cv_begin(240, 16, P_NAVY);
     cv_text_on(120 - text_w(&FONT_S, "12-bit sampling drums") / 2, 0, &FONT_S, "12-bit sampling drums", P_RULE, P_NAVY);
     cv_blit(0, 160);
+    {
+        char v[16] = "version ";
+        cat(v + 8, ZP12_VERSION);
+        cv_begin(240, 16, P_NAVY);
+        cv_text_on(120 - text_w(&FONT_S, v) / 2, 0, &FONT_S, v, P_FRAME, P_NAVY);
+        cv_blit(0, 180);
+    }
     cv_begin(240, 16, P_NAVY);
     cv_text_on(120 - text_w(&FONT_S, "based on SLOOP + Felucca") / 2, 0, &FONT_S, "based on SLOOP + Felucca", P_RULE, P_NAVY);
     cv_blit(0, 214);
