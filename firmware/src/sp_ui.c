@@ -465,6 +465,12 @@ static void key_down(uint32_t k, int erase)
         uint32_t b = 0, i;
         for (i = 0; i < k; i++) b += white_of(i) == 0xFFu;
         sq_post(RQ_LOOP, 0, b);
+        {   /* say it: now, or at the end of the loop playing */
+            char m[24], *p = cat(m, "LOOP ");
+            p = num(p, (int32_t)b + 1, b + 1u >= 10u ? 2u : 1u, 0);
+            cat(p, sq.playing && b != sq.seg ? " NEXT" : "");
+            ui_say(m);
+        }
         return;
     }
     if (ui.multi && !erase) {                    /* MULTI PITCH: the sound, F4 (key 12) as written */
@@ -523,6 +529,7 @@ static void knob(uint32_t n, int32_t d)
             s->start = 0;
             s->end = 1000;
             SP_HIT(ui.sel, 100, 0);                /* (heard at once) */
+            ui_say(KIT_WAVE[s->wave].name);
         }
         if (n == 1u) ui.copy_pad = (uint8_t)((ui.copy_pad + SP_NSOUND + (one > 0 ? 1u : SP_NSOUND - 1u)) % SP_NSOUND);
         if (n == 2u && d > 0 && again(PG_WAVE + 1u) && ui.copy_pad != ui.sel) {

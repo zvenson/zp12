@@ -42,6 +42,8 @@ def main(sloopdx, pkg, version, out, own_site=False):
         <p class="small"><b>KNOB 1&ndash;4</b>: the faders of channels 1&ndash;4, <b>SEL held</b>: 5&ndash;8. A page (EDIT, FX, SEQ, GLO) takes the knobs; untouched for 6 s, or HOME, they are the faders again.</p>
         <p class="small"><b>EDIT</b>: WAVE (the sample of the pad, copy the sound to another pad) &middot; SOUND &middot; TRUNC &middot; OUT &middot; SENDS of the last pad &nbsp; <b>FX</b>: CHORUS &middot; DELAY &middot; REVERB &nbsp; <b>GLO</b>: tempo, click, FACTORY (turn twice: everything as new)</p>
         <p class="small"><b>PLAY</b>: run / stop &nbsp; <b>REC</b>: record (stopped: a bar of count-in first; an empty loop set to AUTO takes the length of your first take) &nbsp; <b>SEQ tapped</b>: LOOP (bars 1&ndash;32 or AUTO, AUTO CORRECT, swing), LOOP TOOLS (clear, copy), SONG (four songs of your loops) &nbsp; <b>SEQ held</b>: the 16 steps of the last pad on the white keys, OCT pages the bars &nbsp; <b>LFO held + pad</b>: erase &nbsp; <b>ENV</b>: tap tempo &nbsp; <b>SAVE</b>: save now (it also saves by itself when stopped)</p>
+        <h2>Cheat sheet</h2>
+        <p class="small"><a href="cheatsheet.html">Every key, button and page on one sheet</a> &middot; <a href="zp12-cheat-sheet.pdf">PDF (A4)</a></p>
         <h2>Back to sloopDX</h2>
         <p class="small">Open the <a href="../webapp/installer/">sloopDX installer</a> and press Install. If the FM-1 does not answer: hold OCT&minus; while switching it on (USB rescue), then install.</p>
       </section>
@@ -76,6 +78,10 @@ def main(sloopdx, pkg, version, out, own_site=False):
         old.unlink()
     shutil.copy(pkg, out / "firmware" / name)
     (out / "index.html").write_text(html, encoding="utf-8")
+    web = Path(__file__).resolve().parents[1] / "web"
+    for f in ("cheatsheet.html", "zp12-cheat-sheet.pdf"):
+        if (web / f).exists():
+            shutil.copy(web / f, out / f)
     vid = os.environ.get("ZP12_VIDEO")                  # the beat video, under the lead
     if vid and Path(vid).exists():
         shutil.copy(vid, out / "zp12-beat.mp4")
