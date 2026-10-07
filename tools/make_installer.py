@@ -9,7 +9,7 @@ from pathlib import Path
 BLK, KEEP, BLOCKS = 512, 16, 20   # (as sloopDX's make_site.py; checked against its product_of below)
 
 
-def main(sloopdx, pkg, version, out):
+def main(sloopdx, pkg, version, out, own_site=False):
     web = Path(sloopdx) / "web"
     sys.path.insert(0, str(web))
     import make_site                                    # sloopDX's own: product_of, strip_module
@@ -50,8 +50,16 @@ def main(sloopdx, pkg, version, out):
         ("../../impressum.html", "../impressum.html"),
         ("../../", "../"),
     ]
+    if own_site:                                        # zp12.designburgapps.com: sloopDX's pages by their address
+        swaps += [("../webapp/installer/", "https://dx7.designburgapps.com/webapp/installer/"),
+                  ('href="../"', 'href="https://dx7.designburgapps.com/"'),
+                  ("../impressum.html", "https://dx7.designburgapps.com/impressum.html"),
+                  ('href="../editor/"', 'href="https://dx7.designburgapps.com/webapp/editor/"'),
+                  ('<link rel="icon" href="../favicon.svg" type="image/svg+xml">', '<link rel="icon" href="favicon.svg" type="image/svg+xml">'),
+                  ('<link rel="icon" href="../favicon-32.png" sizes="32x32">\n', ""),
+                  ('<link rel="apple-touch-icon" href="../apple-touch-icon.png">', '<link rel="apple-touch-icon" href="favicon.svg">')]
     for old, new in swaps:
-        if old.startswith(("<", "../", "https", "github")) and not any(c in old for c in "*?\\("):
+        if old.startswith(("<", "../", "https", "github", "href")) and not any(c in old for c in "*?\\("):
             if old not in html:
                 raise SystemExit(f"installer: {old[:40]!r} not found; update make_installer.py")
             html = html.replace(old, new)
@@ -66,8 +74,12 @@ def main(sloopdx, pkg, version, out):
         old.unlink()
     shutil.copy(pkg, out / "firmware" / name)
     (out / "index.html").write_text(html, encoding="utf-8")
+    if own_site:                                        # the icon: a navy pad with a red LED, "12"
+        (out / "favicon.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="10" fill="#263e70"/>'
+                                         '<circle cx="50" cy="14" r="6" fill="#ff2820"/><text x="32" y="50" font-family="Arial,Helvetica,sans-serif" '
+                                         'font-weight="700" font-size="30" text-anchor="middle" fill="#cecfc9">12</text></svg>\n')
     print(f"installer: {out / 'index.html'} ({len(html)} B), firmware/{name} ({len(raw)} B, {product})")
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:5])
+    main(*sys.argv[1:5], own_site="--own-site" in sys.argv)
