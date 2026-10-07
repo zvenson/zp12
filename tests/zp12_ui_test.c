@@ -21,8 +21,11 @@ static void lcd_fill(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t c)
 }
 #define __attribute__(x)
 #include "gfx.c"
+#define SP_WITH_FX 1
 #include "sp_core.c"
+#include "sp_fx.c"
 #include "zp12_kit.h"
+#include "sp_seq.c"
 #include "sp_ui.c"
 static const char *dir;
 static void ppm(const char *name)
@@ -49,9 +52,11 @@ int main(int argc, char **argv)
     ui_init();
     fm1_ms = 1000;
     ui_draw(); ppm("zp12-home");
-    key_down(0); key_down(4); fm1_ms += 20; ui.mix[2] = 70; sp_mix[2] = 70; ui_draw(); ppm("zp12-hit");
-    button(B_EDIT); button(B_EDIT); fm1_ms += 2000; ui_draw(); ppm("zp12-trunc");
-    button(B_OCTUP); key_down(2); fm1_ms += 10; ui_draw(); ppm("zp12-bankc");
+    key_down(0, 0); key_down(4, 0); fm1_ms += 20; knob(2, -30); ui_draw(); ppm("zp12-hit");
+    button(B_SEQ); fm1_ms += 2000; ui_draw(); ppm("zp12-seg");
+    sq.playing = 1; sq.recording = 1; sq.pos = (SQ_BAR + 2u * SQ_PPQ) << 16; sq_seg[0].bars = 2; fm1_ms += 10; ui_draw(); ppm("zp12-rec");
+    sq.playing = 0; sq.recording = 0; button(B_EDIT); button(B_EDIT); button(B_EDIT); button(B_EDIT); knob(3, 60); fm1_ms += 2000; ui_draw(); ppm("zp12-sfx");
+    button(B_FX); button(B_FX); fm1_ms += 2000; ui_draw(); ppm("zp12-delay");
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;
 }

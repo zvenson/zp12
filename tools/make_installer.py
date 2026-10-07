@@ -33,13 +33,14 @@ def main(sloopdx, pkg, version, out, own_site=False):
          '<a class="gh" href="https://github.com/zvenson/zp12">GitHub</a></div>'),
         ('<p class="eyebrow">Firmware for the M-VAVE FM-1</p>', '<p class="eyebrow">Early test build for the M-VAVE FM-1</p>'),
         ("<h1>Install <b>sloopDX</b></h1>", "<h1>Install <b>zp12</b></h1>"),
-        (r'<p class="lead">.*?</p>', '<p class="lead">12-bit sampling drums in the spirit of the 80s: 32 sounds at 26.04 kHz, pitched without interpolation, eight channels with their filters. This build plays the factory kit on the keys; the sequencer and your own samples come next. Back to sloopDX any time with its installer.</p>'),
+        (r'<p class="lead">.*?</p>', '<p class="lead">12-bit sampling drums in the spirit of the 80s: 32 sounds at 26.04 kHz, pitched without interpolation, eight channels with their filters. With the sequencer of such a machine (segments, song, real-time recording, swing) and the reverb and delay of sloopDX. Your own samples come next. Back to sloopDX any time with its installer.</p>'),
         (r'<div class="dxanim".*?</div>', ""),
         (r'<aside class="side">.*?</aside>', '''<aside class="side">
       <section class="card">
         <h2>Play it</h2>
-        <p class="small"><b>White keys 1&ndash;8</b>: bank A, <b>9&ndash;16</b>: bank B &nbsp; <b>OCT+</b>: banks C + D, <b>OCT&minus;</b>: A + B &nbsp; <b>ARP</b>: MULTI PITCH (the sound on every key)</p>
-        <p class="small"><b>KNOB 1&ndash;4</b>: the last pad's TUNE &middot; FINE &middot; DECAY &middot; LEVEL &nbsp; <b>EDIT</b>: TRUNC (start, end, reverse, 45/33), OUT (channel, pan, cutoff, resonance) &nbsp; <b>GLO</b>: the mix of channels 1&ndash;4, 5&ndash;8 &nbsp; <b>SELECT</b>: tempo &nbsp; <b>ALGORITHM</b>: the sound</p>
+        <p class="small"><b>White keys 1&ndash;8</b>: bank A, <b>9&ndash;16</b>: bank B &nbsp; <b>OCT+</b>: C + D, <b>OCT&minus;</b>: A + B &nbsp; <b>ARP</b>: MULTI PITCH</p>
+        <p class="small"><b>KNOB 1&ndash;4</b> on HOME: the faders of channels 1&ndash;4, <b>SEL held</b>: 5&ndash;8 &nbsp; <b>EDIT</b>: SOUND &middot; TRUNC &middot; OUT &middot; FX SENDS of the last pad &nbsp; <b>FX</b>: CHORUS &middot; DELAY &middot; REVERB</p>
+        <p class="small"><b>PLAY</b>: run / stop &nbsp; <b>REC</b>: record (stopped: a bar of count-in first) &nbsp; <b>SEQ</b>: segment, bars, AUTO CORRECT, swing &nbsp; <b>LFO held + pad</b>: erase &nbsp; <b>ENV</b>: tap tempo &nbsp; <b>SAVE</b>: song (again: song mode) &nbsp; <b>GLO</b>: tempo, click</p>
         <h2>Back to sloopDX</h2>
         <p class="small">Open the <a href="../webapp/installer/">sloopDX installer</a> and press Install. If the FM-1 does not answer: hold OCT&minus; while switching it on (USB rescue), then install.</p>
       </section>

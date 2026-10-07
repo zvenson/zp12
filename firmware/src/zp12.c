@@ -105,8 +105,11 @@ static void ota_commit(const uint8_t *parm)
 }
 #include "recovery.c"
 
+#define SP_WITH_FX 1
 #include "sp_core.c"
+#include "sp_fx.c"
 #include "zp12_kit.h"
+#include "sp_seq.c"
 /* pad hits from the main loop (keys, MIDI) to the audio ISR: a ring, the ISR starts them */
 #define HQ 32u
 static uint32_t hit_q[HQ];
@@ -158,13 +161,15 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
         uint32_t i, b;
         while (hq_r != hq_w) {
             uint32_t h = hit_q[hq_r % HQ];
-            sp_trigger_at(h & 0xFFu, (h >> 8) & 0xFFu, (int32_t)(h >> 16) - 64);
+            sq_hit(h & 0xFFu, (h >> 8) & 0xFFu, (int32_t)(h >> 16) - 64);   /* sounds, and records when REC */
             hq_r++;
         }
         for (i = 0; i < HALF_WORDS; i++)
             o[i] = 0;
-        for (b = 0; b < HALF_FRAMES; b += SP_BLK)
+        for (b = 0; b < HALF_FRAMES; b += SP_BLK) {
+            sq_block();                                     /* the sequencer's hits of this block */
             sp_render(o + 2u * b);
+        }
         for (i = 0; i < HALF_WORDS; i++) {
             int32_t v = (o[i] * master_q12) >> 12;
             o[i] = sp_clamp(v, -32767, 32767) << 8;
@@ -254,9 +259,20 @@ static void zp12_main(void)
         uint32_t n = fm1_in.notes, down = n & ~prev_notes, rel, b;
         fm1_service();
         prev_notes = n;
-        for (i = 0; down; i++, down >>= 1)              /* the keys: pads (ui decides which) */
-            if (down & 1u)
-                key_down(i);
+        {   /* SEL held: the faders 5-8; LFO held: ERASE (the pads held lose their hits as the playhead passes) */
+            uint32_t bt = fm1_in.buttons, er = 0, k;
+            ui.shift = (uint8_t)((bt >> B_SEL) & 1u);
+            if ((bt >> B_LFO) & 1u)
+                for (k = 0; k < 27u; k++)
+                    if ((n >> k) & 1u) {
+                        uint32_t pd = ui.multi ? ui.sel : key_pad(k);
+                        if (pd < 32u) er |= 1u << pd;
+                    }
+            sq.erase = er;
+            for (i = 0; down; i++, down >>= 1)          /* the keys: pads (ui decides which) */
+                if (down & 1u)
+                    key_down(i, (bt >> B_LFO) & 1u);
+        }
         b = fm1_input_edges(&rel);
         for (i = 0; b; i++, b >>= 1)
             if (b & 1u)
@@ -267,7 +283,7 @@ static void zp12_main(void)
                 if ((d = fm1_enc_take(2u + i)) != 0)
                     knob(i, d);
             if ((d = fm1_enc_take(0)) != 0)
-                ui.bpm10 = (uint16_t)sp_clamp((int32_t)ui.bpm10 + d * 5, 400, 2400);
+                sq.bpm10 = (uint16_t)sp_clamp((int32_t)sq.bpm10 + d * 5, 400, 2400);
             if ((d = fm1_enc_take(1)) != 0)
                 ui.sel = (uint8_t)((ui.sel + SP_NSOUND + (d > 0 ? 1 : SP_NSOUND - 1)) % SP_NSOUND);
             (void)fm1_enc_take(6);
@@ -287,6 +303,7 @@ static void zp12_main(void)
                 master_q12 = (int32_t)((k10 * k10) >> 8);
             }
         }
+        fx_bpm10 = sq.bpm10;                            /* the delay follows the tempo */
         if ((uint32_t)(fm1_ms - t_frame) >= 16u) {
             t_frame = fm1_ms;
             ui_draw();

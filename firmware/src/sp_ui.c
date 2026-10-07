@@ -23,24 +23,28 @@
 #define P_PAD RGB(18, 18, 20)
 #define P_RULE RGB(120, 140, 180)
 
-enum { PG_SOUND, PG_TRUNC, PG_OUT, PG_MIX1, PG_MIX2, PG_N };
+enum { PG_HOME, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SONG, PG_SETUP, PG_N };
 static struct {
     uint8_t pair;                               /* 0: banks A + B on the keys, 1: C + D */
     uint8_t sel;                                /* the sound the knobs edit, 0..31 */
     uint8_t page;
     uint8_t multi;                              /* MULTI PITCH */
+    uint8_t shift;                              /* SEL held: the faders 5-8 */
+    uint8_t song_cur;                           /* SONG page: the step under the knobs */
     uint8_t mix[SP_NCH];
-    uint16_t bpm10;                             /* tempo x 10 */
-    uint8_t playing, rec;
     uint32_t hit_ms[8];                         /* when each on-screen pad was last hit (its light) */
     uint32_t chan_ms[SP_NCH];
+    uint32_t tap_ms[4];                         /* TAP: the last taps */
     char msg[24];
     uint32_t msg_until;
     uint32_t sig_lcd, sig_fad, sig_pad, sig_led;   /* what each region shows now */
     uint8_t force;
 } ui;
 
-static const char *const PG_NAME[PG_N] = {"SOUND", "TRUNC", "OUT", "MIX 1-4", "MIX 5-8"};
+static const char *const PG_NAME[PG_N] = {"HOME", "SOUND", "TRUNC", "OUT", "FX SENDS", "CHORUS", "DELAY", "REVERB",
+                                          "SEGMENT", "SONG", "SETUP"};
+static const char *const DTIME_NAME[6] = {"1/4", "1/8", "1/16", "1/32", "8T", "16T"};
+static const char *const CLICK_NAME[3] = {"OFF", "REC", "ON"};
 
 /* text blended onto bg (gfx.c's cv_text blends onto black) */
 static int32_t cv_text_on(int32_t x, int32_t y, const felucca_font_t *f, const char *s, uint16_t c, uint16_t bg)
@@ -107,62 +111,101 @@ static void draw_frame(void)                    /* once: the light frame, the he
     cv_blit(4, 70);
 }
 
-static void draw_lcd(void)                      /* the LCD: what is selected and its values */
+static char *num(char *p, int32_t v, uint32_t digits, int sign) { put_int(p, v, digits, sign); return p + digits + (sign != 0); }
+
+static void draw_lcd(void)                      /* the LCD: where the sequencer is, what is selected, its values */
 {
-    char l1[32], l2[32], *p;
+    char l1[32], l2[40], *p = l1;
     const sp_sound_t *s = &sp_sound[ui.sel];
+    uint32_t bpm = sq.bpm10;
     cv_begin(232, 40, P_FRAME);
     cv_rect(2, 0, 228, 40, RGB(70, 76, 66));    /* the bezel */
     cv_rect(5, 3, 222, 34, P_LCD);
     if (ui.msg[0] && (int32_t)(fm1_ms - ui.msg_until) < 0) {
-        cv_text_on(9, 3, &FONT_S, ui.msg, P_LCDINK, P_LCD);
+        cat(l1, ui.msg);
+    } else if (sq.playing) {                    /* SEG01 2.3  REC  092.0 */
+        uint32_t t = sq.countin > 0 ? 0u : sq.pos >> 16;
+        p = cat(p, sq.song_mode && sq.song_n ? "S" : "SEG");
+        if (sq.song_mode && sq.song_n) { p = num(p, sq.song_i + 1, 2, 0); p = cat(p, ":"); }
+        p = num(p, sq.seg + 1, 2, 0);
+        p = cat(p, " ");
+        p = num(p, (int32_t)(t / SQ_BAR + 1u), 1, 0);
+        p = cat(p, ".");
+        p = num(p, (int32_t)(t % SQ_BAR / SQ_PPQ + 1u), 1, 0);
+        p = cat(p, sq.countin > 0 ? " CNT" : sq.recording ? " REC" : "    ");
+        while (p < l1 + 15) *p++ = ' ';
+        p = num(p, (int32_t)(bpm / 10u), 3, 0); p = cat(p, "."); num(p, (int32_t)(bpm % 10u), 1, 0);
     } else {
-        pad_label(l1, ui.sel);
-        p = cat(l1 + 2, " ");
+        pad_label(p, ui.sel);
+        p = cat(p + 2, " ");
         p = cat(p, sound_name(ui.sel));
         while (p < l1 + 15) *p++ = ' ';
-        put_int(p, ui.bpm10 / 10u, 3, 0);
-        p = cat(p + 3, ".");
-        put_int(p, ui.bpm10 % 10u, 1, 0);
-        cv_text_on(9, 3, &FONT_S, l1, P_LCDINK, P_LCD);
+        p = num(p, (int32_t)(bpm / 10u), 3, 0); p = cat(p, "."); num(p, (int32_t)(bpm % 10u), 1, 0);
     }
+    cv_text_on(9, 3, &FONT_S, l1, P_LCDINK, P_LCD);
     p = l2;
+    *p = 0;
     switch (ui.page) {
+    case PG_HOME: {
+        uint32_t i, b0 = ui.shift ? 4u : 0u;
+        p = cat(p, ui.shift ? "5-8" : "1-4");
+        for (i = 0; i < 4u; i++) { p = cat(p, " "); p = num(p, ui.mix[b0 + i], 3, 0); }
+        break;
+    }
     case PG_SOUND:
-        p = cat(p, "T"); put_int(p, s->tune, 2, 1); p += 3;
-        p = cat(p, " F"); put_int(p, s->fine, 2, 1); p += 3;
-        p = cat(p, " D"); put_int(p, s->decay, 3, 0); p += 3;
-        p = cat(p, " L"); put_int(p, s->level, 3, 0);
+        p = cat(p, "T"); p = num(p, s->tune, 2, 1); p = cat(p, " F"); p = num(p, s->fine, 2, 1);
+        p = cat(p, " D"); p = num(p, s->decay, 3, 0); p = cat(p, " L"); num(p, s->level, 3, 0);
         break;
     case PG_TRUNC:
-        p = cat(p, "S"); put_int(p, s->start, 4, 0); p += 4;
-        p = cat(p, " E"); put_int(p, s->end, 4, 0); p += 4;
-        p = cat(p, (s->flags & SPF_REVERSE) ? " REV" : " FWD");
-        p = cat(p, (s->flags & SPF_33) ? " 33" : " 45");
+        p = cat(p, "S"); p = num(p, s->start, 4, 0); p = cat(p, " E"); p = num(p, s->end, 4, 0);
+        p = cat(p, (s->flags & SPF_REVERSE) ? " REV" : " FWD"); cat(p, (s->flags & SPF_33) ? " 33" : " 45");
         break;
     case PG_OUT:
-        p = cat(p, "CH"); put_int(p, s->chan + 1, 1, 0); p += 1;
-        p = cat(p, " P"); put_int(p, s->pan, 2, 1); p += 3;
-        if (s->chan < 2u) {
-            p = cat(p, " C"); put_int(p, s->cut, 3, 0); p += 3;
-            p = cat(p, " Q"); put_int(p, s->reso, 3, 0);
+        p = cat(p, "CH"); p = num(p, s->chan + 1, 1, 0); p = cat(p, " P"); p = num(p, s->pan, 2, 1);
+        if (s->chan < 2u) { p = cat(p, " C"); p = num(p, s->cut, 3, 0); p = cat(p, " Q"); num(p, s->reso, 3, 0); }
+        else cat(p, s->chan < 6u ? " FIXED LP" : " NO FILTER");
+        break;
+    case PG_SFX:
+        p = cat(p, "DRV"); p = num(p, s->drive, 3, 0); p = cat(p, " CH"); p = num(p, s->send[0], 3, 0);
+        p = cat(p, " DL"); p = num(p, s->send[1], 3, 0); p = cat(p, " RV"); num(p, s->send[2], 3, 0);
+        break;
+    case PG_CHO:
+        p = cat(p, "RATE"); p = num(p, fxp.crate, 3, 0); p = cat(p, " DEP"); p = num(p, fxp.cdepth, 3, 0);
+        p = cat(p, " MIX"); num(p, fxp.cmix, 3, 0);
+        break;
+    case PG_DLY:
+        p = cat(p, DTIME_NAME[fxp.dtime % 6]); p = cat(p, " FB"); p = num(p, fxp.fdbk, 3, 0);
+        p = cat(p, " CO"); p = num(p, fxp.colr, 3, 0); p = cat(p, " MX"); num(p, fxp.dmix, 3, 0);
+        break;
+    case PG_REV:
+        p = cat(p, "SIZE"); p = num(p, fxp.size, 3, 0); p = cat(p, " DAMP"); p = num(p, fxp.damp, 3, 0);
+        p = cat(p, " PRE"); p = num(p, fxp.pre, 2, 0); cat(p, "ms");
+        break;
+    case PG_SEG: {
+        sq_seg_t *g = &sq_seg[sq.seg % SQ_NSEG];
+        p = cat(p, "SEG"); p = num(p, sq.seg + 1, 2, 0); p = cat(p, " "); p = num(p, g->bars, 1, 0);
+        p = cat(p, "BAR "); p = cat(p, SQ_GRID_NAME[sq.quant % 7u]); p = cat(p, " SW"); num(p, SQ_SWING[sq.swing % 6u], 2, 0);
+        break;
+    }
+    case PG_SONG:
+        p = cat(p, sq.song_mode ? "SONG " : "seg  ");
+        p = num(p, ui.song_cur + 1, 2, 0); p = cat(p, "/"); p = num(p, sq.song_n, 2, 0);
+        if (ui.song_cur < sq.song_n) {
+            p = cat(p, " SEG"); p = num(p, sq_song[ui.song_cur].seg + 1, 2, 0);
+            p = cat(p, " x"); num(p, sq_song[ui.song_cur].rep, 2, 0);
         } else {
-            p = cat(p, s->chan < 6u ? " FIXED LP" : " NO FILTER");
+            cat(p, " END");
         }
         break;
-    default: {
-        uint32_t i, b = ui.page == PG_MIX1 ? 0u : 4u;
-        for (i = 0; i < 4u; i++) {
-            p = cat(p, i ? " " : "");
-            put_int(p, ui.mix[b + i], 3, 0);
-            p += 3;
-        }
-        p = cat(p, ui.page == PG_MIX1 ? " CH1-4" : " CH5-8");
+    case PG_SETUP:
+        p = cat(p, "TEMPO "); p = num(p, (int32_t)(bpm / 10u), 3, 0); p = cat(p, "."); p = num(p, (int32_t)(bpm % 10u), 1, 0);
+        p = cat(p, " CLICK "); cat(p, CLICK_NAME[sq.click % 3u]);
+        break;
+    default:
         break;
     }
-    }
-    if (ui.multi)
-        cat(l2 + 20 > p ? p : l2 + 20, " MULTI");
+    if (ui.multi && ui.page != PG_HOME)
+        cat(l2, "");
     cv_text_on(9, 20, &FONT_S, l2, P_LCDINK, P_LCD);
     cv_blit(4, 26);
 }
@@ -183,8 +226,8 @@ static void draw_faders(void)                   /* the eight channel levels; a c
         cv_rect(cx - 9, y, 19, 7, on ? P_LED : P_CAP);
         cv_rect(cx - 9, y + 3, 19, 1, on ? RGB(120, 10, 10) : RGB(90, 90, 96));
         cv_text_on(cx - 4, 66, &FONT_S, n, P_FRAME, P_NAVY);
-        if (i == sp_sound[ui.sel].chan)
-            cv_rect(cx - 9, 70 + 12, 19, 1, P_FRAME);
+        if (ui.page == PG_HOME && (i >= 4u) == (ui.shift != 0))
+            cv_rect(cx - 9, 79, 19, 1, P_FRAME);        /* the four the knobs move now */
     }
     cv_blit(4, 86);
 }
@@ -213,20 +256,23 @@ static void led(int32_t x, int32_t y, int on)
     cv_rect(x + 1, y, 4, 1, on ? RGB(255, 170, 160) : P_LEDOFF);
 }
 
-static void draw_leds(void)                     /* banks A-D (the pair on the keys), MULTI, RUN, REC */
+static void draw_leds(void)                     /* banks A-D (the pair on the keys), MULTI, SONG, RUN, REC */
 {
     uint32_t i;
+    int blink = (sq.beat & 1u) == 0u;
     cv_begin(232, 22, P_NAVY);
     for (i = 0; i < 4u; i++) {
         char b[2] = {(char)('A' + i), 0};
-        led(4 + (int32_t)i * 26, 8, i / 2u == ui.pair);
-        cv_text_on(12 + (int32_t)i * 26, 3, &FONT_S, b, P_FRAME, P_NAVY);
+        led(4 + (int32_t)i * 24, 8, i / 2u == ui.pair);
+        cv_text_on(12 + (int32_t)i * 24, 3, &FONT_S, b, P_FRAME, P_NAVY);
     }
-    led(110, 8, ui.multi);
-    cv_text_on(118, 3, &FONT_S, "M", P_FRAME, P_NAVY);
-    led(146, 8, ui.playing);
-    cv_text_on(154, 3, &FONT_S, "RUN", P_FRAME, P_NAVY);
-    led(190, 8, ui.rec);
+    led(100, 8, ui.multi);
+    cv_text_on(108, 3, &FONT_S, "M", P_FRAME, P_NAVY);
+    led(124, 8, sq.song_mode);
+    cv_text_on(132, 3, &FONT_S, "S", P_FRAME, P_NAVY);
+    led(150, 8, sq.playing && (blink || sq.countin > 0));
+    cv_text_on(158, 3, &FONT_S, "RUN", P_FRAME, P_NAVY);
+    led(190, 8, sq.recording || (sq.rec_arm && blink));
     cv_text_on(198, 3, &FONT_S, "REC", P_FRAME, P_NAVY);
     cv_blit(4, 218);
 }
@@ -245,20 +291,26 @@ static void ui_draw(void)
         draw_frame();
         ui.sig_lcd = ui.sig_fad = ui.sig_pad = ui.sig_led = 0;
     }
-    s = sig_of(&sp_sound[ui.sel], sizeof(sp_sound_t), 2166136261u ^ ui.sel * 7u ^ ui.page * 131u ^ ui.bpm10 * 7919u ^ ui.multi);
-    s = sig_of(ui.mix, sizeof ui.mix, s);
+    s = sig_of(&sp_sound[ui.sel], sizeof(sp_sound_t), 2166136261u ^ ui.sel * 7u ^ ui.page * 131u ^ sq.bpm10 * 7919u ^ ui.multi);
+    s = sig_of(ui.mix, sizeof ui.mix, s ^ ui.shift);
+    s = sig_of(&fxp, sizeof fxp, s);
+    s = sig_of(sq_song, sizeof sq_song, s ^ ui.song_cur * 31u ^ sq.song_n * 17u ^ sq.song_mode);
+    s ^= (sq.seg * 977u) ^ (sq.quant * 31u) ^ (sq.swing * 7u) ^ (sq.click * 3u) ^ sq_seg[sq.seg % SQ_NSEG].bars * 101u;
+    if (sq.playing)
+        s ^= ((sq.countin > 0 ? 0u : (sq.pos >> 16) / SQ_PPQ) + 1u) * 2654435761u ^ sq.recording * 5u ^ (sq.countin > 0) * 9u ^ sq.song_i * 13u;
     if (ui.msg[0] && (int32_t)(fm1_ms - ui.msg_until) < 0)
         s = sig_of(ui.msg, sizeof ui.msg, s ^ 0x55u);
     if (s != ui.sig_lcd || ui.force) { ui.sig_lcd = s; draw_lcd(); }
     for (i = 0; i < SP_NCH; i++)
         on |= (uint32_t)((int32_t)(fm1_ms - ui.chan_ms[i]) < 90 && sp_ch[i].on) << i;
-    s = sig_of(ui.mix, sizeof ui.mix, on * 2654435761u ^ sp_sound[ui.sel].chan);
+    s = sig_of(ui.mix, sizeof ui.mix, on * 2654435761u ^ ui.shift * 3u ^ (ui.page == PG_HOME) * 5u);
     if (s != ui.sig_fad || ui.force) { ui.sig_fad = s; draw_faders(); }
     for (i = 0; i < 8u; i++)
         lit |= (uint32_t)((int32_t)(fm1_ms - ui.hit_ms[i]) < 120) << i;
     s = lit * 31u + ui.sel * 7919u + 1u;
     if (s != ui.sig_pad || ui.force) { ui.sig_pad = s; draw_pads(); }
-    s = ui.pair + ui.multi * 2u + ui.playing * 4u + ui.rec * 8u + 1u;
+    s = ui.pair + ui.multi * 2u + sq.playing * 4u + sq.recording * 8u + sq.rec_arm * 16u + sq.song_mode * 32u +
+        (sq.beat & 1u) * 64u + (sq.countin > 0) * 128u + 1u;
     if (s != ui.sig_led || ui.force) { ui.sig_led = s; draw_leds(); }
     ui.force = 0;
 }
@@ -273,7 +325,7 @@ static void ui_say(const char *m)
 
 /* ---- playing. SP_HIT starts a sound: on the FM-1 a ring to the audio ISR (zp12.c), on the host at once */
 #ifndef SP_HIT
-#define SP_HIT(k, vel, semis) sp_trigger_at(k, vel, semis)
+#define SP_HIT(k, vel, semis) sq_hit(k, vel, semis)
 #endif
 static void pad_hit_at(uint32_t k, uint32_t vel, int32_t semis)
 {
@@ -285,31 +337,52 @@ static void pad_hit_at(uint32_t k, uint32_t vel, int32_t semis)
 }
 static void pad_hit(uint32_t k, uint32_t vel) { pad_hit_at(k, vel, 0); }
 
-/* key k (0 = F3 .. 26 = G5) down */
-static void key_down(uint32_t k)
+/* the pad of key k (0 = F3 .. 26 = G5) in pad mode, or 0xFF (a black key) */
+static uint32_t key_pad(uint32_t k)
 {
     static const uint8_t WHITE_OF[27] = {0, 0xFF, 1, 0xFF, 2, 0xFF, 3, 4, 0xFF, 5, 0xFF, 6, 7, 0xFF, 8, 0xFF, 9,
                                          10, 0xFF, 11, 0xFF, 12, 0xFF, 13, 14, 0xFF, 15};   /* F3 .. G5 */
-    uint32_t w;
+    return k < 27u && WHITE_OF[k] != 0xFFu ? ui.pair * 16u + WHITE_OF[k] : 0xFFu;   /* 1-8: A (C), 9-16: B (D) */
+}
+
+/* key k down; erase: LFO held (the pad's hits go: as the playhead passes, or at once when stopped) */
+static void key_down(uint32_t k, int erase)
+{
+    uint32_t pad;
     if (k >= 27u)
         return;
-    if (ui.multi) {                              /* MULTI PITCH: the sound, F4 (key 12) as written */
+    if (ui.multi && !erase) {                    /* MULTI PITCH: the sound, F4 (key 12) as written */
         pad_hit_at(ui.sel, 110, (int32_t)k - 12);
         return;
     }
-    w = WHITE_OF[k];
-    if (w == 0xFFu)
+    pad = ui.multi ? ui.sel : key_pad(k);
+    if (pad == 0xFFu)
         return;
-    pad_hit(ui.pair * 16u + w, 110);             /* keys 1-8: bank A (C), 9-16: B (D) */
+    if (erase) {
+        ui.sel = (uint8_t)pad;
+        if (!sq.playing) {
+            sq.req_wipe = (uint8_t)(pad + 1u);
+            ui_say("ERASED");
+        }
+        return;
+    }
+    pad_hit(pad, 110);
 }
 
 /* KNOB n turned by d on the page */
 static void knob(uint32_t n, int32_t d)
 {
     sp_sound_t *s = &sp_sound[ui.sel];
+    int32_t one = d > 0 ? 1 : -1;
     switch (ui.page) {
+    case PG_HOME: {
+        uint32_t c = (ui.shift ? 4u : 0u) + n;     /* the faders: channels 1-4, SEL held 5-8 */
+        ui.mix[c] = (uint8_t)sp_clamp(ui.mix[c] + d, 0, 127);
+        sp_mix[c] = ui.mix[c];
+        break;
+    }
     case PG_SOUND:
-        if (n == 0u) s->tune = (int8_t)sp_clamp(s->tune + d, -24, 12);
+        if (n == 0u) s->tune = (int8_t)sp_clamp(s->tune + one, -24, 12);
         if (n == 1u) s->fine = (int8_t)sp_clamp(s->fine + d, -50, 50);
         if (n == 2u) s->decay = (uint8_t)sp_clamp(s->decay + d, 0, 127);
         if (n == 3u) s->level = (uint8_t)sp_clamp(s->level + d, 0, 127);
@@ -317,36 +390,112 @@ static void knob(uint32_t n, int32_t d)
     case PG_TRUNC:
         if (n == 0u) s->start = (uint16_t)sp_clamp(s->start + d * 4, 0, s->end - 10);
         if (n == 1u) s->end = (uint16_t)sp_clamp(s->end + d * 4, s->start + 10, 1000);
-        if (n == 2u && d) s->flags = (uint8_t)(d > 0 ? s->flags | SPF_REVERSE : s->flags & ~SPF_REVERSE);
-        if (n == 3u && d) s->flags = (uint8_t)(d > 0 ? s->flags | SPF_33 : s->flags & ~SPF_33);
+        if (n == 2u) s->flags = (uint8_t)(one > 0 ? s->flags | SPF_REVERSE : s->flags & ~SPF_REVERSE);
+        if (n == 3u) s->flags = (uint8_t)(one > 0 ? s->flags | SPF_33 : s->flags & ~SPF_33);
         break;
     case PG_OUT:
-        if (n == 0u && d) s->chan = (uint8_t)sp_clamp(s->chan + (d > 0 ? 1 : -1), 0, SP_NCH - 1);
+        if (n == 0u) s->chan = (uint8_t)sp_clamp(s->chan + one, 0, SP_NCH - 1);
         if (n == 1u) s->pan = (int8_t)sp_clamp(s->pan + d, -64, 63);
         if (n == 2u) s->cut = (uint8_t)sp_clamp(s->cut + d, 0, 127);
         if (n == 3u) s->reso = (uint8_t)sp_clamp(s->reso + d, 0, 127);
         break;
-    default: {
-        uint32_t c = (ui.page == PG_MIX1 ? 0u : 4u) + n;
-        ui.mix[c] = (uint8_t)sp_clamp(ui.mix[c] + d, 0, 127);
-        sp_mix[c] = ui.mix[c];
+    case PG_SFX:
+        if (n == 0u) s->drive = (uint8_t)sp_clamp(s->drive + d, 0, 127);
+        else s->send[n - 1u] = (uint8_t)sp_clamp(s->send[n - 1u] + d, 0, 127);
         break;
-    }
+    case PG_CHO:
+        if (n == 0u) fxp.crate = (int16_t)sp_clamp(fxp.crate + d, 0, 127);
+        if (n == 1u) fxp.cdepth = (int16_t)sp_clamp(fxp.cdepth + d, 0, 127);
+        if (n == 2u) fxp.cmix = (int16_t)sp_clamp(fxp.cmix + d, 0, 127);
+        break;
+    case PG_DLY:
+        if (n == 0u) fxp.dtime = (int16_t)sp_clamp(fxp.dtime + one, 0, 5);
+        if (n == 1u) fxp.fdbk = (int16_t)sp_clamp(fxp.fdbk + d, 0, 120);
+        if (n == 2u) fxp.colr = (int16_t)sp_clamp(fxp.colr + d, 0, 127);
+        if (n == 3u) fxp.dmix = (int16_t)sp_clamp(fxp.dmix + d, 0, 127);
+        break;
+    case PG_REV:
+        if (n == 0u) fxp.size = (int16_t)sp_clamp(fxp.size + d, 0, 127);
+        if (n == 1u) fxp.damp = (int16_t)sp_clamp(fxp.damp + d, 0, 127);
+        if (n == 2u) fxp.pre = (int16_t)sp_clamp(fxp.pre + d, 0, 90);
+        break;
+    case PG_SEG:
+        if (n == 0u && !sq.playing) sq.seg = (uint8_t)sp_clamp(sq.seg + one, 0, SQ_NSEG - 1);
+        if (n == 1u) sq_seg[sq.seg % SQ_NSEG].bars = (uint8_t)sp_clamp(sq_seg[sq.seg % SQ_NSEG].bars + one, 1, 8);
+        if (n == 2u) sq.quant = (uint8_t)sp_clamp(sq.quant + one, 0, 6);
+        if (n == 3u) sq.swing = (uint8_t)sp_clamp(sq.swing + one, 0, 5);
+        break;
+    case PG_SONG:
+        if (n == 0u) ui.song_cur = (uint8_t)sp_clamp(ui.song_cur + one, 0, sq.song_n < SQ_NSONG ? sq.song_n : SQ_NSONG - 1);
+        if (n == 1u || n == 2u) {
+            uint32_t i = ui.song_cur;
+            if (i >= SQ_NSONG)
+                break;
+            if (i >= sq.song_n && !sq.playing) {          /* past the end: a new step (the segment edited, once) */
+                sq_song[i].seg = sq.seg;
+                sq_song[i].rep = 1;
+                sq.song_n = (uint8_t)(i + 1u);
+            }
+            if (n == 1u) sq_song[i].seg = (uint8_t)sp_clamp(sq_song[i].seg + one, 0, SQ_NSEG - 1);
+            else sq_song[i].rep = (uint8_t)sp_clamp(sq_song[i].rep + one, 1, 99);
+        }
+        if (n == 3u && !sq.playing)                       /* the song's length: steps after it are dropped */
+            sq.song_n = (uint8_t)sp_clamp(sq.song_n + one, 0, SQ_NSONG);
+        break;
+    case PG_SETUP:
+        if (n == 0u) sq.bpm10 = (uint16_t)sp_clamp(sq.bpm10 + d * 5, 400, 2400);
+        if (n == 1u) sq.click = (uint8_t)sp_clamp(sq.click + one, 0, 2);
+        break;
+    default:
+        break;
     }
 }
 
-/* buttons: B_* are the printed labels (panel ids as SLOOP's PANEL_DEFAULT) */
-enum { B_OCTDN = 0, B_OCTUP = 1, B_FX = 2, B_SCL = 3, B_ENV = 4, B_LFO = 5, B_EDIT = 6, B_GLO = 7, B_HOME = 8,
+/* buttons: the printed labels' matrix ids (as SLOOP's PANEL_DEFAULT); SEL is SLOOP's SCL */
+enum { B_OCTDN = 0, B_OCTUP = 1, B_FX = 2, B_SEL = 3, B_ENV = 4, B_LFO = 5, B_EDIT = 6, B_GLO = 7, B_HOME = 8,
        B_SAVE = 9, B_ARP = 10, B_SEQ = 11, B_PLAY = 12, B_REC = 13 };
+static void page(uint32_t p) { ui.page = (uint8_t)p; ui_say(PG_NAME[p]); }
+
+static void tap_tempo(void)                      /* ENV: the tempo of the last taps (two at least, < 2 s apart) */
+{
+    uint32_t i, n = 0, sum = 0;
+    for (i = 3; i; i--) ui.tap_ms[i] = ui.tap_ms[i - 1u];
+    ui.tap_ms[0] = fm1_ms;
+    for (i = 0; i < 3u && ui.tap_ms[i + 1u] && ui.tap_ms[i] - ui.tap_ms[i + 1u] < 2000u; i++, n++)
+        sum += ui.tap_ms[i] - ui.tap_ms[i + 1u];
+    if (n && sum) {
+        sq.bpm10 = (uint16_t)sp_clamp((int32_t)(600000u * n / sum), 400, 2400);
+        ui_say("TAP");
+    }
+}
+
 static void button(uint32_t b)
 {
     switch (b) {
     case B_OCTUP: ui.pair = 1; ui_say("BANKS C + D"); break;
     case B_OCTDN: ui.pair = 0; ui_say("BANKS A + B"); break;
     case B_ARP: ui.multi ^= 1u; ui_say(ui.multi ? "MULTI PITCH ON" : "MULTI PITCH OFF"); break;
-    case B_EDIT: ui.page = ui.page < PG_OUT ? (uint8_t)(ui.page + 1u) % (PG_OUT + 1u) : PG_SOUND; ui_say(PG_NAME[ui.page]); break;
-    case B_GLO: ui.page = ui.page == PG_MIX1 ? PG_MIX2 : PG_MIX1; ui_say(PG_NAME[ui.page]); break;
-    case B_HOME: ui.page = PG_SOUND; break;
+    case B_HOME: ui.page = PG_HOME; break;
+    case B_EDIT: page(ui.page >= PG_SOUND && ui.page < PG_SFX ? ui.page + 1u : PG_SOUND); break;
+    case B_FX: page(ui.page >= PG_CHO && ui.page < PG_REV ? ui.page + 1u : PG_CHO); break;
+    case B_SEQ: page(PG_SEG); break;
+    case B_SAVE:
+        if (ui.page == PG_SONG) {                 /* on the SONG page: SAVE again toggles the song mode */
+            sq.song_mode ^= 1u;
+            ui_say(sq.song_mode ? "SONG MODE" : "SEGMENT MODE");
+        } else {
+            page(PG_SONG);
+        }
+        break;
+    case B_GLO: page(PG_SETUP); break;
+    case B_ENV: tap_tempo(); break;
+    case B_PLAY: sq.req_play = sq.playing ? 2u : 1u; break;
+    case B_REC:
+        if (sq.playing)
+            sq.recording ^= 1u;
+        else
+            sq.rec_arm ^= 1u;
+        break;
     default: break;
     }
 }
@@ -356,6 +505,6 @@ static void ui_init(void)
     uint32_t i;
     for (i = 0; i < SP_NCH; i++)
         ui.mix[i] = sp_mix[i] = 100;
-    ui.bpm10 = 900;
+    sq_init();
     ui.force = 1;
 }

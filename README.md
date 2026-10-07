@@ -4,7 +4,8 @@ A 12-bit sampling drum machine for the **M-VAVE FM-1**: 32 sounds at 26.04 kHz (
 without interpolation, eight output channels with their filters, a panel-style screen. Inspired by the
 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation.
 
-> **Status: 0.1, an early test build.** It plays the factory kit on the keys with the sound core, the
+> **Status: 0.2, an early test build.** The factory kit on the keys, the sequencer (segments, song, real-time
+> recording, AUTO CORRECT, swing, erase, tap tempo) and sloopDX's chorus, delay and reverb. Not saved over power-off yet;
 > screen and the knobs. The sequencer (segments and song) and your own samples (a web editor) come next.
 > Plan: [CONCEPT.md](CONCEPT.md).
 

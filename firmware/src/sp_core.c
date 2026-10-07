@@ -37,6 +37,8 @@ typedef struct {                        /* a sound (a pad) */
     uint8_t flags;                      /* SPF_* */
     uint16_t start, end;                /* truncate, 0..1000 of the wave (end 1000 = its end) */
     uint8_t cut, reso;                  /* channels 1-2: cutoff 0..127, resonance 0..127 */
+    uint8_t drive;                      /* 0..127: the channel's input driven into a soft clip */
+    uint8_t send[3];                    /* chorus, delay, reverb sends 0..127 (sp_fx.c) */
 } sp_sound_t;
 
 typedef struct {
@@ -48,6 +50,7 @@ typedef struct {
     uint8_t tail;                       /* blocks the filter still rings after the sample ended */
     int32_t gl, gr;                     /* Q12 gains: level x pan */
     int32_t cut, res;                   /* channel 1-2 filter settings */
+    int32_t drv, snd[3];                /* drive (Q4 gain), sends Q15 */
     int32_t z[4];                       /* filter state */
     uint8_t on;
 } sp_ch_t;
@@ -56,6 +59,7 @@ static sp_wave_t sp_wave[64];
 static sp_sound_t sp_sound[SP_NSOUND];
 static sp_ch_t sp_ch[SP_NCH];
 static uint8_t sp_mix[SP_NCH] = {100, 100, 100, 100, 100, 100, 100, 100};   /* the channel faders, 0..127 */
+static int32_t sp_bus[3][SP_BLK];       /* the send buses of the block: chorus, delay, reverb (mono, Q15) */
 
 /* sample i of a packed wave, -2048..2047 */
 static inline int32_t sp_sample(const uint8_t *d, uint32_t i)
@@ -93,7 +97,7 @@ static uint32_t sp_pow2_cents(int32_t c)
     while (c >= 1200) { c -= 1200; oct++; }
     s = c / 100, r = c % 100;
     a = SEMI[s], b = SEMI[s + 1];
-    v = a + (uint32_t)(((uint64_t)(b - a) * (uint32_t)r) / 100u);
+    v = a + (b - a) * (uint32_t)r / 100u;          /* (< 2^17 * 100: 32 bits) */
     return oct >= 0 ? v << oct : v >> -oct;
 }
 
@@ -112,8 +116,8 @@ static int32_t sp_decay_mul(uint32_t d)
  * (eight squarings in Q30: within 0.3 % up to 20 kHz) */
 static int32_t sp_onepole(uint32_t hz)
 {
-    int64_t x = (int64_t)hz * 6746518852LL / SP_FS;   /* 2 pi f / fs in Q30 */
-    int64_t y = (1LL << 30) - x / 256;
+    int64_t x = (int64_t)hz * 152982;              /* 2 pi f / fs in Q30 (2^30 * 2 pi / 44100; no 64-bit division) */
+    int64_t y = (1LL << 30) - (x >> 8);
     uint32_t i;
     for (i = 0; i < 8u; i++)
         y = (y * y) >> 30;
@@ -124,6 +128,13 @@ static int32_t sp_onepole(uint32_t hz)
 static uint32_t sp_cut_hz(int32_t c)
 {
     return (uint32_t)(60u * sp_pow2_cents(c * 9600 / 127) >> 16);
+}
+
+/* a soft clip, x in +-49152 (1.5 in Q15): 1.5 (q - q^3 / 3) for q = x / 1.5, 32-bit */
+static int32_t sp_soft(int32_t x)
+{
+    int32_t q = x * 2 / 3, q3 = ((q * q) >> 15) * q >> 15;
+    return (q - q3 / 3) * 3 / 2;
 }
 
 /* hit sound k at velocity 1..127, `semis` semitones from its TUNE (MULTI PITCH) */
@@ -138,8 +149,8 @@ static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis)
         return;
     w = &sp_wave[s->wave];
     c = &sp_ch[s->chan % SP_NCH];
-    a = (uint32_t)((uint64_t)w->n * s->start / 1000u);
-    b = (uint32_t)((uint64_t)w->n * (s->end ? s->end : 1000u) / 1000u);
+    a = w->n / 1000u * s->start + w->n % 1000u * s->start / 1000u;   /* (32 bits, no 64-bit division) */
+    b = s->end ? w->n / 1000u * s->end + w->n % 1000u * s->end / 1000u : w->n;
     if (b > w->n) b = w->n;
     if (b <= a + 1u)
         return;
@@ -152,7 +163,7 @@ static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis)
     c->pos = c->dir > 0 ? a : b - 1u;
     c->end = c->dir > 0 ? b : a;
     c->frac = 0;
-    c->step = (uint32_t)(((uint64_t)rate * 65536u / SP_FS) * sp_pow2_cents(cents) >> 16);
+    c->step = (uint32_t)(((uint64_t)(rate * 65536u / SP_FS) * sp_pow2_cents(cents)) >> 16);
     c->env = 1 << 24;
     c->emul = sp_decay_mul(s->decay);
     lv = (int32_t)s->level * (int32_t)vel / 127;      /* 0..127 */
@@ -160,6 +171,10 @@ static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis)
     c->gr = lv * (64 + (s->pan < 0 ? s->pan : 0)) / 3;   /* (eight at once still fit the mix's headroom) */
     c->cut = s->cut;
     c->res = s->reso;
+    c->drv = s->drive ? 16 + s->drive / 2 : 0;          /* 1x .. ~5x into the clip */
+    c->snd[0] = s->send[0] * 258;
+    c->snd[1] = s->send[1] * 258;
+    c->snd[2] = s->send[2] * 258;
     c->tail = 8;
     c->on = 1;
 }
@@ -174,7 +189,7 @@ static void sp_channel(uint32_t ch, int32_t *out)
     int32_t a1 = 0, k = 0, x, y, e;
     if (!c->on && !c->tail)
         return;
-    e = (int32_t)(((int64_t)(c->env >> 9) * sp_mix[ch]) / 100);   /* (100 = the level as set) */                                  /* Q15 */
+    e = (c->env >> 9) * sp_mix[ch] / 100;   /* (100 = the level as set) */                                  /* Q15 */
     if (ch < 2u) {                                    /* the dynamic filter: the cutoff follows the level */
         uint32_t hz = sp_cut_hz(c->cut) * (uint32_t)(8192 + (e >> 2)) >> 15;   /* x 0.25 .. 0.5+ with it */
         a1 = sp_onepole(hz < 30u ? 30u : hz > 18000u ? 18000u : hz);
@@ -198,10 +213,15 @@ static void sp_channel(uint32_t ch, int32_t *out)
             x = 0;
         }
         x = (int32_t)(((int64_t)x * e) >> 15);
+        if (c->drv) {                                 /* DRIVE: louder into a soft clip, the level kept */
+            x = sp_clamp((x * c->drv) >> 4, -49152, 49152);
+            x = sp_soft(x);
+            x = x * 3 / 4;
+        }
         if (ch < 2u) {                                /* 4 one-pole stages, the 4th fed back, a soft clip in */
             int32_t in = x - ((c->z[3] * k) >> 12);
             in = sp_clamp(in, -49152, 49152);
-            in = in - (int32_t)(((int64_t)in * in / 49152 * in) / 49152 / 3);   /* x - x^3/3 shape */
+            in = sp_soft(in);                         /* x - x^3/3 shape */
             c->z[0] += ((in - c->z[0]) * a1) >> 15;
             c->z[1] += ((c->z[0] - c->z[1]) * a1) >> 15;
             c->z[2] += ((c->z[1] - c->z[2]) * a1) >> 15;
@@ -216,6 +236,12 @@ static void sp_channel(uint32_t ch, int32_t *out)
         }
         out[2u * i] += (y * c->gl) >> 12;
         out[2u * i + 1u] += (y * c->gr) >> 12;
+        if (c->snd[0] | c->snd[1] | c->snd[2]) {      /* the sends: post fader, before pan */
+            int32_t m = (y * (c->gl + c->gr)) >> 13;
+            sp_bus[0][i] += (m * c->snd[0]) >> 15;
+            sp_bus[1][i] += (m * c->snd[1]) >> 15;
+            sp_bus[2][i] += (m * c->snd[2]) >> 15;
+        }
     }
     c->env = (int32_t)(((int64_t)c->env * c->emul) >> 16);
     if (c->env < (1 << 12))                            /* below ~-72 dB: done */
@@ -225,9 +251,40 @@ static void sp_channel(uint32_t ch, int32_t *out)
 }
 
 /* the mix of all channels for one block (stereo Q15, out zeroed by the caller or added to) */
+/* the metronome: a short square blip, the bar's first beat higher; not on a channel, not on the faders */
+static struct { uint32_t ph, inc; int32_t env; } sp_clk;
+static void sp_click(int accent)
+{
+    sp_clk.inc = (accent ? 1760u : 1175u) * 97391u;   /* 2^32 / 44100 = 97391.5 */
+    sp_clk.ph = 0;
+    sp_clk.env = 9000;
+}
+static void sp_click_block(int32_t *out)
+{
+    uint32_t i;
+    if (sp_clk.env < 16)
+        return;
+    for (i = 0; i < SP_BLK; i++) {
+        int32_t v = (sp_clk.ph & 0x80000000u) ? sp_clk.env : -sp_clk.env;
+        sp_clk.ph += sp_clk.inc;
+        out[2u * i] += v;
+        out[2u * i + 1u] += v;
+    }
+    sp_clk.env = sp_clk.env * 27 / 32;          /* ~-1.5 dB a block: gone in ~25 ms */
+}
+
+#ifdef SP_WITH_FX
+static void sp_fx_block(int32_t *out);         /* sp_fx.c */
+#endif
 static void sp_render(int32_t *out)
 {
-    uint32_t ch;
+    uint32_t ch, i;
+    for (i = 0; i < SP_BLK; i++)
+        sp_bus[0][i] = sp_bus[1][i] = sp_bus[2][i] = 0;
     for (ch = 0; ch < SP_NCH; ch++)
         sp_channel(ch, out);
+#ifdef SP_WITH_FX
+    sp_fx_block(out);
+#endif
+    sp_click_block(out);
 }
