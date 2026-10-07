@@ -1,20 +1,28 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* zp12's sequencer, as a 12-bit drum machine's: segments of 1-8 bars at 96 ticks a quarter, hits recorded in
- * real time (quantised by AUTO CORRECT as they come in), swing at playback, a song of segments with
- * repeats, a count-in and a click. Everything that changes a segment runs in the audio ISR (sq_block), so
- * the playing never sees half an edit: the main loop only posts requests.
+/* zp12's sequencer, as a 12-bit drum machine's: segments of 1-32 bars (or AUTO: the first take sets the length)
+ * at 96 ticks a quarter, hits recorded in real time (quantised by AUTO CORRECT as they come in) or set step by
+ * step, swing at playback, a song of segments with repeats, a count-in and a click.
  *
- * A hit is (tick, pad, velocity, semitones (MULTI PITCH), flags). SQF_SKIP: recorded ahead of the playhead
- * (quantised forward), already heard live: not played again this pass. */
+ * Everything that touches a segment runs in the audio ISR (sq_block): the main loop posts requests into a
+ * ring (sq_post), so the playing never sees half an edit. A hit is one word: tick, pad, one of 8 levels (as the
+ * original's dynamic buttons), semitones (MULTI PITCH), and SKIP: recorded ahead of the playhead (quantised
+ * forward) and already heard live, so not played again this pass. */
 #define SQ_PPQ 96u
 #define SQ_BAR (SQ_PPQ * 4u)
 #define SQ_NSEG 16u
 #define SQ_MAXEV 512u
+#define SQ_MAXBARS 32u
 #define SQ_NSONG 32u
-enum { SQF_SKIP = 1 };
 
-typedef struct { uint16_t t; uint8_t pad, vel; int8_t semis; uint8_t flags; } sq_ev_t;
-typedef struct { uint8_t bars, rsv; uint16_t n; sq_ev_t ev[SQ_MAXEV]; } sq_seg_t;   /* ev sorted by t */
+typedef struct {
+    uint32_t t : 14;                            /* tick in the segment (32 bars = 12288) */
+    uint32_t pad : 5;
+    uint32_t lvl : 3;                           /* 0..7: velocity (lvl + 1) * 16 - 1 */
+    uint32_t skip : 1;
+    int32_t semis : 6;                          /* -32..31 */
+    uint32_t rsv : 3;
+} sq_ev_t;
+typedef struct { uint8_t bars, rsv; uint16_t n; sq_ev_t ev[SQ_MAXEV]; } sq_seg_t;   /* bars 0: AUTO; ev by t */
 
 static sq_seg_t sq_seg[SQ_NSEG] __attribute__((section(".pool")));
 static struct { uint8_t seg, rep; } sq_song[SQ_NSONG];
@@ -27,22 +35,31 @@ static const uint8_t SQ_SWING[6] = {50, 54, 58, 63, 67, 71};
 static struct {
     volatile uint8_t playing, recording, song_mode;
     volatile uint8_t rec_arm;                   /* REC pressed while stopped: PLAY starts with a count-in */
-    uint8_t seg;                                /* the segment playing / edited */
+    volatile uint8_t seg;                       /* the segment playing / edited */
     uint8_t quant, swing;                       /* SQ_GRID index, SQ_SWING index */
     uint8_t click;                              /* 0 off, 1 while recording, 2 always */
     uint8_t song_n, song_i, song_rep;
     uint16_t bpm10;
-    uint32_t pos;                               /* the playhead in the segment, ticks Q16 */
-    int32_t countin;                            /* ticks Q16 of count-in left (> 0: counting) */
+    volatile uint32_t pos;                      /* the playhead in the segment, ticks Q16 */
+    volatile int32_t countin;                   /* ticks Q16 of count-in left (> 0: counting) */
     volatile uint32_t erase;                    /* pads held with ERASE: their hits go as the playhead passes */
     volatile uint32_t beat;                     /* beats since PLAY (the UI's blink) */
-    volatile uint8_t req_clear, req_wipe;       /* requests to the ISR: clear the segment / a pad's hits (pad + 1) */
-    volatile uint8_t req_play;                  /* 1 PLAY, 2 STOP */
-} sq = {0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 0, 900, 0, 0, 0, 0, 0, 0, 0};
+    volatile uint32_t played;                   /* pads hit since the UI looked (their keys light) */
+    volatile uint32_t gen;                      /* bumps on every change of a segment (the UI, the autosave) */
+} sq = {0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 0, 900, 0, 0, 0, 0, 0, 0};
 
-static uint32_t sq_len(const sq_seg_t *s) { return (uint32_t)(s->bars ? s->bars : 1u) * SQ_BAR; }
+static uint32_t sq_lvl_vel(uint32_t lvl) { return (lvl + 1u) * 16u - 1u; }
+static uint32_t sq_vel_lvl(uint32_t vel) { return vel >= 127u ? 7u : vel / 16u; }
 
-/* the tick a hit sounds at: its own, odd 1/16 (or 1/8 with AUTO CORRECT 1/8) late by the swing */
+/* the length in ticks; an AUTO segment while its first take runs: the most there is */
+static uint32_t sq_len(const sq_seg_t *s)
+{
+    if (!s->bars)
+        return sq.recording ? SQ_MAXBARS * SQ_BAR : SQ_BAR;
+    return (uint32_t)s->bars * SQ_BAR;
+}
+
+/* the tick a hit sounds at: odd 1/16 (or 1/8 with AUTO CORRECT 1/8) late by the swing */
 static uint32_t sq_play_t(const sq_ev_t *e)
 {
     uint32_t g = sq.quant == 1u ? 48u : 24u, sw = SQ_SWING[sq.swing % 6u] - 50u;
@@ -51,54 +68,92 @@ static uint32_t sq_play_t(const sq_ev_t *e)
     return e->t;
 }
 
-static void sq_insert(sq_seg_t *s, uint32_t t, uint32_t pad, uint32_t vel, int32_t semis, uint32_t flags)
+static int sq_find(const sq_seg_t *s, uint32_t t, uint32_t pad)   /* index of the hit, -1 */
+{
+    uint32_t i;
+    for (i = 0; i < s->n && s->ev[i].t <= t; i++)
+        if (s->ev[i].t == t && s->ev[i].pad == pad)
+            return (int)i;
+    return -1;
+}
+
+static void sq_insert(sq_seg_t *s, uint32_t t, uint32_t pad, uint32_t lvl, int32_t semis, uint32_t skip)
 {
     uint32_t i, j;
-    for (i = 0; i < s->n && s->ev[i].t < t; i++)
-        ;
-    for (j = i; j < s->n && s->ev[j].t == t; j++)
-        if (s->ev[j].pad == pad && s->ev[j].semis == semis) {   /* the same hit again: the louder stays */
-            if (vel > s->ev[j].vel) s->ev[j].vel = (uint8_t)vel;
-            return;
-        }
+    int k = sq_find(s, t, pad);
+    if (k >= 0) {                               /* the same hit again: the louder stays */
+        if (lvl > s->ev[k].lvl) s->ev[k].lvl = lvl & 7u;
+        s->ev[k].semis = semis;
+        return;
+    }
     if (s->n >= SQ_MAXEV)
         return;
+    for (i = 0; i < s->n && s->ev[i].t <= t; i++)
+        ;
     for (j = s->n; j > i; j--)
         s->ev[j] = s->ev[j - 1u];
-    s->ev[i].t = (uint16_t)t;
-    s->ev[i].pad = (uint8_t)pad;
-    s->ev[i].vel = (uint8_t)vel;
-    s->ev[i].semis = (int8_t)semis;
-    s->ev[i].flags = (uint8_t)flags;
+    s->ev[i].t = t;
+    s->ev[i].pad = pad & 31u;
+    s->ev[i].lvl = lvl & 7u;
+    s->ev[i].semis = semis;
+    s->ev[i].skip = skip & 1u;
+    s->ev[i].rsv = 0;
     s->n++;
+    sq.gen++;
+}
+
+static void sq_remove_at(sq_seg_t *s, uint32_t i)
+{
+    for (; i + 1u < s->n; i++)
+        s->ev[i] = s->ev[i + 1u];
+    s->n--;
+    sq.gen++;
 }
 
 static void sq_remove_if(sq_seg_t *s, uint32_t padmask, uint32_t t0, uint32_t t1)   /* pads in mask, t0 <= t < t1 */
 {
-    uint32_t i, k = 0;
-    for (i = 0; i < s->n; i++) {
-        const sq_ev_t *e = &s->ev[i];
-        if (((padmask >> e->pad) & 1u) && e->t >= t0 && e->t < t1)
+    uint32_t i, k = 0, n = s->n;
+    for (i = 0; i < n; i++) {
+        sq_ev_t e = s->ev[i];
+        if (((padmask >> e.pad) & 1u) && e.t >= t0 && e.t < t1)
             continue;
-        s->ev[k++] = *e;
+        s->ev[k++] = e;
     }
-    s->n = (uint16_t)k;
+    if (k != n) {
+        s->n = (uint16_t)k;
+        sq.gen++;
+    }
 }
 
 /* a hit now (ISR): sounds, and when recording goes into the segment at the playhead, auto-corrected */
 static void sq_hit(uint32_t pad, uint32_t vel, int32_t semis)
 {
     sp_trigger_at(pad, vel, semis);
+    sq.played |= 1u << (pad & 31u);
     if (sq.recording && sq.playing && sq.countin <= 0) {
         sq_seg_t *s = &sq_seg[sq.seg % SQ_NSEG];
         uint32_t len = sq_len(s), now = sq.pos >> 16, g = SQ_GRID[sq.quant % 7u], t = (now + g / 2u) / g * g;
         if (t >= len)
             t -= len;
-        sq_insert(s, t, pad, vel, semis, t > now || (t < now && now - t > len / 2u) ? SQF_SKIP : 0u);
+        sq_insert(s, t, pad, sq_vel_lvl(vel), semis, t > now || (t < now && now - t > len / 2u));
     }
 }
 
-static void sq_play(uint32_t on)               /* PLAY / STOP (ISR side: from sq_block's requests) */
+static void sq_stop_rec(void)                  /* recording ends: an AUTO segment gets its length */
+{
+    sq_seg_t *s = &sq_seg[sq.seg % SQ_NSEG];
+    if (sq.recording && !s->bars && s->n) {
+        uint32_t t = sq.pos >> 16, bars = (t + SQ_BAR * 3u / 4u) / SQ_BAR;   /* (up to a quarter past a bar line: that bar) */
+        if (bars < 1u) bars = 1u;
+        if (bars > SQ_MAXBARS) bars = SQ_MAXBARS;
+        s->bars = (uint8_t)bars;
+        sq.pos %= (bars * SQ_BAR) << 16;
+        sq.gen++;
+    }
+    sq.recording = 0;
+}
+
+static void sq_play(uint32_t on)
 {
     if (on) {
         sq.pos = 0;
@@ -112,9 +167,76 @@ static void sq_play(uint32_t on)               /* PLAY / STOP (ISR side: from sq
         sq.rec_arm = 0;
         sq.playing = 1;
     } else {
+        sq_stop_rec();
         sq.playing = 0;
-        sq.recording = 0;
         sq.countin = 0;
+    }
+}
+
+/* ---- requests from the main loop (one word each: op, pad, argument) */
+enum { RQ_HIT, RQ_PLAY, RQ_STOP, RQ_REC, RQ_STEP, RQ_WIPE, RQ_CLEAR, RQ_COPY };
+#define SQ_NRQ 64u
+static uint32_t sq_rq[SQ_NRQ];
+static volatile uint32_t sq_rq_w, sq_rq_r;
+static void sq_post(uint32_t op, uint32_t pad, uint32_t arg)   /* arg: 16 bits (RQ_HIT: vel | (semis + 64) << 8) */
+{
+    if (sq_rq_w - sq_rq_r < SQ_NRQ) {
+        sq_rq[sq_rq_w % SQ_NRQ] = op | (pad & 31u) << 4 | (arg & 0xFFFFu) << 16;
+        __asm__ volatile("" ::: "memory");
+        sq_rq_w++;
+    }
+}
+
+static void sq_request(uint32_t r)
+{
+    uint32_t op = r & 15u, pad = (r >> 4) & 31u, arg = r >> 16;
+    sq_seg_t *s = &sq_seg[sq.seg % SQ_NSEG];
+    switch (op) {
+    case RQ_HIT:
+        sq_hit(pad, arg & 0xFFu, (int32_t)(arg >> 8) - 64);
+        break;
+    case RQ_PLAY:
+        sq_play(1);
+        break;
+    case RQ_STOP:
+        sq_play(0);
+        break;
+    case RQ_REC:                                /* REC: playing: overdub on / off; stopped: armed / not */
+        if (sq.playing) {
+            if (sq.recording) sq_stop_rec();
+            else sq.recording = 1;
+        } else {
+            sq.rec_arm ^= 1u;
+        }
+        break;
+    case RQ_STEP: {                             /* step edit: the hit of pad at tick arg on / off */
+        int k = sq_find(s, arg, pad);
+        if (k >= 0)
+            sq_remove_at(s, (uint32_t)k);
+        else
+            sq_insert(s, arg, pad, 6u, 0, 0);
+        break;
+    }
+    case RQ_WIPE:
+        sq_remove_if(s, 1u << pad, 0, 0xFFFFu);
+        break;
+    case RQ_CLEAR:
+        s->n = 0;
+        sq.gen++;
+        break;
+    case RQ_COPY: {                             /* the segment into segment arg (its length too) */
+        sq_seg_t *d = &sq_seg[arg % SQ_NSEG];
+        uint32_t i;
+        if (d != s) {
+            d->bars = s->bars;
+            d->n = s->n;
+            for (i = 0; i < s->n; i++) d->ev[i] = s->ev[i];
+            sq.gen++;
+        }
+        break;
+    }
+    default:
+        break;
     }
 }
 
@@ -133,8 +255,7 @@ static void sq_wrap(void)
     sq.seg = sq_song[sq.song_i].seg % SQ_NSEG;
 }
 
-/* the click: an accent on the bar */
-static void sq_click_at(uint32_t t0, uint32_t t1)   /* beats in [t0, t1) */
+static void sq_click_at(uint32_t t0, uint32_t t1)   /* a beat in [t0, t1): the click, the bar's first accented */
 {
     uint32_t b = (t0 + SQ_PPQ - 1u) / SQ_PPQ * SQ_PPQ;
     if (b < t1) {
@@ -144,34 +265,28 @@ static void sq_click_at(uint32_t t0, uint32_t t1)   /* beats in [t0, t1) */
     }
 }
 
-/* one audio block (SP_BLK samples): requests, the count-in, the hits whose time has come */
+/* one audio block (SP_BLK samples): the requests, the count-in, the hits whose time has come */
 static void sq_block(void)
 {
-    sq_seg_t *s = &sq_seg[sq.seg % SQ_NSEG];
+    sq_seg_t *s;
     uint32_t len, from, to, i, d;
-    if (sq.req_clear) {
-        sq.req_clear = 0;
-        s->n = 0;
-    }
-    if (sq.req_wipe) {
-        sq_remove_if(s, 1u << ((sq.req_wipe - 1u) & 31u), 0, 0xFFFFu);
-        sq.req_wipe = 0;
-    }
-    if (sq.req_play) {
-        sq_play(sq.req_play == 1u);
-        sq.req_play = 0;
-        s = &sq_seg[sq.seg % SQ_NSEG];
+    while (sq_rq_r != sq_rq_w) {
+        sq_request(sq_rq[sq_rq_r % SQ_NRQ]);
+        sq_rq_r++;
     }
     if (!sq.playing)
         return;
+    s = &sq_seg[sq.seg % SQ_NSEG];
     d = (uint32_t)sq.bpm10 * 76087u / 10000u;   /* ticks Q16 a block: bpm10 * 96 * 32 * 65536 / (600 * 44100) */
     if (sq.countin > 0) {                        /* the count-in: a bar of clicks, whatever CLICK is */
         uint32_t c0 = SQ_BAR - (uint32_t)(sq.countin >> 16), c1, b;
         sq.countin -= (int32_t)d;
         c1 = sq.countin > 0 ? SQ_BAR - (uint32_t)(sq.countin >> 16) : SQ_BAR;
         b = (c0 + SQ_PPQ - 1u) / SQ_PPQ * SQ_PPQ;
-        if (b < c1)
+        if (b < c1) {
             sp_click(b == 0u);
+            sq.beat++;
+        }
         if (sq.countin > 0)
             return;
         sq.pos = (uint32_t)(-sq.countin);       /* (what is left of the block) */
@@ -194,13 +309,14 @@ static void sq_block(void)
             uint32_t pt = sq_play_t(e);
             if (pt >= len)
                 pt -= len;
-            if (pt < from || pt >= end || (e->t >= len))
+            if (pt < from || pt >= end || e->t >= len)
                 continue;
-            if (e->flags & SQF_SKIP) {
-                e->flags &= (uint8_t)~SQF_SKIP;
+            if (e->skip) {
+                e->skip = 0;
                 continue;
             }
-            sp_trigger_at(e->pad, e->vel, e->semis);
+            sp_trigger_at(e->pad, sq_lvl_vel(e->lvl), e->semis);
+            sq.played |= 1u << e->pad;
         }
         if (to < len)
             break;
@@ -221,7 +337,7 @@ static void sq_init(void)
 {
     uint32_t i;
     for (i = 0; i < SQ_NSEG; i++) {
-        sq_seg[i].bars = 1;
+        sq_seg[i].bars = 0;                     /* AUTO until a take or LENGTH sets it */
         sq_seg[i].n = 0;
     }
 }

@@ -110,21 +110,10 @@ static void ota_commit(const uint8_t *parm)
 #include "sp_fx.c"
 #include "zp12_kit.h"
 #include "sp_seq.c"
-/* pad hits from the main loop (keys, MIDI) to the audio ISR: a ring, the ISR starts them */
-#define HQ 32u
-static uint32_t hit_q[HQ];
-static volatile uint32_t hq_w, hq_r;
-static void hit_post(uint32_t k, uint32_t vel, int32_t semis)
-{
-    if (hq_w - hq_r < HQ) {
-        hit_q[hq_w % HQ] = k | vel << 8 | (uint32_t)(semis + 64) << 16;
-        RING_PUBLISH();
-        hq_w++;
-    }
-}
-
-#define SP_HIT(k, vel, semis) hit_post(k, vel, semis)
+/* pad hits go to the audio ISR as requests (sp_seq.c sq_post): sounded, and recorded when REC */
+#define SP_HIT(k, vel, semis) sq_post(RQ_HIT, k, (vel) | (uint32_t)((semis) + 64) << 8)
 #include "sp_ui.c"
+#include "sp_store.c"
 
 /* ---- the timer: 10 kHz key scan, milliseconds, USB at 2 kHz */
 void fm1_timer5_irq(void)
@@ -159,11 +148,6 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
     if (p & FM1_AUDIO_HALF) {
         int32_t *o = &abuf[fm1_audio_free_half() * HALF_WORDS];
         uint32_t i, b;
-        while (hq_r != hq_w) {
-            uint32_t h = hit_q[hq_r % HQ];
-            sq_hit(h & 0xFFu, (h >> 8) & 0xFFu, (int32_t)(h >> 16) - 64);   /* sounds, and records when REC */
-            hq_r++;
-        }
         for (i = 0; i < HALF_WORDS; i++)
             o[i] = 0;
         for (b = 0; b < HALF_FRAMES; b += SP_BLK) {
@@ -242,7 +226,7 @@ static void splash(void)                       /* the wordmark a moment (tools/g
 
 static void zp12_main(void)
 {
-    uint32_t i, prev_notes = 0, t_frame = 0;
+    uint32_t i, prev_notes = 0, t_frame = 0, seq_down = 0, seq_used = 0, t_sig = 0, t_change = 0, last_sig = 0, save_later = 0;
     int32_t knob_avg = 512 * 16;
     for (i = 0; i < KIT_NWAVE; i++) {
         sp_wave[i].d = KIT_DATA + KIT_WAVE[i].off;
@@ -251,10 +235,14 @@ static void zp12_main(void)
     }
     for (i = 0; i < SP_NSOUND; i++)
         sp_sound[i] = KIT_PADS[i];
+    sq_init();
+    if (zs_load())                                      /* what was left: sounds, mix, effects, segments, song */
+        zs_saved_sig = zs_sig();
     ui_init();
     splash();
     while (fm1_ms < 1200u)
         fm1_service();
+    ui.force = 1;
     for (;;) {
         uint32_t n = fm1_in.notes, down = n & ~prev_notes, rel, b;
         fm1_service();
@@ -274,9 +262,41 @@ static void zp12_main(void)
                     key_down(i, (bt >> B_LFO) & 1u);
         }
         b = fm1_input_edges(&rel);
+        if (b & (1u << B_SEQ)) {                        /* SEQ down: the step grid while held */
+            seq_down = fm1_ms;
+            seq_used = 0;
+            ui.steps = 1;
+            ui.force = 1;
+            b &= ~(1u << B_SEQ);
+        }
+        if (ui.steps && (b & ((1u << B_OCTDN) | (1u << B_OCTUP)) || down))
+            seq_used = 1;
         for (i = 0; b; i++, b >>= 1)
             if (b & 1u)
                 button(i);
+        if (rel & (1u << B_SEQ) && ui.steps) {          /* SEQ up: a short tap opens the SEQ pages */
+            ui.steps = 0;
+            ui.force = 1;
+            if ((uint32_t)(fm1_ms - seq_down) < 350u && !seq_used)
+                button(B_SEQ);
+        }
+        {   /* the LEDs: built aside, then swapped in (the scan never shows half of them) */
+            uint32_t lb, lk, lg, id, c, r;
+            uint8_t nl[FM1_NCOL], nd[FM1_NCOL];
+            ui_leds(&lb, &lk, &lg);
+            memset(nl, 0, sizeof nl);
+            memset(nd, 0, sizeof nd);
+            for (c = 0; c < FM1_NCOL; c++)
+                for (r = 1; r < 5u; r++) {
+                    int32_t kid = FM1_KEYMAP[r][c];
+                    if (kid < 0) continue;
+                    id = (uint32_t)kid;
+                    if (id < 14u ? (lb >> id) & 1u : (lk >> (id - 14u)) & 1u) nl[c] |= (uint8_t)(1u << r);
+                    if (id >= 14u && (lg >> (id - 14u)) & 1u) nd[c] |= (uint8_t)(1u << r);
+                }
+            memcpy(fm1_led, nl, sizeof nl);
+            memcpy(fm1_led_dim, nd, sizeof nd);
+        }
         {   /* KNOB 1-4 (encoders 2..5), SELECT (0): tempo, ALGORITHM (1): the sound */
             int32_t d;
             for (i = 0; i < 4u; i++)
@@ -307,6 +327,27 @@ static void zp12_main(void)
         if ((uint32_t)(fm1_ms - t_frame) >= 16u) {
             t_frame = fm1_ms;
             ui_draw();
+        }
+        {   /* saving: SAVE, or by itself when stopped, silent and nothing changed for 3 s (an erase stops the audio) */
+            uint32_t k, quiet = !sq.playing;
+            for (k = 0; k < SP_NCH; k++) quiet &= !sp_ch[k].on;
+            if (fm1_ms - t_sig >= 500u) {
+                uint32_t sg = zs_sig();
+                t_sig = fm1_ms;
+                if (sg != last_sig) { last_sig = sg; t_change = fm1_ms; }
+            }
+            if (ui.save_req && !quiet && sq.playing) {
+                ui.save_req = 0;
+                save_later = 1;
+                ui_say("SAVES AT STOP");
+            }
+            if ((ui.save_req || save_later || (last_sig != zs_saved_sig && fm1_ms - t_change > 3000u)) && quiet) {
+                ui.save_req = 0;
+                save_later = 0;
+                if (zs_save())
+                    ui_say("SAVE ERROR");
+                last_sig = zs_saved_sig;
+            }
         }
     }
 }

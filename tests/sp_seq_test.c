@@ -58,8 +58,8 @@ int main(int argc, char **argv)
     sq_seg[0].bars = 1;
 
     /* 1. REC armed, PLAY: a bar of count-in, then the hits recorded as they come (a little late / early) */
-    sq.rec_arm = 1;
-    sq.req_play = 1;
+    sq_post(RQ_REC, 0, 0);
+    sq_post(RQ_PLAY, 0, 0);
     block();
     check(sq.playing && sq.recording && sq.countin > 0, "REC armed + PLAY: count-in, recording");
     until_tick(0);
@@ -86,7 +86,8 @@ int main(int argc, char **argv)
 
     /* 2. swing: 63 % moves the odd 16ths (and leaves the even ones) */
     {
-        sq_ev_t e = {24, 0, 100, 0, 0}, f = {48, 0, 100, 0, 0};
+        sq_ev_t e = {0}, f = {0};
+        e.t = 24; f.t = 48;
         sq.swing = 3;
         check(sq_play_t(&e) == 24u + 48u * 13u / 100u && sq_play_t(&f) == 48u, "SWING 63 %: an odd 16th 6 ticks late, an even one on time");
     }
@@ -99,20 +100,43 @@ int main(int argc, char **argv)
     sq.erase = 0;
     check(count(s0, 4) == 0u && count(s0, 0) == 2u, "ERASE: the hat gone, the kick kept");
 
+    /* 3b. AUTO: an empty segment of no length, a take of two bars: it becomes two bars long */
+    sq_post(RQ_STOP, 0, 0);
+    block();
+    sq.seg = 2;
+    sq_seg[2].bars = 0;
+    sq_post(RQ_REC, 0, 0);
+    sq_post(RQ_PLAY, 0, 0);
+    block();
+    until_tick(0);
+    for (b = 0; b < 8u; b++) { until_tick(b * SQ_PPQ); sq_hit(0, 120, 0); }
+    until_tick(2u * SQ_BAR + 20u);                      /* REC again just after the second bar */
+    sq_post(RQ_REC, 0, 0);
+    block();
+    check(sq_seg[2].bars == 2u && count(&sq_seg[2], 0) == 8u && !sq.recording && sq.playing, "AUTO: a take of two bars makes the segment two bars long");
+    check(tick() < SQ_BAR, "AUTO: the playhead wraps into the new length");
+    sq_post(RQ_STEP, 3, SQ_BAR + 3u * 24u);             /* step edit: a clap on bar 2, step 4 ... */
+    block();
+    check(sq_find(&sq_seg[2], SQ_BAR + 72u, 3) >= 0, "step edit: a step set");
+    sq_post(RQ_STEP, 3, SQ_BAR + 3u * 24u);             /* ... and off again */
+    block();
+    check(sq_find(&sq_seg[2], SQ_BAR + 72u, 3) < 0, "step edit: the same step cleared");
+    sq.seg = 0;
+
     /* 4. a second segment and a song: seg 1 twice, seg 2 once, then the end stops */
-    sq.req_play = 2;
+    sq_post(RQ_STOP, 0, 0);
     block();
     sq_seg[1].bars = 1;
-    sq_insert(&sq_seg[1], 0, 0, 120, 0, 0);
-    sq_insert(&sq_seg[1], 96, 6, 110, -5, 0);
-    sq_insert(&sq_seg[1], 192, 0, 120, 0, 0);
-    sq_insert(&sq_seg[1], 288, 7, 110, 0, 0);
-    sq_insert(&sq_seg[1], 288 + 48, 7, 90, 2, 0);
+    sq_insert(&sq_seg[1], 0, 0, 7, 0, 0);
+    sq_insert(&sq_seg[1], 96, 6, 6, -5, 0);
+    sq_insert(&sq_seg[1], 192, 0, 7, 0, 0);
+    sq_insert(&sq_seg[1], 288, 7, 6, 0, 0);
+    sq_insert(&sq_seg[1], 288 + 48, 7, 5, 2, 0);
     sq_song[0].seg = 0; sq_song[0].rep = 2;
     sq_song[1].seg = 1; sq_song[1].rep = 1;
     sq.song_n = 2;
     sq.song_mode = 1;
-    sq.req_play = 1;
+    sq_post(RQ_PLAY, 0, 0);
     block();
     check(sq.playing && sq.seg == 0u && !sq.recording, "SONG: starts on its first step");
     until_wrap();
