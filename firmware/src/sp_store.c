@@ -9,6 +9,7 @@
 #define ZS_SLOT 0xA000u                          /* 40 KiB a copy */
 #define ZS_MAGIC 0x3231505Au                     /* "ZP12" */
 #define ZS_VER 1u
+#define ZS_KIT_ID ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u))   /* the factory kit the pads were saved with */
 
 typedef struct { uint32_t magic, ver, gen, len, crc; } zs_head_t;
 static uint8_t zs_buf[ZS_SLOT] __attribute__((section(".pool"), aligned(4)));
@@ -33,7 +34,7 @@ static uint32_t zs_pack(uint8_t *b)
 {
     uint8_t *p = b;
     uint32_t i;
-    uint16_t st[8] = {sq.bpm10, sq.quant, sq.swing, sq.click, sq.song_n, sq.song_mode, sq.seg, 0};
+    uint16_t st[8] = {sq.bpm10, sq.quant, sq.swing, sq.click, sq.song_n, sq.song_mode, sq.seg, ZS_KIT_ID};
     p = zs_put(p, sp_sound, sizeof sp_sound);
     p = zs_put(p, sp_mix, sizeof sp_mix);
     p = zs_put(p, &fxp, sizeof fxp);
@@ -78,6 +79,9 @@ static int zs_unpack(const uint8_t *b, uint32_t len)
         }
         p = zs_get(p, s->ev, s->n * sizeof(sq_ev_t));
     }
+    if (st[7] != ZS_KIT_ID)                         /* saved with another factory kit: the pads its new sounds */
+        for (i = 0; i < SP_NSOUND; i++)
+            sp_sound[i] = KIT_PADS[i];
     for (i = 0; i < SP_NSOUND; i++)                 /* (a sound's wave must exist) */
         if (sp_sound[i].wave >= 64u || !sp_wave[sp_sound[i].wave].n)
             sp_sound[i].wave = 0xFFu;
