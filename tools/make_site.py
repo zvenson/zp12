@@ -27,6 +27,9 @@ def main(sloopdx, pkg, version, video=None):
     for a, b in (('href="favicon.svg"', 'href="../favicon.svg"'), ('href="cheatsheet.html"', 'href="../cheatsheet.html"'),
                  ('href="zp12-cheat-sheet.pdf"', 'href="../zp12-cheat-sheet.pdf"'),
                  ('href="https://dx7.designburgapps.com/impressum.html"', 'href="../impressum.html"'),
+                 ('<a class="logo" href="https://dx7.designburgapps.com/" aria-label="sloopDX">', '<a class="logo" href="../" aria-label="zp12">'),
+                 ('<link rel="canonical" href="https://dx7.designburgapps.com/webapp/installer/">',
+                  '<link rel="canonical" href="https://zp12.designburgapps.com/install/">'),
                  ('<div class="links"><a href="https://dx7.designburgapps.com/">sloopDX</a>', '<div class="links"><a href="../">zp12</a><a href="https://dx7.designburgapps.com/">sloopDX</a>')):
         h = h.replace(a, b)
     (inst / "index.html").write_text(h, encoding="utf-8")

@@ -56,7 +56,7 @@ int main(int argc, char **argv)
     button(B_SEQ); fm1_ms += 2000; ui_draw(); ppm("zp12-seg");
     sq.playing = 1; sq.recording = 1; sq.pos = (SQ_BAR + 2u * SQ_PPQ) << 16; sq_seg[0].bars = 2; fm1_ms += 10; ui_draw(); ppm("zp12-rec");
     sq.playing = 0; sq.recording = 0; button(B_EDIT); button(B_EDIT); button(B_EDIT); button(B_EDIT); knob(3, 60); fm1_ms += 2000; ui_draw(); ppm("zp12-sfx");
-    button(B_FX); button(B_FX); fm1_ms += 2000; ui_draw(); ppm("zp12-delay");
+    button(B_FX); knob(0, -9); fm1_ms += 2000; ui_draw(); ppm("zp12-filter"); djf.v = 0; button(B_FX); button(B_FX); fm1_ms += 2000; ui_draw(); ppm("zp12-delay");
     fm1_ms += 7000; ui_draw(); ppm("zp12-back");            /* untouched: the faders again */
     sq_insert(&sq_seg[0], 0, 0, 7, 0, 0, 0); sq_insert(&sq_seg[0], 96, 1, 7, 0, 0, sp_lock_of(&sp_sound[1])); sq_insert(&sq_seg[0], 48, 4, 5, 0, 0, 0);
     sq_insert(&sq_seg[0], 144, 4, 5, 0, 0, 0); sq_insert(&sq_seg[0], 240, 0, 7, 0, 0, 0); sq_seg[0].bars = 2;

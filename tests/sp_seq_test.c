@@ -239,6 +239,25 @@ int main(int argc, char **argv)
     sq_post(RQ_STOP, 0, 0);
     block();
     sq.song_sel = 0;
+    {   /* the DJ filter: a hat through the low-pass shut, then the high-pass open, resonance up: quieter, bounded */
+        int32_t pk[3] = {0, 0, 0}, v[3] = {0, -64, 63}, o[2 * SP_BLK];
+        uint32_t m, j;
+        for (m = 0; m < 3u; m++) {
+            djf.v = (int8_t)v[m];
+            djf.res = m == 2u ? 127 : 40;               /* (the high-pass with the resonance up: still bounded) */
+            for (i = 0; i < 300u; i++) block();          /* (the glide) */
+            sp_trigger(4, 127);
+            for (i = 0; i < 200u; i++) {
+                memset(o, 0, sizeof o); sp_render(o);
+                for (j = 0; j < 2u * SP_BLK; j++) if (abs(o[j]) > pk[m]) pk[m] = abs(o[j]);
+            }
+        }
+        check(pk[1] < pk[0] / 4 && pk[2] < 3 * pk[0], "DJ FILTER: the low-pass shut takes the hat away, the high-pass bounded");
+        djf.v = 0;
+        djf.res = 40;
+        for (i = 0; i < 400u; i++) block();
+        check(djf.mode == 0, "DJ FILTER: back at 0 it is off");
+    }
     for (i = 0; i < SP_FS * 2u / SP_BLK; i++) block();  /* the reverb's tail */
     check(peak < 65536, "bounded");
     fseek(wf, 4, SEEK_SET); put32(36u + frames * 4u);

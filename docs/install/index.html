@@ -8,7 +8,7 @@
 <title>zp12: a 12-bit sampling drum machine for the M-VAVE FM-1</title>
 <meta name="description" content="zp12: 12-bit sampling drums for the M-VAVE FM-1, installed from Chrome or Edge. Early test build.">
 <meta name="robots" content="noindex">
-<link rel="canonical" href="https://dx7.designburgapps.com/webapp/installer/">
+<link rel="canonical" href="https://zp12.designburgapps.com/install/">
 <meta property="og:title" content="zp12">
 <meta property="og:image" content="https://dx7.designburgapps.com/og-image.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -126,7 +126,7 @@
 </head>
 <body>
 <nav class="bar"><div class="wrap">
-  <a class="logo" href="https://dx7.designburgapps.com/" aria-label="sloopDX"><b>zp<span style="color:var(--led)">12</span></b></a>
+  <a class="logo" href="../" aria-label="zp12"><b>zp<span style="color:var(--led)">12</span></b></a>
   <div class="links"><a href="../">zp12</a><a href="https://dx7.designburgapps.com/">sloopDX</a><a href="https://dx7.designburgapps.com/webapp/installer/">Back to sloopDX</a><a class="gh" href="https://github.com/zvenson/zp12">GitHub</a></div>
   <button class="lang" id="lang" hidden></button>
 </div></nav>
@@ -615,7 +615,7 @@ const sayK = (k, arg = "") => { lastKey = k; lastArg = arg; $("status").textCont
 const say = (txt) => { lastKey = null; $("status").textContent = txt; };
 const log = (t) => { $("log").textContent += t + "\n"; };
 let image = null;
-const meta = {"version": "1.0", "product": "FM-1_970", "pkg": "firmware/zp12-1.0.fwsc", "sha256": "aeb5a35eef1c4cbb27750c8d962bf1c5862ca017ba9cd81bbf46de4a91a06a87"};
+const meta = {"version": "1.1", "product": "FM-1_971", "pkg": "firmware/zp12-1.1.fwsc", "sha256": "b392f66dbb8865e9436d336b41b9e414a8818f07851a655ffc4a5ef7c1ad0a4f"};
 
 let writing = false, stock = null;
 const lockAll = (on) => {

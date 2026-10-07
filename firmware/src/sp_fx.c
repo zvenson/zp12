@@ -151,6 +151,71 @@ static void fx_buses(const int32_t *cho_in, const int32_t *dly_in, const int32_t
 }
 
 /* the sends of the block (sp_channel adds into them), the wet added to out */
+/* ---- the DJ filter on the whole mix (sloopDX's): FILTER < 0 a low-pass closing, > 0 a high-pass opening, 0 off.
+ * The cutoff glides to the knob (no zipper); back at 0 it opens fully, then it is bypassed. Not saved: a live knob. */
+static const uint16_t SP_SVF_G[128] = {    /* tan(pi f / fs) Q12, f = 30 Hz .. 19 kHz exponential */
+    9, 9, 10, 10, 11, 11, 12, 12, 13, 14, 15, 15, 16, 17, 18, 19,
+    20, 21, 22, 23, 24, 25, 27, 28, 30, 31, 33, 34, 36, 38, 40, 42,
+    44, 47, 49, 52, 54, 57, 60, 63, 67, 70, 74, 78, 82, 86, 90, 95,
+    100, 105, 111, 117, 123, 129, 136, 143, 150, 158, 166, 175, 184, 194, 204, 214,
+    226, 237, 250, 263, 277, 291, 306, 322, 339, 357, 376, 395, 416, 438, 461, 485,
+    510, 537, 566, 595, 627, 660, 695, 732, 771, 812, 856, 902, 950, 1002, 1056, 1114,
+    1175, 1239, 1308, 1381, 1459, 1542, 1630, 1724, 1825, 1933, 2050, 2175, 2310, 2457, 2616, 2790,
+    2981, 3191, 3425, 3685, 3978, 4311, 4692, 5136, 5659, 6288, 7062, 8040, 9323, 11093, 13709, 18007
+};
+static struct {
+    int8_t v, res;                              /* the knobs: -64..63, 0..127 */
+    int8_t mode;                                /* -1 LP, 1 HP, 0 off */
+    int32_t cut;                                /* now, 0..127 << 8 */
+    int32_t l1, l2, r1, r2;
+} djf = {0, 40, 0, 0, 0, 0, 0, 0};
+
+static void sp_djf_block(int32_t *out)
+{
+    int32_t v = djf.v, to, i, g, k, den, a1, a2, a3, c;
+    if (v < 0 && djf.mode >= 0) {               /* (switching side: from open) */
+        djf.mode = -1;
+        djf.cut = 127 << 8;
+        djf.l1 = djf.l2 = djf.r1 = djf.r2 = 0;
+    } else if (v > 0 && djf.mode <= 0) {
+        djf.mode = 1;
+        djf.cut = 0;
+        djf.l1 = djf.l2 = djf.r1 = djf.r2 = 0;
+    }
+    if (!djf.mode)
+        return;
+    to = djf.mode < 0 ? (v < 0 ? (127 << 8) + v * 90 * 4 : 127 << 8) : (v > 0 ? v * 90 * 4 : 0);
+    djf.cut += sp_clamp(to - djf.cut, -384, 384);
+    if (!v && djf.cut == to) {
+        djf.mode = 0;
+        return;
+    }
+    c = sp_clamp(djf.cut, 0, 127 << 8);         /* the TPT state-variable filter's coefficients (sloopDX's tsvf) */
+    g = SP_SVF_G[c >> 8];
+    if ((c >> 8) < 127)
+        g += ((SP_SVF_G[(c >> 8) + 1] - g) * (c & 255)) >> 8;
+    k = 8192 - djf.res * 7600 / 127;
+    den = 4096 + ((g * (g + k)) >> 12);
+    a1 = (int32_t)((4096u << 13) / (uint32_t)den);
+    a2 = (a1 * g) >> 12;
+    a3 = (a2 * g) >> 12;
+    for (i = 0; i < SP_BLK; i++) {
+        int32_t x = sp_clamp(out[2 * i], -140000, 140000), y = sp_clamp(out[2 * i + 1], -140000, 140000), v1, v2, v3;
+        v3 = x - djf.l2;
+        v1 = (a1 * djf.l1 + a2 * v3) >> 13;
+        v2 = djf.l2 + ((a2 * djf.l1 + a3 * v3) >> 13);
+        djf.l1 = sp_clamp(2 * v1 - djf.l1, -150000, 150000);
+        djf.l2 = sp_clamp(2 * v2 - djf.l2, -150000, 150000);
+        out[2 * i] = djf.mode < 0 ? v2 : x - v2;
+        v3 = y - djf.r2;
+        v1 = (a1 * djf.r1 + a2 * v3) >> 13;
+        v2 = djf.r2 + ((a2 * djf.r1 + a3 * v3) >> 13);
+        djf.r1 = sp_clamp(2 * v1 - djf.r1, -150000, 150000);
+        djf.r2 = sp_clamp(2 * v2 - djf.r2, -150000, 150000);
+        out[2 * i + 1] = djf.mode < 0 ? v2 : y - v2;
+    }
+}
+
 static void sp_fx_block(int32_t *out)
 {
     static int32_t wl[SP_BLK], wr[SP_BLK];
@@ -160,4 +225,5 @@ static void sp_fx_block(int32_t *out)
         out[2u * i] += wl[i];
         out[2u * i + 1u] += wr[i];
     }
+    sp_djf_block(out);
 }
