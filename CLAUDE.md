@@ -45,7 +45,7 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   (pulls this repo into the Pi's zp12repo; served as zp12.designburgapps.com and dx7.designburgapps.com/zp12/).
   sloopDX's site copies docs/zp12 too: rebuild it there when /zp12/ should change.
 - Videos: C harness renders the real UI + audio per frame (`../video/zp12av*.c`), compositor `../video/make_video*.py`
-  (panel, knobs, keys, cold open, cuts on bar lines, loudnorm -14 LUFS). Latest: `zp12-1.0-downbeat.mp4`.
+  (panel, knobs, keys, cold open, cuts on bar lines, loudnorm -14 LUFS). Latest: `zp12-1.1-doubletime.mp4` (`zp12av5.c`, `make_video11.py`, then loudnorm -14 LUFS with a limiter from `v11/track.wav`).
 
 ## Style
 
