@@ -40,7 +40,10 @@ def main(sloopdx, pkg, version, video=None):
     shutil.copytree(web / "img", docs / "img", dirs_exist_ok=True)
     if video:
         shutil.copy(video, docs / "zp12-beat.mp4")
-    (docs / "index.html").write_text((web / "landing.html").read_text(encoding="utf-8").replace("/*VER*/", version), encoding="utf-8")
+    import hashlib
+    vh = hashlib.sha256((docs / "zp12-beat.mp4").read_bytes()).hexdigest()[:8] if (docs / "zp12-beat.mp4").exists() else version
+    page = (web / "landing.html").read_text(encoding="utf-8").replace("zp12-beat.mp4?v=/*VER*/", "zp12-beat.mp4?v=" + vh)
+    (docs / "index.html").write_text(page.replace("/*VER*/", version), encoding="utf-8")   # (the video by its hash: no stale cache)
     print(f"site: {docs} (start page, install/ {version}, cheat sheet, impressum, img/, video)")
 
 
