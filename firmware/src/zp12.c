@@ -257,6 +257,7 @@ static void zp12_main(void)
         {   /* SEL held: the faders 5-8; LFO held: ERASE (the pads held lose their hits as the playhead passes) */
             uint32_t bt = fm1_in.buttons, er = 0, k;
             ui.shift = (uint8_t)((bt >> B_SEL) & 1u);
+            ui.held = bt;                               /* (SAVE held + a black key: key_down) */
             if ((bt >> B_LFO) & 1u)
                 for (k = 0; k < 27u; k++)
                     if ((n >> k) & 1u) {
@@ -269,6 +270,7 @@ static void zp12_main(void)
                     key_down(i, (bt >> B_LFO) & 1u);
         }
         b = fm1_input_edges(&rel);
+        b = ui_holds(fm1_in.buttons, b, rel);           /* REC held: CLEAR; SAVE tapped / held + a black key */
         if (b & (1u << B_SEQ)) {                        /* SEQ down: the step grid while held */
             seq_down = fm1_ms;
             seq_used = 0;
@@ -304,7 +306,7 @@ static void zp12_main(void)
             memcpy(fm1_led, nl, sizeof nl);
             memcpy(fm1_led_dim, nd, sizeof nd);
         }
-        {   /* KNOB 1-4 (encoders 2..5), SELECT (0): tempo, ALGORITHM (1): the sound */
+        {   /* KNOB 1-4 (encoders 2..5), SELECT (0): tempo, ALGORITHM (1): the pad, PRESETS (6): its sample */
             int32_t d;
             for (i = 0; i < 4u; i++)
                 if ((d = fm1_enc_take(2u + i)) != 0)
@@ -313,7 +315,8 @@ static void zp12_main(void)
                 sq.bpm10 = (uint16_t)sp_clamp((int32_t)sq.bpm10 + d * 5, 400, 2400);
             if ((d = fm1_enc_take(1)) != 0)
                 ui.sel = (uint8_t)((ui.sel + SP_NSOUND + (d > 0 ? 1 : SP_NSOUND - 1)) % SP_NSOUND);
-            (void)fm1_enc_take(6);
+            if ((d = fm1_enc_take(6)) != 0)
+                ui_preset(d);
         }
         while (mi_r != mi_w) {                          /* USB MIDI in: notes 36..67 play the 32 pads */
             uint32_t pk = midi_in_q[mi_r % MQ], st = (pk >> 8) & 0xF0u, nt = (pk >> 16) & 0x7Fu, vel = pk >> 24 & 0x7Fu;

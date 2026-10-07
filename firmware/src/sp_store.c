@@ -8,7 +8,7 @@
 #define ZS_BASE 0xC4000u
 #define ZS_SLOT 0xA000u                          /* 40 KiB a copy */
 #define ZS_MAGIC 0x3231505Au                     /* "ZP12" */
-#define ZS_VER 2u                                /* 2: four songs (1: one; read, it becomes song 1) */
+#define ZS_VER 3u                                /* 3: the hits' locks; 2: four songs (1: one; read, it becomes song 1) */
 #define ZS_KIT_ID ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u ^ 0x0600u))   /* the factory kit the pads were saved with
                                                  * (0.6: changed once, so every older save gets the kit's pads) */
 
@@ -30,11 +30,12 @@ static uint32_t zs_crc(const uint8_t *p, uint32_t n)
 static uint8_t *zs_put(uint8_t *p, const void *s, uint32_t n) { memcpy(p, s, n); return p + n; }
 static const uint8_t *zs_get(const uint8_t *p, void *d, uint32_t n) { memcpy(d, p, n); return p + n; }
 
-/* everything that is saved, as bytes after the head; returns the length */
+/* everything that is saved, as bytes after the head; returns the length. The locks come last, one word for each
+ * hit that has one, as many as there is room for (the hits always fit: 16 full segments are 32 KiB) */
 static uint32_t zs_pack(uint8_t *b)
 {
-    uint8_t *p = b;
-    uint32_t i;
+    uint8_t *p = b, *e = b + ZS_SLOT - sizeof(zs_head_t);
+    uint32_t i, j;
     uint16_t st[8] = {sq.bpm10, sq.quant, sq.swing, sq.click, sq.song_sel, sq.song_mode, sq.seg, ZS_KIT_ID};
     p = zs_put(p, sp_sound, sizeof sp_sound);
     p = zs_put(p, sp_mix, sizeof sp_mix);
@@ -47,13 +48,17 @@ static uint32_t zs_pack(uint8_t *b)
         p = zs_put(p, s, 4u);                    /* bars, rsv, n */
         p = zs_put(p, s->ev, s->n * sizeof(sq_ev_t));
     }
+    for (i = 0; i < SQ_NSEG; i++)
+        for (j = 0; j < sq_seg[i].n; j++)
+            if (sq_seg[i].ev[j].lk && e - p >= 4)
+                p = zs_put(p, &sq_lk[i][j], 4u);
     return (uint32_t)(p - b);
 }
 
 static int zs_unpack(const uint8_t *b, uint32_t len, uint32_t ver)
 {
     const uint8_t *p = b, *e = b + len;
-    uint32_t i;
+    uint32_t i, j;
     uint16_t st[8];
     if (len < sizeof sp_sound + sizeof sp_mix + sizeof fxp + sizeof st + sizeof sq_songs[0] + 4u * SQ_NSEG)
         return -1;
@@ -92,6 +97,14 @@ static int zs_unpack(const uint8_t *b, uint32_t len, uint32_t ver)
         }
         p = zs_get(p, s->ev, s->n * sizeof(sq_ev_t));
     }
+    for (i = 0; i < SQ_NSEG; i++)                   /* the locks (none before 3; past the end of the room: gone) */
+        for (j = 0; j < sq_seg[i].n; j++)
+            if (sq_seg[i].ev[j].lk) {
+                if (ver >= 3u && e - p >= 4)
+                    p = zs_get(p, &sq_lk[i][j], 4u);
+                else
+                    sq_seg[i].ev[j].lk = 0;
+            }
     if (st[7] != ZS_KIT_ID)                         /* saved with another factory kit: the pads its new sounds */
         for (i = 0; i < SP_NSOUND; i++)
             sp_sound[i] = KIT_PADS[i];

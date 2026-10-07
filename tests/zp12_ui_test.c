@@ -58,8 +58,8 @@ int main(int argc, char **argv)
     sq.playing = 0; sq.recording = 0; button(B_EDIT); button(B_EDIT); button(B_EDIT); button(B_EDIT); knob(3, 60); fm1_ms += 2000; ui_draw(); ppm("zp12-sfx");
     button(B_FX); button(B_FX); fm1_ms += 2000; ui_draw(); ppm("zp12-delay");
     fm1_ms += 7000; ui_draw(); ppm("zp12-back");            /* untouched: the faders again */
-    sq_insert(&sq_seg[0], 0, 0, 7, 0, 0); sq_insert(&sq_seg[0], 96, 1, 7, 0, 0); sq_insert(&sq_seg[0], 48, 4, 5, 0, 0);
-    sq_insert(&sq_seg[0], 144, 4, 5, 0, 0); sq_insert(&sq_seg[0], 240, 0, 7, 0, 0); sq_seg[0].bars = 2;
+    sq_insert(&sq_seg[0], 0, 0, 7, 0, 0, 0); sq_insert(&sq_seg[0], 96, 1, 7, 0, 0, sp_lock_of(&sp_sound[1])); sq_insert(&sq_seg[0], 48, 4, 5, 0, 0, 0);
+    sq_insert(&sq_seg[0], 144, 4, 5, 0, 0, 0); sq_insert(&sq_seg[0], 240, 0, 7, 0, 0, 0); sq_seg[0].bars = 2;
     ui.sel = 0; ui.steps = 1; ui.force = 1; sq.playing = 1; sq.pos = (5u * 24u) << 16; fm1_ms += 10; ui_draw(); ppm("zp12-steps");
     ui.steps = 0; ui.force = 1; sq.playing = 0;            /* the sample: D1, WAVE */
     ui.pair = 1; key_down(21, 0); ui.sel = 24; page(PG_WAVE); fm1_ms += 2000; ui_draw(); ppm("zp12-wave");
@@ -67,6 +67,18 @@ int main(int argc, char **argv)
     sq.playing = 1; sq.recording = 0; sq.seg = 2; sq.pos = (SQ_BAR + 3u * SQ_PPQ) << 16; page(PG_SEG); fm1_ms += 2000; ui_draw(); ppm("zp12-loop");
     sq.playing = 0; ui.sel = 1; page(PG_SFX); fm1_ms += 2000; ui_draw(); ppm("zp12-sends");
     ui.sel = 0; page(PG_SETUP); fm1_ms += 2000; ui_draw(); ppm("zp12-setup");
+    page(PG_HOME); ui.pair = 0; key_down(2, 0); fm1_ms += 2000; ui_preset(1); fm1_ms += 20; ui_draw(); ppm("zp12-preset");
+    if (sp_sound[1].wave != (KIT_PADS[1].wave + 1u) % KIT_NWAVE) { printf("zp12 ui: PRESETS did not change the pad's sample FAIL\n"); return 1; }
+    fm1_ms += 2000; sq.seg = 0;                            /* REC held: undone at 0.7 s, the bar, the loop cleared */
+    ui_holds(1u << B_REC, 1u << B_REC, 0); fm1_ms += 800; ui_holds(1u << B_REC, 0, 0); fm1_ms += 600; ui_holds(1u << B_REC, 0, 0);
+    ui_draw(); ppm("zp12-hold");
+    fm1_ms += 800; ui_holds(1u << B_REC, 0, 0); sq_block(); ui_draw(); ppm("zp12-cleared");
+    if (sq_seg[0].n || sq.rec_arm) { printf("zp12 ui: REC held did not clear the loop / undo the arm FAIL\n"); return 1; }
+    ui_holds(0, 0, 1u << B_REC);
+    ui_holds(1u << B_EDIT, 1u << B_EDIT, 0); button(B_EDIT); button(B_OCTDN); sq_block(); ui_holds(0, 0, 1u << B_EDIT);
+    if (sq_seg[0].n != 5u || ui.page != PG_HOME) { printf("zp12 ui: EDIT + OCT- did not undo FAIL\n"); return 1; }
+    fm1_ms += 2000; ui_holds(1u << B_SAVE, 1u << B_SAVE, 0); key_down(3, 0); sq_block(); ui_holds(0, 0, 1u << B_SAVE); ui_draw(); ppm("zp12-saveloop");
+    if (sq_seg[1].n != 5u || ui.save_req != 1u) { printf("zp12 ui: SAVE + a black key did not save the loop FAIL\n"); return 1; }
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;
 }

@@ -24,11 +24,13 @@ switching it on (USB rescue).
 | FX | CHORUS (RATE · DEPTH · MIX), DELAY (TIME · FDBK · COLOR · MIX), REVERB (SIZE · DAMP · PRE) |
 | SEQ tapped | LOOP (LOOP · BARS 1–32 / AUTO · QUANT · SWING), LOOP TOOLS (CLEAR · COPY> · COPY, turn twice), SONG (STEP · LOOP · REPEAT, 0 ends · SONG OFF / 1–4: four songs of the loops) |
 | SEQ held | the last pad's 16 steps of a bar on the white keys (lit = a hit); OCT− / OCT+: the bars |
-| PLAY · REC | run / stop · record (stopped: armed, PLAY counts a bar in; playing: overdub on / off) |
+| PLAY · REC | run / stop · record (stopped: armed, PLAY counts a bar in; playing: overdub on / off); REC held 2 s: clear the loop |
+| Recording + TUNE / FINE / DECAY / CUT turned | the pad's hits keep the values turned (a lock per hit, a red dot in the step grid) |
+| EDIT + OCT− | undo the last clear / erase / copy (again: redo) |
 | LFO held + pad | erase that pad's hits as the playhead passes (stopped: at once) |
-| ENV · GLO · SAVE | tap tempo · TEMPO, CLICK, VER, RESET (turn twice: the factory state) · save now (it saves by itself when stopped and quiet) |
+| ENV · GLO · SAVE | tap tempo · TEMPO, CLICK, VER, RESET (turn twice: the factory state) · save now (it saves by itself when stopped and quiet); SAVE held + a black key: the loop into that loop |
 | ARP | MULTI PITCH: the last sound over all 27 keys (F4 as tuned) |
-| SELECT · ALGORITHM | tempo · the sound to edit |
+| SELECT · ALGORITHM · PRESETS | tempo · the sound to edit · the sample of the last pad (one sample on many pads, each tuned its own way) |
 | USB MIDI | notes 36–67 play pads A1–D8 |
 
 ## Sound

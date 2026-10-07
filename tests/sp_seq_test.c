@@ -12,6 +12,12 @@
 #include "../firmware/src/sp_fx.c"
 #include "zp12_kit.h"
 #include "../firmware/src/sp_seq.c"
+static int flash_ok;                                    /* (sp_store.c: only pack / unpack here) */
+static void st_read(uint32_t a, void *d, uint32_t n) { (void)a; (void)d; (void)n; }
+static int fl_erase4k(uint32_t a, uint32_t *t) { (void)a; (void)t; return -1; }
+static int fl_write(uint32_t a, const void *d, uint32_t n) { (void)a; (void)d; (void)n; return -1; }
+static void fm1_wdt_feed(void) {}
+#include "../firmware/src/sp_store.c"
 
 static int bad;
 static void check(int ok, const char *what) { printf("seq: %-70s %s\n", what, ok ? "ok" : "FAIL"); bad += !ok; }
@@ -100,6 +106,71 @@ int main(int argc, char **argv)
     sq.erase = 0;
     check(count(s0, 4) == 0u && count(s0, 0) == 2u, "ERASE: the hat gone, the kick kept");
 
+    /* 3a. locks: recording while DECAY is turned, the snare's passing hits and a new hat take it; the rest keep none */
+    {
+        uint32_t lk, n0 = 0, n1 = 0, k;
+        sq.recording = 1;
+        sp_sound[1].decay = 20;
+        sp_sound[1].tune = 3;
+        sq.turn = 1u << 1;
+        until_wrap();
+        sq_hit(4, 100, 0);                              /* (a hat: not turned, no lock) */
+        sq.turn = (1u << 1) | (1u << 4);
+        until_tick(SQ_BAR / 2u + 2u);
+        sq_hit(4, 100, 0);
+        sq.turn = 0;
+        sq.recording = 0;
+        for (k = 0; k < s0->n; k++) {
+            if (s0->ev[k].pad == 1u) n1 += s0->ev[k].lk;
+            if (s0->ev[k].pad == 0u) n0 += s0->ev[k].lk;
+        }
+        k = (uint32_t)sq_find(s0, SQ_BAR / 2u, 4);
+        check(n1 == 2u && n0 == 0u, "LOCK: the turned snare's hits take its knobs, the kick none");
+        check(s0->ev[k].lk && sq_lk[0][k] == sp_lock_of(&sp_sound[4]), "LOCK: a hit played while turning takes the knobs");
+        lk = sq_lk[0][(uint32_t)sq_find(s0, 96, 1)];
+        check(((lk >> 12) & 127u) == 20u && (lk & 0xFFFu) == 2860u, "LOCK: DECAY and TUNE as turned");
+        sp_sound[1].decay = 100;
+        sp_sound[1].tune = 0;
+        sq_post(RQ_STOP, 0, 0);
+        block();
+        sp_trigger_lk(1, 100, 0, lk);
+        check(sp_ch[sp_sound[1].chan].emul == sp_decay_mul(20), "LOCK: played with its own DECAY, not the sound's");
+        sq_post(RQ_PLAY, 0, 0);
+        block();
+    }
+
+    /* 3a store: the locks saved and read back; a version 2 save has none */
+    {
+        uint32_t n = zs_pack(zs_buf), k = (uint32_t)sq_find(s0, 96, 1), lk = sq_lk[0][k];
+        sq_lk[0][k] = 0;
+        check(zs_unpack(zs_buf, n, 3) == 0 && s0->ev[k].lk && sq_lk[0][k] == lk, "STORE: a lock saved and read back");
+        n = zs_pack(zs_buf);
+        check(zs_unpack(zs_buf, n, 2) == 0 && !s0->ev[k].lk, "STORE: a version 2 save has no locks");
+        zs_unpack(zs_buf, n, 3);
+    }
+
+    /* 3a'. CLEAR, then UNDO brings it back (locks too), UNDO again clears it again */
+    {
+        uint32_t n = s0->n, k1 = (uint32_t)sq_find(s0, 96, 1);
+        sq_post(RQ_CLEAR, 0, 0);
+        block();
+        check(s0->n == 0u, "CLEAR: the loop empty");
+        sq_post(RQ_UNDO, 0, 0);
+        block();
+        check(s0->n == n && s0->ev[k1].lk && ((sq_lk[0][k1] >> 12) & 127u) == 20u, "UNDO: the loop back, with its locks");
+        sq_post(RQ_UNDO, 0, 0);
+        block();
+        check(s0->n == 0u, "UNDO again: cleared again (redo)");
+        sq_post(RQ_UNDO, 0, 0);
+        block();
+    }
+
+    /* 3a''. REC held: its press undone */
+    sq_post(RQ_REC, 0, 0);
+    sq_post(RQ_RECSET, 0, 0);
+    block();
+    check(!sq.recording && sq.playing, "REC held: the overdub it started is undone");
+
     /* 3b. AUTO: an empty segment of no length, a take of two bars: it becomes two bars long */
     sq_post(RQ_STOP, 0, 0);
     block();
@@ -140,11 +211,11 @@ int main(int argc, char **argv)
     sq_post(RQ_STOP, 0, 0);
     block();
     sq_seg[1].bars = 1;
-    sq_insert(&sq_seg[1], 0, 0, 7, 0, 0);
-    sq_insert(&sq_seg[1], 96, 6, 6, -5, 0);
-    sq_insert(&sq_seg[1], 192, 0, 7, 0, 0);
-    sq_insert(&sq_seg[1], 288, 7, 6, 0, 0);
-    sq_insert(&sq_seg[1], 288 + 48, 7, 5, 2, 0);
+    sq_insert(&sq_seg[1], 0, 0, 7, 0, 0, 0);
+    sq_insert(&sq_seg[1], 96, 6, 6, -5, 0, 0);
+    sq_insert(&sq_seg[1], 192, 0, 7, 0, 0, 0);
+    sq_insert(&sq_seg[1], 288, 7, 6, 0, 0, 0);
+    sq_insert(&sq_seg[1], 288 + 48, 7, 5, 2, 0, 0);
     sq_song[0].seg = 0; sq_song[0].rep = 2;
     sq_song[1].seg = 1; sq_song[1].rep = 1;
     SQ_SONG_N = 2;

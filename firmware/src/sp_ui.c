@@ -25,6 +25,7 @@
 #define P_STEP RGB(240, 200, 60)
 
 #define UI_PAGE_MS 6000u
+#define UI_HOLD_MS 1300u                        /* REC held 0.7 s, then this much more: the loop cleared */
 #ifndef FELUCCA_ID
 #define FELUCCA_ID "FM-1_970"
 #endif
@@ -33,6 +34,9 @@ static const char ZP12_VERSION[4] = {'0', '.', FELUCCA_ID[7], 0};   /* FM-1_97N:
 enum { PG_HOME, PG_WAVE, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_N };
 static const char *const PG_NAME[PG_N] = {"MIX", "WAVE", "SOUND", "TRUNC", "OUT", "SENDS", "CHORUS", "DELAY", "REVERB",
                                           "LOOP", "TOOLS", "SONG", "SETUP"};
+/* buttons: the printed labels' matrix ids (as SLOOP's PANEL_DEFAULT); SEL is SLOOP's SCL */
+enum { B_OCTDN = 0, B_OCTUP = 1, B_FX = 2, B_SEL = 3, B_ENV = 4, B_LFO = 5, B_EDIT = 6, B_GLO = 7, B_HOME = 8,
+       B_SAVE = 9, B_ARP = 10, B_SEQ = 11, B_PLAY = 12, B_REC = 13 };
 static const char *const DTIME_NAME[6] = {"1/4", "1/8", "1/16", "1/32", "8T", "16T"};
 static const char *const CLICK_NAME[3] = {"OFF", "REC", "ON"};
 
@@ -48,6 +52,12 @@ static struct {
     uint8_t copy_to;                            /* SEG TOOLS: the target */
     uint8_t copy_pad;                           /* WAVE: the pad the sound goes to */
     uint8_t arm;                                /* a destructive knob turned once (it wants AGAIN): its page + 1 */
+    uint8_t turn_pad;                           /* the pad whose TUNE / DECAY / CUT was turned last ... */
+    uint32_t turn_ms;                           /* ... and when (recording: its hits take them) */
+    uint32_t held;                              /* the buttons held (bit = matrix id) */
+    uint8_t rec_on, rec_prev, holding;          /* REC: pressed, the state before, held into a CLEAR */
+    uint8_t save_used, prev_page;               /* SAVE held: a loop saved; the page before EDIT */
+    uint32_t rec_t0, hold_t0;
     uint8_t mix[SP_NCH];
     uint32_t arm_ms, touch_ms;
     uint32_t hit_ms[32];                        /* when each pad was last heard (its key and pad light) */
@@ -211,7 +221,13 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
     cv_rect(0, 0, 232, 78, RGB(70, 76, 66));    /* the bezel */
     cv_rect(3, 3, 226, 72, P_LCD);
     small[0] = 0;
-    if (ui.msg[0] && (int32_t)(fm1_ms - ui.msg_until) < 0) {
+    if (ui.holding) {                           /* REC held: what letting go late does, and how long it still takes */
+        uint32_t w = (fm1_ms - ui.hold_t0) * 212u / UI_HOLD_MS;
+        p = cat(big, "CLEAR LOOP ");
+        num(p, sq.seg + 1, sq.seg + 1u >= 10u ? 2u : 1u, 0);
+        cv_rect(10, 34, 212, 3, P_LCDDIM);
+        cv_rect(10, 34, (int32_t)(w < 212u ? w : 212u), 3, P_LCDINK);
+    } else if (ui.msg[0] && (int32_t)(fm1_ms - ui.msg_until) < 0) {
         cat(big, ui.msg);
     } else if (ui.steps) {                      /* the step grid: the pad, the bar of the keys */
         pad_label(p, ui.sel);
@@ -313,18 +329,22 @@ static void draw_grid(void)
         if (t >= t0 && t < t0 + SQ_BAR) ph = (t - t0) / 24u;
     }
     for (r = 0; r < 8u; r++) {
-        uint32_t k = bank * 8u + r, row = 0;
+        uint32_t k = bank * 8u + r, row = 0, lks = 0;
         int32_t y = 4 + (int32_t)r * 13;
         char l[3];
         for (i = 0; i < g->n; i++)
-            if (g->ev[i].pad == k && g->ev[i].t >= t0 && g->ev[i].t < t0 + SQ_BAR)
+            if (g->ev[i].pad == k && g->ev[i].t >= t0 && g->ev[i].t < t0 + SQ_BAR) {
                 row |= 1u << ((g->ev[i].t - t0) / 24u);
+                lks |= (uint32_t)g->ev[i].lk << ((g->ev[i].t - t0) / 24u);
+            }
         pad_label(l, k);
         cv_text_on(2, y - 3, &FONT_S, l, k == ui.sel ? C_WHITE : P_RULE, P_NAVY);
         for (i = 0; i < 16u; i++) {
             int32_t x = 24 + (int32_t)i * 12 + (int32_t)(i / 4u) * 2;
             uint16_t c = (row >> i) & 1u ? (k == ui.sel ? P_STEP : P_FRAME) : (k == ui.sel ? RGB(70, 90, 140) : RGB(52, 74, 124));
             cv_rect(x, y, 10, 10, c);
+            if ((lks >> i) & 1u)                 /* a hit with its own TUNE / DECAY / CUT: a dot */
+                cv_rect(x + 3, y + 3, 4, 4, P_RED);
             if (i == ph)
                 cv_rect(x, y + 10, 10, 2, P_LED);
         }
@@ -381,6 +401,7 @@ static void ui_draw(void)
 {
     uint32_t i, s, lit = 0, on = 0, bank = ui.sel / 8u;
     ui_note_played();
+    sq.turn = sq.recording && (uint32_t)(fm1_ms - ui.turn_ms) < 600u ? 1u << ui.turn_pad : 0u;
     if (ui.page != PG_HOME && (uint32_t)(fm1_ms - ui.touch_ms) > UI_PAGE_MS && !ui.steps)
         ui.page = PG_HOME;                      /* untouched: the knobs are the faders again */
     if (ui.arm && (uint32_t)(fm1_ms - ui.arm_ms) > 1500u)
@@ -399,6 +420,8 @@ static void ui_draw(void)
         s ^= ((sq.countin > 0 ? 0u : (sq.pos >> 16) / SQ_PPQ) + 1u) * 2654435761u ^ (sq.countin > 0) * 9u ^ sq.song_i * 13u;
     if (ui.msg[0] && (int32_t)(fm1_ms - ui.msg_until) < 0)
         s = sig_of(ui.msg, sizeof ui.msg, s ^ 0x55u);
+    if (ui.holding)
+        s ^= ((fm1_ms - ui.hold_t0) / 40u + 1u) * 0x9E3779B1u;
     if (s != ui.sig_lcd || ui.force) { ui.sig_lcd = s; draw_lcd(); }
     if (ui.steps) {
         const sq_seg_t *g = &sq_seg[sq.seg % SQ_NSEG];
@@ -463,6 +486,21 @@ static void key_down(uint32_t k, int erase)
     uint32_t pad;
     if (k >= 27u)
         return;
+    if ((ui.held >> B_SAVE) & 1u) {              /* SAVE held: a black key saves the loop into that loop */
+        if (white_of(k) == 0xFFu) {
+            uint32_t b = 0, i;
+            char m[24], *p = cat(m, "LOOP ");
+            for (i = 0; i < k; i++) b += white_of(i) == 0xFFu;
+            if (b != sq.seg)
+                sq_post(RQ_COPY, 0, b);
+            p = num(p, (int32_t)b + 1, b + 1u >= 10u ? 2u : 1u, 0);
+            cat(p, " SAVED");
+            ui_say(m);
+            ui.save_req = 1;
+            ui.save_used = 1;
+        }
+        return;
+    }
     if (ui.steps) {                              /* SEQ held: a white key sets / clears the selected pad's step */
         uint32_t w = white_of(k);
         if (w != 0xFFu) {
@@ -520,6 +558,30 @@ static int32_t accel(int32_t d)
     return d * (a >= 3 ? 8 : a == 2 ? 5 : 3);
 }
 
+/* the sample the selected pad plays, one on (the factory's; own ones later): any sample on as many pads as
+ * wanted, each with its own TUNE, DECAY, ... */
+static void wave_step(int32_t one)
+{
+    sp_sound_t *s = &sp_sound[ui.sel];
+    uint32_t w = s->wave < KIT_NWAVE ? s->wave : 0u;
+    char m[24];
+    s->wave = (uint8_t)((w + KIT_NWAVE + (one > 0 ? 1u : KIT_NWAVE - 1u)) % KIT_NWAVE);
+    s->start = 0;
+    s->end = 1000;
+    SP_HIT(ui.sel, 100, 0);                    /* (heard at once) */
+    pad_label(m, ui.sel);
+    m[2] = ' ';
+    cat(m + 3, KIT_WAVE[s->wave].name);
+    ui_say(m);
+}
+
+/* PRESETS turned: the sample of the pad played last */
+static void ui_preset(int32_t d)
+{
+    ui.touch_ms = fm1_ms;
+    wave_step(d > 0 ? 1 : -1);
+}
+
 /* KNOB n turned by d */
 static void knob(uint32_t n, int32_t d)
 {
@@ -534,14 +596,8 @@ static void knob(uint32_t n, int32_t d)
         break;
     }
     case PG_WAVE:
-        if (n == 0u) {                             /* the sample this pad plays (the factory's 24; own ones later) */
-            uint32_t w = s->wave < KIT_NWAVE ? s->wave : 0u;
-            s->wave = (uint8_t)((w + KIT_NWAVE + (one > 0 ? 1u : KIT_NWAVE - 1u)) % KIT_NWAVE);
-            s->start = 0;
-            s->end = 1000;
-            SP_HIT(ui.sel, 100, 0);                /* (heard at once) */
-            ui_say(KIT_WAVE[s->wave].name);
-        }
+        if (n == 0u)
+            wave_step(one);
         if (n == 1u) ui.copy_pad = (uint8_t)((ui.copy_pad + SP_NSOUND + (one > 0 ? 1u : SP_NSOUND - 1u)) % SP_NSOUND);
         if (n == 2u && d > 0 && again(PG_WAVE + 1u) && ui.copy_pad != ui.sel) {
             sp_sound[ui.copy_pad] = *s;
@@ -549,6 +605,7 @@ static void knob(uint32_t n, int32_t d)
         }
         break;
     case PG_SOUND:
+        if (n < 3u) { ui.turn_pad = ui.sel; ui.turn_ms = fm1_ms; }   /* (recording: the hits take TUNE / FINE / DECAY) */
         if (n == 0u) s->tune = (int8_t)sp_clamp(s->tune + one, -24, 12);
         if (n == 1u) s->fine = (int8_t)sp_clamp(s->fine + d, -50, 50);
         if (n == 2u) s->decay = (uint8_t)sp_clamp(s->decay + dd, 0, 127);
@@ -563,7 +620,7 @@ static void knob(uint32_t n, int32_t d)
     case PG_OUT:
         if (n == 0u) s->chan = (uint8_t)sp_clamp(s->chan + one, 0, SP_NCH - 1);
         if (n == 1u) s->pan = (int8_t)sp_clamp(s->pan + dd, -64, 63);
-        if (n == 2u) s->cut = (uint8_t)sp_clamp(s->cut + dd, 0, 127);
+        if (n == 2u) { s->cut = (uint8_t)sp_clamp(s->cut + dd, 0, 127); ui.turn_pad = ui.sel; ui.turn_ms = fm1_ms; }
         if (n == 3u) s->reso = (uint8_t)sp_clamp(s->reso + dd, 0, 127);
         break;
     case PG_SFX:
@@ -635,9 +692,6 @@ static void knob(uint32_t n, int32_t d)
     }
 }
 
-/* buttons: the printed labels' matrix ids (as SLOOP's PANEL_DEFAULT); SEL is SLOOP's SCL */
-enum { B_OCTDN = 0, B_OCTUP = 1, B_FX = 2, B_SEL = 3, B_ENV = 4, B_LFO = 5, B_EDIT = 6, B_GLO = 7, B_HOME = 8,
-       B_SAVE = 9, B_ARP = 10, B_SEQ = 11, B_PLAY = 12, B_REC = 13 };
 static void page(uint32_t p) { ui.page = (uint8_t)p; ui.touch_ms = fm1_ms; ui.arm = 0; }
 
 static void tap_tempo(void)                      /* ENV: the tempo of the last taps (two at least, < 2 s apart) */
@@ -664,12 +718,16 @@ static void button(uint32_t b)
         }
         break;
     case B_OCTDN:
-        if (ui.steps) { if (ui.step_bar) ui.step_bar--; }
+        if ((ui.held >> B_EDIT) & 1u) {          /* EDIT + OCT-: undo the last CLEAR / ERASE / COPY (again: redo) */
+            sq_post(RQ_UNDO, 0, 0);
+            page(ui.prev_page);
+            ui_say(sq_undo_of < SQ_NSEG ? "UNDO" : "NO UNDO");
+        } else if (ui.steps) { if (ui.step_bar) ui.step_bar--; }
         else ui.pair = 0;
         break;
     case B_ARP: ui.multi ^= 1u; break;
     case B_HOME: page(PG_HOME); break;
-    case B_EDIT: page(ui.page >= PG_WAVE && ui.page < PG_SFX ? ui.page + 1u : PG_WAVE); break;
+    case B_EDIT: ui.prev_page = ui.page; page(ui.page >= PG_WAVE && ui.page < PG_SFX ? ui.page + 1u : PG_WAVE); break;
     case B_FX: page(ui.page >= PG_CHO && ui.page < PG_REV ? ui.page + 1u : PG_CHO); break;
     case B_SEQ: page(ui.page == PG_SEG ? PG_SEG2 : ui.page == PG_SEG2 ? PG_SONG : PG_SEG); break;
     case B_SAVE: ui.save_req = 1; ui_say("SAVED"); break;
@@ -679,6 +737,47 @@ static void button(uint32_t b)
     case B_REC: sq_post(RQ_REC, 0, 0); break;
     default: break;
     }
+}
+
+/* REC and SAVE, as on sloopDX. REC acts on the press (no lag); held 0.7 s the press is undone and a bar fills:
+ * held to its end, the loop is cleared (EDIT + OCT- brings it back), let go before, nothing. SAVE tapped saves
+ * now; held, a black key saves the loop into that loop (key_down). held: the buttons held now; returns pressed
+ * without the two. */
+static uint32_t ui_holds(uint32_t held, uint32_t pressed, uint32_t released)
+{
+    ui.held = held;
+    if (pressed & (1u << B_REC)) {
+        ui.rec_prev = (uint8_t)(sq.recording | sq.rec_arm << 1);
+        ui.rec_t0 = fm1_ms;
+        ui.rec_on = 1;
+        sq_post(RQ_REC, 0, 0);
+    }
+    if ((held >> B_REC) & 1u) {
+        if (ui.rec_on && !ui.holding && (uint32_t)(fm1_ms - ui.rec_t0) >= 700u) {
+            sq_post(RQ_RECSET, 0, ui.rec_prev); /* a hold: the press undone */
+            ui.holding = 1;
+            ui.hold_t0 = fm1_ms;
+        }
+        if (ui.holding && (uint32_t)(fm1_ms - ui.hold_t0) >= UI_HOLD_MS) {
+            char m[24], *p = cat(m, "LOOP ");
+            sq_post(RQ_CLEAR, 0, 0);
+            p = num(p, sq.seg + 1, sq.seg + 1u >= 10u ? 2u : 1u, 0);
+            cat(p, " CLEARED");
+            ui_say(m);
+            ui.holding = 0;
+            ui.rec_on = 0;                       /* (until REC is up: nothing more) */
+        }
+    } else {
+        ui.holding = 0;                          /* let go before the end: nothing */
+        ui.rec_on = 0;
+    }
+    if (pressed & (1u << B_SAVE))
+        ui.save_used = 0;
+    if (released & (1u << B_SAVE) && !ui.save_used) {
+        ui.save_req = 1;
+        ui_say("SAVED");
+    }
+    return pressed & ~((1u << B_REC) | (1u << B_SAVE));
 }
 
 /* what lights on the panel: buttons (bit = matrix id), white and black keys (bit = key 0..26, F3 = 0), the

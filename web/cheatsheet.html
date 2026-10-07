@@ -98,6 +98,7 @@
       <tr><td>A page</td><td>EDIT, FX, SEQ, GLO open one; untouched for <b>6 s</b>, or <span class="k">HOME</span>: the faders again</td></tr>
       <tr><td>SELECT</td><td>tempo</td></tr>
       <tr><td>ALGORITHM</td><td>the sound to edit (A1 … D8), without playing it</td></tr>
+      <tr><td>PRESETS</td><td><b>the sample</b> of the pad you hit last: one sample on as many pads as you like, each with its own TUNE, DECAY …</td></tr>
       <tr><td>MASTER</td><td>the volume</td></tr>
     </table>
   </div></div>
@@ -129,6 +130,7 @@
       <li><span class="k">REC</span> again at the end: an empty loop (BARS <b>AUTO</b>) is now as long as your take.</li>
       <li>Hats step by step: hit the hat, <b>hold</b> <span class="k">SEQ</span>: the white keys are its 16 steps (lit = a hit), tap to set / clear; <span class="k">OCT+</span> the next bar.</li>
       <li><span class="k">REC</span> while it plays: overdub more on top; <span class="k">REC</span> again: off.</li>
+      <li>Turn TUNE, DECAY (EDIT → SOUND) or CUT while recording: <b>the pad's hits keep what you turned</b> (a red dot in the step grid).</li>
       <li>A chord: <span class="k">OCT+</span>, white 9 (D1). Melodic: <span class="k">ARP</span> (MULTI PITCH).</li>
       <li>Another loop: a black key, record into it. Songs: SEQ → SONG.</li>
     </ol>
@@ -137,10 +139,11 @@
   <div class="box" style="margin-top:6px"><h2>Buttons</h2><div class="in">
     <table>
       <tr><td><span class="k">PLAY</span></td><td>run / stop (lit while it runs)</td></tr>
-      <tr><td><span class="k red">REC</span></td><td>stopped: armed (blinks); playing: overdub on / off</td></tr>
+      <tr><td><span class="k red">REC</span></td><td>stopped: armed (blinks); playing: overdub on / off; <b>hold 2 s</b>: clear the loop</td></tr>
+      <tr><td><span class="k">EDIT</span> + <span class="k">OCT−</span></td><td><b>undo</b> the last clear / erase / copy (again: redo)</td></tr>
       <tr><td><span class="k">LFO</span> + pad</td><td><b>erase</b>: that pad's hits go as the playhead passes (stopped: all at once)</td></tr>
       <tr><td><span class="k">ENV</span></td><td>tap tempo (it blinks on the beat)</td></tr>
-      <tr><td><span class="k">SAVE</span></td><td>save now; stopped and quiet for 3 s it saves by itself (sounds, mix, effects, loops, songs)</td></tr>
+      <tr><td><span class="k">SAVE</span></td><td>save now; <b>held + a black key</b>: the loop into that loop; stopped and quiet for 3 s it saves by itself</td></tr>
       <tr><td><span class="k">HOME</span></td><td>the faders</td></tr>
     </table>
   </div></div>

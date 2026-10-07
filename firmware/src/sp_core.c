@@ -137,8 +137,17 @@ static int32_t sp_soft(int32_t x)
     return (q - q3 / 3) * 3 / 2;
 }
 
-/* hit sound k at velocity 1..127, `semis` semitones from its TUNE (MULTI PITCH) */
-static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis)
+/* a hit's own TUNE + FINE, DECAY and CUT (recorded with it while they were turned, sp_seq.c), one word:
+ * bit 31 set, cents + 2560 in 0-11, decay in 12-18, cut in 19-25; 0 = the sound's own */
+#define SP_LOCK 0x80000000u
+static uint32_t sp_lock_of(const sp_sound_t *s)
+{
+    return SP_LOCK | (uint32_t)(s->tune * 100 + s->fine + 2560) | (uint32_t)(s->decay & 127u) << 12 |
+           (uint32_t)(s->cut & 127u) << 19;
+}
+
+/* hit sound k at velocity 1..127, `semis` semitones from its TUNE (MULTI PITCH), with a hit's lock (0: none) */
+static void sp_trigger_lk(uint32_t k, uint32_t vel, int32_t semis, uint32_t lk)
 {
     const sp_sound_t *s = &sp_sound[k % SP_NSOUND];
     sp_ch_t *c;
@@ -154,7 +163,8 @@ static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis)
     if (b > w->n) b = w->n;
     if (b <= a + 1u)
         return;
-    cents = sp_clamp(s->tune + semis, -36, 24) * 100 + s->fine;
+    cents = (lk ? (int32_t)(lk & 0xFFFu) - 2560 : s->tune * 100 + s->fine) + semis * 100;
+    cents = sp_clamp(cents, -3650, 2450);
     rate = w->rate;
     if (s->flags & SPF_33)
         rate = rate * 33u / 45u;
@@ -165,11 +175,11 @@ static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis)
     c->frac = 0;
     c->step = (uint32_t)(((uint64_t)(rate * 65536u / SP_FS) * sp_pow2_cents(cents)) >> 16);
     c->env = 1 << 24;
-    c->emul = sp_decay_mul(s->decay);
+    c->emul = sp_decay_mul(lk ? (lk >> 12) & 127u : s->decay);
     lv = (int32_t)s->level * (int32_t)vel / 127;      /* 0..127 */
     c->gl = lv * (64 - (s->pan > 0 ? s->pan : 0)) / 3;   /* Q12: 127 * 64 / 3 = 2709, -3.6 dB a channel */
     c->gr = lv * (64 + (s->pan < 0 ? s->pan : 0)) / 3;   /* (eight at once still fit the mix's headroom) */
-    c->cut = s->cut;
+    c->cut = lk ? (int32_t)((lk >> 19) & 127u) : s->cut;
     c->res = s->reso;
     c->drv = s->drive ? 16 + s->drive / 2 : 0;          /* 1x .. ~5x into the clip */
     c->snd[0] = s->send[0] * 258;
@@ -179,6 +189,7 @@ static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis)
     c->on = 1;
 }
 
+static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis) { sp_trigger_lk(k, vel, semis, 0); }
 static void sp_trigger(uint32_t k, uint32_t vel) { sp_trigger_at(k, vel, 0); }
 
 /* channel ch's next SP_BLK samples into out (stereo, added) */
