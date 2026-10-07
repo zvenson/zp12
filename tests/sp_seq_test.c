@@ -123,6 +123,19 @@ int main(int argc, char **argv)
     check(sq_find(&sq_seg[2], SQ_BAR + 72u, 3) < 0, "step edit: the same step cleared");
     sq.seg = 0;
 
+    /* 3c. loops: a black key while playing switches at the loop's end */
+    sq_post(RQ_PLAY, 0, 0);
+    block();
+    sq_post(RQ_LOOP, 0, 2);
+    block();
+    check(sq.seg == 0u && sq.next_seg == 2u, "LOOP 3 chosen while loop 1 plays: waits");
+    until_wrap();
+    check(sq.seg == 2u && sq.next_seg == 0xFFu, "LOOP 3 from loop 1's end");
+    sq_post(RQ_STOP, 0, 0);
+    sq_post(RQ_LOOP, 0, 0);
+    block();
+    check(sq.seg == 0u, "stopped: a loop at once");
+
     /* 4. a second segment and a song: seg 1 twice, seg 2 once, then the end stops */
     sq_post(RQ_STOP, 0, 0);
     block();

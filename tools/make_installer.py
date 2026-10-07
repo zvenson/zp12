@@ -3,7 +3,7 @@
 tested update path) with zp12's package and texts. Usage:
   make_installer.py <sloopdx repo> build/zp12-X.Y.fwsc <version> <out dir>
 writes <out>/index.html and <out>/firmware/zp12-<version>.fwsc (for now the page sits at dx7's /zp12/)."""
-import hashlib, json, re, shutil, sys
+import hashlib, json, os, re, shutil, sys
 from pathlib import Path
 
 BLK, KEEP, BLOCKS = 512, 16, 20   # (as sloopDX's make_site.py; checked against its product_of below)
@@ -33,15 +33,15 @@ def main(sloopdx, pkg, version, out, own_site=False):
          '<a class="gh" href="https://github.com/zvenson/zp12">GitHub</a></div>'),
         ('<p class="eyebrow">Firmware for the M-VAVE FM-1</p>', '<p class="eyebrow">Early test build for the M-VAVE FM-1</p>'),
         ("<h1>Install <b>sloopDX</b></h1>", "<h1>Install <b>zp12</b></h1>"),
-        (r'<p class="lead">.*?</p>', '<p class="lead">12-bit sampling drums in the spirit of the 80s: 32 sounds at 26.04 kHz, pitched without interpolation, eight channels with their filters. With the sequencer of such a machine (segments up to 32 bars, song, real-time recording, step editing, swing) and the reverb and delay of sloopDX; it keeps your work in flash. Your own samples come next. Back to sloopDX any time with its installer.</p>'),
+        (r'<p class="lead">.*?</p>', '<p class="lead">12-bit sampling drums in the spirit of the 80s: 32 sounds at 26.04 kHz, pitched without interpolation, eight channels with their filters. With the sequencer of such a machine (loops up to 32 bars, eleven of them on the black keys, a song, real-time recording, step editing, swing), the reverb and delay of sloopDX, and sampled chords, horns and bass from CC0 sources; it keeps your work in flash. Your own samples come next. Back to sloopDX any time with its installer.</p>'),
         (r'<div class="dxanim".*?</div>', ""),
         (r'<aside class="side">.*?</aside>', '''<aside class="side">
       <section class="card">
         <h2>Play it</h2>
-        <p class="small"><b>White keys 1&ndash;8</b>: bank A, <b>9&ndash;16</b>: bank B &nbsp; <b>OCT+</b>: C + D, <b>OCT&minus;</b>: A + B &nbsp; <b>ARP</b>: MULTI PITCH</p>
+        <p class="small"><b>White keys 1&ndash;8</b>: bank A, <b>9&ndash;16</b>: bank B &nbsp; <b>OCT+</b>: C + D (D: E-piano chords, horns, vibes, bass, scratches), <b>OCT&minus;</b>: A + B &nbsp; <b>Black keys</b>: loops 1&ndash;11 (playing: from the end of the loop) &nbsp; <b>ARP</b>: MULTI PITCH</p>
         <p class="small"><b>KNOB 1&ndash;4</b>: the faders of channels 1&ndash;4, <b>SEL held</b>: 5&ndash;8. A page (EDIT, FX, SEQ, GLO) takes the knobs; untouched for 6 s, or HOME, they are the faders again.</p>
-        <p class="small"><b>EDIT</b>: SOUND &middot; TRUNC &middot; OUT &middot; SENDS of the last pad &nbsp; <b>FX</b>: CHORUS &middot; DELAY &middot; REVERB &nbsp; <b>GLO</b>: tempo, click</p>
-        <p class="small"><b>PLAY</b>: run / stop &nbsp; <b>REC</b>: record (stopped: a bar of count-in first; an empty segment set to AUTO takes the length of your first take) &nbsp; <b>SEQ tapped</b>: SEGMENT (bars 1&ndash;32 or AUTO, AUTO CORRECT, swing), SEG TOOLS (clear, copy), SONG &nbsp; <b>SEQ held</b>: the 16 steps of the last pad on the white keys, OCT pages the bars &nbsp; <b>LFO held + pad</b>: erase &nbsp; <b>ENV</b>: tap tempo &nbsp; <b>SAVE</b>: save now (it also saves by itself when stopped)</p>
+        <p class="small"><b>EDIT</b>: WAVE (the sample of the pad, copy the sound to another pad) &middot; SOUND &middot; TRUNC &middot; OUT &middot; SENDS of the last pad &nbsp; <b>FX</b>: CHORUS &middot; DELAY &middot; REVERB &nbsp; <b>GLO</b>: tempo, click</p>
+        <p class="small"><b>PLAY</b>: run / stop &nbsp; <b>REC</b>: record (stopped: a bar of count-in first; an empty loop set to AUTO takes the length of your first take) &nbsp; <b>SEQ tapped</b>: LOOP (bars 1&ndash;32 or AUTO, AUTO CORRECT, swing), LOOP TOOLS (clear, copy), SONG &nbsp; <b>SEQ held</b>: the 16 steps of the last pad on the white keys, OCT pages the bars &nbsp; <b>LFO held + pad</b>: erase &nbsp; <b>ENV</b>: tap tempo &nbsp; <b>SAVE</b>: save now (it also saves by itself when stopped)</p>
         <h2>Back to sloopDX</h2>
         <p class="small">Open the <a href="../webapp/installer/">sloopDX installer</a> and press Install. If the FM-1 does not answer: hold OCT&minus; while switching it on (USB rescue), then install.</p>
       </section>
@@ -76,6 +76,13 @@ def main(sloopdx, pkg, version, out, own_site=False):
         old.unlink()
     shutil.copy(pkg, out / "firmware" / name)
     (out / "index.html").write_text(html, encoding="utf-8")
+    vid = os.environ.get("ZP12_VIDEO")                  # the beat video, under the lead
+    if vid and Path(vid).exists():
+        shutil.copy(vid, out / "zp12-beat.mp4")
+        html = re.sub(r'(<p class="lead">.*?</p>)', lambda m: m.group(1) + '\n      <video controls preload="none" playsinline '
+                      'style="width:100%;border-radius:12px;margin:8px 0 18px" src="zp12-beat.mp4?v=' + version + '"></video>',
+                      html, count=1, flags=re.S)
+        (out / "index.html").write_text(html, encoding="utf-8")
     if own_site:                                        # the icon: a navy pad with a red LED, "12"
         (out / "favicon.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="10" fill="#263e70"/>'
                                          '<circle cx="50" cy="14" r="6" fill="#ff2820"/><text x="32" y="50" font-family="Arial,Helvetica,sans-serif" '

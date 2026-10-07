@@ -36,6 +36,7 @@ static struct {
     volatile uint8_t playing, recording, song_mode;
     volatile uint8_t rec_arm;                   /* REC pressed while stopped: PLAY starts with a count-in */
     volatile uint8_t seg;                       /* the segment playing / edited */
+    volatile uint8_t next_seg;                  /* a loop chosen while playing: from the end of this one (0xFF none) */
     uint8_t quant, swing;                       /* SQ_GRID index, SQ_SWING index */
     uint8_t click;                              /* 0 off, 1 while recording, 2 always */
     uint8_t song_n, song_i, song_rep;
@@ -46,7 +47,7 @@ static struct {
     volatile uint32_t beat;                     /* beats since PLAY (the UI's blink) */
     volatile uint32_t played;                   /* pads hit since the UI looked (their keys light) */
     volatile uint32_t gen;                      /* bumps on every change of a segment (the UI, the autosave) */
-} sq = {0, 0, 0, 0, 0, 3, 0, 1, 0, 0, 0, 900, 0, 0, 0, 0, 0, 0};
+} sq = {0, 0, 0, 0, 0, 0xFF, 3, 0, 1, 0, 0, 0, 900, 0, 0, 0, 0, 0, 0};
 
 static uint32_t sq_lvl_vel(uint32_t lvl) { return (lvl + 1u) * 16u - 1u; }
 static uint32_t sq_vel_lvl(uint32_t vel) { return vel >= 127u ? 7u : vel / 16u; }
@@ -174,7 +175,7 @@ static void sq_play(uint32_t on)
 }
 
 /* ---- requests from the main loop (one word each: op, pad, argument) */
-enum { RQ_HIT, RQ_PLAY, RQ_STOP, RQ_REC, RQ_STEP, RQ_WIPE, RQ_CLEAR, RQ_COPY };
+enum { RQ_HIT, RQ_PLAY, RQ_STOP, RQ_REC, RQ_STEP, RQ_WIPE, RQ_CLEAR, RQ_COPY, RQ_LOOP };
 #define SQ_NRQ 64u
 static uint32_t sq_rq[SQ_NRQ];
 static volatile uint32_t sq_rq_w, sq_rq_r;
@@ -235,6 +236,19 @@ static void sq_request(uint32_t r)
         }
         break;
     }
+    case RQ_LOOP:                               /* a loop (segment): stopped at once, playing from this one's end */
+        if (arg >= SQ_NSEG)
+            break;
+        if (!sq.playing || sq.countin > 0) {
+            sq.seg = (uint8_t)arg;
+            sq.next_seg = 0xFF;
+        } else if (sq.recording && !s->bars) {
+            break;                              /* (an AUTO take runs: it decides its length first) */
+        } else {
+            sq.next_seg = arg == sq.seg ? 0xFFu : (uint8_t)arg;
+        }
+        sq.song_mode = 0;
+        break;
     default:
         break;
     }
@@ -243,6 +257,11 @@ static void sq_request(uint32_t r)
 /* the segment's end: the next one of the song, or the same again */
 static void sq_wrap(void)
 {
+    if (sq.next_seg < SQ_NSEG) {                /* the loop chosen */
+        sq.seg = sq.next_seg;
+        sq.next_seg = 0xFF;
+        return;
+    }
     if (!sq.song_mode || !sq.song_n)
         return;
     if (++sq.song_rep >= (sq_song[sq.song_i].rep ? sq_song[sq.song_i].rep : 1u)) {

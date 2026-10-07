@@ -26,9 +26,9 @@
 
 #define UI_PAGE_MS 6000u                        /* a page untouched this long: back to the faders */
 
-enum { PG_HOME, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_N };
-static const char *const PG_NAME[PG_N] = {"MIX", "SOUND", "TRUNC", "OUT", "SENDS", "CHORUS", "DELAY", "REVERB",
-                                          "SEGMENT", "SEG TOOLS", "SONG", "SETUP"};
+enum { PG_HOME, PG_WAVE, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_N };
+static const char *const PG_NAME[PG_N] = {"MIX", "WAVE", "SOUND", "TRUNC", "OUT", "SENDS", "CHORUS", "DELAY", "REVERB",
+                                          "LOOP", "LOOP TOOLS", "SONG", "SETUP"};
 static const char *const DTIME_NAME[6] = {"1/4", "1/8", "1/16", "1/32", "8T", "16T"};
 static const char *const CLICK_NAME[3] = {"OFF", "REC", "ON"};
 
@@ -42,6 +42,7 @@ static struct {
     uint8_t step_bar;                           /* the bar the step grid shows */
     uint8_t song_cur;                           /* SONG page: the step under the knobs */
     uint8_t copy_to;                            /* SEG TOOLS: the target */
+    uint8_t copy_pad;                           /* WAVE: the pad the sound goes to */
     uint8_t arm;                                /* a destructive knob turned once (it wants AGAIN): its page + 1 */
     uint8_t mix[SP_NCH];
     uint32_t arm_ms, touch_ms;
@@ -114,6 +115,11 @@ static void page_cols(char lab[4][8], char val[4][8])
             num(val[i], ui.mix[c], 3, 0);
         }
         break;
+    case PG_WAVE:
+        COL(0, "WAVE", cat(val[0], s->wave < KIT_NWAVE ? KIT_WAVE[s->wave].name : "-----"));
+        COL(1, "COPY>", pad_label(val[1], ui.copy_pad));
+        COL(2, "COPY", cat(val[2], ui.arm == PG_WAVE + 1u ? "AGAIN" : "-->"));
+        break;
     case PG_SOUND:
         COL(0, "TUNE", num(val[0], s->tune, 2, 1)); COL(1, "FINE", num(val[1], s->fine, 2, 1));
         COL(2, "DECAY", num(val[2], s->decay, 3, 0)); COL(3, "LEVEL", num(val[3], s->level, 3, 0));
@@ -146,7 +152,7 @@ static void page_cols(char lab[4][8], char val[4][8])
         break;
     case PG_SEG: {
         const sq_seg_t *g = &sq_seg[sq.seg % SQ_NSEG];
-        COL(0, "SEG", num(val[0], sq.seg + 1, 2, 0));
+        COL(0, "LOOP", num(val[0], sq.seg + 1, 2, 0));
         COL(1, "BARS", g->bars ? (void)num(val[1], g->bars, 2, 0) : (void)cat(val[1], "AUTO"));
         COL(2, "QUANT", cat(val[2], SQ_GRID_NAME[sq.quant % 7u]));
         COL(3, "SWING", num(val[3], SQ_SWING[sq.swing % 6u], 2, 0));
@@ -210,8 +216,8 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
     } else if (sq.playing) {                    /* SEG01 2.3 */
         uint32_t t = sq.countin > 0 ? 0u : sq.pos >> 16;
         if (sq.song_mode && sq.song_n) { p = cat(p, "S"); p = num(p, sq.song_i + 1, 2, 0); p = cat(p, ":"); }
-        else p = cat(p, "SEG");
-        p = num(p, sq.seg + 1, 2, 0);
+        else p = cat(p, "LOOP");
+        p = num(p, sq.seg + 1, sq.seg + 1u >= 10u ? 2u : 1u, 0);
         p = cat(p, " ");
         p = num(p, (int32_t)(t / SQ_BAR + 1u), t / SQ_BAR + 1u >= 10u ? 2u : 1u, 0);
         p = cat(p, ".");
@@ -452,6 +458,12 @@ static void key_down(uint32_t k, int erase)
         }
         return;
     }
+    if (white_of(k) == 0xFFu && !ui.multi && !erase) {   /* a black key: loop (segment) 1-11, at the loop's end */
+        uint32_t b = 0, i;
+        for (i = 0; i < k; i++) b += white_of(i) == 0xFFu;
+        sq_post(RQ_LOOP, 0, b);
+        return;
+    }
     if (ui.multi && !erase) {                    /* MULTI PITCH: the sound, F4 (key 12) as written */
         pad_hit_at(ui.sel, 110, (int32_t)k - 12);
         return;
@@ -481,55 +493,76 @@ static int again(uint32_t which)                 /* a destructive turn: the firs
     return 0;
 }
 
+/* a 0..127 value's step: 3 a detent, more when turned fast (a half turn from 0 to 127) */
+static int32_t accel(int32_t d)
+{
+    int32_t a = d < 0 ? -d : d;
+    return d * (a >= 3 ? 8 : a == 2 ? 5 : 3);
+}
+
 /* KNOB n turned by d */
 static void knob(uint32_t n, int32_t d)
 {
     sp_sound_t *s = &sp_sound[ui.sel];
-    int32_t one = d > 0 ? 1 : -1;
+    int32_t one = d > 0 ? 1 : -1, dd = accel(d);
     ui.touch_ms = fm1_ms;
     switch (ui.page) {
     case PG_HOME: {
         uint32_t c = (ui.shift ? 4u : 0u) + n;     /* the faders: channels 1-4, SEL held 5-8 */
-        ui.mix[c] = (uint8_t)sp_clamp(ui.mix[c] + d, 0, 127);
+        ui.mix[c] = (uint8_t)sp_clamp(ui.mix[c] + dd, 0, 127);
         sp_mix[c] = ui.mix[c];
         break;
     }
+    case PG_WAVE:
+        if (n == 0u) {                             /* the sample this pad plays (the factory's 24; own ones later) */
+            uint32_t w = s->wave < KIT_NWAVE ? s->wave : 0u;
+            s->wave = (uint8_t)((w + KIT_NWAVE + (one > 0 ? 1u : KIT_NWAVE - 1u)) % KIT_NWAVE);
+            s->start = 0;
+            s->end = 1000;
+            SP_HIT(ui.sel, 100, 0);                /* (heard at once) */
+        }
+        if (n == 1u) ui.copy_pad = (uint8_t)((ui.copy_pad + SP_NSOUND + (one > 0 ? 1u : SP_NSOUND - 1u)) % SP_NSOUND);
+        if (n == 2u && d > 0 && again(PG_WAVE + 1u) && ui.copy_pad != ui.sel) {
+            sp_sound[ui.copy_pad] = *s;
+            ui_say("SOUND COPIED");
+        }
+        break;
     case PG_SOUND:
         if (n == 0u) s->tune = (int8_t)sp_clamp(s->tune + one, -24, 12);
         if (n == 1u) s->fine = (int8_t)sp_clamp(s->fine + d, -50, 50);
-        if (n == 2u) s->decay = (uint8_t)sp_clamp(s->decay + d, 0, 127);
-        if (n == 3u) s->level = (uint8_t)sp_clamp(s->level + d, 0, 127);
+        if (n == 2u) s->decay = (uint8_t)sp_clamp(s->decay + dd, 0, 127);
+        if (n == 3u) s->level = (uint8_t)sp_clamp(s->level + dd, 0, 127);
         break;
     case PG_TRUNC:
-        if (n == 0u) s->start = (uint16_t)sp_clamp(s->start + d * 4, 0, s->end - 10);
-        if (n == 1u) s->end = (uint16_t)sp_clamp(s->end + d * 4, s->start + 10, 1000);
+        if (n == 0u) s->start = (uint16_t)sp_clamp(s->start + dd * 3, 0, s->end - 10);
+        if (n == 1u) s->end = (uint16_t)sp_clamp(s->end + dd * 3, s->start + 10, 1000);
         if (n == 2u) s->flags = (uint8_t)(one > 0 ? s->flags | SPF_REVERSE : s->flags & ~SPF_REVERSE);
         if (n == 3u) s->flags = (uint8_t)(one > 0 ? s->flags | SPF_33 : s->flags & ~SPF_33);
         break;
     case PG_OUT:
         if (n == 0u) s->chan = (uint8_t)sp_clamp(s->chan + one, 0, SP_NCH - 1);
-        if (n == 1u) s->pan = (int8_t)sp_clamp(s->pan + d, -64, 63);
-        if (n == 2u) s->cut = (uint8_t)sp_clamp(s->cut + d, 0, 127);
-        if (n == 3u) s->reso = (uint8_t)sp_clamp(s->reso + d, 0, 127);
+        if (n == 1u) s->pan = (int8_t)sp_clamp(s->pan + dd, -64, 63);
+        if (n == 2u) s->cut = (uint8_t)sp_clamp(s->cut + dd, 0, 127);
+        if (n == 3u) s->reso = (uint8_t)sp_clamp(s->reso + dd, 0, 127);
         break;
     case PG_SFX:
-        if (n == 0u) s->drive = (uint8_t)sp_clamp(s->drive + d, 0, 127);
-        else s->send[n - 1u] = (uint8_t)sp_clamp(s->send[n - 1u] + d, 0, 127);
+        if (n == 0u) s->drive = (uint8_t)sp_clamp(s->drive + dd, 0, 127);
+        else s->send[n - 1u] = (uint8_t)sp_clamp(s->send[n - 1u] + dd, 0, 127);
         break;
     case PG_CHO:
-        if (n == 0u) fxp.crate = (int16_t)sp_clamp(fxp.crate + d, 0, 127);
-        if (n == 1u) fxp.cdepth = (int16_t)sp_clamp(fxp.cdepth + d, 0, 127);
-        if (n == 2u) fxp.cmix = (int16_t)sp_clamp(fxp.cmix + d, 0, 127);
+        if (n == 0u) fxp.crate = (int16_t)sp_clamp(fxp.crate + dd, 0, 127);
+        if (n == 1u) fxp.cdepth = (int16_t)sp_clamp(fxp.cdepth + dd, 0, 127);
+        if (n == 2u) fxp.cmix = (int16_t)sp_clamp(fxp.cmix + dd, 0, 127);
         break;
     case PG_DLY:
         if (n == 0u) fxp.dtime = (int16_t)sp_clamp(fxp.dtime + one, 0, 5);
-        if (n == 1u) fxp.fdbk = (int16_t)sp_clamp(fxp.fdbk + d, 0, 120);
-        if (n == 2u) fxp.colr = (int16_t)sp_clamp(fxp.colr + d, 0, 127);
-        if (n == 3u) fxp.dmix = (int16_t)sp_clamp(fxp.dmix + d, 0, 127);
+        if (n == 1u) fxp.fdbk = (int16_t)sp_clamp(fxp.fdbk + dd, 0, 120);
+        if (n == 2u) fxp.colr = (int16_t)sp_clamp(fxp.colr + dd, 0, 127);
+        if (n == 3u) fxp.dmix = (int16_t)sp_clamp(fxp.dmix + dd, 0, 127);
         break;
     case PG_REV:
-        if (n == 0u) fxp.size = (int16_t)sp_clamp(fxp.size + d, 0, 127);
-        if (n == 1u) fxp.damp = (int16_t)sp_clamp(fxp.damp + d, 0, 127);
+        if (n == 0u) fxp.size = (int16_t)sp_clamp(fxp.size + dd, 0, 127);
+        if (n == 1u) fxp.damp = (int16_t)sp_clamp(fxp.damp + dd, 0, 127);
         if (n == 2u) fxp.pre = (int16_t)sp_clamp(fxp.pre + d, 0, 90);
         break;
     case PG_SEG:
@@ -567,7 +600,7 @@ static void knob(uint32_t n, int32_t d)
         if (n == 3u) sq.song_mode = (uint8_t)(one > 0);
         break;
     case PG_SETUP:
-        if (n == 0u) sq.bpm10 = (uint16_t)sp_clamp(sq.bpm10 + d * 5, 400, 2400);
+        if (n == 0u) sq.bpm10 = (uint16_t)sp_clamp(sq.bpm10 + dd * 3, 400, 2400);
         if (n == 1u) sq.click = (uint8_t)sp_clamp(sq.click + one, 0, 2);
         break;
     default:
@@ -609,7 +642,7 @@ static void button(uint32_t b)
         break;
     case B_ARP: ui.multi ^= 1u; break;
     case B_HOME: page(PG_HOME); break;
-    case B_EDIT: page(ui.page >= PG_SOUND && ui.page < PG_SFX ? ui.page + 1u : PG_SOUND); break;
+    case B_EDIT: page(ui.page >= PG_WAVE && ui.page < PG_SFX ? ui.page + 1u : PG_WAVE); break;
     case B_FX: page(ui.page >= PG_CHO && ui.page < PG_REV ? ui.page + 1u : PG_CHO); break;
     case B_SEQ: page(ui.page == PG_SEG ? PG_SEG2 : ui.page == PG_SEG2 ? PG_SONG : PG_SEG); break;
     case B_SAVE: ui.save_req = 1; ui_say("SAVED"); break;
@@ -651,10 +684,17 @@ static void ui_leds(uint32_t *btn, uint32_t *keys, uint32_t *glow)
         }
         b |= 1u << B_SEQ;
     } else {                                     /* the pads heard just now: their keys flash */
+        uint32_t nb = 0;
         for (i = 0; i < 27u; i++) {
             uint32_t p = ui.multi ? 0xFFu : key_pad(i);
             if (p < 32u && (int32_t)(fm1_ms - ui.hit_ms[p]) < 90)
                 k |= 1u << i;
+            if (white_of(i) == 0xFFu && !ui.multi) {   /* the loops: the one playing lit, one waiting blinks */
+                if (nb == sq.seg) k |= 1u << i;
+                if (nb == sq.next_seg && blink) k |= 1u << i;
+                g |= 1u << i;                    /* (the others glow: there is a loop under every black key) */
+                nb++;
+            }
         }
     }
     *btn = b;
