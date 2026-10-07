@@ -101,24 +101,66 @@
   table.spec td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--frame2); vertical-align: top; }
   table.spec td:first-child { font-weight: 700; white-space: nowrap; width: 1%; padding-right: 22px; }
   .navy table.spec td { border-color: rgba(169, 182, 212, 0.22); }
-  .sheet { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; }
-  .sheet img { width: 100%; border-radius: 8px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25); display: block; }
+  .csw { margin-top: 26px; overflow-x: auto; border-radius: 8px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18); }
   details { border-bottom: 1px solid var(--frame2); padding: 14px 0; }
   details summary { cursor: pointer; font-weight: 700; font-size: 17px; }
   details p { margin: 10px 0 0; color: #3a4666; }
   footer { background: var(--navy3); color: var(--dim); font-size: 14px; padding: 34px 0 40px; }
   footer .wrap { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
   footer a { color: #fff; }
-  @media (max-width: 980px) { .hero .wrap, .split, .sheet, footer .wrap { grid-template-columns: 1fr; } .grid3 { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 980px) { .hero .wrap, .split, footer .wrap { grid-template-columns: 1fr; } .grid3 { grid-template-columns: 1fr 1fr; }
     .stats .wrap { grid-template-columns: repeat(2, 1fr); } nav .links a:not(.gh):not(.in) { display: none; } nav .rule { display: none; } }
   @media (max-width: 620px) { .grid3, .screens { grid-template-columns: 1fr; } .pads { grid-template-columns: repeat(4, 1fr); } .wrap { padding: 0 18px; } }
+</style>
+<style id="cs-style">
+  .cs { --frame: #cecfc9; --frame2: #b9bbb3; --navy: #263e70; --navy2: #1e3260; --ink: #1e3060; --red: #c82e32; --led: #ff2820;
+          --lcd: #b2be92; --lcdink: #10180e; --paper: #e9eae4; --txt: #e8ecf4; --dim: #a9b6d4; }
+  .cs * { box-sizing: border-box; }
+  .cs { font: 10.4px/1.36 "Helvetica Neue", Arial, sans-serif; color: var(--ink); }
+  .cs .sheet { width: 297mm; min-height: 210mm; margin: 0 auto; padding: 7mm 8mm; background: var(--frame);
+           border: 1px solid var(--frame2); }
+  .cs header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 5px; }
+  .cs .mark { font: 900 30px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: -1px; color: var(--ink); font-style: italic; }
+  .cs .sub { font-size: 15px; color: var(--ink); font-style: italic; }
+  .cs .rule { flex: 1; height: 5px; border-top: 1.5px solid var(--red); border-bottom: 1.5px solid var(--ink); align-self: center; }
+  .cs .ver { font-size: 10px; color: #4a587c; }
+  .cs .grid { display: grid; grid-template-columns: 1.05fr 1fr 1fr; gap: 6px; }
+  .cs .box { background: var(--navy); color: var(--txt); border-radius: 5px; overflow: hidden; }
+  .cs .box h2 { margin: 0; padding: 3px 8px 2px; background: var(--frame); color: var(--ink); font: italic 400 15px/1.2 Georgia, "Times New Roman", serif;
+            display: flex; align-items: center; gap: 8px; }
+  .cs .box h2::after { content: ""; flex: 1; height: 3px; border-top: 1px solid var(--red); border-bottom: 1px solid var(--ink); }
+  .cs .in { padding: 5px 8px 6px; }
+  .cs table { border-collapse: collapse; width: 100%; }
+  .cs td { padding: 1.6px 4px 1.6px 0; vertical-align: top; border-bottom: 1px solid rgba(169, 182, 212, 0.18); }
+  .cs td:first-child { white-space: nowrap; color: #fff; font-weight: 700; width: 1%; padding-right: 7px; }
+  .cs tr:last-child td { border-bottom: 0; }
+  .cs b, .cs .k { color: #fff; }
+  .cs .k { display: inline-block; padding: 0 4px; border-radius: 3px; background: #6f8fcf; color: #0e1a36; font-weight: 800; font-size: 9.4px; line-height: 13px; }
+  .cs .k.red { background: var(--led); color: #fff; }
+  .cs .k.blk { background: #0e1220; color: #fff; border: 1px solid #6f8fcf; }
+  .cs .dim { color: var(--dim); }
+  .cs .lcd { background: var(--lcd); color: var(--lcdink); border: 3px solid #464c42; border-radius: 3px; padding: 3px 6px;
+         font: 700 11px/1.3 "Courier New", monospace; margin: 4px 0; }
+  .cs ol { margin: 2px 0 0 15px; padding: 0; }
+  .cs li { margin: 1.6px 0; }
+  .cs .pads { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; margin: 3px 0 2px; }
+  .cs .pads span { background: #0e1220; color: #fff; text-align: center; border-radius: 2px; padding: 1px 0; font-size: 8.6px; font-weight: 700; }
+  .cs .pads span i { display: block; font-style: normal; color: var(--dim); font-weight: 400; font-size: 8px; }
+  .cs .kb { display: flex; height: 40px; position: relative; margin: 3px 0 4px; }
+  .cs .kb .w { flex: 1; background: #ecece6; border: 1px solid #0e1220; border-radius: 0 0 3px 3px; margin-right: -1px; font-size: 7.5px;
+           color: #333; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 1px; }
+  .cs .kb .b { position: absolute; top: 0; width: 3.6%; height: 24px; background: #0e1220; border-radius: 0 0 2px 2px; color: #ff8a80;
+           font-size: 7px; text-align: center; line-height: 30px; }
+  .cs footer { margin-top: 5px; font-size: 8.6px; color: #4a587c; display: flex; justify-content: space-between; }
+  @media print { .cs .sheet { border: 0; } }
+  @media screen and (max-width: 900px) { .cs .sheet { width: auto; min-height: 0; } .cs .grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
 <nav><div class="wrap">
   <a class="mark" href="#top">zp12<small>sampling drums</small></a>
   <span class="rule"></span>
-  <div class="links"><a href="#video">Video</a><a href="#workflow">Workflow</a><a href="#sound">Sound</a><a href="cheatsheet.html">Cheat sheet</a>
+  <div class="links"><a href="#video">Video</a><a href="#workflow">Workflow</a><a href="#sound">Sound</a><a href="#cheatsheet">Cheat sheet</a><a href="backup/">Backup</a>
     <a class="in" href="install/"><b>Install</b></a><a class="gh" href="https://github.com/zvenson/zp12">GitHub</a></div>
 </div></nav>
 
@@ -127,7 +169,7 @@
     <p class="eyebrow">Free firmware for the M-VAVE FM-1</p>
     <h1>A <b>12-bit</b> sampling drum machine in your hands.</h1>
     <p class="lead">32 pads at 26.04 kHz, pitched the old way: no interpolation, the aliasing is the sound. Eight channels with their filters, eleven loops on the black keys, songs, step editing, swing, and the reverb and delay of sloopDX. Install it from the browser; going back is one click.</p>
-    <div class="cta"><a class="btn primary" href="install/">Install zp12</a><a class="btn ghost" href="#video">Watch the beat</a><a class="btn ghost" href="cheatsheet.html">Cheat sheet</a></div>
+    <div class="cta"><a class="btn primary" href="install/">Install zp12</a><a class="btn ghost" href="#video">Watch the beat</a><a class="btn ghost" href="#cheatsheet">Cheat sheet</a></div>
   </div>
   <div>
     <div class="device"><img id="shot" src="img/rec.png" alt="The zp12 screen on the FM-1: recording loop 1" width="480" height="480"><div class="cap" id="shotcap">Recording: LOOP1 2.3, the knobs' columns below</div></div>
@@ -220,13 +262,132 @@
   </div>
 </div></section>
 
-<section id="cheatsheet"><div class="wrap sheet">
-  <a href="cheatsheet.html"><img src="img/cheatsheet.png" alt="The zp12 cheat sheet" width="1170" height="827"></a>
-  <div>
-    <h2>Cheat sheet</h2>
-    <p class="intro">Every key, button and page on one A4 sheet, in the panel's colours. Print it and lay it next to the FM-1.</p>
-    <div class="cta"><a class="btn primary" href="cheatsheet.html">Open it</a><a class="btn ghost" style="color:var(--ink);border-color:var(--frame2)" href="zp12-cheat-sheet.pdf">PDF (A4)</a></div>
-  </div>
+<section id="cheatsheet"><div class="wrap">
+  <h2>Cheat sheet</h2>
+  <p class="intro">Every key, button and page on one sheet, in the panel's colours. <a href="zp12-cheat-sheet.pdf">The PDF (A4)</a> to print and lay next to the FM-1.</p>
+  <div class="csw"><!--cs--><div class="cs"><div class="sheet">
+<header>
+  <span class="mark">zp12</span><span class="sub">sampling drums</span><span class="rule"></span>
+  <span class="ver">firmware 1.3 for the M-VAVE FM-1 · zp12.designburgapps.com</span>
+</header>
+
+<div class="grid">
+<div>
+  <div class="box"><h2>The keys</h2><div class="in">
+    <div class="kb" id="kb"></div>
+    <table>
+      <tr><td>White 1–8</td><td>pads of bank <b>A</b> (or <b>C</b>)</td></tr>
+      <tr><td>White 9–16</td><td>pads of bank <b>B</b> (or <b>D</b>)</td></tr>
+      <tr><td><span class="k">OCT+</span> <span class="k">OCT−</span></td><td>banks <b>C + D</b> / back to <b>A + B</b> (the LEDs A–D show which)</td></tr>
+      <tr><td><span class="k blk">black keys</span></td><td><b>loops 1–11</b>: stopped at once; playing: from the end of the loop (its key blinks, the LCD says <b>LOOP 3 NEXT</b>). The loop playing is lit.</td></tr>
+      <tr><td><span class="k">ARP</span></td><td><b>MULTI PITCH</b>: the last sound on all 27 keys, F4 (white 8) as tuned. ARP again: pads.</td></tr>
+      <tr><td>USB MIDI</td><td>notes 36–67 play pads A1–D8</td></tr>
+    </table>
+  </div></div>
+
+  <div class="box" style="margin-top:6px"><h2>The factory sounds</h2><div class="in">
+    <div class="pads"><span>A1<i>KICK</i></span><span>A2<i>SNARE</i></span><span>A3<i>RIM</i></span><span>A4<i>CLAP</i></span><span>A5<i>HAT</i></span><span>A6<i>OHAT</i></span><span>A7<i>TOM L</i></span><span>A8<i>TOM H</i></span></div>
+    <div class="pads"><span>B1<i>CRASH</i></span><span>B2<i>RIDE</i></span><span>B3<i>COWBL</i></span><span>B4<i>TAMB</i></span><span>B5<i>SHAKR</i></span><span>B6<i>CONGA</i></span><span>B7<i>CLAVE</i></span><span>B8<i>WOOD</i></span></div>
+    <div class="pads"><span>C1–C5<i>A1–A5</i></span><span style="grid-column: span 4">bank A lower, 45→33, the filter on ch 1–2</span><span>C6<i>PNO Cm9</i></span><span>C7<i>PNO F13</i></span><span>C8<i>PIANO</i></span></div>
+    <div class="pads"><span>D1<i>EP Dm9</i></span><span>D2<i>EP Gm9</i></span><span>D3<i>HORNS</i></span><span>D4<i>VIBES</i></span><span>D5<i>BASS</i></span><span>D6<i>SCRCH</i></span><span>D7<i>SPIN</i></span><span>D8<i>SNAP</i></span></div>
+    <p class="dim" style="margin:3px 0 0">Any pad, any of these 27 samples: hit it, turn <b>PRESETS</b>. 12 bit at 26.04 kHz, pitched without interpolation.</p>
+  </div></div>
+
+  <div class="box" style="margin-top:6px"><h2>Sound</h2><div class="in">
+    <table>
+      <tr><td>Channels</td><td>a pad plays on a channel 1–8 (OUT, CHAN); one sound at a time each: a new hit cuts the last (HAT and OHAT share 3)</td></tr>
+      <tr><td>1–2</td><td>a 4-pole resonant low-pass whose cutoff follows the decay (CUT, RESO)</td></tr>
+      <tr><td>3–6 · 7–8</td><td>a fixed low-pass · no filter</td></tr>
+      <tr><td>45 → 33</td><td>TRUNC, SPEED: played at 33/45 of its rate: lower, grainier</td></tr>
+    </table>
+  </div></div>
+</div>
+
+<div>
+  <div class="box"><h2>The knobs</h2><div class="in">
+    <div class="lcd">A1 KICK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;090<br><span style="font-weight:400">CH1 &nbsp;CH2 &nbsp;CH3 &nbsp;CH4</span><br>100 &nbsp;100 &nbsp;100 &nbsp;100</div>
+    <table>
+      <tr><td>KNOB 1–4</td><td>the <b>faders</b> of channels 1–4; <span class="k">SEL</span> held: <b>5–8</b>, on any page. The LCD's four columns always say what the knobs do.</td></tr>
+      <tr><td>A page</td><td>EDIT, FX, SEQ, GLO open one; untouched for <b>6 s</b>, or <span class="k">HOME</span>: the faders again</td></tr>
+      <tr><td>SELECT</td><td>tempo</td></tr>
+      <tr><td>ALGORITHM</td><td>the sound to edit (A1 … D8), without playing it</td></tr>
+      <tr><td>PRESETS</td><td><b>the sample</b> of the pad you hit last: one sample on as many pads as you like, each with its own TUNE, DECAY …</td></tr>
+      <tr><td>MASTER</td><td>the volume</td></tr>
+    </table>
+  </div></div>
+
+  <div class="box" style="margin-top:6px"><h2>Pages · KNOB 1 · 2 · 3 · 4</h2><div class="in">
+    <table>
+      <tr><td><span class="k">EDIT</span> WAVE</td><td>the pad's sample · COPY> pad · COPY (turn twice) · –</td></tr>
+      <tr><td>SOUND</td><td>TUNE (semitones) · FINE · DECAY · LEVEL</td></tr>
+      <tr><td>TRUNC</td><td>START · END · DIR (fwd / rev) · SPEED (45 / 33)</td></tr>
+      <tr><td>OUT</td><td>CHAN · PAN · CUT · RESO (CUT / RESO on ch 1–2)</td></tr>
+      <tr><td>SENDS</td><td>DRIVE · CHO · DLY · REV: <b>the effects of this pad</b></td></tr>
+      <tr><td><span class="k">FX</span> FILTER</td><td><b>DJ filter</b> on the whole mix: left a low-pass, right a high-pass, centre OFF · RESO</td></tr>
+      <tr><td>CHORUS</td><td>RATE · DEPTH · MIX</td></tr>
+      <tr><td>DELAY</td><td>TIME (1/4 … 16T, in tempo) · FDBK · COLOR · MIX</td></tr>
+      <tr><td>REVERB</td><td>SIZE · DAMP · PRE (ms)</td></tr>
+      <tr><td><span class="k">SEQ</span> LOOP</td><td>LOOP · BARS (AUTO, 1–32) · QUANT (AUTO CORRECT) · SWING 50–71 %</td></tr>
+      <tr><td>LOOP TOOLS</td><td>CLEAR (turn twice) · COPY> loop · COPY (turn twice)</td></tr>
+      <tr><td>SONG</td><td>STEP · LOOP · REPEAT (0: the song ends here) · SONG OFF / 1–4</td></tr>
+      <tr><td><span class="k">GLO</span> SETUP</td><td>TEMPO · CLICK (off / rec / on) · VER · RESET (turn twice: the factory state)</td></tr>
+    </table>
+    <p class="dim" style="margin:3px 0 0">Each tap of EDIT, FX or SEQ: the next of its pages. The header says where you are (EDIT &gt; SOUND), the tabs below show the others.</p>
+  </div></div>
+</div>
+
+<div>
+  <div class="box"><h2>Make a beat</h2><div class="in">
+    <ol>
+      <li><span class="k">REC</span> (it blinks: armed), <span class="k">PLAY</span>: a bar of count-in.</li>
+      <li>Play kick and snare. <b>AUTO CORRECT</b> puts them on the grid.</li>
+      <li><span class="k">REC</span> again at the end: an empty loop (BARS <b>AUTO</b>) is now as long as your take.</li>
+      <li>Hats step by step: hit the hat, <b>hold</b> <span class="k">SEQ</span>: the white keys are its 16 steps (lit = a hit), tap to set / clear; <span class="k">OCT+</span> the next bar.</li>
+      <li><span class="k">REC</span> while it plays: overdub more on top; <span class="k">REC</span> again: off.</li>
+      <li>Turn TUNE, DECAY (EDIT → SOUND) or CUT while recording: <b>the pad's hits keep what you turned</b> (a red dot in the step grid).</li>
+      <li>A chord: <span class="k">OCT+</span>, white 9 (D1). Melodic: <span class="k">ARP</span> (MULTI PITCH).</li>
+      <li>Another loop: a black key, record into it. Songs: SEQ → SONG.</li>
+    </ol>
+  </div></div>
+
+  <div class="box" style="margin-top:6px"><h2>Buttons</h2><div class="in">
+    <table>
+      <tr><td><span class="k">PLAY</span></td><td>run / stop (lit while it runs)</td></tr>
+      <tr><td><span class="k red">REC</span></td><td>stopped: armed (blinks); playing: overdub on / off; <b>hold 2 s</b>: clear the loop</td></tr>
+      <tr><td><span class="k">EDIT</span> + <span class="k">OCT−</span></td><td><b>undo</b> the last clear / erase / copy (again: redo)</td></tr>
+      <tr><td><span class="k">LFO</span> + pad</td><td><b>erase</b>: that pad's hits go as the playhead passes (stopped: all at once)</td></tr>
+      <tr><td><span class="k">ENV</span></td><td>tap tempo (it blinks on the beat)</td></tr>
+      <tr><td><span class="k">SAVE</span></td><td>save now; <b>held + a black key</b>: the loop into that loop; stopped and quiet for 3 s it saves by itself</td></tr>
+      <tr><td><span class="k">HOME</span></td><td>the faders</td></tr>
+    </table>
+  </div></div>
+
+  <div class="box" style="margin-top:6px"><h2>Effects in 3 steps</h2><div class="in">
+    <ol>
+      <li>Hit the pad (the snare).</li>
+      <li><span class="k">EDIT</span> until the LCD says <b>SENDS</b>.</li>
+      <li>KNOB 4 = REV, KNOB 3 = DLY. Shape them: <span class="k">FX</span>.</li>
+    </ol>
+    <p class="dim" style="margin:4px 0 0">Back to sloopDX: its installer. No answer? Hold OCT− while switching on (USB rescue).</p>
+  </div></div>
+</div>
+</div>
+
+<footer><span>zp12: based on SLOOP (isod89) and Felucca (Leo Kuroshita, Hügelton Instruments), GPL-3.0. Sounds: CC0 (VSCO-2 CE, VCSL, Sonic Pi); E-piano by Greg Sullivan (CC BY 3.0).</span>
+<span>Inspired by the 12-bit samplers of the 80s; their names are trademarks of their owners. Not affiliated with M-VAVE.</span></footer>
+</div></div>
+<script>
+/* the 27 keys: white 1-16 numbered, the black ones the loops */
+(() => {
+  const kb = document.getElementById("kb"), black = [1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25];
+  let w = 0, loop = 1;
+  for (let k = 0; k < 27; k++) if (!black.includes(k)) { const d = document.createElement("div"); d.className = "w"; d.textContent = ++w; kb.append(d); }
+  for (let k = 0; k < 27; k++) if (black.includes(k)) {
+    let wb = 0; for (let i = 0; i < k; i++) if (!black.includes(i)) wb++;
+    const d = document.createElement("div"); d.className = "b"; d.style.left = `calc(${wb / 16 * 100}% - 1.8%)`; d.textContent = "L" + loop++; kb.append(d);
+  }
+})();
+</script><!--/cs--></div>
 </div></section>
 
 <section id="start" class="navy"><div class="wrap split">
@@ -235,12 +396,13 @@
     <ol class="steps" style="margin-top:24px">
       <li>Connect the FM-1 by USB, open the <a href="install/" style="color:#ffb4ab">installer</a> in Chrome or Edge.</li>
       <li>Press Install. About a minute; the FM-1 restarts twice. The splash shows the version.</li>
+      <li>Before you switch or try something: <a href="backup/" style="color:#ffb4ab">back up</a> your loops, sounds and sloopDX's DX7 banks in the browser, and put them back later.</li>
       <li>Back to sloopDX or the stock firmware any time with their installers. No answer? Hold OCT− while switching on: the USB rescue.</li>
     </ol>
   </div>
   <div>
     <p class="dim" style="font-size:15px">zp12 is an early test build: try it, and tell what you find on GitHub. Unofficial firmware, free and without warranty: you install it at your own risk.</p>
-    <div class="cta"><a class="btn primary" href="install/">Install zp12 1.2</a><a class="btn ghost" href="https://github.com/zvenson/zp12">Source on GitHub</a></div>
+    <div class="cta"><a class="btn primary" href="install/">Install zp12 1.3</a><a class="btn ghost" href="https://github.com/zvenson/zp12">Source on GitHub</a></div>
   </div>
 </div></section>
 
@@ -261,7 +423,7 @@
 <footer><div class="wrap">
   <div>zp12 by zvenson. Based on <a href="https://github.com/isod89/sloop-fm1">SLOOP</a> (isod89) and <a href="https://github.com/hugelton/Felucca">Felucca</a> (Leo Kuroshita, Hügelton Instruments), with the effects and the FM-1 platform of <a href="https://dx7.designburgapps.com/">sloopDX</a>. GPL-3.0, no warranty: custom firmware is installed at your own risk.<br>
   Inspired by the 12-bit samplers of the 80s; their names are trademarks of their owners. M-VAVE and FM-1 are trademarks of their owners; zp12 is not affiliated with them.</div>
-  <div><a href="https://github.com/zvenson/zp12">github.com/zvenson/zp12</a><br><a href="install/">Installer</a> · <a href="cheatsheet.html">Cheat sheet</a><br><a href="impressum.html">Impressum · Disclaimer · Datenschutz</a><br><a href="https://webdesignhamburg.net/">webdesignhamburg.net</a></div>
+  <div><a href="https://github.com/zvenson/zp12">github.com/zvenson/zp12</a><br><a href="install/">Installer</a> · <a href="#cheatsheet">Cheat sheet</a> · <a href="backup/">Backup</a><br><a href="impressum.html">Impressum · Disclaimer · Datenschutz</a><br><a href="https://webdesignhamburg.net/">webdesignhamburg.net</a></div>
 </div></footer>
 
 <script>

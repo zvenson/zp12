@@ -34,6 +34,9 @@ static volatile uint32_t fm1_ms;
 #include "usb.c"
 
 /* ---- flash: read anywhere, erase / program only the update's staging area (saving comes later) */
+/* (the app writes Felucca's store, the update staging and, for the web tools, the free rooms above it:
+ * 0xE5000..0xE8FFF and 0xEA000..0xFBFFF; sp_link.c narrows that to zp12's own and sloopDX's banks) */
+#define FL_RANGE_OK(off, n) (FL_STORE_OK(off, n) || FL_IN(off, n, FL_OTA_LO, 0xE9000u) || FL_IN(off, n, 0xEA000u, 0xFC000u))
 #include "fm1_flash.h"
 static uint8_t flash_ok;
 static int st_read(uint32_t off, void *dst, uint32_t n)
@@ -114,6 +117,7 @@ static void ota_commit(const uint8_t *parm)
 #define SP_HIT(k, vel, semis) sq_post(RQ_HIT, k, (vel) | (uint32_t)((semis) + 64) << 8)
 #include "sp_ui.c"
 #include "sp_store.c"
+#include "sp_link.c"
 
 /* ---- the timer: 10 kHz key scan, milliseconds, USB at 2 kHz */
 void fm1_timer5_irq(void)
@@ -164,10 +168,12 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
 extern void isr_alnk0(void);
 
 /* the USB side, polled from the main loop: the installer's update request, the UBOOT request */
+static void zl_service(void);
 static void fm1_service(void)
 {
     fm1_wdt_feed();
     usb_retry(fm1_ms);
+    zl_service();                               /* (the web tools' frames first: ota_service drops the rest) */
     ota_service();
     if (usb.ota_req) {
         usb.ota_req = 0;
@@ -353,7 +359,7 @@ static void zp12_main(void)
             ui_say("FACTORY RESET");
         }
         {   /* saving: SAVE, or by itself when stopped, silent and nothing changed for 3 s (an erase stops the audio) */
-            uint32_t k, quiet = !sq.playing;
+            uint32_t k, quiet = !sq.playing && !zl_busy();   /* (not while a backup is read or restored) */
             for (k = 0; k < SP_NCH; k++) quiet &= !sp_ch[k].on;
             if (fm1_ms - t_sig >= 500u) {
                 uint32_t sg = zs_sig();

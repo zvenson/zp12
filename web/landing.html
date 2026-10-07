@@ -101,15 +101,14 @@
   table.spec td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--frame2); vertical-align: top; }
   table.spec td:first-child { font-weight: 700; white-space: nowrap; width: 1%; padding-right: 22px; }
   .navy table.spec td { border-color: rgba(169, 182, 212, 0.22); }
-  .sheet { display: grid; grid-template-columns: 1.4fr 1fr; gap: 40px; align-items: center; }
-  .sheet img { width: 100%; border-radius: 8px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25); display: block; }
+  .csw { margin-top: 26px; overflow-x: auto; border-radius: 8px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18); }
   details { border-bottom: 1px solid var(--frame2); padding: 14px 0; }
   details summary { cursor: pointer; font-weight: 700; font-size: 17px; }
   details p { margin: 10px 0 0; color: #3a4666; }
   footer { background: var(--navy3); color: var(--dim); font-size: 14px; padding: 34px 0 40px; }
   footer .wrap { display: grid; grid-template-columns: 2fr 1fr; gap: 32px; }
   footer a { color: #fff; }
-  @media (max-width: 980px) { .hero .wrap, .split, .sheet, footer .wrap { grid-template-columns: 1fr; } .grid3 { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 980px) { .hero .wrap, .split, footer .wrap { grid-template-columns: 1fr; } .grid3 { grid-template-columns: 1fr 1fr; }
     .stats .wrap { grid-template-columns: repeat(2, 1fr); } nav .links a:not(.gh):not(.in) { display: none; } nav .rule { display: none; } }
   @media (max-width: 620px) { .grid3, .screens { grid-template-columns: 1fr; } .pads { grid-template-columns: repeat(4, 1fr); } .wrap { padding: 0 18px; } }
 </style>
@@ -118,7 +117,7 @@
 <nav><div class="wrap">
   <a class="mark" href="#top">zp12<small>sampling drums</small></a>
   <span class="rule"></span>
-  <div class="links"><a href="#video">Video</a><a href="#workflow">Workflow</a><a href="#sound">Sound</a><a href="cheatsheet.html">Cheat sheet</a>
+  <div class="links"><a href="#video">Video</a><a href="#workflow">Workflow</a><a href="#sound">Sound</a><a href="#cheatsheet">Cheat sheet</a><a href="backup/">Backup</a>
     <a class="in" href="install/"><b>Install</b></a><a class="gh" href="https://github.com/zvenson/zp12">GitHub</a></div>
 </div></nav>
 
@@ -127,7 +126,7 @@
     <p class="eyebrow">Free firmware for the M-VAVE FM-1</p>
     <h1>A <b>12-bit</b> sampling drum machine in your hands.</h1>
     <p class="lead">32 pads at 26.04 kHz, pitched the old way: no interpolation, the aliasing is the sound. Eight channels with their filters, eleven loops on the black keys, songs, step editing, swing, and the reverb and delay of sloopDX. Install it from the browser; going back is one click.</p>
-    <div class="cta"><a class="btn primary" href="install/">Install zp12</a><a class="btn ghost" href="#video">Watch the beat</a><a class="btn ghost" href="cheatsheet.html">Cheat sheet</a></div>
+    <div class="cta"><a class="btn primary" href="install/">Install zp12</a><a class="btn ghost" href="#video">Watch the beat</a><a class="btn ghost" href="#cheatsheet">Cheat sheet</a></div>
   </div>
   <div>
     <div class="device"><img id="shot" src="img/rec.png" alt="The zp12 screen on the FM-1: recording loop 1" width="480" height="480"><div class="cap" id="shotcap">Recording: LOOP1 2.3, the knobs' columns below</div></div>
@@ -220,13 +219,10 @@
   </div>
 </div></section>
 
-<section id="cheatsheet"><div class="wrap sheet">
-  <a href="cheatsheet.html"><img src="img/cheatsheet.png" alt="The zp12 cheat sheet" width="1170" height="827"></a>
-  <div>
-    <h2>Cheat sheet</h2>
-    <p class="intro">Every key, button and page on one A4 sheet, in the panel's colours. Print it and lay it next to the FM-1.</p>
-    <div class="cta"><a class="btn primary" href="cheatsheet.html">Open it</a><a class="btn ghost" style="color:var(--ink);border-color:var(--frame2)" href="zp12-cheat-sheet.pdf">PDF (A4)</a></div>
-  </div>
+<section id="cheatsheet"><div class="wrap">
+  <h2>Cheat sheet</h2>
+  <p class="intro">Every key, button and page on one sheet, in the panel's colours. <a href="zp12-cheat-sheet.pdf">The PDF (A4)</a> to print and lay next to the FM-1.</p>
+  <div class="csw"><!--CHEATSHEET--></div>
 </div></section>
 
 <section id="start" class="navy"><div class="wrap split">
@@ -235,6 +231,7 @@
     <ol class="steps" style="margin-top:24px">
       <li>Connect the FM-1 by USB, open the <a href="install/" style="color:#ffb4ab">installer</a> in Chrome or Edge.</li>
       <li>Press Install. About a minute; the FM-1 restarts twice. The splash shows the version.</li>
+      <li>Before you switch or try something: <a href="backup/" style="color:#ffb4ab">back up</a> your loops, sounds and sloopDX's DX7 banks in the browser, and put them back later.</li>
       <li>Back to sloopDX or the stock firmware any time with their installers. No answer? Hold OCT− while switching on: the USB rescue.</li>
     </ol>
   </div>
@@ -261,7 +258,7 @@
 <footer><div class="wrap">
   <div>zp12 by zvenson. Based on <a href="https://github.com/isod89/sloop-fm1">SLOOP</a> (isod89) and <a href="https://github.com/hugelton/Felucca">Felucca</a> (Leo Kuroshita, Hügelton Instruments), with the effects and the FM-1 platform of <a href="https://dx7.designburgapps.com/">sloopDX</a>. GPL-3.0, no warranty: custom firmware is installed at your own risk.<br>
   Inspired by the 12-bit samplers of the 80s; their names are trademarks of their owners. M-VAVE and FM-1 are trademarks of their owners; zp12 is not affiliated with them.</div>
-  <div><a href="https://github.com/zvenson/zp12">github.com/zvenson/zp12</a><br><a href="install/">Installer</a> · <a href="cheatsheet.html">Cheat sheet</a><br><a href="impressum.html">Impressum · Disclaimer · Datenschutz</a><br><a href="https://webdesignhamburg.net/">webdesignhamburg.net</a></div>
+  <div><a href="https://github.com/zvenson/zp12">github.com/zvenson/zp12</a><br><a href="install/">Installer</a> · <a href="#cheatsheet">Cheat sheet</a> · <a href="backup/">Backup</a><br><a href="impressum.html">Impressum · Disclaimer · Datenschutz</a><br><a href="https://webdesignhamburg.net/">webdesignhamburg.net</a></div>
 </div></footer>
 
 <script>

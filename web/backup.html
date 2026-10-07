@@ -1,0 +1,214 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only  (C) 2026 Sven Trogus
+     zp12: the backup page (tools/make_site.py writes it as docs/backup/index.html, beside zp12link.js). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zp12 backup</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="description" content="Back up and restore zp12 on the M-VAVE FM-1 from the browser: loops, sounds, songs, samples, and sloopDX's DX7 banks. Chrome or Edge over USB MIDI.">
+<link rel="canonical" href="https://zp12.designburgapps.com/backup/">
+<meta name="theme-color" content="#263e70">
+<style>
+  :root { --paper: #e4e5df; --frame: #cecfc9; --frame2: #b9bbb3; --navy: #263e70; --navy2: #1d3160; --ink: #1e3060;
+          --red: #c82e32; --led: #ff3424; --txt: #eef1f8; --dim: #a9b6d4; --mute: #56627e; --lcd: #b2be92; --lcdink: #10180e;
+          --ok: #2f8f5b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--red); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+  .rule { height: 6px; border-top: 2px solid var(--red); border-bottom: 2px solid var(--ink); }
+  nav { background: var(--frame); border-bottom: 1px solid var(--frame2); }
+  nav .wrap { display: flex; align-items: center; height: 60px; gap: 20px; }
+  .mark { font: italic 900 30px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: -1px; color: var(--ink); }
+  .mark small { font: italic 400 15px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0; margin-left: 8px; }
+  nav .rule { flex: 1; }
+  nav .links { display: flex; gap: 18px; font-size: 14.5px; }
+  nav .links a { color: var(--ink); }
+  header { background: var(--navy); color: var(--txt); padding: 44px 0 40px; }
+  h1 { font-weight: 300; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; margin: 0 0 10px; }
+  h1 b { font-weight: 900; font-style: italic; }
+  header p { color: #d6dcec; margin: 0; max-width: 40em; font-size: 18px; }
+  main { padding: 34px 0 60px; }
+  .card { background: var(--navy); color: var(--txt); border-radius: 10px; padding: 22px 24px; margin-bottom: 22px; }
+  .card h2 { font: italic 400 30px/1.1 Georgia, "Times New Roman", serif; margin: 0 0 12px; display: flex; gap: 14px; align-items: center; }
+  .card h2::after { content: ""; flex: 1; height: 6px; border-top: 2px solid var(--red); border-bottom: 2px solid var(--txt); opacity: 0.8; }
+  .card p, .card li { color: var(--dim); }
+  .card p b, .card li b { color: var(--txt); }
+  .lcd { background: var(--lcd); color: var(--lcdink); border: 3px solid #464c42; border-radius: 6px; padding: 10px 14px;
+         font: 700 17px/1.4 "Courier New", monospace; min-height: 52px; white-space: pre-wrap; }
+  button, .file { font-family: inherit; font-weight: 700; font-size: 15.5px; line-height: 1; padding: 12px 20px; border-radius: 8px; border: 0; cursor: pointer;
+                  background: var(--led); color: #fff; display: inline-flex; align-items: center; gap: 8px; }
+  button.ghost, .file { background: transparent; color: var(--txt); border: 1px solid rgba(238, 241, 248, 0.4); }
+  button:disabled { opacity: 0.4; cursor: default; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+  label.part { display: flex; gap: 10px; align-items: flex-start; margin: 8px 0; color: var(--txt); cursor: pointer; }
+  label.part input { margin-top: 5px; accent-color: var(--led); width: 18px; height: 18px; }
+  label.part span { color: var(--dim); display: block; font-size: 14.5px; }
+  .bar { height: 10px; background: var(--navy2); border-radius: 5px; overflow: hidden; margin-top: 14px; display: none; }
+  .bar i { display: block; height: 100%; width: 0; background: var(--led); transition: width 0.1s; }
+  .warn { background: #fff3cd; color: #5c4400; border-radius: 8px; padding: 12px 16px; margin-top: 14px; font-size: 14.5px; }
+  .ok { color: #9fe0b8 !important; }
+  .err { color: #ffb4ab !important; }
+  input[type=file] { display: none; }
+  footer { font-size: 13.5px; color: var(--mute); padding: 0 0 40px; }
+</style>
+</head>
+<body>
+<nav><div class="wrap"><a class="mark" href="../">zp12<small>backup</small></a><div class="rule"></div>
+  <div class="links"><a href="../">zp12</a><a href="../install/">Install</a><a href="../#cheatsheet">Cheat sheet</a></div></div></nav>
+<header><div class="wrap">
+  <h1>Back up <b>zp12</b></h1>
+  <p>Everything on your FM-1 in one file: loops, songs, sounds, mix and effects (and, later, your samples), and if you like
+     sloopDX's DX7 user banks and MY KIT too. Put it back whenever you want. Chrome or Edge, over USB.</p>
+</div></header>
+<main><div class="wrap">
+
+  <section class="card">
+    <h2>1 · Connect</h2>
+    <p>Plug in the FM-1 with zp12 <b>1.3 or newer</b> running, close other music apps and editors that use MIDI, then connect.
+       The browser asks for MIDI access with SysEx: allow it.</p>
+    <div class="lcd" id="lcd">NOT CONNECTED</div>
+    <div class="row"><button id="connect">Connect the FM-1</button></div>
+  </section>
+
+  <section class="card">
+    <h2>2 · Download a backup</h2>
+    <label class="part"><input type="checkbox" id="b-zp12" checked disabled><div>zp12<span>loops, songs, the 32 sounds, mix, effects, settings, your samples</span></div></label>
+    <label class="part"><input type="checkbox" id="b-banks" checked><div>sloopDX's DX7 banks<span>the 8 user banks, the bank in use and MY KIT, as sloopDX left them (144 KB)</span></div></label>
+    <div class="row"><button id="backup" disabled>Download backup</button></div>
+    <div class="bar" id="bar-b"><i></i></div>
+    <p id="msg-b"></p>
+  </section>
+
+  <section class="card">
+    <h2>3 · Restore</h2>
+    <p>Choose a backup file. What it holds is written back exactly as it was, then the FM-1 restarts.
+       <b>What is on the FM-1 in those parts now is replaced</b>: download a backup of it first if you may want it.</p>
+    <div class="row"><label class="file" for="file">Choose a backup file…</label><input type="file" id="file" accept=".zp12bak"><span id="fname"></span></div>
+    <label class="part"><input type="checkbox" id="r-zp12" disabled><div>zp12<span>loops, songs, sounds, settings, samples</span></div></label>
+    <label class="part"><input type="checkbox" id="r-banks" disabled><div>sloopDX's DX7 banks<span>the banks and MY KIT</span></div></label>
+    <div class="row"><button id="restore" disabled>Restore to the FM-1</button></div>
+    <div class="bar" id="bar-r"><i></i></div>
+    <p id="msg-r"></p>
+  </section>
+
+  <section class="card">
+    <h2>Good to know</h2>
+    <ul>
+      <li>Stop playing first: the backup stops the sequencer, and the sound may click while the flash is written.</li>
+      <li>Nothing else of sloopDX is in a backup or touched by a restore: its projects, presets and settings stay as they are.</li>
+      <li>A backup of sloopDX's banks can be put back while zp12 runs, before you switch to sloopDX.</li>
+      <li>The file is checked (CRC) before anything is written; a damaged file is refused.</li>
+      <li>Please always check the latest firmware version: <a href="../install/">zp12.designburgapps.com/install</a>.</li>
+    </ul>
+  </section>
+</div></main>
+<footer><div class="wrap">zp12 · free firmware for the M-VAVE FM-1, based on SLOOP + Felucca · <a href="../impressum.html">Impressum</a> · M-VAVE and FM-1 are trademarks of their respective owners.</div></footer>
+
+<script src="zp12link.js"></script>
+<script>
+"use strict";
+const Z = window.ZP12Link, $ = (id) => document.getElementById(id);
+let link = null, file = null, busy = false;
+const lcd = (s) => { $("lcd").textContent = s; };
+const msg = (id, s, cls = "") => { $(id).textContent = s; $(id).className = cls; };
+function bar(id, done, total) {
+  const b = $(id); b.style.display = total ? "block" : "none";
+  b.firstElementChild.style.width = total ? (100 * done / total).toFixed(1) + "%" : "0";
+}
+function refresh() {
+  $("backup").disabled = !link || busy;
+  $("restore").disabled = !link || busy || !file || !($("r-zp12").checked || $("r-banks").checked);
+  $("connect").disabled = busy;
+}
+
+$("connect").onclick = async () => {
+  if (!navigator.requestMIDIAccess) { lcd("THIS BROWSER HAS NO WEB MIDI\nuse Chrome or Edge"); return; }
+  let access;
+  try { access = await navigator.requestMIDIAccess({ sysex: true }); }
+  catch (e) { lcd("MIDI ACCESS DENIED\nallow MIDI with SysEx for this page"); return; }
+  const isF = (p) => /felucca/i.test(p.name || "") && p.state !== "disconnected";
+  const input = [...access.inputs.values()].find(isF), output = [...access.outputs.values()].find(isF);
+  if (!input || !output) { lcd("NO FM-1 FOUND\nplug it in, close other MIDI apps"); return; }
+  const l = new Z.Link((d) => output.send(d));
+  input.onmidimessage = (e) => l.receive(e.data);
+  try {
+    const h = await l.hello();
+    link = l;
+    lcd(`CONNECTED\n${h.version.toUpperCase()}`);
+  } catch (e) {
+    lcd("THE FM-1 DOES NOT ANSWER\nzp12 1.3 or newer needed: see Install");
+  }
+  access.onstatechange = () => { if (!isF(input)) { link = null; lcd("DISCONNECTED"); refresh(); } };
+  refresh();
+};
+
+$("backup").onclick = async () => {
+  busy = true; refresh();
+  const parts = ["zp12", ...($("b-banks").checked ? ["banks"] : [])];
+  msg("msg-b", "Reading the FM-1…");
+  try {
+    const f = await Z.backup(link, parts, (d, t) => { bar("bar-b", d, t); lcd(`READING ${Math.round(100 * d / t)} %`); });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([f], { type: "application/octet-stream" }));
+    a.download = `zp12-backup-${new Date().toISOString().slice(0, 10)}.zp12bak`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    msg("msg-b", `Saved: ${a.download} (${Math.round(f.length / 1024)} KB).`, "ok");
+    lcd("BACKUP SAVED");
+  } catch (e) { msg("msg-b", e.message, "err"); lcd("BACKUP FAILED"); }
+  bar("bar-b", 0, 0); busy = false; refresh();
+};
+
+$("file").onchange = async () => {
+  file = null;
+  const f = $("file").files[0];
+  $("fname").textContent = f ? f.name : "";
+  for (const p of ["zp12", "banks"]) { $("r-" + p).checked = false; $("r-" + p).disabled = true; }
+  if (!f) { refresh(); return; }
+  try {
+    const u8 = new Uint8Array(await f.arrayBuffer()), b = Z.readBackup(u8);
+    file = u8;
+    for (const p of b.parts) { $("r-" + p).disabled = false; $("r-" + p).checked = true; }
+    msg("msg-r", `A backup of ${b.version || "zp12"}: ${[...b.parts].map((p) => p === "banks" ? "sloopDX's banks" : "zp12").join(" and ")}.`);
+  } catch (e) { msg("msg-r", e.message, "err"); }
+  refresh();
+};
+for (const p of ["zp12", "banks"]) $("r-" + p).onchange = refresh;
+
+$("restore").onclick = async () => {
+  const parts = ["zp12", "banks"].filter((p) => $("r-" + p).checked);
+  if (!confirm(`Replace ${parts.map((p) => p === "banks" ? "sloopDX's DX7 banks" : "zp12's loops, sounds and samples").join(" and ")} on the FM-1 with the backup?`)) return;
+  busy = true; refresh();
+  msg("msg-r", "Writing…");
+  try {
+    await Z.restore(link, file, parts, (d, t) => { bar("bar-r", d, t); lcd(`RESTORING ${Math.round(100 * d / t)} %`); });
+    msg("msg-r", "Restored. The FM-1 restarts with it; connect again to go on.", "ok");
+    lcd("RESTORED · RESTARTING");
+    link = null;
+  } catch (e) { msg("msg-r", e.message + " — nothing is lost that the file holds: try again.", "err"); lcd("RESTORE FAILED"); }
+  bar("bar-r", 0, 0); busy = false; refresh();
+};
+refresh();
+// ?demo=connected|reading|saved|restore: the page in a state, for the video's screenshots (no FM-1 needed)
+{
+  const demo = new URLSearchParams(location.search).get("demo");
+  if (demo) {
+    link = {};
+    lcd("CONNECTED\nZP12 1.3");
+    if (demo === "reading") { busy = true; bar("bar-b", 46, 100); lcd("READING 46 %"); msg("msg-b", "Reading the FM-1…"); }
+    if (demo === "saved") { msg("msg-b", "Saved: zp12-backup-2026-10-07.zp12bak (172 KB).", "ok"); lcd("BACKUP SAVED"); }
+    if (demo === "restore") {
+      file = new Uint8Array(1); $("fname").textContent = "zp12-backup-2026-10-07.zp12bak";
+      for (const p of ["zp12", "banks"]) { $("r-" + p).disabled = false; $("r-" + p).checked = true; }
+      msg("msg-r", "A backup of zp12 1.3: zp12 and sloopDX's banks.");
+      if (location.hash === "#writing") { busy = true; bar("bar-r", 71, 100); lcd("RESTORING 71 %"); msg("msg-r", "Writing…"); }
+    }
+    refresh();
+  }
+}
+</script>
+</body>
+</html>
