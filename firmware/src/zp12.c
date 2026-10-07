@@ -328,6 +328,20 @@ static void zp12_main(void)
             t_frame = fm1_ms;
             ui_draw();
         }
+        if (ui.factory_req) {                           /* SETUP > FACTORY: the kit's pads, mix, effects, no loops, no songs */
+            ui.factory_req = 0;
+            for (i = 0; i < SP_NSOUND; i++) sp_sound[i] = KIT_PADS[i];
+            for (i = 0; i < SP_NCH; i++) ui.mix[i] = sp_mix[i] = 100;
+            fxp.crate = 40; fxp.cdepth = 60; fxp.cmix = 127; fxp.dtime = 1; fxp.fdbk = 60; fxp.colr = 70; fxp.dmix = 90;
+            fxp.size = 90; fxp.damp = 60; fxp.pre = 0;
+            sq_init();
+            memset(sq_songs, 0, sizeof sq_songs);
+            memset(sq_song_len, 0, sizeof sq_song_len);
+            sq.seg = 0; sq.song_mode = 0; sq.song_sel = 0; sq.swing = 0; sq.quant = 3; sq.bpm10 = 900;
+            ui.save_req = 1;
+            ui.force = 1;
+            ui_say("FACTORY RESET");
+        }
         {   /* saving: SAVE, or by itself when stopped, silent and nothing changed for 3 s (an erase stops the audio) */
             uint32_t k, quiet = !sq.playing;
             for (k = 0; k < SP_NCH; k++) quiet &= !sp_ch[k].on;

@@ -147,7 +147,7 @@ int main(int argc, char **argv)
     sq_insert(&sq_seg[1], 288 + 48, 7, 5, 2, 0);
     sq_song[0].seg = 0; sq_song[0].rep = 2;
     sq_song[1].seg = 1; sq_song[1].rep = 1;
-    sq.song_n = 2;
+    SQ_SONG_N = 2;
     sq.song_mode = 1;
     sq_post(RQ_PLAY, 0, 0);
     block();
@@ -158,6 +158,16 @@ int main(int argc, char **argv)
     check(sq.seg == 1u && sq.song_i == 1u, "SONG: then the second");
     until_wrap();
     check(!sq.playing, "SONG: stops at its end");
+    sq.song_sel = 1;                                    /* song 2: loop 2 once, then loop 1 */
+    sq_song[0].seg = 1; sq_song[0].rep = 1; sq_song[1].seg = 0; sq_song[1].rep = 1; SQ_SONG_N = 2;
+    sq_post(RQ_PLAY, 0, 0);
+    block();
+    check(sq.seg == 1u, "SONG 2: its own first loop");
+    until_wrap();
+    check(sq.seg == 0u && sq_songs[0][0].rep == 2u, "SONG 2: its own second loop; song 1 as it was");
+    sq_post(RQ_STOP, 0, 0);
+    block();
+    sq.song_sel = 0;
     for (i = 0; i < SP_FS * 2u / SP_BLK; i++) block();  /* the reverb's tail */
     check(peak < 65536, "bounded");
     fseek(wf, 4, SEEK_SET); put32(36u + frames * 4u);

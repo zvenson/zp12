@@ -8,8 +8,9 @@
 #define ZS_BASE 0xC4000u
 #define ZS_SLOT 0xA000u                          /* 40 KiB a copy */
 #define ZS_MAGIC 0x3231505Au                     /* "ZP12" */
-#define ZS_VER 1u
-#define ZS_KIT_ID ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u))   /* the factory kit the pads were saved with */
+#define ZS_VER 2u                                /* 2: four songs (1: one; read, it becomes song 1) */
+#define ZS_KIT_ID ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u ^ 0x0600u))   /* the factory kit the pads were saved with
+                                                 * (0.6: changed once, so every older save gets the kit's pads) */
 
 typedef struct { uint32_t magic, ver, gen, len, crc; } zs_head_t;
 static uint8_t zs_buf[ZS_SLOT] __attribute__((section(".pool"), aligned(4)));
@@ -34,12 +35,13 @@ static uint32_t zs_pack(uint8_t *b)
 {
     uint8_t *p = b;
     uint32_t i;
-    uint16_t st[8] = {sq.bpm10, sq.quant, sq.swing, sq.click, sq.song_n, sq.song_mode, sq.seg, ZS_KIT_ID};
+    uint16_t st[8] = {sq.bpm10, sq.quant, sq.swing, sq.click, sq.song_sel, sq.song_mode, sq.seg, ZS_KIT_ID};
     p = zs_put(p, sp_sound, sizeof sp_sound);
     p = zs_put(p, sp_mix, sizeof sp_mix);
     p = zs_put(p, &fxp, sizeof fxp);
     p = zs_put(p, st, sizeof st);
-    p = zs_put(p, sq_song, sizeof sq_song);
+    p = zs_put(p, sq_songs, sizeof sq_songs);
+    p = zs_put(p, sq_song_len, sizeof sq_song_len);
     for (i = 0; i < SQ_NSEG; i++) {
         const sq_seg_t *s = &sq_seg[i];
         p = zs_put(p, s, 4u);                    /* bars, rsv, n */
@@ -48,23 +50,34 @@ static uint32_t zs_pack(uint8_t *b)
     return (uint32_t)(p - b);
 }
 
-static int zs_unpack(const uint8_t *b, uint32_t len)
+static int zs_unpack(const uint8_t *b, uint32_t len, uint32_t ver)
 {
     const uint8_t *p = b, *e = b + len;
     uint32_t i;
     uint16_t st[8];
-    if (len < sizeof sp_sound + sizeof sp_mix + sizeof fxp + sizeof st + sizeof sq_song + 4u * SQ_NSEG)
+    if (len < sizeof sp_sound + sizeof sp_mix + sizeof fxp + sizeof st + sizeof sq_songs[0] + 4u * SQ_NSEG)
         return -1;
     p = zs_get(p, sp_sound, sizeof sp_sound);
     p = zs_get(p, sp_mix, sizeof sp_mix);
     p = zs_get(p, &fxp, sizeof fxp);
     p = zs_get(p, st, sizeof st);
-    p = zs_get(p, sq_song, sizeof sq_song);
+    memset(sq_songs, 0, sizeof sq_songs);
+    memset(sq_song_len, 0, sizeof sq_song_len);
+    if (ver == 1u) {                                /* one song: song 1 */
+        p = zs_get(p, sq_songs[0], sizeof sq_songs[0]);
+        sq_song_len[0] = (uint8_t)(st[4] <= SQ_NSONG ? st[4] : 0u);
+        st[4] = 0;
+    } else {
+        p = zs_get(p, sq_songs, sizeof sq_songs);
+        p = zs_get(p, sq_song_len, sizeof sq_song_len);
+        for (i = 0; i < SQ_SONGS; i++)
+            if (sq_song_len[i] > SQ_NSONG) sq_song_len[i] = 0;
+    }
     sq.bpm10 = (uint16_t)sp_clamp(st[0], 400, 2400);
     sq.quant = (uint8_t)(st[1] % 7u);
     sq.swing = (uint8_t)(st[2] % 6u);
     sq.click = (uint8_t)(st[3] % 3u);
-    sq.song_n = (uint8_t)(st[4] <= SQ_NSONG ? st[4] : 0u);
+    sq.song_sel = (uint8_t)(st[4] & 3u);
     sq.song_mode = (uint8_t)(st[5] & 1u);
     sq.seg = (uint8_t)(st[6] % SQ_NSEG);
     for (i = 0; i < SQ_NSEG; i++) {
@@ -97,17 +110,17 @@ static int zs_load(void)
         return 0;
     for (i = 0; i < 2u; i++) {
         st_read(ZS_BASE + i * ZS_SLOT, &h[i], sizeof h[i]);
-        if (h[i].magic != ZS_MAGIC || h[i].ver != ZS_VER || h[i].len > ZS_SLOT - sizeof(zs_head_t))
+        if (h[i].magic != ZS_MAGIC || h[i].ver < 1u || h[i].ver > ZS_VER || h[i].len > ZS_SLOT - sizeof(zs_head_t))
             continue;
         if (best == 2u || h[i].gen > h[best].gen)
             best = i;
     }
     for (i = 0; i < 2u && best < 2u; i++) {          /* the newest; if its CRC fails, the other */
         uint32_t k = i ? best ^ 1u : best;
-        if (h[k].magic != ZS_MAGIC || h[k].ver != ZS_VER || h[k].len > ZS_SLOT - sizeof(zs_head_t))
+        if (h[k].magic != ZS_MAGIC || h[k].ver < 1u || h[k].ver > ZS_VER || h[k].len > ZS_SLOT - sizeof(zs_head_t))
             continue;
         st_read(ZS_BASE + k * ZS_SLOT + sizeof(zs_head_t), zs_buf, h[k].len);
-        if (zs_crc(zs_buf, h[k].len) == h[k].crc && zs_unpack(zs_buf, h[k].len) == 0) {
+        if (zs_crc(zs_buf, h[k].len) == h[k].crc && zs_unpack(zs_buf, h[k].len, h[k].ver) == 0) {
             zs_gen = h[k].gen;
             return 1;
         }

@@ -52,7 +52,7 @@ static struct {
     char msg[24];
     uint32_t msg_until;
     uint32_t sig_lcd, sig_mid, sig_pad, sig_led;   /* what each region shows now */
-    uint8_t force, save_req;
+    uint8_t force, save_req, factory_req;
 } ui;
 
 /* text blended onto bg (gfx.c's cv_text blends onto black) */
@@ -165,16 +165,17 @@ static void page_cols(char lab[4][8], char val[4][8])
         break;
     case PG_SONG:
         COL(0, "STEP", num(val[0], ui.song_cur + 1, 2, 0));
-        if (ui.song_cur < sq.song_n) {
+        if (ui.song_cur < SQ_SONG_N) {
             COL(1, "SEG", num(val[1], sq_song[ui.song_cur].seg + 1, 2, 0));
             COL(2, "REPEAT", num(val[2], sq_song[ui.song_cur].rep, 2, 0));
         } else {
             COL(1, "SEG", cat(val[1], "END"));
         }
-        COL(3, "MODE", cat(val[3], sq.song_mode ? "SONG" : "SEG"));
+        COL(3, "SONG", sq.song_mode ? (void)num(val[3], sq.song_sel + 1, 1, 0) : (void)cat(val[3], "OFF"));
         break;
     case PG_SETUP:
         COL(0, "TEMPO", num(val[0], (int32_t)(sq.bpm10 / 10u), 3, 0)); COL(1, "CLICK", cat(val[1], CLICK_NAME[sq.click % 3u]));
+        COL(3, "FACTORY", cat(val[3], ui.arm == PG_SETUP + 1u ? "AGAIN" : "-->"));
         break;
     default:
         break;
@@ -215,8 +216,10 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
         num(p, sq_seg[sq.seg % SQ_NSEG].bars ? sq_seg[sq.seg % SQ_NSEG].bars : 1, 1, 0);
     } else if (sq.playing) {                    /* SEG01 2.3 */
         uint32_t t = sq.countin > 0 ? 0u : sq.pos >> 16;
-        if (sq.song_mode && sq.song_n) { p = cat(p, "S"); p = num(p, sq.song_i + 1, 2, 0); p = cat(p, ":"); }
-        else p = cat(p, "LOOP");
+        if (sq.song_mode && SQ_SONG_N) {          /* S2.03 L4: song 2, its step 3, loop 4 */
+            p = cat(p, "S"); p = num(p, sq.song_sel + 1, 1, 0); p = cat(p, "."); p = num(p, sq.song_i + 1, 2, 0);
+            p = cat(p, " L");
+        } else p = cat(p, "LOOP");
         p = num(p, sq.seg + 1, sq.seg + 1u >= 10u ? 2u : 1u, 0);
         p = cat(p, " ");
         p = num(p, (int32_t)(t / SQ_BAR + 1u), t / SQ_BAR + 1u >= 10u ? 2u : 1u, 0);
@@ -378,7 +381,7 @@ static void ui_draw(void)
     s = sig_of(&sp_sound[ui.sel], sizeof(sp_sound_t), 2166136261u ^ ui.sel * 7u ^ ui.page * 131u ^ sq.bpm10 * 7919u ^ ui.multi);
     s = sig_of(ui.mix, sizeof ui.mix, s ^ ui.shift ^ ui.steps * 3u ^ ui.step_bar * 29u ^ ui.arm * 37u ^ ui.copy_to * 41u);
     s = sig_of(&fxp, sizeof fxp, s);
-    s = sig_of(sq_song, sizeof sq_song, s ^ ui.song_cur * 31u ^ sq.song_n * 17u ^ sq.song_mode);
+    s = sig_of(sq_songs, sizeof sq_songs, s ^ ui.song_cur * 31u ^ SQ_SONG_N * 17u ^ sq.song_mode ^ sq.song_sel * 7u);
     s ^= (sq.seg * 977u) ^ (sq.quant * 31u) ^ (sq.swing * 7u) ^ (sq.click * 3u) ^ sq_seg[sq.seg % SQ_NSEG].bars * 101u;
     s ^= sq.recording * 5u ^ sq.rec_arm * 11u;
     if (sq.playing)
@@ -581,27 +584,33 @@ static void knob(uint32_t n, int32_t d)
         if (n == 2u && d > 0 && again(PG_SEG2 + 2u)) { sq_post(RQ_COPY, 0, ui.copy_to); ui_say("COPIED"); }
         break;
     case PG_SONG:
-        if (n == 0u) ui.song_cur = (uint8_t)sp_clamp(ui.song_cur + one, 0, sq.song_n < SQ_NSONG ? sq.song_n : SQ_NSONG - 1);
+        if (n == 0u) ui.song_cur = (uint8_t)sp_clamp(ui.song_cur + one, 0, SQ_SONG_N < SQ_NSONG ? SQ_SONG_N : SQ_NSONG - 1);
         if (n == 1u && ui.song_cur < SQ_NSONG && !sq.playing) {
             uint32_t i = ui.song_cur;
-            if (i >= sq.song_n) {                     /* past the end: a new step with the segment edited */
+            if (i >= SQ_SONG_N) {                     /* past the end: a new step with the segment edited */
                 sq_song[i].seg = sq.seg;
                 sq_song[i].rep = 1;
-                sq.song_n = (uint8_t)(i + 1u);
+                SQ_SONG_N = (uint8_t)(i + 1u);
             } else {
                 sq_song[i].seg = (uint8_t)sp_clamp(sq_song[i].seg + one, 0, SQ_NSEG - 1);
             }
         }
-        if (n == 2u && ui.song_cur < sq.song_n && !sq.playing) {   /* REPEAT 0: the song ends here */
+        if (n == 2u && ui.song_cur < SQ_SONG_N && !sq.playing) {   /* REPEAT 0: the song ends here */
             int32_t r = sp_clamp(sq_song[ui.song_cur].rep + one, 0, 99);
-            if (r == 0) sq.song_n = ui.song_cur;
+            if (r == 0) SQ_SONG_N = ui.song_cur;
             else sq_song[ui.song_cur].rep = (uint8_t)r;
         }
-        if (n == 3u) sq.song_mode = (uint8_t)(one > 0);
+        if (n == 3u && !sq.playing) {              /* SONG: OFF (the loops) or 1-4, the one played and edited */
+            int32_t v = sp_clamp((sq.song_mode ? sq.song_sel + 1 : 0) + one, 0, (int32_t)SQ_SONGS);
+            sq.song_mode = (uint8_t)(v > 0);
+            if (v > 0) { sq.song_sel = (uint8_t)(v - 1); ui.song_cur = 0; }
+        }
         break;
     case PG_SETUP:
         if (n == 0u) sq.bpm10 = (uint16_t)sp_clamp(sq.bpm10 + dd * 3, 400, 2400);
         if (n == 1u) sq.click = (uint8_t)sp_clamp(sq.click + one, 0, 2);
+        if (n == 3u && d > 0 && !sq.playing && again(PG_SETUP + 1u))
+            ui.factory_req = 1;                    /* (zp12.c: everything to the factory state, saved) */
         break;
     default:
         break;

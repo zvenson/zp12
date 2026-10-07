@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
 /* zp12's sequencer, as a 12-bit drum machine's: segments of 1-32 bars (or AUTO: the first take sets the length)
  * at 96 ticks a quarter, hits recorded in real time (quantised by AUTO CORRECT as they come in) or set step by
- * step, swing at playback, a song of segments with repeats, a count-in and a click.
+ * step, swing at playback, four songs of loops with repeats, a count-in and a click.
  *
  * Everything that touches a segment runs in the audio ISR (sq_block): the main loop posts requests into a
  * ring (sq_post), so the playing never sees half an edit. A hit is one word: tick, pad, one of 8 levels (as the
@@ -25,7 +25,11 @@ typedef struct {
 typedef struct { uint8_t bars, rsv; uint16_t n; sq_ev_t ev[SQ_MAXEV]; } sq_seg_t;   /* bars 0: AUTO; ev by t */
 
 static sq_seg_t sq_seg[SQ_NSEG] __attribute__((section(".pool")));
-static struct { uint8_t seg, rep; } sq_song[SQ_NSONG];
+#define SQ_SONGS 4u
+static struct { uint8_t seg, rep; } sq_songs[SQ_SONGS][SQ_NSONG];   /* four songs, each a chain of loops */
+static uint8_t sq_song_len[SQ_SONGS];
+#define sq_song (sq_songs[sq.song_sel & 3u])    /* the song chosen: played, edited */
+#define SQ_SONG_N (sq_song_len[sq.song_sel & 3u])
 
 /* AUTO CORRECT: the grid in ticks (0: off, 1-tick resolution) and the swing steps */
 static const uint8_t SQ_GRID[7] = {1, 48, 32, 24, 16, 12, 8};
@@ -39,7 +43,7 @@ static struct {
     volatile uint8_t next_seg;                  /* a loop chosen while playing: from the end of this one (0xFF none) */
     uint8_t quant, swing;                       /* SQ_GRID index, SQ_SWING index */
     uint8_t click;                              /* 0 off, 1 while recording, 2 always */
-    uint8_t song_n, song_i, song_rep;
+    uint8_t song_sel, song_i, song_rep;
     uint16_t bpm10;
     volatile uint32_t pos;                      /* the playhead in the segment, ticks Q16 */
     volatile int32_t countin;                   /* ticks Q16 of count-in left (> 0: counting) */
@@ -160,7 +164,7 @@ static void sq_play(uint32_t on)
         sq.pos = 0;
         sq.beat = 0;
         sq.song_i = sq.song_rep = 0;
-        if (sq.song_mode && sq.song_n)
+        if (sq.song_mode && SQ_SONG_N)
             sq.seg = sq_song[0].seg;
         sq.countin = sq.rec_arm ? (int32_t)(SQ_BAR << 16) : 0;
         if (sq.rec_arm)
@@ -262,11 +266,11 @@ static void sq_wrap(void)
         sq.next_seg = 0xFF;
         return;
     }
-    if (!sq.song_mode || !sq.song_n)
+    if (!sq.song_mode || !SQ_SONG_N)
         return;
     if (++sq.song_rep >= (sq_song[sq.song_i].rep ? sq_song[sq.song_i].rep : 1u)) {
         sq.song_rep = 0;
-        if (++sq.song_i >= sq.song_n) {         /* the song's end: stop */
+        if (++sq.song_i >= SQ_SONG_N) {         /* the song's end: stop */
             sq_play(0);
             return;
         }

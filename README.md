@@ -4,7 +4,7 @@ A 12-bit sampling drum machine for the **M-VAVE FM-1**: 32 sounds at 26.04 kHz (
 without interpolation, eight output channels with their filters, a panel-style screen. Inspired by the
 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation.
 
-> **Status: 0.5, an early test build.** The factory kit on the keys (bank D: E-piano chords, horns, vibes, bass,
+> **Status: 0.6, an early test build.** The factory kit on the keys (bank D: E-piano chords, horns, vibes, bass,
 > scratches), eleven loops on the black keys, the sequencer (loops of 1–32 bars or AUTO, song, real-time recording with count-in and AUTO CORRECT, step editing, swing, erase, tap tempo), sloopDX's
 > chorus, delay and reverb, saved in flash (0xC4000.., a room sloopDX leaves free). Own samples (a web editor) next.
 > Plan: [CONCEPT.md](CONCEPT.md).
@@ -22,11 +22,11 @@ switching it on (USB rescue).
 | KNOB 1–4 | the faders of channels 1–4 (SEL held: 5–8); a page takes them, 6 s untouched or HOME gives them back |
 | EDIT | WAVE (the pad's sample · COPY> · COPY the sound to a pad), SOUND (TUNE · FINE · DECAY · LEVEL), TRUNC (START · END · DIR · SPEED 45/33), OUT (CHAN · PAN · CUT · RESO), SENDS (DRIVE · CHO · DLY · REV) of the last pad |
 | FX | CHORUS (RATE · DEPTH · MIX), DELAY (TIME · FDBK · COLOR · MIX), REVERB (SIZE · DAMP · PRE) |
-| SEQ tapped | SEGMENT (SEG · BARS 1–32 / AUTO · QUANT · SWING), SEG TOOLS (CLEAR · COPY> · COPY, turn twice), SONG (STEP · SEG · REPEAT, 0 ends · MODE) |
+| SEQ tapped | LOOP (LOOP · BARS 1–32 / AUTO · QUANT · SWING), LOOP TOOLS (CLEAR · COPY> · COPY, turn twice), SONG (STEP · LOOP · REPEAT, 0 ends · SONG OFF / 1–4: four songs of the loops) |
 | SEQ held | the last pad's 16 steps of a bar on the white keys (lit = a hit); OCT− / OCT+: the bars |
 | PLAY · REC | run / stop · record (stopped: armed, PLAY counts a bar in; playing: overdub on / off) |
 | LFO held + pad | erase that pad's hits as the playhead passes (stopped: at once) |
-| ENV · GLO · SAVE | tap tempo · TEMPO and CLICK · save now (it saves by itself when stopped and quiet) |
+| ENV · GLO · SAVE | tap tempo · TEMPO, CLICK, FACTORY (turn twice: everything as new) · save now (it saves by itself when stopped and quiet) |
 | ARP | MULTI PITCH: the last sound over all 27 keys (F4 as tuned) |
 | SELECT · ALGORITHM | tempo · the sound to edit |
 | USB MIDI | notes 36–67 play pads A1–D8 |
