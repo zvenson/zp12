@@ -179,8 +179,8 @@ static void page_cols(char lab[4][8], char val[4][8])
         break;
     case PG_SETUP:
         COL(0, "TEMPO", num(val[0], (int32_t)(sq.bpm10 / 10u), 3, 0)); COL(1, "CLICK", cat(val[1], CLICK_NAME[sq.click % 3u]));
-        COL(2, "VERSION", cat(val[2], ZP12_VERSION));
-        COL(3, "FACTORY", cat(val[3], ui.arm == PG_SETUP + 1u ? "AGAIN" : "-->"));
+        COL(2, "VER", cat(val[2], ZP12_VERSION));
+        COL(3, "RESET", cat(val[3], ui.arm == PG_SETUP + 1u ? "AGAIN" : "-->"));
         break;
     default:
         break;

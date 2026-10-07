@@ -26,7 +26,7 @@ switching it on (USB rescue).
 | SEQ held | the last pad's 16 steps of a bar on the white keys (lit = a hit); OCT− / OCT+: the bars |
 | PLAY · REC | run / stop · record (stopped: armed, PLAY counts a bar in; playing: overdub on / off) |
 | LFO held + pad | erase that pad's hits as the playhead passes (stopped: at once) |
-| ENV · GLO · SAVE | tap tempo · TEMPO, CLICK, FACTORY (turn twice: everything as new) · save now (it saves by itself when stopped and quiet) |
+| ENV · GLO · SAVE | tap tempo · TEMPO, CLICK, VER, RESET (turn twice: the factory state) · save now (it saves by itself when stopped and quiet) |
 | ARP | MULTI PITCH: the last sound over all 27 keys (F4 as tuned) |
 | SELECT · ALGORITHM | tempo · the sound to edit |
 | USB MIDI | notes 36–67 play pads A1–D8 |
