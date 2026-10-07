@@ -32,7 +32,7 @@ static const char ZP12_VERSION[4] = {'0', '.', FELUCCA_ID[7], 0};   /* FM-1_97N:
 
 enum { PG_HOME, PG_WAVE, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_N };
 static const char *const PG_NAME[PG_N] = {"MIX", "WAVE", "SOUND", "TRUNC", "OUT", "SENDS", "CHORUS", "DELAY", "REVERB",
-                                          "LOOP", "LOOP TOOLS", "SONG", "SETUP"};
+                                          "LOOP", "TOOLS", "SONG", "SETUP"};
 static const char *const DTIME_NAME[6] = {"1/4", "1/8", "1/16", "1/32", "8T", "16T"};
 static const char *const CLICK_NAME[3] = {"OFF", "REC", "ON"};
 
@@ -235,15 +235,21 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
         p = cat(p + 2, " ");
         cat(p, sound_name(ui.sel));
     }
-    p = small;                                  /* top right, small: the tempo, REC / count-in */
-    if (sq.playing && sq.countin > 0) p = cat(p, "COUNT ");
-    else if (sq.recording) p = cat(p, "REC ");
-    else if (sq.rec_arm) p = cat(p, "ARMED ");
-    p = num(p, (int32_t)(bpm / 10u), 3, 0);
-    cv_text_on(10, 6, &FONT_L, big, P_LCDINK, P_LCD);
-    cv_text_on(222 - text_w(&FONT_S, small), 4, &FONT_S, small, P_LCDDIM, P_LCD);
-    cv_text_on(222 - text_w(&FONT_S, ui.page == PG_HOME ? "BPM" : PG_NAME[ui.page]), 20, &FONT_S,
-               ui.page == PG_HOME ? "BPM" : PG_NAME[ui.page], P_LCDDIM, P_LCD);
+    {   /* top right, small: the tempo (REC / COUNT / ARMED before it), below it the page; what does not fit
+         * beside the big line is left out (the big line wins) */
+        int32_t bw = 10 + text_w(&FONT_L, big) + 6;
+        const char *pg = ui.page == PG_HOME ? "BPM" : PG_NAME[ui.page];
+        const char *st = sq.playing && sq.countin > 0 ? "COUNT " : sq.recording ? "REC " : sq.rec_arm ? "ARMED " : "";
+        p = cat(small, st);
+        num(p, (int32_t)(bpm / 10u), 3, 0);
+        if (222 - text_w(&FONT_S, small) < bw)
+            num(small, (int32_t)(bpm / 10u), 3, 0);
+        cv_text_on(10, 6, &FONT_L, big, P_LCDINK, P_LCD);
+        if (222 - text_w(&FONT_S, small) >= bw)
+            cv_text_on(222 - text_w(&FONT_S, small), 4, &FONT_S, small, P_LCDDIM, P_LCD);
+        if (222 - text_w(&FONT_S, pg) >= bw)
+            cv_text_on(222 - text_w(&FONT_S, pg), 20, &FONT_S, pg, P_LCDDIM, P_LCD);
+    }
     cv_rect(6, 40, 220, 1, P_LCDDIM);
     page_cols(lab, val);
     for (i = 0; i < 4u; i++) {
