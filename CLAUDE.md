@@ -25,6 +25,9 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   count-in, click off/rec/on; black keys = loops 1-11 (switch at loop end); 4 songs `sq_songs[4][32]`.
 - `sp_store.c`: two 40 KiB copies at 0xC4000 / 0xCE000 (gen + CRC32), `ZS_VER` 2; `ZS_KIT_ID` resets the pads
   when the factory kit changes (bump it then). Autosave 3 s after stop; SAVE saves now.
+- `sp_link.c`: USB link for the web tools, SysEx F0 pack7(7D 'Z' 'P' cmd addr len data sum) F7: HELLO, READ, ERASE,
+  WRITE (only 0xA0000-0xDBFFF, 0xE5000-0xE8FFF, 0xEA000-0xFBFFF: sloopDX's banks + zp12's rooms), HOLD, REBOOT. The
+  logic is in `web/zp12link.js` (backup / restore; the sample editor goes on top). Image ~565 of 582 KB (FONT_S cut to ASCII saved 12.9 KB; -Oz would save 4.3 KB more but slows the audio ISR: untried on the device).
 - `sp_ui.c`: panel look (header, big LCD line + 4 columns for KNOB 1-4, faders, pads, LEDs via `ui_leds()`).
   HOME: KNOB 1-4 = pad volumes 1-4, SEL held 5-8. EDIT: WAVE, SOUND, TRUNC, OUT, SENDS. FX: CHORUS, DELAY,
   REVERB. SEQ tap: LOOP, TOOLS (CLEAR, COPY>, COPY: turn twice), SONG. GLO: SETUP (TEMPO, CLICK, VER, RESET).
@@ -38,14 +41,18 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   `cc -O2 -w -o build/host/sp_core_test tests/sp_core_test.c -lm && build/host/sp_core_test build/host/core.wav`
   `cc -O2 -Wall -Wno-unused-function -Ifirmware/src -Ibuild/gen -o build/host/sp_seq_test tests/sp_seq_test.c -lm && build/host/sp_seq_test`
   `cc -O2 -w -Ifirmware/src -Ifirmware/gen -Ibuild/gen -o build/host/zp12_ui_test tests/zp12_ui_test.c -lm && build/host/zp12_ui_test`
+- Link: `cc -O2 -Wall -Wno-unused-function -Ifirmware/src -o build/host/zp12_link_host tests/zp12_link_host.c && node tests/zp12_link_test.mjs`
 - Site: `python3 tools/make_site.py ../sloopdx build/zp12-X.Y.fwsc X.Y [video.mp4]` -> `docs/` (start page
-  web/landing.html, installer docs/install/, cheat sheet web/cheatsheet.html + PDF via headless Chrome, impressum).
+  web/landing.html with the cheat sheet embedded from web/cheatsheet.html (its scoped `cs-style` and `<!--cs-->` block;
+  no own page), installer docs/install/, backup docs/backup/, impressum). Always pass the video (it is deleted
+  otherwise). PDF / screenshots: `flatpak-spawn --host flatpak run --filesystem=$PWD com.google.Chrome --headless=new ...`.
   Bump the version in README, landing, cheat sheet when releasing.
 - Deploy: commit, push `main`, then `ssh -o BatchMode=yes pi-remote '~/docker/sloopdx-site/update.sh'`
   (pulls this repo into the Pi's zp12repo; served as zp12.designburgapps.com and dx7.designburgapps.com/zp12/).
   sloopDX's site copies docs/zp12 too: rebuild it there when /zp12/ should change.
 - Videos: C harness renders the real UI + audio per frame (`../video/zp12av*.c`), compositor `../video/make_video*.py`
-  (panel, knobs, keys, cold open, cuts on bar lines, loudnorm -14 LUFS). Latest: `zp12-1.1-doubletime.mp4` (`zp12av5.c`, `make_video11.py`, then loudnorm -14 LUFS with a limiter from `v11/track.wav`).
+  (panel, knobs, keys, cold open, cuts on bar lines, loudnorm -14 LUFS). Latest: `zp12-1.3-doubletime.mp4` (`zp12av5.c`, `make_video11.py`, then loudnorm -14 LUFS with a limiter from `v11/track.wav`).
+  Every video ends with "Please always check the latest firmware version!" + zp12.designburgapps.com/install.
 
 ## Style
 

@@ -9,7 +9,7 @@ Released: 0.9 (FM-1_979). Open, from the user's tests:
 - [x] 1.3: the backup tool (web/backup.html, web/zp12link.js; firmware sp_link.c: raw flash READ / ERASE / WRITE in zp12's rooms and sloopDX's banks only); the cheat sheet a section of the start page. Next: the sample editor on the same link.
 - [x] 1.2: the 8th black key (A#4) is loop 8 again (it and B4 were swapped in white_of).
 - [x] 1.1: SEL held = faders 5-8 on any page; the header says where you are (EDIT > SOUND) and a page shows its
-      family's tabs; FX > FILTER: sloopDX's DJ filter on the mix (not saved). Image 576 of 582 KB: nearly full.
+      family's tabs; FX > FILTER: sloopDX's DJ filter on the mix (not saved). Image 576 of 582 KB then; 565 KB after FONT_S was cut to ASCII (1.3+).
 - [ ] Factory hats quieter in the kit (`tools/gen_kit.py`, then bump `ZS_KIT_ID`).
 - [ ] Web editor for own samples (FM-1 USB audio is output only: upload over MIDI sysex like sloopDX's bank upload;
       user sample flash ~356 KB = ~9.1 s at 26.04 kHz).

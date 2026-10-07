@@ -32,6 +32,7 @@ switching it on (USB rescue).
 | ARP | MULTI PITCH: the last sound over all 27 keys (F4 as tuned) |
 | SELECT · ALGORITHM · PRESETS | tempo · the sound to edit · the sample of the last pad (one sample on many pads, each tuned its own way) |
 | USB MIDI | notes 36–67 play pads A1–D8 |
+| Backup | zp12.designburgapps.com/backup: loops, sounds, songs, samples and sloopDX's DX7 banks in one file, and back (Chrome / Edge, 1.3+) |
 
 ## Sound
 
