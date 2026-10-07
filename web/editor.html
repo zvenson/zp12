@@ -1,0 +1,325 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only  (C) 2026 Sven Trogus
+     zp12: the sample editor (tools/make_site.py writes it as docs/editor/index.html, beside zp12link.js). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zp12 sample editor</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<meta name="description" content="Your own samples on zp12 for the M-VAVE FM-1: drop a WAV, trim it, hear it as the FM-1 plays it (12 bit, 26 kHz, 45 to 33), put it on a pad. Chrome or Edge over USB MIDI.">
+<link rel="canonical" href="https://zp12.designburgapps.com/editor/">
+<meta name="theme-color" content="#263e70">
+<style>
+  :root { --paper: #e4e5df; --frame: #cecfc9; --frame2: #b9bbb3; --navy: #263e70; --navy2: #1d3160; --ink: #1e3060;
+          --red: #c82e32; --led: #ff3424; --txt: #eef1f8; --dim: #a9b6d4; --mute: #56627e; --lcd: #b2be92; --lcdink: #10180e; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.6 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--red); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 24px; }
+  .rule { height: 6px; border-top: 2px solid var(--red); border-bottom: 2px solid var(--ink); }
+  nav { background: var(--frame); border-bottom: 1px solid var(--frame2); }
+  nav .wrap { display: flex; align-items: center; height: 60px; gap: 20px; }
+  .mark { font: italic 900 30px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: -1px; color: var(--ink); }
+  .mark small { font: italic 400 15px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0; margin-left: 8px; }
+  nav .rule { flex: 1; }
+  nav .links { display: flex; gap: 18px; font-size: 14.5px; }
+  nav .links a { color: var(--ink); }
+  header { background: var(--navy); color: var(--txt); padding: 40px 0 36px; }
+  h1 { font-weight: 300; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; margin: 0 0 10px; }
+  h1 b { font-weight: 900; font-style: italic; }
+  header p { color: #d6dcec; margin: 0; max-width: 44em; font-size: 18px; }
+  main { padding: 30px 0 60px; }
+  .card { background: var(--navy); color: var(--txt); border-radius: 10px; padding: 22px 24px; margin-bottom: 22px; }
+  .card h2 { font: italic 400 30px/1.1 Georgia, "Times New Roman", serif; margin: 0 0 12px; display: flex; gap: 14px; align-items: center; }
+  .card h2::after { content: ""; flex: 1; height: 6px; border-top: 2px solid var(--red); border-bottom: 2px solid var(--txt); opacity: 0.8; }
+  .card p { color: var(--dim); margin: 6px 0; }
+  .card p b { color: var(--txt); }
+  .lcd { background: var(--lcd); color: var(--lcdink); border: 3px solid #464c42; border-radius: 6px; padding: 10px 14px;
+         font: 700 17px/1.4 "Courier New", monospace; min-height: 52px; white-space: pre-wrap; }
+  button, .file { font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1; padding: 11px 18px; border-radius: 8px; border: 0;
+                  cursor: pointer; background: var(--led); color: #fff; display: inline-flex; align-items: center; gap: 8px; }
+  button.ghost, .file { background: transparent; color: var(--txt); border: 1px solid rgba(238, 241, 248, 0.4); }
+  button.small { padding: 7px 11px; font-size: 13.5px; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+  .mem { height: 16px; background: var(--navy2); border-radius: 8px; overflow: hidden; margin-top: 10px; display: flex; }
+  .mem i { display: block; height: 100%; background: var(--led); }
+  .mem i.b { background: #6f8fcf; }
+  .drop { display: block; border: 2px dashed rgba(238, 241, 248, 0.35); border-radius: 10px; padding: 26px; text-align: center; color: var(--dim); cursor: pointer; }
+  .drop.on { border-color: var(--led); color: var(--txt); }
+  canvas { width: 100%; height: 150px; background: #0e1220; border-radius: 8px; display: block; margin-top: 14px; touch-action: none; cursor: ew-resize; }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 14px; }
+  .opts label { font-size: 14px; color: var(--dim); display: flex; flex-direction: column; gap: 5px; }
+  .opts label.chk { flex-direction: row; align-items: center; gap: 8px; color: var(--txt); }
+  input[type=text], select { font: inherit; font-size: 15px; padding: 8px 10px; border-radius: 6px; border: 1px solid #52628c; background: #f3f4ef; color: var(--ink); }
+  input[type=checkbox] { accent-color: var(--led); width: 18px; height: 18px; }
+  input[type=file] { display: none; }
+  .info { font: 700 14px/1.5 "Courier New", monospace; color: var(--txt); margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th { text-align: left; font-size: 13px; color: var(--dim); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid #3e5488; }
+  td { padding: 8px; border-bottom: 1px solid #33497c; font-size: 15px; vertical-align: middle; }
+  td.n { font: 700 15px "Courier New", monospace; color: #fff; }
+  td.act { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+  .empty { color: var(--dim); font-style: italic; }
+  .ok { color: #9fe0b8 !important; } .err { color: #ffb4ab !important; }
+  .warn { background: #fff3cd; color: #5c4400; border-radius: 8px; padding: 10px 14px; margin-top: 12px; font-size: 14.5px; }
+  footer { font-size: 13.5px; color: var(--mute); padding: 0 0 40px; }
+  @media (max-width: 700px) { td.act { justify-content: flex-start; } th:nth-child(3), td:nth-child(3) { display: none; } }
+</style>
+</head>
+<body>
+<nav><div class="wrap"><a class="mark" href="../">zp12<small>sample editor</small></a><div class="rule"></div>
+  <div class="links"><a href="../">zp12</a><a href="../install/">Install</a><a href="../backup/">Backup</a><a href="../#cheatsheet">Cheat sheet</a></div></div></nav>
+<header><div class="wrap">
+  <h1>Your own <b>samples</b></h1>
+  <p>Drop a sound, trim it, hear it as the FM-1 will play it (12 bit, 26 kHz, no interpolation), and put it on a pad.
+     Your samples then turn up on the FM-1 too: hit a pad, turn PRESETS. Chrome or Edge, over USB.</p>
+</div></header>
+<main><div class="wrap">
+
+  <section class="card">
+    <h2>1 · Connect</h2>
+    <p>The FM-1 with zp12 <b>1.4 or newer</b>, other MIDI apps closed. Allow MIDI with SysEx when the browser asks.</p>
+    <div class="lcd" id="lcd">NOT CONNECTED</div>
+    <div class="row"><button id="connect">Connect the FM-1</button></div>
+  </section>
+
+  <section class="card">
+    <h2>2 · On the FM-1</h2>
+    <p id="memtxt">Connect to see your samples.</p>
+    <div class="mem" id="mem"></div>
+    <table><thead><tr><th>Name</th><th>Length</th><th>Rate</th><th></th></tr></thead><tbody id="list"></tbody></table>
+    <div class="row" style="margin-top:18px">
+      <label class="chk" style="display:flex;gap:10px;align-items:center;color:var(--txt)"><input type="checkbox" id="banks" disabled>
+        Use sloopDX's DX7 bank room too: about 3.8 s more</label>
+    </div>
+    <p id="banktxt" style="font-size:14px">It holds sloopDX's 8 user banks and MY KIT: they are saved to a file first (put them back with the
+      <a href="../backup/" style="color:#ffb4ab">backup</a> page), then the room is yours.</p>
+  </section>
+
+  <section class="card">
+    <h2>3 · Add a sample</h2>
+    <label class="drop" id="drop" for="file">Drop a WAV, AIFF, MP3 or FLAC here, or click to choose one</label>
+    <input type="file" id="file" accept="audio/*,.wav,.aif,.aiff,.mp3,.flac,.ogg">
+    <div id="ed" style="display:none">
+      <canvas id="wave" width="2000" height="300"></canvas>
+      <p style="font-size:13.5px">Drag the left or right part of the picture to set where it starts and ends.</p>
+      <div class="opts">
+        <label>Name (8 letters)<input type="text" id="name" maxlength="8"></label>
+        <label>Rate<select id="rate"><option value="26040">26.04 kHz (the SP-1200)</option><option value="27500">27.5 kHz (the SP-12)</option></select></label>
+        <label class="chk"><input type="checkbox" id="slow"> 45 → 33: a third more time, grainier</label>
+        <label class="chk"><input type="checkbox" id="norm" checked> Normalise</label>
+        <label>Then put it on<select id="pad"><option value="-1">no pad</option></select></label>
+      </div>
+      <div class="info" id="info"></div>
+      <div class="row">
+        <button class="ghost" id="play-o">▶ Original</button>
+        <button class="ghost" id="play-z">▶ As the FM-1 plays it</button>
+        <button id="upload" disabled>Onto the FM-1</button>
+      </div>
+      <p id="msg"></p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Good to know</h2>
+    <p>• Room: 96 KB free = about <b>2.5 s</b> at 26 kHz, <b>3.4 s</b> at 45 → 33 (with sloopDX's bank room 6.3 s / 8.6 s). Up to 24 samples.</p>
+    <p>• Your samples are in the <a href="../backup/" style="color:#ffb4ab">backup</a>. Replacing one: delete it, add the new one.</p>
+    <p>• On the FM-1 they come after the 27 factory samples: hit a pad, turn <b>PRESETS</b>, or EDIT → WAVE.</p>
+    <p>• Please always check the latest firmware version: <a href="../install/" style="color:#ffb4ab">zp12.designburgapps.com/install</a>.</p>
+  </section>
+</div></main>
+<footer><div class="wrap">zp12 · free firmware for the M-VAVE FM-1, based on SLOOP + Felucca · <a href="../impressum.html">Impressum</a> · M-VAVE and FM-1 are trademarks of their respective owners.</div></footer>
+
+<script src="../backup/zp12link.js"></script>
+<script>
+"use strict";
+const Z = window.ZP12Link, $ = (id) => document.getElementById(id);
+let link = null, dir = null, busy = false, src = null, cut = [0, 0], enc = null, ac = null, banksSaved = false;
+const PADS = [];
+for (const b of "ABCD") for (let i = 1; i <= 8; i++) PADS.push(b + i);
+PADS.forEach((p, i) => { const o = document.createElement("option"); o.value = i; o.textContent = p; $("pad").append(o); });
+const lcd = (s) => { $("lcd").textContent = s; };
+const msg = (s, cls = "") => { $("msg").textContent = s; $("msg").className = cls; };
+const secs = (n, rate, slow) => (n / (slow ? rate * 33 / 45 : rate)).toFixed(2) + " s";
+function audio() { if (!ac) ac = new AudioContext({ sampleRate: 44100 }); return ac; }
+function play(f32) {
+  const a = audio(), b = a.createBuffer(1, f32.length, 44100);
+  b.copyToChannel(f32, 0);
+  const s = a.createBufferSource(); s.buffer = b; s.connect(a.destination); s.start();
+}
+
+function refresh() {
+  const on = !!link && !busy;
+  $("connect").disabled = busy;
+  $("upload").disabled = !on || !enc;
+  $("banks").disabled = !on || (dir && dir.flags & 1);
+  document.querySelectorAll("#list button").forEach((b) => { b.disabled = !on; });
+}
+function showDir() {
+  const tb = $("list"); tb.innerHTML = "";
+  if (!dir) return;
+  const kit = link?.info?.kit || 27, useB = $("banks").checked || !!(dir.flags & 1), r = Z.room(dir, useB);
+  dir.slots.forEach((s, i) => {
+    if (!s) return;
+    const tr = document.createElement("tr"), slow = s.flags & 1;
+    tr.innerHTML = `<td class="n">${s.name}</td><td>${secs(s.n, s.rate, slow)}</td><td>${(s.rate / 1000).toFixed(2)} kHz${slow ? " · 45→33" : ""}</td><td class="act"></td>`;
+    const act = tr.lastChild, btn = (t, f, cls = "ghost small") => { const b = document.createElement("button"); b.className = cls; b.textContent = t; b.onclick = f; act.append(b); };
+    btn("▶", () => run(async () => play(Z.zoh(await Z.fetchSample(link, s), s.rate, slow))));
+    const sel = document.createElement("select"); sel.innerHTML = PADS.map((p, k) => `<option value="${k}">${p}</option>`).join("");
+    sel.style.padding = "5px"; act.append(sel);
+    btn("On the pad", () => run(async () => { await link.assign(+sel.value, kit + i); lcd(`${PADS[+sel.value]} ${s.name}`); }));
+    btn("WAV", () => run(async () => save(Z.wav(await Z.fetchSample(link, s), slow ? Math.floor(s.rate * 33 / 45) : s.rate), s.name.toLowerCase().replace(/\W+/g, "-") + ".wav")));
+    btn("Delete", () => { if (confirm(`Delete ${s.name} from the FM-1? Pads that play it fall silent.`)) run(async () => { await Z.remove(link, dir, i); }); });
+    tb.append(tr);
+  });
+  if (!tb.children.length) tb.innerHTML = '<tr><td colspan="4" class="empty">No own samples yet.</td></tr>';
+  const usedB = r.total - r.free;
+  $("mem").innerHTML = `<i style="width:${(100 * usedB / r.total).toFixed(1)}%"></i>`;
+  $("memtxt").innerHTML = `<b>${dir.slots.filter(Boolean).length}</b> of 24 places · <b>${Math.round(usedB / 1024)}</b> of ${Math.round(r.total / 1024)} KB used · ` +
+    `the longest still fits: <b>${(r.longest / 26040).toFixed(2)} s</b> at 26 kHz, <b>${(r.longest / 26040 * 45 / 33).toFixed(2)} s</b> at 45 → 33`;
+  $("banks").checked = useB;
+  refresh(); info();
+}
+function save(u8, name) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([u8])); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+async function run(f) {
+  busy = true; refresh();
+  try { await f(); if (link) { dir = await Z.readDir(link); showDir(); } }
+  catch (e) { msg(e.message, "err"); lcd("ERROR"); }
+  busy = false; refresh();
+}
+
+$("connect").onclick = async () => {
+  if (!navigator.requestMIDIAccess) { lcd("THIS BROWSER HAS NO WEB MIDI\nuse Chrome or Edge"); return; }
+  let access;
+  try { access = await navigator.requestMIDIAccess({ sysex: true }); } catch (e) { lcd("MIDI ACCESS DENIED"); return; }
+  const isF = (p) => /felucca/i.test(p.name || "") && p.state !== "disconnected";
+  const input = [...access.inputs.values()].find(isF), output = [...access.outputs.values()].find(isF);
+  if (!input || !output) { lcd("NO FM-1 FOUND\nplug it in, close other MIDI apps"); return; }
+  const l = new Z.Link((d) => output.send(d));
+  input.onmidimessage = (e) => l.receive(e.data);
+  try {
+    const h = await l.hello();
+    if (h.proto < 2) { lcd(`${h.version.toUpperCase()}\nthe editor needs zp12 1.4 or newer: see Install`); return; }
+    link = l;
+    lcd(`CONNECTED\n${h.version.toUpperCase()}`);
+    await run(async () => {});
+  } catch (e) { lcd("THE FM-1 DOES NOT ANSWER\nzp12 1.4 or newer needed: see Install"); }
+  access.onstatechange = () => { if (!isF(input)) { link = null; lcd("DISCONNECTED"); refresh(); } };
+};
+
+$("banks").onchange = async () => {
+  if (!$("banks").checked) { showDir(); return; }
+  if (!banksSaved && !confirm("sloopDX's DX7 banks and MY KIT are saved to a file first, then that room holds samples. Go on?")) { $("banks").checked = false; return; }
+  if (!banksSaved) await run(async () => {
+    lcd("SAVING SLOOPDX'S BANKS");
+    const f = await Z.backup(link, ["banks"]);
+    save(f, `sloopdx-banks-${new Date().toISOString().slice(0, 10)}.zp12bak`);
+    banksSaved = true;
+    lcd("BANKS SAVED");
+  });
+  $("banks").checked = banksSaved;
+  showDir();
+};
+
+// ---- a new sample
+const drop = $("drop");
+drop.ondragover = (e) => { e.preventDefault(); drop.classList.add("on"); };
+drop.ondragleave = () => drop.classList.remove("on");
+drop.ondrop = (e) => { e.preventDefault(); drop.classList.remove("on"); if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]); };
+$("file").onchange = () => { if ($("file").files[0]) load($("file").files[0]); };
+async function load(f) {
+  try {
+    const buf = await audio().decodeAudioData(await f.arrayBuffer());
+    const m = new Float32Array(buf.length);
+    for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < m.length; i++) m[i] += d[i] / buf.numberOfChannels; }
+    src = { x: m, rate: buf.sampleRate };
+    let a = 0, b = m.length;                       // the silence before and after off
+    while (a < b && Math.abs(m[a]) < 0.003) a++;
+    while (b > a && Math.abs(m[b - 1]) < 0.003) b--;
+    cut = [a, b];
+    $("name").value = Z.cleanName(f.name.replace(/\.[^.]*$/, ""));
+    $("ed").style.display = "block";
+    msg("");
+    info(); draw();
+  } catch (e) { msg("That file could not be read: " + e.message, "err"); }
+}
+function info() {
+  if (!src) return;
+  const slow = $("slow").checked, rate = +$("rate").value;
+  enc = Z.encode(src.x, src.rate, { start: cut[0], end: cut[1], slow, rate, normalize: $("norm").checked });
+  const kb = Z.bytesOf(enc.length) / 1024, r = dir ? Z.room(dir, $("banks").checked || !!(dir.flags & 1)) : null;
+  const fits = !r || Z.bytesOf(enc.length) <= Math.ceil(r.longest * 1.5 / 4096) * 4096;
+  $("info").innerHTML = `${((cut[1] - cut[0]) / src.rate).toFixed(2)} s → ${secs(enc.length, rate, slow)} on the FM-1 · ${kb.toFixed(1)} KB` +
+    (r ? (fits ? ' · <span class="ok">fits</span>' : ' · <span class="err">too long: trim it, or 45 → 33, or the bank room</span>') : "");
+  refresh();
+}
+for (const id of ["slow", "rate", "norm"]) $(id).onchange = info;
+function draw() {
+  const c = $("wave"), g = c.getContext("2d"), W = c.width, H = c.height, x = src.x, n = x.length;
+  g.fillStyle = "#0e1220"; g.fillRect(0, 0, W, H);
+  for (let px = 0; px < W; px++) {
+    const a = Math.floor(px * n / W), b = Math.max(a + 1, Math.floor((px + 1) * n / W));
+    let lo = 1, hi = -1;
+    for (let i = a; i < b; i++) { lo = Math.min(lo, x[i]); hi = Math.max(hi, x[i]); }
+    const inside = a >= cut[0] && a < cut[1];
+    g.fillStyle = inside ? "#ff6a5c" : "#3b4a72";
+    g.fillRect(px, H / 2 - hi * H / 2, 1, Math.max(1, (hi - lo) * H / 2));
+  }
+  g.fillStyle = "rgba(14,18,32,0.55)";
+  g.fillRect(0, 0, cut[0] * W / n, H); g.fillRect(cut[1] * W / n, 0, W - cut[1] * W / n, H);
+  g.fillStyle = "#ffffff";
+  g.fillRect(cut[0] * W / n - 2, 0, 4, H); g.fillRect(cut[1] * W / n - 2, 0, 4, H);
+}
+{
+  const c = $("wave");
+  let which = -1;
+  const at = (e) => { const r = c.getBoundingClientRect(); return Math.max(0, Math.min(src.x.length, Math.round((e.clientX - r.left) / r.width * src.x.length))); };
+  c.onpointerdown = (e) => { if (!src) return; const p = at(e); which = Math.abs(p - cut[0]) < Math.abs(p - cut[1]) ? 0 : 1; c.setPointerCapture(e.pointerId); c.onpointermove(e); };
+  c.onpointermove = (e) => {
+    if (which < 0) return;
+    const p = at(e);
+    cut[which] = which ? Math.max(p, cut[0] + 64) : Math.min(p, cut[1] - 64);
+    draw();
+  };
+  c.onpointerup = () => { if (which >= 0) { which = -1; info(); } };
+}
+$("play-o").onclick = () => src && play(src.rate === 44100 ? src.x.slice(cut[0], cut[1]) : Z.zoh(Int16Array.from(src.x.slice(cut[0], cut[1]), (v) => Math.round(v * 2047)), src.rate, false));
+$("play-z").onclick = () => enc && play(Z.zoh(enc, +$("rate").value, $("slow").checked));
+$("upload").onclick = () => run(async () => {
+  const name = Z.cleanName($("name").value), slow = $("slow").checked, pad = +$("pad").value;
+  msg("Writing…");
+  const slot = await Z.upload(link, dir, { name, y: enc, rate: +$("rate").value, slow }, $("banks").checked,
+                              (d, t) => lcd(`WRITING ${name} ${Math.round(100 * d / t)} %`));
+  if (pad >= 0) await link.assign(pad, link.info.kit + slot);
+  lcd(pad >= 0 ? `${PADS[pad]} ${name}` : `${name} ON THE FM-1`);
+  msg(`${name} is on the FM-1${pad >= 0 ? ", on pad " + PADS[pad] : ""}. Hit a pad and turn PRESETS to find it.`, "ok");
+});
+
+// ?demo: the page with a few samples and one loaded (the video's screenshots; no FM-1)
+if (new URLSearchParams(location.search).has("demo")) {
+  link = { info: { kit: 27 } };
+  lcd("CONNECTED\nZP12 1.4");
+  dir = { gen: 3, flags: 0, copy: 0, slots: Array(24).fill(null) };
+  dir.slots[0] = { off: 0xea000, n: 21000, rate: 26040, flags: 0, name: "BREAK 1" };
+  dir.slots[1] = { off: 0xef000, n: 9000, rate: 26040, flags: 1, name: "VOX HEY" };
+  dir.slots[2] = { off: 0xe5000, n: 6000, rate: 27500, flags: 0, name: "808 SUB" };
+  showDir();
+  const n = 44100 * 0.9, x = new Float32Array(n);
+  for (let i = 0; i < n; i++) { const t = i / 44100, k = t % 0.225; x[i] = (Math.sin(2 * Math.PI * 55 * k * (1 + 3 * Math.exp(-k * 30))) * Math.exp(-k * 9) * 0.9 + (Math.random() - 0.5) * Math.exp(-((t + 0.1125) % 0.225) * 40) * 0.6) * (t < 0.88 ? 1 : 0); }
+  src = { x, rate: 44100 }; cut = [Math.floor(n * 0.02), Math.floor(n * 0.97)];
+  $("name").value = "MY KICK"; $("pad").value = "0"; $("ed").style.display = "block";
+  info(); draw();
+  const st = new URLSearchParams(location.search).get("demo");
+  if (st === "writing") { busy = true; refresh(); lcd("WRITING MY KICK 64 %"); msg("Writing…"); }
+  if (st === "done") { lcd("A1 MY KICK"); msg("MY KICK is on the FM-1, on pad A1. Hit a pad and turn PRESETS to find it.", "ok"); }
+}
+refresh();
+</script>
+</body>
+</html>

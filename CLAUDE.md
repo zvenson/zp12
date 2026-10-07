@@ -25,8 +25,11 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   count-in, click off/rec/on; black keys = loops 1-11 (switch at loop end); 4 songs `sq_songs[4][32]`.
 - `sp_store.c`: two 40 KiB copies at 0xC4000 / 0xCE000 (gen + CRC32), `ZS_VER` 2; `ZS_KIT_ID` resets the pads
   when the factory kit changes (bump it then). Autosave 3 s after stop; SAVE saves now.
+- `sp_samples.c`: own samples from the web editor: directory 0xD8000 / 0xD9000 (gen + CRC, 24 slots), data in
+  0xDA000-0xDBFFF, 0xE5000-0xE8FFF, 0xEA000-0xFBFFF (+ sloopDX's bank room 0xA0000-0xC3FFF if chosen), read via the
+  plain XIP window; waves KIT_NWAVE + slot; names in sp_ui.c `ui_uname`. Editor: web/editor.html.
 - `sp_link.c`: USB link for the web tools, SysEx F0 pack7(7D 'Z' 'P' cmd addr len data sum) F7: HELLO, READ, ERASE,
-  WRITE (only 0xA0000-0xDBFFF, 0xE5000-0xE8FFF, 0xEA000-0xFBFFF: sloopDX's banks + zp12's rooms), HOLD, REBOOT. The
+  WRITE (only 0xA0000-0xDBFFF, 0xE5000-0xE8FFF, 0xEA000-0xFBFFF: sloopDX's banks + zp12's rooms), HOLD, REBOOT, RELOAD, ASSIGN. The
   logic is in `web/zp12link.js` (backup / restore; the sample editor goes on top). Image ~565 of 582 KB (FONT_S cut to ASCII saved 12.9 KB; -Oz would save 4.3 KB more but slows the audio ISR: untried on the device).
 - `sp_ui.c`: panel look (header, big LCD line + 4 columns for KNOB 1-4, faders, pads, LEDs via `ui_leds()`).
   HOME: KNOB 1-4 = pad volumes 1-4, SEL held 5-8. EDIT: WAVE, SOUND, TRUNC, OUT, SENDS. FX: CHORUS, DELAY,

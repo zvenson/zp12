@@ -4,7 +4,7 @@ A 12-bit sampling drum machine for the **M-VAVE FM-1**: 32 sounds at 26.04 kHz (
 without interpolation, eight output channels with their filters, a panel-style screen. Inspired by the
 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation.
 
-> **Status: 1.3.** Cheat sheet: `web/cheatsheet.html` (on the site, with a PDF). The factory kit on the keys (bank C6–C8: a grand piano, Cm9 and F13 stabs and a note, VCSL CC0; bank D: E-piano chords, horns, vibes, bass,
+> **Status: 1.4.** Cheat sheet: `web/cheatsheet.html` (on the site, with a PDF). The factory kit on the keys (bank C6–C8: a grand piano, Cm9 and F13 stabs and a note, VCSL CC0; bank D: E-piano chords, horns, vibes, bass,
 > scratches), eleven loops on the black keys, the sequencer (loops of 1–32 bars or AUTO, song, real-time recording with count-in and AUTO CORRECT, step editing, swing, erase, tap tempo), sloopDX's
 > chorus, delay and reverb, saved in flash (0xC4000.., a room sloopDX leaves free). Own samples (a web editor) next.
 > Plan: [CONCEPT.md](CONCEPT.md).
@@ -32,6 +32,7 @@ switching it on (USB rescue).
 | ARP | MULTI PITCH: the last sound over all 27 keys (F4 as tuned) |
 | SELECT · ALGORITHM · PRESETS | tempo · the sound to edit · the sample of the last pad (one sample on many pads, each tuned its own way) |
 | USB MIDI | notes 36–67 play pads A1–D8 |
+| Own samples | zp12.designburgapps.com/editor: drop a WAV, trim, 26 / 27.5 kHz, 45→33, hear it as the FM-1 plays it, onto a pad (2.5 s free, 6.3 s with sloopDX's bank room; 1.4+) |
 | Backup | zp12.designburgapps.com/backup: loops, sounds, songs, samples and sloopDX's DX7 banks in one file, and back (Chrome / Edge, 1.3+) |
 
 ## Sound

@@ -117,7 +117,7 @@
 <nav><div class="wrap">
   <a class="mark" href="#top">zp12<small>sampling drums</small></a>
   <span class="rule"></span>
-  <div class="links"><a href="#video">Video</a><a href="#workflow">Workflow</a><a href="#sound">Sound</a><a href="#cheatsheet">Cheat sheet</a><a href="backup/">Backup</a>
+  <div class="links"><a href="#video">Video</a><a href="#workflow">Workflow</a><a href="#sound">Sound</a><a href="#cheatsheet">Cheat sheet</a><a href="editor/">Samples</a><a href="backup/">Backup</a>
     <a class="in" href="install/"><b>Install</b></a><a class="gh" href="https://github.com/zvenson/zp12">GitHub</a></div>
 </div></nav>
 
@@ -189,7 +189,7 @@
 
 <section id="sounds"><div class="wrap">
   <h2>The sounds</h2>
-  <p class="intro">Bank A and B a full kit, C bank A lower and grainier at 45 → 33 and a grand piano (two funky stabs, Cm9 and F13, and a note to play over all keys), D what a sampler is for: chords and phrases. Put any of the 27 on any pad (hit it, turn PRESETS); your own samples come with the web editor.</p>
+  <p class="intro">Bank A and B a full kit, C bank A lower and grainier at 45 → 33 and a grand piano (two funky stabs, Cm9 and F13, and a note to play over all keys), D what a sampler is for: chords and phrases. Put any of the 27 on any pad (hit it, turn PRESETS); your own with the <a href="editor/">sample editor</a>.</p>
   <div class="pads"><span>A1<i>KICK</i></span><span>A2<i>SNARE</i></span><span>A3<i>RIM</i></span><span>A4<i>CLAP</i></span><span>A5<i>HAT</i></span><span>A6<i>OHAT</i></span><span>A7<i>TOM L</i></span><span>A8<i>TOM H</i></span></div>
   <div class="pads"><span>B1<i>CRASH</i></span><span>B2<i>RIDE</i></span><span>B3<i>COWBELL</i></span><span>B4<i>TAMB</i></span><span>B5<i>SHAKER</i></span><span>B6<i>CONGA</i></span><span>B7<i>CLAVE</i></span><span>B8<i>WOOD</i></span></div>
   <div class="pads"><span>C1<i>KICK 33</i></span><span>C2<i>SNARE 33</i></span><span>C3<i>RIM 33</i></span><span>C4<i>CLAP 33</i></span><span>C5<i>HAT 33</i></span><span class="d">C6<i>PNO Cm9</i></span><span class="d">C7<i>PNO F13</i></span><span class="d">C8<i>PIANO</i></span></div>
@@ -208,7 +208,7 @@
       <tr><td>Sequencer</td><td>96 ticks a quarter, 16 loops of 1–32 bars, 512 hits each, 4 songs</td></tr>
       <tr><td>Effects</td><td>stereo chorus, tempo delay, FDN reverb with pre-delay (from sloopDX), a drive per pad</td></tr>
       <tr><td>Memory</td><td>everything saved in 0xC4000–0xD7FFF, two copies; sloopDX's data untouched</td></tr>
-      <tr><td>Own samples</td><td>coming: a web editor that converts your WAVs to 12 bit, bit for bit as the FM-1 plays them. Recording into the FM-1 itself is not possible: it has no audio input.</td></tr>
+      <tr><td>Own samples</td><td>the <a href="editor/">sample editor</a> in the browser: drop a WAV, trim it, hear it as the FM-1 plays it (converted to 12 bit bit for bit as the device's own code does), put it on a pad. 2.5 s free, 6.3 s with sloopDX's bank room. Recording into the FM-1 itself is not possible: it has no audio input.</td></tr>
     </table>
   </div>
   <div class="screens">
@@ -243,7 +243,7 @@
 
 <section id="faq"><div class="wrap">
   <h2>Questions</h2>
-  <details><summary>Can I record samples into the FM-1?</summary><p>No: the FM-1 has no audio input, and its USB audio only goes to the computer. Your own sounds will come from the web editor: drop a WAV, trim it, send it.</p></details>
+  <details><summary>Can I record samples into the FM-1?</summary><p>No: the FM-1 has no audio input, and its USB audio only goes to the computer. Your own sounds come from the <a href="editor/">sample editor</a>: drop a WAV, trim it, put it on a pad.</p></details>
   <details><summary>Does it replace sloopDX?</summary><p>While it is installed, yes; your sloopDX projects, DX7 banks and kit stay in their own part of the flash, and the sloopDX installer puts sloopDX back.</p></details>
   <details><summary>Is it a copy of a vintage sampler?</summary><p>No. It is inspired by how the 12-bit samplers of the 80s sound and work; it ships none of their sounds, code or names. Those names are trademarks of their owners.</p></details>
   <details><summary>Where are the chords?</summary><p>Press OCT+ (the LEDs C and D light), then white key 9: D1, the E-piano chord. ARP plays it over all keys.</p></details>
@@ -258,7 +258,7 @@
 <footer><div class="wrap">
   <div>zp12 by zvenson. Based on <a href="https://github.com/isod89/sloop-fm1">SLOOP</a> (isod89) and <a href="https://github.com/hugelton/Felucca">Felucca</a> (Leo Kuroshita, Hügelton Instruments), with the effects and the FM-1 platform of <a href="https://dx7.designburgapps.com/">sloopDX</a>. GPL-3.0, no warranty: custom firmware is installed at your own risk.<br>
   Inspired by the 12-bit samplers of the 80s; their names are trademarks of their owners. M-VAVE and FM-1 are trademarks of their owners; zp12 is not affiliated with them.</div>
-  <div><a href="https://github.com/zvenson/zp12">github.com/zvenson/zp12</a><br><a href="install/">Installer</a> · <a href="#cheatsheet">Cheat sheet</a> · <a href="backup/">Backup</a><br><a href="impressum.html">Impressum · Disclaimer · Datenschutz</a><br><a href="https://webdesignhamburg.net/">webdesignhamburg.net</a></div>
+  <div><a href="https://github.com/zvenson/zp12">github.com/zvenson/zp12</a><br><a href="install/">Installer</a> · <a href="#cheatsheet">Cheat sheet</a> · <a href="editor/">Sample editor</a> · <a href="backup/">Backup</a><br><a href="impressum.html">Impressum · Disclaimer · Datenschutz</a><br><a href="https://webdesignhamburg.net/">webdesignhamburg.net</a></div>
 </div></footer>
 
 <script>

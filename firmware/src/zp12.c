@@ -117,6 +117,7 @@ static void ota_commit(const uint8_t *parm)
 #define SP_HIT(k, vel, semis) sq_post(RQ_HIT, k, (vel) | (uint32_t)((semis) + 64) << 8)
 #include "sp_ui.c"
 #include "sp_store.c"
+#include "sp_samples.c"
 #include "sp_link.c"
 
 /* ---- the timer: 10 kHz key scan, milliseconds, USB at 2 kHz */
@@ -249,6 +250,7 @@ static void zp12_main(void)
     for (i = 0; i < SP_NSOUND; i++)
         sp_sound[i] = KIT_PADS[i];
     sq_init();
+    zu_load();                                          /* the own samples (before the pads that play them) */
     if (zs_load())                                      /* what was left: sounds, mix, effects, segments, song */
         zs_saved_sig = zs_sig();
     ui_init();
@@ -407,6 +409,8 @@ void fm1_cstart(void)
     if (boot_mode == BOOT_RECOVERY || recovery_key())
         recovery_main();                        /* OCT- at power-on: the USB rescue */
     flash_ok = FL_FAR(fl_jedec_ram)() == 0x856014u;
+    if (flash_ok)
+        fl_plain_window_init();                 /* flash above 0x93000 reads plain through XIP: the own samples */
     ota_boot_cleanup();
     lcd_init();
     lcd_fill(0, 0, 240, 240, C_BLACK);

@@ -114,10 +114,17 @@ static void put_int(char *b, int32_t v, uint32_t digits, int sign)
 static char *cat(char *d, const char *s) { while (*s) *d++ = *s++; *d = 0; return d; }
 static char *num(char *p, int32_t v, uint32_t digits, int sign) { put_int(p, v, digits, sign); return p + digits + (sign != 0); }
 
+/* the samples: the kit's, then the own ones from the web editor (sp_samples.c fills their names and flags) */
+#define SP_NUSER 24
+static char ui_uname[SP_NUSER][9];
+static uint8_t ui_uflags[SP_NUSER];              /* bit 0: stored for 45->33 */
+static const char *wave_name(uint32_t w)
+{
+    return w < KIT_NWAVE ? KIT_WAVE[w].name : w < KIT_NWAVE + SP_NUSER && sp_wave[w].n ? ui_uname[w - KIT_NWAVE] : "-----";
+}
 static const char *sound_name(uint32_t k)
 {
-    const sp_sound_t *s = &sp_sound[k];
-    return s->wave < KIT_NWAVE ? KIT_WAVE[s->wave].name : s->wave == 0xFFu ? "-----" : "USER";
+    return wave_name(sp_sound[k].wave);
 }
 static void pad_label(char *b, uint32_t k) { b[0] = (char)('A' + k / 8u); b[1] = (char)('1' + k % 8u); b[2] = 0; }
 
@@ -137,7 +144,7 @@ static void page_cols(char lab[4][8], char val[4][8])
         }
         break;
     case PG_WAVE:
-        COL(0, "WAVE", cat(val[0], s->wave < KIT_NWAVE ? KIT_WAVE[s->wave].name : "-----"));
+        COL(0, "WAVE", cat(val[0], wave_name(s->wave)));
         COL(1, "COPY>", pad_label(val[1], ui.copy_pad));
         COL(2, "COPY", cat(val[2], ui.arm == PG_WAVE + 1u ? "AGAIN" : "-->"));
         break;
@@ -621,21 +628,33 @@ static int32_t accel(int32_t d)
     return d * (a >= 3 ? 8 : a == 2 ? 5 : 3);
 }
 
-/* the sample the selected pad plays, one on (the factory's; own ones later): any sample on as many pads as
+/* the sample the selected pad plays, one on (the factory's, then the own ones): any sample on as many pads as
  * wanted, each with its own TUNE, DECAY, ... */
-static void wave_step(int32_t one)
+static void wave_set(uint32_t pad, uint32_t w)
 {
-    sp_sound_t *s = &sp_sound[ui.sel];
-    uint32_t w = s->wave < KIT_NWAVE ? s->wave : 0u;
+    sp_sound_t *s = &sp_sound[pad % SP_NSOUND];
     char m[24];
-    s->wave = (uint8_t)((w + KIT_NWAVE + (one > 0 ? 1u : KIT_NWAVE - 1u)) % KIT_NWAVE);
+    s->wave = (uint8_t)w;
+    if (w >= KIT_NWAVE)                          /* an own sample: 45->33 as it was stored */
+        s->flags = (uint8_t)((ui_uflags[w - KIT_NWAVE] & 1u) ? s->flags | SPF_33 : s->flags & ~SPF_33);
     s->start = 0;
     s->end = 1000;
+    ui.sel = (uint8_t)(pad % SP_NSOUND);
     SP_HIT(ui.sel, 100, 0);                    /* (heard at once) */
     pad_label(m, ui.sel);
     m[2] = ' ';
-    cat(m + 3, KIT_WAVE[s->wave].name);
+    cat(m + 3, wave_name(w));
     ui_say(m);
+}
+static void wave_step(int32_t one)
+{
+    uint32_t n = KIT_NWAVE + SP_NUSER, w = sp_sound[ui.sel].wave < n ? sp_sound[ui.sel].wave : 0u, i;
+    for (i = 0; i < n; i++) {                   /* the next that is there */
+        w = (w + (one > 0 ? 1u : n - 1u)) % n;
+        if (sp_wave[w].n)
+            break;
+    }
+    wave_set(ui.sel, w);
 }
 
 /* PRESETS turned: the sample of the pad played last */

@@ -4,6 +4,7 @@
   index.html            web/landing.html (/*VER*/ the version)
   install/              the installer (tools/make_installer.py: sloopDX's tested update path) and the package
   backup/               web/backup.html + web/zp12link.js (the backup tool)
+  editor/               web/editor.html (the sample editor; it loads ../backup/zp12link.js)
   zp12-cheat-sheet.pdf, impressum.html, favicon.svg, img/, zp12-beat.mp4; the cheat sheet itself is a section of
   the start page (web/cheatsheet.html's sheet and its scoped style, <!--CHEATSHEET-->), cheatsheet.html only sends
   old links there
@@ -48,6 +49,8 @@ def main(sloopdx, pkg, version, video=None):
     (docs / "backup").mkdir(exist_ok=True)
     shutil.copy(web / "backup.html", docs / "backup" / "index.html")
     shutil.copy(web / "zp12link.js", docs / "backup" / "zp12link.js")
+    (docs / "editor").mkdir(exist_ok=True)
+    shutil.copy(web / "editor.html", docs / "editor" / "index.html")
     if (docs / "install" / "favicon.svg").exists():
         (docs / "install" / "favicon.svg").unlink()
     shutil.copytree(web / "img", docs / "img", dirs_exist_ok=True)

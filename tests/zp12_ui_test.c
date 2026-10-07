@@ -84,6 +84,18 @@ int main(int argc, char **argv)
     page(PG_SEG); ui.shift = 1; i = ui.mix[4]; knob(0, -3); fm1_ms += 20; ui_draw(); ppm("zp12-sel");
     if (ui.mix[4] == i || sq.seg != 0u) { printf("zp12 ui: SEL held on the LOOP page did not move fader 5 FAIL\n"); return 1; }
     ui.shift = 0;
+    {   /* an own sample (the web editor's): PRESETS finds it after the kit, shows its name, skips the empty places */
+        static uint8_t snd[300];
+        sp_wave[KIT_NWAVE + 3].d = snd; sp_wave[KIT_NWAVE + 3].n = 200; sp_wave[KIT_NWAVE + 3].rate = 26040;
+        strcpy(ui_uname[3], "MY KICK"); ui_uflags[3] = 1;
+        page(PG_HOME); ui.sel = 0; sp_sound[0].wave = KIT_NWAVE - 1; sp_sound[0].flags = 0;
+        ui_preset(1); fm1_ms += 20; ui_draw(); ppm("zp12-own");
+        if (sp_sound[0].wave != KIT_NWAVE + 3 || !(sp_sound[0].flags & SPF_33) || strcmp(sound_name(0), "MY KICK")) { printf("zp12 ui: PRESETS did not find the own sample FAIL\n"); return 1; }
+        ui_preset(1);
+        if (sp_sound[0].wave != 0u) { printf("zp12 ui: PRESETS did not skip the empty places FAIL\n"); return 1; }
+        ui_preset(-1);
+        if (sp_sound[0].wave != KIT_NWAVE + 3) { printf("zp12 ui: PRESETS back did not find the own sample FAIL\n"); return 1; }
+    }
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;
 }

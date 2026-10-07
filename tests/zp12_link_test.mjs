@@ -30,7 +30,7 @@ const check = (ok, what) => { console.log(`link: ${what.padEnd(72)} ${ok ? "ok" 
 const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
 
 const info = await link.hello();
-check(info.proto === 1 && info.version === "zp12 1.3", `HELLO: protocol 1, "${info.version}"`);
+check(info.proto === 2 && info.version === "zp12 1.4" && info.kit === 27, `HELLO: protocol 2, "${info.version}", ${info.kit} kit waves`);
 const store0 = await dump(0xC4000, 0x8000), banks0 = await dump(0xA0000, 0x3000), smp0 = await dump(0xEA000, 0x1800);
 const presets0 = await dump(0xDC000, 0x1000);
 
@@ -38,7 +38,7 @@ const presets0 = await dump(0xDC000, 0x1000);
 drop = 1;
 const file = await Z.backup(link, ["zp12", "banks"]);
 const b = Z.readBackup(file);
-check(b.version === "zp12 1.3" && b.parts.has("zp12") && b.parts.has("banks"), "backup: the version and both parts in the file");
+check(b.version === "zp12 1.4" && b.parts.has("zp12") && b.parts.has("banks"), "backup: the version and both parts in the file");
 check(b.sectors.size === 8 + 3 + 2, `backup: only the sectors that are not empty (${b.sectors.size})`);
 check(file.length < 60000, `backup: ${file.length} bytes`);
 
@@ -78,6 +78,65 @@ const broken = file.slice(); broken[100] ^= 1;
 e = null;
 try { await Z.restore(link, broken, ["zp12"]); } catch (x) { e = x; }
 check(e && /damaged/.test(e.message), "restore: a damaged file refused (CRC)");
+
+// 5. own samples: the resampler as the C one, upload, what the firmware reads, delete, room
+{
+  const x = Float64Array.from({ length: 3000 }, (_, i) => 0.8 * Math.sin(i * 0.05) * Math.exp(-i / 1500) + (i % 7 === 0 ? 0.1 : 0));
+  const c = (await raw(`RS 44100 26040 ${[...x].map((v) => v.toPrecision(17)).join(" ")}`)).trim().split(" ").map(Number);
+  const js = [...Z.resample12(x, 44100, 26040)];
+  check(c.length === js.length && c.every((v, i) => v === js[i]), `resample12: the browser's ${js.length} samples = the C one's, bit for bit`);
+  const slowC = (await raw(`RS ${Math.round(44100 * 45 / 33)} 26040 ${[...x].map((v) => v.toPrecision(17)).join(" ")}`)).trim().split(" ").map(Number);
+  const slowJ = [...Z.resample12(x, Math.round(44100 * 45 / 33), 26040)];
+  check(slowC.length === slowJ.length && slowC.every((v, i) => v === slowJ[i]) && Math.abs(slowJ.length / js.length - 33 / 45) < 0.01,
+        `at 45: ${slowJ.length} samples (33/45 of ${js.length}), bit for bit as the C one`);
+  const enc = Z.encode(Float32Array.from(x), 44100, { slow: true });
+  check(enc.length === slowJ.length && Math.max(...enc.map(Math.abs)) >= 1980, "encode: normalised, at 45 as asked");
+  const y = Z.resample12(x, 44100, 26040), packed = Z.pack12(y);
+  check([...Z.unpack12(packed, y.length)].every((v, i) => v === y[i]), "pack12 / unpack12: 12 bit packed and back");
+
+  let d = await Z.readDir(link);
+  check(d.copy === -1 && d.slots.every((s) => !s), "directory: none at first");
+  const r0 = Z.room(d, false);
+  check(r0.free === 24 * 4096 && r0.total === 24 * 4096, `room: ${r0.free / 1024} KB free without sloopDX's banks`);
+  const s0 = await Z.upload(link, d, { name: "my kick", y, rate: 26040 });
+  let w = (await raw("WAVES")).trim().split(" ");
+  check(s0 === 0 && w[0] === "0" && +w[2] === y.length && w[3] === "26040" && w[4] === "MY" , `upload: the firmware plays slot 0, ${w[2]} samples (name "${w[4]} ${w[5]}")`);
+  const atFlash = await dump(+w[1], packed.length);
+  check(same(atFlash, packed), "upload: the bytes in flash are the packed sample");
+  const s1 = await Z.upload(link, d, { name: "SNARE2", y, rate: 27500, slow: true });
+  const wl = await raw("WAVES");
+  check(s1 === 1 && / 27500 SNARE2 1 /.test(wl + " "), "a second one: 27.5 kHz, stored for 45->33");
+  d = await Z.readDir(link);
+  check(d.gen === 2 && d.slots[0].name === "MY KICK" && d.slots[1].flags === 1, "directory read back: two, generation 2, names upper case");
+  await link.assign(5, info.kit + s1);
+  check((await raw("PADS")).split(" ")[5] === String(27 + 1), "ASSIGN: pad A6 plays the second one");
+  e = null;
+  try { await link.assign(6, info.kit + 7); } catch (x) { e = x; }
+  check(e, "ASSIGN to an empty slot: refused");
+  await Z.remove(link, d, s0);
+  w = (await raw("WAVES")).trim().split(" ");
+  check(w[0] === "1" && w.length === 6, "delete: only the second one left");
+  // a long one: more than the free rooms hold without the banks, fits with them
+  const big = new Int16Array(70000);
+  e = null;
+  try { await Z.upload(link, d, { name: "LONG", y: big }); } catch (x) { e = x; }
+  check(e && /not enough room/.test(e.message), "too long for the free rooms: refused before anything is written");
+  const sl = await Z.upload(link, d, { name: "LONG", y: big }, true);
+  check(d.slots[sl].off >= 0xa0000 && d.slots[sl].off < 0xc4000 && d.flags === 1, "with sloopDX's bank room: it goes there, the directory says so");
+  w = (await raw("WAVES")).trim().split(" ");
+  check(w.includes("LONG"), "the firmware takes a sample in the bank room");
+  const back = await Z.fetchSample(link, d.slots[1]);
+  check(back.length === y.length && back.every((v, i) => v === y[i]), "fetchSample: read back as it was uploaded");
+  const z = Z.zoh(y, 26040, false);
+  check(Math.abs(z.length - Math.round(y.length * 44100 / 26040)) <= 2, `zoh: ${z.length} frames at 44.1 kHz as the FM-1 steps through them`);
+  // a backup keeps them: zp12's part holds the directory and the free rooms
+  const f2 = await Z.backup(link, ["zp12", "banks"]);
+  await Z.remove(link, d, 1);
+  await Z.restore(link, f2, ["zp12", "banks"]);
+  await link.reload();
+  w = (await raw("WAVES")).trim().split(" ");
+  check(w.includes("SNARE2") && w.includes("LONG"), "backup + restore: the samples come back");
+}
 
 dev.stdin.end();
 console.log(bad ? "LINK TEST FAILED" : "link test passed");

@@ -3,14 +3,16 @@
  * logic in the browser. A message is F0 pack7(7D 'Z' 'P' cmd addr:3 len:2 data:len sum) F7, packed as the
  * updater's (ota.c: ota_pack7), sum = ~(the bytes from cmd on); the reply has the same header and cmd, then
  * rc, addr, len, data, sum.
- *   1 HELLO        -> data: protocol, "zp12 X.Y"
+ *   1 HELLO        -> data: protocol, "zp12 X.Y", 0, the kit's waves
  *   2 READ a n     -> n <= 512 bytes of flash from 0x93000 up
  *   3 ERASE a      -> the 4 KiB sector at a          } only where zp12 keeps things: its store and samples,
  *   4 WRITE a data -> programmed, read back, compared } and sloopDX's DX7 banks + MY KIT (0xA0000..0xC3FFF)
  *   5 HOLD         -> the sequencer stops; no autosave while the link is busy (10 s from the last message)
- *   6 REBOOT       -> after the reply (a restored store is read at the start) */
+ *   6 REBOOT       -> after the reply (a restored store is read at the start)
+ *   7 RELOAD       -> the samples' directory read again (sp_samples.c); data: how many there are
+ *   8 ASSIGN a     -> pad a & 31 plays wave (a >> 8) & 63, heard at once (the web editor's "on a pad") */
 #define ZL_MAX 512u
-#define ZL_PROTO 1u
+#define ZL_PROTO 2u                              /* 2: RELOAD, ASSIGN (the sample editor) */
 static uint8_t zl_dec[16 + ZL_MAX], zl_wire[32 + (16 + ZL_MAX) * 8u / 7u];
 static uint8_t zl_back[ZL_MAX];
 static uint32_t zl_last;                         /* fm1_ms of the last message (0: never) */
@@ -67,7 +69,9 @@ static void zl_service(void)
         static const uint8_t HI[] = {ZL_PROTO, 'z', 'p', '1', '2', ' '};
         uint8_t b[16];
         for (i = 0; i < sizeof HI; i++) b[i] = HI[i];
-        for (n = 0; ZP12_VERSION[n] && i < sizeof b; n++) b[i++] = (uint8_t)ZP12_VERSION[n];
+        for (n = 0; ZP12_VERSION[n] && i + 2u < sizeof b; n++) b[i++] = (uint8_t)ZP12_VERSION[n];
+        b[i++] = 0;
+        b[i++] = KIT_NWAVE;                      /* (the own samples are waves KIT_NWAVE + slot) */
         zl_reply(1, 0, 0, b, i);
         return;
     }
@@ -102,6 +106,20 @@ static void zl_service(void)
         }
         fm1_reboot();
         return;
+    case 7: {
+        uint8_t b[1] = {0};
+        zu_load();
+        for (i = 0; i < SP_NUSER; i++) b[0] += sp_wave[KIT_NWAVE + i].n != 0u;
+        ui_say(b[0] ? "SAMPLES LOADED" : "NO SAMPLES");
+        zl_reply(7, 0, a, b, 1);
+        return;
+    }
+    case 8:
+        if (((a >> 8) & 63u) >= KIT_NWAVE + SP_NUSER || !sp_wave[(a >> 8) & 63u].n)
+            rc = 2;
+        else
+            wave_set(a & 31u, (a >> 8) & 63u);
+        break;
     default:
         rc = 7;
         break;
