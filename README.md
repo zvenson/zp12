@@ -19,7 +19,7 @@ switching it on (USB rescue).
 | --- | --- |
 | White keys 1–8 · 9–16 | bank A · B pads (OCT+: C · D, OCT−: back) |
 | Black keys | loops 1–11 (segments): stopped at once, playing from the end of the loop |
-| KNOB 1–4 | the faders of channels 1–4 (SEL held: 5–8); a page takes them, 6 s untouched or HOME gives them back |
+| KNOB 1–4 | the faders of channels 1–4 (SEL held: 5–8, on any page); a page takes them, 6 s untouched or HOME gives them back |
 | EDIT | WAVE (the pad's sample · COPY> · COPY the sound to a pad), SOUND (TUNE · FINE · DECAY · LEVEL), TRUNC (START · END · DIR · SPEED 45/33), OUT (CHAN · PAN · CUT · RESO), SENDS (DRIVE · CHO · DLY · REV) of the last pad |
 | FX | CHORUS (RATE · DEPTH · MIX), DELAY (TIME · FDBK · COLOR · MIX), REVERB (SIZE · DAMP · PRE) |
 | SEQ tapped | LOOP (LOOP · BARS 1–32 / AUTO · QUANT · SWING), LOOP TOOLS (CLEAR · COPY> · COPY, turn twice), SONG (STEP · LOOP · REPEAT, 0 ends · SONG OFF / 1–4: four songs of the loops) |

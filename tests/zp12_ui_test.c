@@ -79,6 +79,9 @@ int main(int argc, char **argv)
     if (sq_seg[0].n != 5u || ui.page != PG_HOME) { printf("zp12 ui: EDIT + OCT- did not undo FAIL\n"); return 1; }
     fm1_ms += 2000; ui_holds(1u << B_SAVE, 1u << B_SAVE, 0); key_down(3, 0); sq_block(); ui_holds(0, 0, 1u << B_SAVE); ui_draw(); ppm("zp12-saveloop");
     if (sq_seg[1].n != 5u || ui.save_req != 1u) { printf("zp12 ui: SAVE + a black key did not save the loop FAIL\n"); return 1; }
+    page(PG_SEG); ui.shift = 1; i = ui.mix[4]; knob(0, -3); fm1_ms += 20; ui_draw(); ppm("zp12-sel");
+    if (ui.mix[4] == i || sq.seg != 0u) { printf("zp12 ui: SEL held on the LOOP page did not move fader 5 FAIL\n"); return 1; }
+    ui.shift = 0;
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;
 }

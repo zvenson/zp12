@@ -121,7 +121,7 @@ static void page_cols(char lab[4][8], char val[4][8])
     uint32_t i;
     for (i = 0; i < 4u; i++) lab[i][0] = val[i][0] = 0;
 #define COL(i, l, ...) do { cat(lab[i], l); __VA_ARGS__; } while (0)
-    switch (ui.page) {
+    switch (ui.shift ? (uint32_t)PG_HOME : ui.page) {   /* (SEL held: the faders 5-8 on every page) */
     case PG_HOME:
         for (i = 0; i < 4u; i++) {
             uint32_t c = (ui.shift ? 4u : 0u) + i;
@@ -254,7 +254,7 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
     {   /* top right, small: the tempo (REC / COUNT / ARMED before it), below it the page; what does not fit
          * beside the big line is left out (the big line wins) */
         int32_t bw = 10 + text_w(&FONT_L, big) + 6;
-        const char *pg = ui.page == PG_HOME ? "BPM" : PG_NAME[ui.page];
+        const char *pg = ui.page == PG_HOME || ui.shift ? "BPM" : PG_NAME[ui.page];
         const char *st = sq.playing && sq.countin > 0 ? "COUNT " : sq.recording ? "REC " : sq.rec_arm ? "ARMED " : "";
         p = cat(small, st);
         num(p, (int32_t)(bpm / 10u), 3, 0);
@@ -288,7 +288,7 @@ static void draw_faders(void)                   /* the eight channel levels; a c
     for (i = 0; i < SP_NCH; i++) {
         int32_t cx = 14 + (int32_t)i * 29, y = (int32_t)fader_y(ui.mix[i]);
         int on = (int32_t)(fm1_ms - ui.chan_ms[i]) < 90 && sp_ch[i].on;
-        int knobbed = ui.page == PG_HOME && (i >= 4u) == (ui.shift != 0);
+        int knobbed = (ui.page == PG_HOME || ui.shift) && (i >= 4u) == (ui.shift != 0);
         char n[2] = {(char)('1' + i), 0};
         cv_rect(cx - 1, 3, 3, 46, P_SLOT);
         cv_rect(cx - 9, y, 19, 7, on ? P_LED : P_CAP);
@@ -432,7 +432,7 @@ static void ui_draw(void)
     } else {
         for (i = 0; i < SP_NCH; i++)
             on |= (uint32_t)((int32_t)(fm1_ms - ui.chan_ms[i]) < 90 && sp_ch[i].on) << i;
-        s = sig_of(ui.mix, sizeof ui.mix, on * 2654435761u ^ ui.shift * 3u ^ (ui.page == PG_HOME) * 5u) | 1u;
+        s = sig_of(ui.mix, sizeof ui.mix, on * 2654435761u ^ ui.shift * 3u ^ (ui.page == PG_HOME || ui.shift) * 5u) | 1u;
         if (s != ui.sig_mid || ui.force) { ui.sig_mid = s; draw_faders(); }
         for (i = 0; i < 8u; i++)
             lit |= (uint32_t)((int32_t)(fm1_ms - ui.hit_ms[bank * 8u + i]) < 110) << i;
@@ -588,7 +588,7 @@ static void knob(uint32_t n, int32_t d)
     sp_sound_t *s = &sp_sound[ui.sel];
     int32_t one = d > 0 ? 1 : -1, dd = accel(d);
     ui.touch_ms = fm1_ms;
-    switch (ui.page) {
+    switch (ui.shift ? (uint32_t)PG_HOME : ui.page) {   /* SEL held: the faders 5-8, whatever page is open */
     case PG_HOME: {
         uint32_t c = (ui.shift ? 4u : 0u) + n;     /* the faders: channels 1-4, SEL held 5-8 */
         ui.mix[c] = (uint8_t)sp_clamp(ui.mix[c] + dd, 0, 127);
