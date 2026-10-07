@@ -55,6 +55,7 @@ typedef struct {
 static sp_wave_t sp_wave[64];
 static sp_sound_t sp_sound[SP_NSOUND];
 static sp_ch_t sp_ch[SP_NCH];
+static uint8_t sp_mix[SP_NCH] = {100, 100, 100, 100, 100, 100, 100, 100};   /* the channel faders, 0..127 */
 
 /* sample i of a packed wave, -2048..2047 */
 static inline int32_t sp_sample(const uint8_t *d, uint32_t i)
@@ -125,8 +126,8 @@ static uint32_t sp_cut_hz(int32_t c)
     return (uint32_t)(60u * sp_pow2_cents(c * 9600 / 127) >> 16);
 }
 
-/* hit sound k at velocity 1..127 */
-static void sp_trigger(uint32_t k, uint32_t vel)
+/* hit sound k at velocity 1..127, `semis` semitones from its TUNE (MULTI PITCH) */
+static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis)
 {
     const sp_sound_t *s = &sp_sound[k % SP_NSOUND];
     sp_ch_t *c;
@@ -142,7 +143,7 @@ static void sp_trigger(uint32_t k, uint32_t vel)
     if (b > w->n) b = w->n;
     if (b <= a + 1u)
         return;
-    cents = s->tune * 100 + s->fine;
+    cents = sp_clamp(s->tune + semis, -36, 24) * 100 + s->fine;
     rate = w->rate;
     if (s->flags & SPF_33)
         rate = rate * 33u / 45u;
@@ -163,6 +164,8 @@ static void sp_trigger(uint32_t k, uint32_t vel)
     c->on = 1;
 }
 
+static void sp_trigger(uint32_t k, uint32_t vel) { sp_trigger_at(k, vel, 0); }
+
 /* channel ch's next SP_BLK samples into out (stereo, added) */
 static void sp_channel(uint32_t ch, int32_t *out)
 {
@@ -171,7 +174,7 @@ static void sp_channel(uint32_t ch, int32_t *out)
     int32_t a1 = 0, k = 0, x, y, e;
     if (!c->on && !c->tail)
         return;
-    e = c->env >> 9;                                  /* Q15 */
+    e = (int32_t)(((int64_t)(c->env >> 9) * sp_mix[ch]) / 100);   /* (100 = the level as set) */                                  /* Q15 */
     if (ch < 2u) {                                    /* the dynamic filter: the cutoff follows the level */
         uint32_t hz = sp_cut_hz(c->cut) * (uint32_t)(8192 + (e >> 2)) >> 15;   /* x 0.25 .. 0.5+ with it */
         a1 = sp_onepole(hz < 30u ? 30u : hz > 18000u ? 18000u : hz);
