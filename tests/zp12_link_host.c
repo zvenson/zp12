@@ -28,7 +28,7 @@ static void fm1_reboot(void) { printf("REBOOT\n"); fflush(stdout); }
 static void ui_say(const char *m) { (void)m; }
 enum { RQ_STOP = 2 };
 static void sq_post(uint32_t op, uint32_t pad, uint32_t arg) { (void)op; (void)pad; (void)arg; }
-static const char ZP12_VERSION[] = "1.4";
+static const char ZP12_VERSION[] = "1.5";
 /* what sp_samples.c needs of the sound core and the UI */
 #define KIT_NWAVE 27u
 #define SP_NUSER 24
@@ -40,7 +40,14 @@ static struct { const sp_wave_t *w; uint8_t on; } sp_ch[SP_NCH];
 static char ui_uname[SP_NUSER][9];
 static uint8_t ui_uflags[SP_NUSER];
 static uint32_t pad_wave[32] = {0};
-static void wave_set(uint32_t pad, uint32_t w) { pad_wave[pad & 31u] = w; }
+#define SP_NSOUND 32u
+static struct { uint8_t wave; } sp_sound[SP_NSOUND];
+static const struct { uint32_t off, n; const char *name; } KIT_WAVE[KIT_NWAVE] = {
+    {0, 0, "KICK"}, {0, 0, "SNARE"}, {0, 0, "RIM"}, {0, 0, "CLAP"}, {0, 0, "HAT"}, {0, 0, "OHAT"}, {0, 0, "TOM L"}, {0, 0, "TOM H"},
+    {0, 0, "CRASH"}, {0, 0, "RIDE"}, {0, 0, "COWBL"}, {0, 0, "TAMB"}, {0, 0, "SHAKR"}, {0, 0, "CONGA"}, {0, 0, "CLAVE"}, {0, 0, "WOOD"},
+    {0, 0, "EP Dm9"}, {0, 0, "EP Gm9"}, {0, 0, "HORNS"}, {0, 0, "VIBES"}, {0, 0, "BASS"}, {0, 0, "SCRCH"}, {0, 0, "SPIN"}, {0, 0, "SNAP"},
+    {0, 0, "PNO Cm9"}, {0, 0, "PNO F13"}, {0, 0, "PIANO"}};
+static void wave_set(uint32_t pad, uint32_t w) { pad_wave[pad & 31u] = w; sp_sound[pad & 31u].wave = (uint8_t)w; }
 static uint32_t zs_crc(const uint8_t *p, uint32_t n)
 {
     uint32_t c = 0xFFFFFFFFu, k;
@@ -112,6 +119,7 @@ int main(void)
     static char line[400000];
     uint32_t a;
     memset(flash, 0xFF, sizeof flash);
+    for (a = 0; a < SP_NSOUND; a++) sp_sound[a].wave = (uint8_t)(a % 24u);
     for (a = 0xA0000; a < 0xA3000; a++) flash[a] = (uint8_t)(a * 7u);       /* sloopDX: two banks' worth */
     for (a = 0xC4000; a < 0xCC000; a++) flash[a] = (uint8_t)(a * 13u + 1u);  /* zp12's store */
     for (a = 0xEA000; a < 0xEB800; a++) flash[a] = (uint8_t)(a >> 3);        /* a sample */

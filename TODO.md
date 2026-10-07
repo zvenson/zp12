@@ -11,6 +11,7 @@ Released: 0.9 (FM-1_979). Open, from the user's tests:
 - [x] 1.1: SEL held = faders 5-8 on any page; the header says where you are (EDIT > SOUND) and a page shows its
       family's tabs; FX > FILTER: sloopDX's DJ filter on the mix (not saved). Image 576 of 582 KB then; 565 KB after FONT_S was cut to ASCII (1.3+).
 - [ ] Factory hats quieter in the kit (`tools/gen_kit.py`, then bump `ZS_KIT_ID`).
+- [x] 1.5: a start with a kick sampled into the LCD and the name typed on drums (ba-dum-tss; a key skips it); the editor shows the 32 pads (choose a sample, drop a file on a pad; link PADS).
 - [x] 1.4: the sample editor (web/editor.html over sp_link.c; sp_samples.c): 96 KB free (2.5 s), + sloopDX's bank room
       after a forced backup of it (6.3 s). Not yet tried on the device.
 - [ ] Matomo for zp12.designburgapps.com (not set up; the impressum says none).

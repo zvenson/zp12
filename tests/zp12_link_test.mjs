@@ -30,7 +30,7 @@ const check = (ok, what) => { console.log(`link: ${what.padEnd(72)} ${ok ? "ok" 
 const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
 
 const info = await link.hello();
-check(info.proto === 2 && info.version === "zp12 1.4" && info.kit === 27, `HELLO: protocol 2, "${info.version}", ${info.kit} kit waves`);
+check(info.proto === 3 && info.version === "zp12 1.5" && info.kit === 27, `HELLO: protocol 3, "${info.version}", ${info.kit} kit waves`);
 const store0 = await dump(0xC4000, 0x8000), banks0 = await dump(0xA0000, 0x3000), smp0 = await dump(0xEA000, 0x1800);
 const presets0 = await dump(0xDC000, 0x1000);
 
@@ -38,7 +38,7 @@ const presets0 = await dump(0xDC000, 0x1000);
 drop = 1;
 const file = await Z.backup(link, ["zp12", "banks"]);
 const b = Z.readBackup(file);
-check(b.version === "zp12 1.4" && b.parts.has("zp12") && b.parts.has("banks"), "backup: the version and both parts in the file");
+check(b.version === "zp12 1.5" && b.parts.has("zp12") && b.parts.has("banks"), "backup: the version and both parts in the file");
 check(b.sectors.size === 8 + 3 + 2, `backup: only the sectors that are not empty (${b.sectors.size})`);
 check(file.length < 60000, `backup: ${file.length} bytes`);
 
@@ -110,6 +110,9 @@ check(e && /damaged/.test(e.message), "restore: a damaged file refused (CRC)");
   check(d.gen === 2 && d.slots[0].name === "MY KICK" && d.slots[1].flags === 1, "directory read back: two, generation 2, names upper case");
   await link.assign(5, info.kit + s1);
   check((await raw("PADS")).split(" ")[5] === String(27 + 1), "ASSIGN: pad A6 plays the second one");
+  const pd = await link.pads();
+  check(pd.waves.length === 32 && pd.waves[5] === 28 && pd.waves[0] === 0 && pd.kit.length === 27 && pd.kit[26] === "PIANO",
+        `PADS: the 32 pads (A6 = ${pd.waves[5]}) and the kit's ${pd.kit.length} names`);
   e = null;
   try { await link.assign(6, info.kit + 7); } catch (x) { e = x; }
   check(e, "ASSIGN to an empty slot: refused");

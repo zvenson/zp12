@@ -214,30 +214,6 @@ static void fm1_fault(const fm1_crash_t *c)
     fm1_reboot();
 }
 
-static void splash(void)                       /* the wordmark a moment (tools/gen_logo.py later) */
-{
-    lcd_fill(0, 0, 240, 240, P_NAVY);
-    lcd_fill(0, 96, 240, 2, P_RED);
-    lcd_fill(0, 150, 240, 2, P_RED);
-    cv_begin(240, 40, P_NAVY);
-    cv_text_on(120 - text_w(&FONT_L, "zp12") / 2, 4, &FONT_L, "zp12", P_FRAME, P_NAVY);
-    cv_blit(0, 104);
-    cv_begin(240, 16, P_NAVY);
-    cv_text_on(120 - text_w(&FONT_S, "12-bit sampling drums") / 2, 0, &FONT_S, "12-bit sampling drums", P_RULE, P_NAVY);
-    cv_blit(0, 160);
-    {
-        char v[16] = "version ";
-        cat(v + 8, ZP12_VERSION);
-        cv_begin(240, 16, P_NAVY);
-        cv_text_on(120 - text_w(&FONT_S, v) / 2, 0, &FONT_S, v, P_FRAME, P_NAVY);
-        cv_blit(0, 180);
-    }
-    cv_begin(240, 16, P_NAVY);
-    cv_text_on(120 - text_w(&FONT_S, "based on SLOOP + Felucca") / 2, 0, &FONT_S, "based on SLOOP + Felucca", P_RULE, P_NAVY);
-    cv_blit(0, 214);
-    lcd_sync();
-}
-
 static void zp12_main(void)
 {
     uint32_t i, prev_notes = 0, t_frame = 0, seq_down = 0, seq_used = 0, t_sig = 0, t_change = 0, last_sig = 0, save_later = 0;
@@ -254,9 +230,22 @@ static void zp12_main(void)
     if (zs_load())                                      /* what was left: sounds, mix, effects, segments, song */
         zs_saved_sig = zs_sig();
     ui_init();
-    splash();
-    while (fm1_ms < 1200u)
-        fm1_service();
+    {   /* the start (sp_ui.c ui_splash): ~3 s, its drums played; a key or a button cuts it short */
+        uint32_t t0 = fm1_ms, t = 0, prev = 0, drawn = 0, k;
+        lcd_fill(0, 0, 240, 240, P_NAVY);
+        ui_splash(0);
+        while (t < SPLASH_MS && !fm1_in.notes && !fm1_in.buttons) {
+            fm1_service();
+            t = fm1_ms - t0;
+            for (k = 0; k < 4u; k++)                    /* the hits whose time came since the last pass */
+                if (SPLASH_HIT[k].t > prev && SPLASH_HIT[k].t <= t)
+                    SP_HIT(SPLASH_HIT[k].pad, SPLASH_HIT[k].vel, 0);
+            prev = t;
+            if (t - drawn >= 40u) { ui_splash(t); drawn = t; }
+        }
+        while (fm1_in.notes || fm1_in.buttons)          /* (the key that cut it short is not played) */
+            fm1_service();
+    }
     ui.force = 1;
     for (;;) {
         uint32_t n = fm1_in.notes, down = n & ~prev_notes, rel, b;

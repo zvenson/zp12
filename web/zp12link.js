@@ -4,7 +4,7 @@
 // Used by web/backup.html in the browser and by tests/zp12_link_test.mjs in node.
 "use strict";
 (function (root) {
-  const CMD = { HELLO: 1, READ: 2, ERASE: 3, WRITE: 4, HOLD: 5, REBOOT: 6, RELOAD: 7, ASSIGN: 8 };
+  const CMD = { HELLO: 1, READ: 2, ERASE: 3, WRITE: 4, HOLD: 5, REBOOT: 6, RELOAD: 7, ASSIGN: 8, PADS: 9 };
   const SECT = 4096, CHUNK = 512;
   // the parts of a backup: zp12's store and sample rooms; sloopDX's 8 DX7 user banks, the bank in use, MY KIT
   const PARTS = {
@@ -98,6 +98,13 @@
       return h;
     }
     async reload() { const r = await this.request(CMD.RELOAD); return r.data[0]; }
+    // the 32 pads' waves (255: none) and the kit's names (the own ones are in the directory)
+    async pads() {
+      const r = await this.request(CMD.PADS), d = r.data, names = [];
+      let s = "";
+      for (let i = 32; i < d.length; i++) { if (d[i]) s += String.fromCharCode(d[i]); else { names.push(s); s = ""; } }
+      return { waves: d.slice(0, 32), kit: names };
+    }
     async assign(pad, wave) { const r = await this.request(CMD.ASSIGN, (pad & 31) | (wave & 63) << 8); if (r.rc) throw new Error(`that sample is not on the FM-1 (${r.rc})`); }
     async read(addr, n) {
       const r = await this.request(CMD.READ, addr, [], n);

@@ -914,6 +914,91 @@ static void ui_leds(uint32_t *btn, uint32_t *keys, uint32_t *glow)
     *glow = g;
 }
 
+/* ---- the start: a kick is sampled into the LCD (the 12-bit steps drawn as they come in), then the name is
+ * typed in big LCD pixels, each letter a drum: ba (tom), dum (tom), tss (kick + crash: "12"). t: ms since the
+ * start; zp12.c draws it and plays SPLASH_HIT */
+#define SPLASH_MS 3000u
+static const struct { uint16_t t; uint8_t pad, vel; } SPLASH_HIT[4] = {{1350, 7, 84}, {1550, 6, 84}, {1850, 0, 100}, {1850, 8, 70}};
+
+static void cv_big(int32_t x, int32_t y, const char *s, int32_t k, uint16_t c)   /* FONT_S, k x k pixels a dot */
+{
+    for (; *s; s++) {
+        uint32_t gi = glyph(&FONT_S, (uint8_t)*s), gx, gy, w = FONT_S.bw[gi], bpr = (w + 1u) / 2u;
+        const uint8_t *gd = FONT_S.data + FONT_S.off[gi];
+        for (gy = 0; gy < FONT_S.h; gy++)
+            for (gx = 0; gx < w; gx++) {
+                uint32_t v = gd[gy * bpr + gx / 2u];
+                if (((gx & 1u) ? (v & 15u) : (v >> 4)) >= 8u)
+                    cv_rect(x + ((int32_t)gx - FONT_S.pad) * k, y + (int32_t)gy * k, k, k, c);
+            }
+        x += FONT_S.adv[gi] * k;
+    }
+}
+
+static int32_t splash_kick(uint32_t i)            /* the sampled kick at x = i: its pitch falling, dying away, held in steps */
+{
+    int32_t x = (int32_t)(i / 3u * 3u), ph = (85 * x - x * x / 8) & 1023, e = 42 - x * 34 / 232, v;
+    v = ph < 512 ? ph - 256 : 767 - ph;          /* (a triangle for the sine: no tables) */
+    return v * e / 256;
+}
+
+static void ui_splash(uint32_t t)
+{
+    uint32_t i, lit = 0, n = t < 1300u ? t * 232u / 1300u : 232u, flash = t >= 1850u && t < 1990u;
+    char b[24];
+    cv_begin(240, 20, P_NAVY);                   /* the top: SAMPLING and its LED, the rate */
+    if (t < 1300u) {
+        cv_text_on(8, 2, &FONT_S, "SAMPLING", P_FRAME, P_NAVY);
+        if ((t / 250u) & 1u) cv_rect(84, 7, 7, 7, P_LED);
+        num(b, (int32_t)(n * 26040u / 232u), 5, 0);   /* (the samples taken: one second's worth) */
+        cv_text_on(232 - text_w(&FONT_S, b), 2, &FONT_S, b, P_RULE, P_NAVY);
+    } else {
+        cv_text_on(8, 2, &FONT_S, "12 BIT  26.04 KHZ", P_RULE, P_NAVY);
+    }
+    cv_blit(0, 0);
+    cv_begin(232, 112, flash ? P_LCDINK : P_LCD);   /* the LCD: the wave coming in, then the name over it */
+    cv_rect(0, 0, 232, 3, RGB(70, 76, 66));
+    for (i = 0; i < n; i++) {                     /* the wave as stairs: each step, and the rise to it */
+        int32_t v = splash_kick(i), u = i ? splash_kick(i - 1u) : v, lo = v < u ? v : u, hi = v < u ? u : v;
+        cv_rect((int32_t)i, 56 - hi, 2, hi - lo + 2, t < 1300u ? P_LCDINK : RGB(150, 162, 124));
+    }
+    if (t < 1300u)
+        cv_rect((int32_t)n, 8, 2, 96, P_RED);    /* the write head */
+    {
+        static const char NAME[] = "zp12";
+        uint32_t k = t < 1350u ? 0u : t < 1550u ? 1u : t < 1850u ? 2u : 4u;
+        char nm[5];
+        for (i = 0; i < k; i++) nm[i] = NAME[i];
+        nm[k] = 0;
+        if (k) {
+            int32_t sh = flash ? (int32_t)((t / 30u) & 1u) * 4 - 2 : 0;   /* (the crash shakes it) */
+            cv_big(116 - 80 + sh, 16, nm, 5, flash ? P_LCD : P_LCDINK);
+        }
+    }
+    cv_blit(4, 22);
+    for (i = 0; i < 4u; i++)                      /* the pads: a chase while sampling, the hits after */
+        if (t >= SPLASH_HIT[i].t && t < SPLASH_HIT[i].t + 160u) lit |= 1u << (SPLASH_HIT[i].pad & 7u);
+    if (t < 1300u) lit = 1u << (t / 90u % 8u);
+    if (flash) lit = 0xFF;
+    cv_begin(232, 46, P_NAVY);
+    for (i = 0; i < 8u; i++) {
+        int32_t cx = 14 + (int32_t)i * 29;
+        cv_rect(cx - 11, 2, 23, 23, RGB(6, 6, 8));
+        cv_rect(cx - 10, 3, 21, 21, (lit >> i) & 1u ? P_LED : P_PAD);
+        cv_rect(cx - 8, 5, 17, 2, (lit >> i) & 1u ? RGB(255, 140, 120) : RGB(48, 48, 52));
+    }
+    if (t >= 1900u) {
+        cat(cat(b, "12-bit sampling drums  "), ZP12_VERSION);
+        cv_text_on(116 - text_w(&FONT_S, b) / 2, 28, &FONT_S, b, P_FRAME, P_NAVY);
+    }
+    cv_blit(4, 136);
+    cv_begin(240, 58, P_NAVY);
+    if (t >= 2100u)
+        cv_text_on(120 - text_w(&FONT_S, "based on SLOOP + Felucca") / 2, 30, &FONT_S, "based on SLOOP + Felucca", P_RULE, P_NAVY);
+    cv_blit(0, 182);
+    lcd_sync();
+}
+
 static void ui_init(void)
 {
     uint32_t i;

@@ -64,6 +64,15 @@
   .empty { color: var(--dim); font-style: italic; }
   .ok { color: #9fe0b8 !important; } .err { color: #ffb4ab !important; }
   .warn { background: #fff3cd; color: #5c4400; border-radius: 8px; padding: 10px 14px; margin-top: 12px; font-size: 14.5px; }
+  .pads { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 12px; }
+  .pad { background: #0e1220; border: 2px solid #33497c; border-radius: 8px; padding: 6px 6px 8px; min-width: 0; }
+  .pad.own { border-color: #6f8fcf; }
+  .pad.on { border-color: var(--led); box-shadow: 0 0 0 3px rgba(255, 52, 36, 0.35); }
+  .pad b { display: block; font: 700 13px/1.2 "Courier New", monospace; color: var(--dim); }
+  .pad select { width: 100%; margin-top: 4px; padding: 4px 2px; font: 700 13px "Courier New", monospace; background: var(--lcd); color: var(--lcdink);
+                border: 0; border-radius: 4px; }
+  .bank { grid-column: 1 / -1; font-size: 13px; color: var(--dim); margin-top: 4px; }
+  @media (max-width: 760px) { .pads { grid-template-columns: repeat(4, 1fr); } }
   footer { font-size: 13.5px; color: var(--mute); padding: 0 0 40px; }
   @media (max-width: 700px) { td.act { justify-content: flex-start; } th:nth-child(3), td:nth-child(3) { display: none; } }
 </style>
@@ -80,7 +89,7 @@
 
   <section class="card">
     <h2>1 · Connect</h2>
-    <p>The FM-1 with zp12 <b>1.4 or newer</b>, other MIDI apps closed. Allow MIDI with SysEx when the browser asks.</p>
+    <p>The FM-1 with zp12 <b>1.5 or newer</b>, other MIDI apps closed. Allow MIDI with SysEx when the browser asks.</p>
     <div class="lcd" id="lcd">NOT CONNECTED</div>
     <div class="row"><button id="connect">Connect the FM-1</button></div>
   </section>
@@ -99,7 +108,14 @@
   </section>
 
   <section class="card">
-    <h2>3 · Add a sample</h2>
+    <h2>3 · The pads</h2>
+    <p>All 32 pads and what each plays. Choose a sample for a pad (factory or your own, ★): it is on the FM-1 at once.
+       Or <b>drop a sound file onto a pad</b>: it opens below, and goes onto that pad.</p>
+    <div class="pads" id="pads"><p class="empty">Connect to see the pads.</p></div>
+  </section>
+
+  <section class="card" id="add">
+    <h2>4 · Add a sample</h2>
     <label class="drop" id="drop" for="file">Drop a WAV, AIFF, MP3 or FLAC here, or click to choose one</label>
     <input type="file" id="file" accept="audio/*,.wav,.aif,.aiff,.mp3,.flac,.ogg">
     <div id="ed" style="display:none">
@@ -136,7 +152,7 @@
 <script>
 "use strict";
 const Z = window.ZP12Link, $ = (id) => document.getElementById(id);
-let link = null, dir = null, busy = false, src = null, cut = [0, 0], enc = null, ac = null, banksSaved = false;
+let link = null, dir = null, busy = false, src = null, cut = [0, 0], enc = null, ac = null, banksSaved = false, pads = null;
 const PADS = [];
 for (const b of "ABCD") for (let i = 1; i <= 8; i++) PADS.push(b + i);
 PADS.forEach((p, i) => { const o = document.createElement("option"); o.value = i; o.textContent = p; $("pad").append(o); });
@@ -155,7 +171,7 @@ function refresh() {
   $("connect").disabled = busy;
   $("upload").disabled = !on || !enc;
   $("banks").disabled = !on || (dir && dir.flags & 1);
-  document.querySelectorAll("#list button").forEach((b) => { b.disabled = !on; });
+  document.querySelectorAll("#list button, #pads select").forEach((b) => { b.disabled = !on; });
 }
 function showDir() {
   const tb = $("list"); tb.innerHTML = "";
@@ -182,6 +198,27 @@ function showDir() {
   $("banks").checked = useB;
   refresh(); info();
 }
+// the 32 pads: what each plays, a choice of every sample there is; a file dropped on one opens for that pad
+function showPads() {
+  const g = $("pads"); g.innerHTML = "";
+  if (!pads) return;
+  const kit = pads.kit.length, opts = pads.kit.map((n, w) => `<option value="${w}">${n}</option>`).join("") +
+    (dir ? dir.slots.map((s, i) => s ? `<option value="${kit + i}">★ ${s.name}</option>` : "").join("") : "");
+  PADS.forEach((label, p) => {
+    if (p % 8 === 0) { const h = document.createElement("div"); h.className = "bank"; h.textContent = `Bank ${label[0]}: white keys ${p % 16 ? "9–16" : "1–8"}${p >= 16 ? " with OCT+" : ""}`; g.append(h); }
+    const w = pads.waves[p], c = document.createElement("div");
+    c.className = "pad" + (w >= kit && w !== 255 ? " own" : "") + (+$("pad").value === p && src ? " on" : "");
+    c.innerHTML = `<b>${label}</b><select>${w === 255 || (w >= kit && !(dir && dir.slots[w - kit])) ? '<option value="-1" selected>-----</option>' : ""}${opts}</select>`;
+    const sel = c.querySelector("select");
+    if (w !== 255) sel.value = String(w);
+    sel.disabled = !link || busy;
+    sel.onchange = () => +sel.value >= 0 && run(async () => { await link.assign(p, +sel.value); lcd(`${label} ${sel.selectedOptions[0].textContent.replace("★ ", "")}`); });
+    c.ondragover = (e) => { e.preventDefault(); c.classList.add("on"); };
+    c.ondragleave = () => c.classList.remove("on");
+    c.ondrop = (e) => { e.preventDefault(); if (e.dataTransfer.files[0]) { $("pad").value = String(p); load(e.dataTransfer.files[0]); $("add").scrollIntoView({ behavior: "smooth" }); } };
+    g.append(c);
+  });
+}
 function save(u8, name) {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(new Blob([u8])); a.download = name; a.click();
@@ -189,7 +226,7 @@ function save(u8, name) {
 }
 async function run(f) {
   busy = true; refresh();
-  try { await f(); if (link) { dir = await Z.readDir(link); showDir(); } }
+  try { await f(); if (link && link.read) { dir = await Z.readDir(link); pads = await link.pads(); showDir(); showPads(); } }
   catch (e) { msg(e.message, "err"); lcd("ERROR"); }
   busy = false; refresh();
 }
@@ -205,11 +242,11 @@ $("connect").onclick = async () => {
   input.onmidimessage = (e) => l.receive(e.data);
   try {
     const h = await l.hello();
-    if (h.proto < 2) { lcd(`${h.version.toUpperCase()}\nthe editor needs zp12 1.4 or newer: see Install`); return; }
+    if (h.proto < 3) { lcd(`${h.version.toUpperCase()}\nthe editor needs zp12 1.5 or newer: see Install`); return; }
     link = l;
     lcd(`CONNECTED\n${h.version.toUpperCase()}`);
     await run(async () => {});
-  } catch (e) { lcd("THE FM-1 DOES NOT ANSWER\nzp12 1.4 or newer needed: see Install"); }
+  } catch (e) { lcd("THE FM-1 DOES NOT ANSWER\nzp12 1.5 or newer needed: see Install"); }
   access.onstatechange = () => { if (!isF(input)) { link = null; lcd("DISCONNECTED"); refresh(); } };
 };
 
@@ -246,7 +283,7 @@ async function load(f) {
     $("name").value = Z.cleanName(f.name.replace(/\.[^.]*$/, ""));
     $("ed").style.display = "block";
     msg("");
-    info(); draw();
+    info(); draw(); showPads();
   } catch (e) { msg("That file could not be read: " + e.message, "err"); }
 }
 function info() {
@@ -260,6 +297,7 @@ function info() {
   refresh();
 }
 for (const id of ["slow", "rate", "norm"]) $(id).onchange = info;
+$("pad").onchange = showPads;
 function draw() {
   const c = $("wave"), g = c.getContext("2d"), W = c.width, H = c.height, x = src.x, n = x.length;
   g.fillStyle = "#0e1220"; g.fillRect(0, 0, W, H);
@@ -304,17 +342,21 @@ $("upload").onclick = () => run(async () => {
 // ?demo: the page with a few samples and one loaded (the video's screenshots; no FM-1)
 if (new URLSearchParams(location.search).has("demo")) {
   link = { info: { kit: 27 } };
-  lcd("CONNECTED\nZP12 1.4");
+  lcd("CONNECTED\nZP12 1.5");
   dir = { gen: 3, flags: 0, copy: 0, slots: Array(24).fill(null) };
   dir.slots[0] = { off: 0xea000, n: 21000, rate: 26040, flags: 0, name: "BREAK 1" };
   dir.slots[1] = { off: 0xef000, n: 9000, rate: 26040, flags: 1, name: "VOX HEY" };
   dir.slots[2] = { off: 0xe5000, n: 6000, rate: 27500, flags: 0, name: "808 SUB" };
   showDir();
+  pads = { kit: ["KICK", "SNARE", "RIM", "CLAP", "HAT", "OHAT", "TOM L", "TOM H", "CRASH", "RIDE", "COWBL", "TAMB", "SHAKR", "CONGA", "CLAVE", "WOOD",
+                 "EP Dm9", "EP Gm9", "HORNS", "VIBES", "BASS", "SCRCH", "SPIN", "SNAP", "PNO Cm9", "PNO F13", "PIANO"],
+           waves: [27, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0, 1, 2, 3, 4, 24, 25, 26, 16, 17, 18, 19, 20, 21, 28, 23] };
+  showPads();
   const n = 44100 * 0.9, x = new Float32Array(n);
   for (let i = 0; i < n; i++) { const t = i / 44100, k = t % 0.225; x[i] = (Math.sin(2 * Math.PI * 55 * k * (1 + 3 * Math.exp(-k * 30))) * Math.exp(-k * 9) * 0.9 + (Math.random() - 0.5) * Math.exp(-((t + 0.1125) % 0.225) * 40) * 0.6) * (t < 0.88 ? 1 : 0); }
   src = { x, rate: 44100 }; cut = [Math.floor(n * 0.02), Math.floor(n * 0.97)];
   $("name").value = "MY KICK"; $("pad").value = "0"; $("ed").style.display = "block";
-  info(); draw();
+  info(); draw(); showPads();
   const st = new URLSearchParams(location.search).get("demo");
   if (st === "writing") { busy = true; refresh(); lcd("WRITING MY KICK 64 %"); msg("Writing…"); }
   if (st === "done") { lcd("A1 MY KICK"); msg("MY KICK is on the FM-1, on pad A1. Hit a pad and turn PRESETS to find it.", "ok"); }

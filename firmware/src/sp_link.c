@@ -10,9 +10,10 @@
  *   5 HOLD         -> the sequencer stops; no autosave while the link is busy (10 s from the last message)
  *   6 REBOOT       -> after the reply (a restored store is read at the start)
  *   7 RELOAD       -> the samples' directory read again (sp_samples.c); data: how many there are
- *   8 ASSIGN a     -> pad a & 31 plays wave (a >> 8) & 63, heard at once (the web editor's "on a pad") */
+ *   8 ASSIGN a     -> pad a & 31 plays wave (a >> 8) & 63, heard at once (the web editor's "on a pad")
+ *   9 PADS         -> data: the wave of each of the 32 pads (0xFF none), then the kit's names, each ended by 0 */
 #define ZL_MAX 512u
-#define ZL_PROTO 2u                              /* 2: RELOAD, ASSIGN (the sample editor) */
+#define ZL_PROTO 3u                              /* 2: RELOAD, ASSIGN (the sample editor); 3: PADS */
 static uint8_t zl_dec[16 + ZL_MAX], zl_wire[32 + (16 + ZL_MAX) * 8u / 7u];
 static uint8_t zl_back[ZL_MAX];
 static uint32_t zl_last;                         /* fm1_ms of the last message (0: never) */
@@ -120,6 +121,16 @@ static void zl_service(void)
         else
             wave_set(a & 31u, (a >> 8) & 63u);
         break;
+    case 9: {
+        uint32_t k;
+        for (i = 0; i < SP_NSOUND; i++) zl_back[i] = sp_sound[i].wave;
+        for (k = 0; k < KIT_NWAVE && i + 10u < ZL_MAX; k++) {
+            for (n = 0; KIT_WAVE[k].name[n]; n++) zl_back[i++] = (uint8_t)KIT_WAVE[k].name[n];
+            zl_back[i++] = 0;
+        }
+        zl_reply(9, 0, a, zl_back, i);
+        return;
+    }
     default:
         rc = 7;
         break;
