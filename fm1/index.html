@@ -85,14 +85,14 @@
   .warn b { color: var(--warn); }
   main { padding: 24px 0 80px; }
   h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 24px; font-weight: 600; text-align: center; }
-  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  @media (min-width: 2000px) { .grid { grid-template-columns: repeat(6, 1fr); } }
-  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }   /* six firmwares + yours + the official one: 2 x 4 */
+  .fws { display: contents; }
+  @media (max-width: 1300px) { .grid { grid-template-columns: repeat(2, 1fr); } }
   .fw { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 0 26px 24px; display: flex;
         flex-direction: column; gap: 12px; overflow: hidden; transition: transform .12s, border-color .15s, background .15s; }
   .fw:hover { transform: translateY(-3px); border-color: var(--c); background: var(--panel2); }
   .fw.now { border-color: var(--ok); box-shadow: 0 0 0 1px var(--ok); }
-  .fw .shot { --h: clamp(250px, 19vw, 340px); margin: 0 -26px 8px; height: var(--h); background: #0e0c0d; display: grid; place-items: center; border-bottom: 4px solid var(--c); }
+  .fw .shot { --h: clamp(230px, 15vw, 320px); margin: 0 -26px 8px; height: var(--h); background: #0e0c0d; display: grid; place-items: center; border-bottom: 4px solid var(--c); }
   .fw .shot img { height: calc(var(--h) * .82); width: calc(var(--h) * .82); border-radius: 8px; image-rendering: pixelated; box-shadow: 0 8px 34px rgba(0, 0, 0, .6); }
   .fw .shot.wide img { width: 100%; height: var(--h); object-fit: contain; border-radius: 0; box-shadow: none; image-rendering: auto; }
   .fw .head { display: flex; gap: 18px; align-items: center; }
@@ -110,6 +110,16 @@
   .fw button.go { background: var(--c); color: #121011; width: 100%; margin-top: 6px; }
   progress { width: 100%; height: 8px; display: none; accent-color: var(--c); }
   .fw .msg { font-size: 14px; color: var(--dim); min-height: 1.2em; }
+  .fw > h3 { font-size: 28px; margin: 0; font-weight: 800; color: var(--c); }
+  .fw .what code { color: var(--cyan); } .fw .what a { color: var(--fg); text-decoration: underline; text-decoration-color: var(--line); }
+  .fw .slot { width: calc(var(--h) * .82); height: calc(var(--h) * .82); border: 2px dashed var(--line); border-radius: 10px; display: grid;
+              place-items: center; color: var(--pink); font-size: calc(var(--h) * .3); font-weight: 200; }
+  .fw .slot.v15 { border-style: solid; color: var(--dim); font-size: 20px; letter-spacing: 3px; text-align: center; line-height: 1.3; }
+  .fw .slot.v15 b { display: block; font-size: calc(var(--h) * .2); letter-spacing: 0; color: var(--fg); font-weight: 200; }
+  .fw .btn.go { background: var(--c); color: #121011; width: 100%; margin-top: 6px; }
+  .fw.stock button.go { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); }
+  .fw.stock button.go:not(:disabled):hover { box-shadow: inset 0 0 0 1px var(--beige); }
+  .fw.stock:hover { border-color: var(--beige); } .fw.stock > h3 { color: var(--fg); }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px; }
   .card { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 30px 28px; overflow: hidden; }
   .card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--c, var(--beige)); }
@@ -159,25 +169,24 @@
 
 <main><div class="wrap">
   <h2 class="sec">Six open-source firmwares, one FM-1</h2>
-  <div class="grid" id="grid"><p class="meta">Loading the catalogue…</p></div>
-
-  <div class="two">
-    <section class="card">
-      <h3>Back to the <b>official firmware</b></h3>
-      <p>Download <b>FM-1 V15</b> from <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>
-         (PC Firmware → FM-1) and choose the file here: only that exact file is accepted.</p>
-      <p><input type="file" id="stock-file" accept=".fwsc"></p>
-      <label class="chk"><input type="checkbox" id="stock-saved"> I have saved what I want to keep</label>
-      <button id="stock-go" class="ghost" disabled>Install the official firmware</button>
-      <p class="meta" id="stock-msg"></p>
+  <div class="grid"><div id="grid" class="fws"><p class="meta">Loading the catalogue…</p></div>
+    <section class="fw mailcta" style="--c: var(--pink)">
+      <div class="shot"><div class="slot">+</div></div>
+      <h3>Your firmware</h3>
+      <p class="what">Made an open-source firmware for the FM-1? Free, with its source (GPL-3.0), released as a <code>.fwsc</code> on
+         GitHub: join in. It goes here with your name and your links, and follows every release you make.</p>
+      <p class="meta">The hub is free and stays free. If it saved you an evening: <a href="https://paypal.me/zvenson" rel="noopener">☕ buy me a coffee</a>.</p>
+      <a class="btn go" href="mailto:sven@designburg.net?subject=FM-1%20Firmware%20Hub%3A%20my%20firmware&amp;body=Name%3A%0ARepository%3A%0AWhat%20it%20does%3A%0A">Mail sven@designburg.net</a>
     </section>
-    <section class="card mailcta">
-      <h3>Want to show <b>your firmware</b> here?</h3>
-      <p>Made an open-source firmware for the FM-1? Free, with its source (GPL-3.0), released as a <code>.fwsc</code> on GitHub: join in. It goes on this
-         page with your name and your links, and follows every release you make.</p>
-      <p><a class="btn" href="mailto:sven@designburg.net?subject=FM-1%20Firmware%20Hub%3A%20my%20firmware&amp;body=Name%3A%0ARepository%3A%0AWhat%20it%20does%3A%0A">Send a mail to sven@designburg.net</a></p>
-      <p class="meta" style="margin-top:18px">The hub is free and stays free. If it saved you an evening:
-         <a href="https://paypal.me/zvenson" rel="noopener">☕ buy me a coffee</a>.</p>
+    <section class="fw stock" style="--c: var(--dim)">
+      <div class="shot"><div class="slot v15">M-VAVE<br><b>V15</b></div></div>
+      <h3>Official firmware</h3>
+      <p class="what">Back to M-VAVE's own: download <b>FM-1 V15</b> from <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>
+         (PC Firmware → FM-1) and choose the file here: only that exact file is accepted.</p>
+      <input type="file" id="stock-file" accept=".fwsc">
+      <label class="chk"><input type="checkbox" id="stock-saved"> I have saved what I want to keep</label>
+      <button id="stock-go" class="go" disabled>Install the official firmware</button>
+      <p class="meta" id="stock-msg"></p>
     </section>
   </div>
 
