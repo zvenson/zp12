@@ -1,4 +1,4 @@
-# The FM-1 firmware switcher (fm1.designburgapps.com)
+# The FM-1 Firmware Hub, "Make Firmware, Not War" (fm1.designburgapps.com)
 
 A page that installs any of the FM-1's custom firmwares with one click: `fm1/` in this repo (built by
 `tools/make_fm1.py` from `web/fm1.html`), its catalogue and packages by `tools/fm1_sync.py`. On the Pi, nginx serves
@@ -28,9 +28,9 @@ available even if a repository goes). The page does not claim the authors endors
 **Felucca** — github.com/hugelton/Felucca · **SLOOP** — github.com/isod89/sloop-fm1 ·
 **X0X / FoMni** — github.com/charlesvestal/fm1-x0x (one message for both)
 
-> **Title:** The FM-1 firmware wars are over: your firmware on a switcher page
+> **Title:** Make Firmware, Not War: your firmware on the FM-1 Firmware Hub
 >
-> Hi! I made a small page where FM-1 owners can try every custom firmware with one click and go back just as easily,
+> Hi! I made a small page where FM-1 owners can try every open-source firmware with one click and go back just as easily,
 > no need to pick a side: https://fm1.designburgapps.com
 >
 > [Felucca / SLOOP / X0X and FoMni] is on it: your latest release, mirrored unchanged (same SHA-256 as on GitHub),
