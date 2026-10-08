@@ -116,8 +116,9 @@
 </div></main>
 
 <footer><div class="wrap">
-  The packages are the projects' own, mirrored unchanged from their GitHub releases (GPL-3.0); the source of each is at its repository,
-  linked on its card. Felucca by Leo Kuroshita (Hügelton Instruments); SLOOP by isod89; X0X and FoMni by Charles Vestal; sloopDX and zp12
+  The packages are the projects' own, mirrored unchanged from their GitHub releases (GPL-3.0,
+  <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">the license</a>); the source of each is at its
+  repository and tag, linked on its card, and a copy of that source is kept here next to the package. Felucca by Leo Kuroshita (Hügelton Instruments); SLOOP by isod89; X0X and FoMni by Charles Vestal; sloopDX and zp12
   by Sven Trogus. The update path is Felucca's, as sloopDX carries it. M-VAVE and FM-1 are trademarks of their owners; not affiliated
   with M-VAVE. Unofficial firmware, free and without warranty: you install it at your own risk.
   <br><a href="https://designburgapps.com/">designburgapps.com</a> · <a href="https://zp12.designburgapps.com/impressum.html">Impressum · Datenschutz</a>
@@ -163,7 +164,7 @@ function render() {
       <p class="what">${esc(f.what)}</p>
       <div class="meta">${esc(f.date)} · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
-        <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a></div>
+        <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}</div>
       <progress max="100" value="0"></progress>
       <div class="row"><button>${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button></div>
       <div class="msg"></div>`;

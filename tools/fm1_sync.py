@@ -4,6 +4,10 @@ of every firmware, mirrored unchanged next to the page (GitHub's downloads canno
 CORS), checked (the FM-1 package identity, the Felucca update loader), with its SHA-256, version and date.
 
   tools/fm1_sync.py [sloopdx repo]      -> fm1/fw/<id>-<version>.fwsc, fm1/catalog.json (old packages removed)
+  tools/fm1_sync.py --sources DIR       -> DIR/<id>-<version>.tar.gz: the source of every package in the catalogue,
+                                           the project's archive of that tag (GPL-3.0 §6: the source next to the
+                                           object code, kept even if a repository goes); on the Pi, outside git,
+                                           served as fm1.designburgapps.com/src/
 
 GPL-3.0 projects only (each package's source is at the project's repository and tag, linked on the page).
 A firmware is added to FIRMWARES below; its author asked first."""
@@ -89,6 +93,8 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
             "site": f.get("site") or f"https://github.com/{f['repo']}", "version": version, "date": date,
             "pkg": "fw/" + name, "product": ident, "size": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
             "release": rel_url or f.get("site"), "source": src_url or f"https://github.com/{f['repo']}",
+            "tag": rel_url.rsplit("/", 1)[-1] if rel_url else None,
+            "mirror": f"src/{f['id']}-{version}.tar.gz" if rel_url else None,
             "beta": bool(re.search(r"beta|alpha|rc", version, re.I) or version.startswith("0."))})
         print(f"fm1_sync: {f['name']:8} {version:14} {date}  {ident:14} {len(raw)} B")
     for p in (OUT / "fw").glob("*.fwsc"):
@@ -98,5 +104,27 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
                                                    "firmwares": cat}, indent=1, ensure_ascii=False) + "\n")
 
 
+def sources(dest):
+    """the source archive of each catalogued package (the GitHub ones: their tag), the old ones removed"""
+    dest = Path(dest)
+    dest.mkdir(parents=True, exist_ok=True)
+    cat = json.loads((OUT / "catalog.json").read_text())["firmwares"]
+    keep = set()
+    for f in cat:
+        if not f.get("mirror"):
+            continue
+        name = Path(f["mirror"]).name
+        keep.add(name)
+        if not (dest / name).exists():
+            (dest / name).write_bytes(get(f"https://github.com/{f['repo']}/archive/refs/tags/{f['tag']}.tar.gz", "application/octet-stream"))
+            print(f"fm1_sync: source {name} ({(dest / name).stat().st_size // 1024} KB)")
+    for p in dest.glob("*.tar.gz"):
+        if p.name not in keep:
+            p.unlink()
+
+
 if __name__ == "__main__":
-    main(*sys.argv[1:2])
+    if len(sys.argv) > 2 and sys.argv[1] == "--sources":
+        sources(sys.argv[2])
+    else:
+        main(*sys.argv[1:2])

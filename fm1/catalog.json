@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-08 09:04 UTC",
+ "updated": "2026-10-08 09:08 UTC",
  "firmwares": [
   {
    "id": "felucca",
@@ -17,6 +17,8 @@
    "sha256": "7c2bc07dae5659b2b6444ba23f5ae68057ac896fabe9ac0b1e315abbfae9d725",
    "release": "https://github.com/hugelton/Felucca/releases/tag/v1.1.5.1",
    "source": "https://github.com/hugelton/Felucca/tree/v1.1.5.1",
+   "tag": "v1.1.5.1",
+   "mirror": "src/felucca-1.1.5.1.tar.gz",
    "beta": false
   },
   {
@@ -35,6 +37,8 @@
    "sha256": "98ccc614d67a6fe48ee180368d5586b64f071f3c196224bfff3daef1631fb005",
    "release": "https://github.com/isod89/sloop-fm1/releases/tag/v2.4.1",
    "source": "https://github.com/isod89/sloop-fm1/tree/v2.4.1",
+   "tag": "v2.4.1",
+   "mirror": "src/sloop-2.4.1.tar.gz",
    "beta": false
   },
   {
@@ -53,6 +57,8 @@
    "sha256": "fa9b6c99aa01b8492276d79a886a24a5f4be63c84033c05236bdbcd02cd3627b",
    "release": "https://dx7.designburgapps.com",
    "source": "https://github.com/zvenson/dxsloop",
+   "tag": null,
+   "mirror": null,
    "beta": false
   },
   {
@@ -71,6 +77,8 @@
    "sha256": "e0c732ff611802604eb249ab099696925003eb099940fd5d66e059f0b6822b15",
    "release": "https://zp12.designburgapps.com",
    "source": "https://github.com/zvenson/zp12",
+   "tag": null,
+   "mirror": null,
    "beta": false
   },
   {
@@ -89,6 +97,8 @@
    "sha256": "360dffbabddf38fdabfacb964cc101afaf92806958c0835c9839033df6e8d31b",
    "release": "https://github.com/charlesvestal/fm1-x0x/releases/tag/v0.10.1-beta",
    "source": "https://github.com/charlesvestal/fm1-x0x/tree/v0.10.1-beta",
+   "tag": "v0.10.1-beta",
+   "mirror": "src/x0x-0.10.1-beta.tar.gz",
    "beta": true
   },
   {
@@ -107,6 +117,8 @@
    "sha256": "6e0457e0aca2e8c470af0d2c6da11a6ed91fbb2ed5174075033d4e0bf96a8e4d",
    "release": "https://github.com/charlesvestal/fm1-fomni/releases/tag/v0.3",
    "source": "https://github.com/charlesvestal/fm1-fomni/tree/v0.3",
+   "tag": "v0.3",
+   "mirror": "src/fomni-0.3.tar.gz",
    "beta": true
   }
  ]
