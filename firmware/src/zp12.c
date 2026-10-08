@@ -337,6 +337,7 @@ static void zp12_main(void)
         if (ui.factory_req) {                           /* SETUP > FACTORY: the kit's pads, mix, effects, no loops, no songs */
             ui.factory_req = 0;
             ui.back = 1;
+            sp_smooth = 1;
             for (i = 0; i < SP_NSOUND; i++) sp_sound[i] = KIT_PADS[i];
             for (i = 0; i < SP_NCH; i++) ui.mix[i] = sp_mix[i] = 100;
             fxp.crate = 40; fxp.cdepth = 60; fxp.cmix = 127; fxp.dtime = 1; fxp.fdbk = 60; fxp.colr = 70; fxp.dmix = 90;

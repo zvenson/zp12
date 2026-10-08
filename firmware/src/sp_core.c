@@ -54,12 +54,15 @@ typedef struct {
     int32_t drv, snd[3];                /* drive (Q4 gain), sends Q15 */
     int32_t z[4];                       /* filter state */
     uint8_t on;
+    uint8_t jump;                       /* the signal jumps next sample (a hit cut, a sample's end): SMOOTH bridges it */
+    int32_t dc, last;                   /* SMOOTH: what bridges the jump, dying away; the last output */
 } sp_ch_t;
 
 static sp_wave_t sp_wave[64];
 static sp_sound_t sp_sound[SP_NSOUND];
 static sp_ch_t sp_ch[SP_NCH];
 static uint8_t sp_mix[SP_NCH] = {100, 100, 100, 100, 100, 100, 100, 100};   /* the channel faders, 0..127 */
+static uint8_t sp_smooth = 1;            /* GLO > OUTPUT > SMOOTH: a jump in a channel's signal bridged in ~1 ms (no click) */
 static int32_t sp_bus[3][SP_BLK];       /* the send buses of the block: chorus, delay, reverb (mono, Q15) */
 
 /* sample i of a packed wave, -2048..2047 */
@@ -187,6 +190,10 @@ static void sp_trigger_lk(uint32_t k, uint32_t vel, int32_t semis, uint32_t lk)
     c->snd[1] = s->send[1] * 258;
     c->snd[2] = s->send[2] * 258;
     c->tail = 8;
+    /* SMOOTH only where it clicks: a sound still sounding cut, or a start inside the wave (TRUNC); a sample from
+     * its own beginning keeps its attack */
+    c->jump = (uint8_t)(c->on || ((s->flags & SPF_REVERSE) ? s->end < 1000u && s->end : s->start > 0u));
+    if (!c->jump) c->dc = 0;
     c->on = 1;
 }
 
@@ -221,6 +228,7 @@ static void sp_channel(uint32_t ch, int32_t *out)
                 c->pos += (uint32_t)c->dir;
                 if (c->pos == c->end || (c->dir < 0 && c->pos == 0xFFFFFFFFu)) {
                     c->on = 0;
+                    c->jump = 1;                      /* (the sample ends: from where it was to silence) */
                     break;
                 }
             }
@@ -249,6 +257,13 @@ static void sp_channel(uint32_t ch, int32_t *out)
         } else {
             y = x;
         }
+        if (c->jump) {                                /* SMOOTH: go on from where it was, into the new signal */
+            c->jump = 0;
+            if (sp_smooth) c->dc = c->last - y;
+        }
+        y += c->dc;
+        c->dc -= c->dc / 24;                          /* (gone in ~1 ms: e^-1 every 24 samples) */
+        c->last = y;
         out[2u * i] += (y * gl) >> 12;
         out[2u * i + 1u] += (y * gr) >> 12;
         if (c->snd[0] | c->snd[1] | c->snd[2]) {      /* the sends: post fader, before pan */

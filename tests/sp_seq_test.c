@@ -146,11 +146,11 @@ int main(int argc, char **argv)
         static uint8_t keep[ZS_SLOT], old[ZS_SLOT];
         uint32_t n, k = (uint32_t)sq_find(s0, 96, 1), lk = sq_lk[0][k];
         uint32_t at = sizeof sp_sound + sizeof sp_mix + sizeof fxp + 16u + sizeof sq_songs + sizeof sq_song_len;
-        ui.back = 4;
+        ui.back = 4; sp_smooth = 0;
         n = zs_pack(keep);
-        sq_lk[0][k] = 0; ui.back = 1;
+        sq_lk[0][k] = 0; ui.back = 1; sp_smooth = 1;
         check(zs_unpack(keep, n, ZS_VER) == 0 && s0->ev[k].lk && sq_lk[0][k] == lk, "STORE: a lock saved and read back");
-        check(ui.back == 4, "STORE: BACK (pages never back) saved and read back");
+        check(ui.back == 4 && !sp_smooth, "STORE: BACK (pages never back) and SMOOTH off saved and read back");
         memcpy(old, keep, at); memcpy(old + at, keep + at + 8u, n - at - 8u);
         {   /* an older save's LEVEL (linear) becomes the one that sounds the same squared: 64 -> 90, 127 -> 127 */
             uint32_t l = at;                         /* (the sounds are the record's first bytes) */
@@ -161,12 +161,13 @@ int main(int argc, char **argv)
             memcpy(old, keep, at); memcpy(old + at, keep + at + 8u, n - at - 8u);
             sp_sound[0].level = l0; sp_sound[1].level = l1;
         }
-        check(zs_unpack(old, n - 8u, 3) == 0 && s0->ev[k].lk && ui.back == 1, "STORE: a version 3 save: its locks, BACK 12 s");
+        check(zs_unpack(old, n - 8u, 3) == 0 && s0->ev[k].lk && ui.back == 1 && sp_smooth, "STORE: a version 3 save: its locks, BACK 12 s, SMOOTH on");
         check(sp_sound[0].level == 90u && sp_sound[1].level == 127u, "STORE: an older save's LEVEL in the audio taper (64 -> 90, 127 -> 127)");
         check(zs_unpack(old, n - 8u, 2) == 0 && !s0->ev[k].lk, "STORE: a version 2 save has no locks");
         sp_sound[0].level = 64; sp_sound[1].level = 127;
         check(zs_unpack(keep, n, ZS_VER) == 0 && s0->ev[k].lk && sp_sound[0].level == 64u, "STORE: back as it was (a version 5 save: LEVEL as it is)");
         memcpy(sp_sound, KIT_PADS, sizeof sp_sound);
+        sp_smooth = 1;
     }
 
     /* 3a'. CLEAR, then UNDO brings it back (locks too), UNDO again clears it again */

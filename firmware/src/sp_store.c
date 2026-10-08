@@ -8,7 +8,7 @@
 #define ZS_BASE 0xC4000u
 #define ZS_SLOT 0xA000u                          /* 40 KiB a copy */
 #define ZS_MAGIC 0x3231505Au                     /* "ZP12" */
-#define ZS_VER 5u                                /* 5: LEVEL in an audio taper; 4: the UI's settings (BACK); 3: the hits'
+#define ZS_VER 6u                                /* 6: SMOOTH; 5: LEVEL in an audio taper; 4: the UI's settings (BACK); 3: the hits'
                                                  * locks; 2: four songs (1: one) */
 #define ZS_KIT_ID ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u ^ 0x0600u))   /* the factory kit the pads were saved with
                                                  * (0.6: changed once, so every older save gets the kit's pads) */
@@ -45,7 +45,7 @@ static uint32_t zs_pack(uint8_t *b)
     p = zs_put(p, sq_songs, sizeof sq_songs);
     p = zs_put(p, sq_song_len, sizeof sq_song_len);
     {
-        uint16_t u[4] = {ui.back, 0, 0, 0};      /* (room for more of the UI's settings) */
+        uint16_t u[4] = {ui.back, (uint16_t)(sp_smooth + 1u), 0, 0};   /* (room for more of the UI's settings) */
         p = zs_put(p, u, sizeof u);
     }
     for (i = 0; i < SQ_NSEG; i++) {
@@ -87,8 +87,10 @@ static int zs_unpack(const uint8_t *b, uint32_t len, uint32_t ver)
         uint16_t u[4];
         p = zs_get(p, u, sizeof u);
         ui.back = (uint8_t)(u[0] < 5u ? u[0] : 1u);
+        sp_smooth = (uint8_t)(u[1] != 1u);       /* (0: an older save: on; 1: off; 2: on) */
     } else {
-        ui.back = 1;                              /* (an older save: 12 s) */
+        ui.back = 1;                              /* (an older save: 12 s, SMOOTH on) */
+        sp_smooth = 1;
     }
     sq.bpm10 = (uint16_t)sp_clamp(st[0], 400, 2400);
     sq.quant = (uint8_t)(st[1] % 7u);

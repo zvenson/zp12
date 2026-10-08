@@ -117,6 +117,10 @@ int main(int argc, char **argv)
     if (ui.page != PG_FILT) { printf("zp12 ui: BACK 30 s went back after 20 s FAIL\n"); return 1; }
     fm1_ms += 11000; ui_draw();                                       /* ... and back after 31 */
     if (ui.page != PG_HOME) { printf("zp12 ui: BACK 30 s did not go back FAIL\n"); return 1; }
+    button(B_GLO); button(B_GLO); knob(0, -1); fm1_ms += 20; ui_draw(); ppm("zp12-output");   /* GLO twice: OUTPUT, SMOOTH */
+    if (ui.page != PG_OUTPUT || sp_smooth) { printf("zp12 ui: GLO > OUTPUT > SMOOTH off FAIL\n"); return 1; }
+    knob(0, 1);
+    if (!sp_smooth) { printf("zp12 ui: SMOOTH on again FAIL\n"); return 1; }
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;
 }

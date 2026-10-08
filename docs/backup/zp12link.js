@@ -302,7 +302,15 @@
   // oct = at double speed, played an octave down on the pad (twice the time, half the bandwidth, the grit)
   const speedOf = (o) => (o.slow ? 45 / 33 : 1) * (o.oct ? 2 : 1);
   function encode(x, srcRate, o = {}) {
-    const p = x.subarray(o.start || 0, o.end || x.length), from = Math.round(srcRate * speedOf(o)), to = o.rate || RATES[0];
+    let p = x.subarray(o.start || 0, o.end || x.length);
+    const from = Math.round(srcRate * speedOf(o)), to = o.rate || RATES[0];
+    if (o.fade !== false && ((o.start || 0) > 0 || (o.end || x.length) < x.length)) {   // trimmed inside the sound: no click
+      p = Float32Array.from(p);
+      const fi = (o.start || 0) > 0 ? Math.min(p.length >> 2, Math.round(srcRate * 0.001)) : 0;   // 1 ms in
+      const fo = (o.end || x.length) < x.length ? Math.min(p.length >> 2, Math.round(srcRate * 0.002)) : 0;   // 2 ms out
+      for (let i = 0; i < fi; i++) p[i] *= i / fi;
+      for (let i = 0; i < fo; i++) p[p.length - 1 - i] *= i / fo;
+    }
     const y = resample12(p, from, to);
     if (o.normalize === false) return y;
     let pk = 0;                                  // normalised as it comes out (the low-pass takes peaks off): once more

@@ -35,16 +35,16 @@ static const char *const UI_BACK_NAME[5] = {"6 S", "12 S", "30 S", "60 S", "OFF"
 #endif
 static const char ZP12_VERSION[] = ZP12_VER;
 
-enum { PG_HOME, PG_WAVE, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_FILT, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_N };
+enum { PG_HOME, PG_WAVE, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_FILT, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_OUTPUT, PG_N };
 static const char *const PG_NAME[PG_N] = {"MIX", "WAVE", "SOUND", "TRUNC", "OUT", "SENDS", "FILTER", "CHORUS", "DELAY", "REVERB",
-                                          "LOOP", "TOOLS", "SONG", "SETUP"};
+                                          "LOOP", "TOOLS", "SONG", "SETUP", "OUTPUT"};
 /* buttons: the printed labels' matrix ids (as SLOOP's PANEL_DEFAULT); SEL is SLOOP's SCL */
 enum { B_OCTDN = 0, B_OCTUP = 1, B_FX = 2, B_SEL = 3, B_ENV = 4, B_LFO = 5, B_EDIT = 6, B_GLO = 7, B_HOME = 8,
        B_SAVE = 9, B_ARP = 10, B_SEQ = 11, B_PLAY = 12, B_REC = 13 };
 /* the page families (the button that opens them): their name, colour, pages; on a page the header says where
  * (EDIT > SOUND) and the tabs take the faders' place */
 static const char *const FAM_NAME[5] = {"MIX", "EDIT", "FX", "SEQ", "GLO"};
-static const uint8_t FAM_FIRST[5] = {PG_HOME, PG_WAVE, PG_FILT, PG_SEG, PG_SETUP}, FAM_N[5] = {1, 5, 4, 3, 1};
+static const uint8_t FAM_FIRST[5] = {PG_HOME, PG_WAVE, PG_FILT, PG_SEG, PG_SETUP}, FAM_N[5] = {1, 5, 4, 3, 2};
 static uint32_t fam_of(uint32_t pg) { return pg == PG_HOME ? 0u : pg <= PG_SFX ? 1u : pg <= PG_REV ? 2u : pg <= PG_SONG ? 3u : 4u; }
 static const char *const DTIME_NAME[6] = {"1/4", "1/8", "1/16", "1/32", "8T", "16T"};
 static const char *const CLICK_NAME[3] = {"OFF", "REC", "ON"};
@@ -213,6 +213,9 @@ static void page_cols(char lab[4][8], char val[4][8])
         COL(0, "TEMPO", num(val[0], (int32_t)(sq.bpm10 / 10u), 3, 0)); COL(1, "CLICK", cat(val[1], CLICK_NAME[sq.click % 3u]));
         COL(2, "BACK", cat(val[2], UI_BACK_NAME[ui.back % 5u]));
         COL(3, "RESET", cat(val[3], ui.arm == PG_SETUP + 1u ? "AGAIN" : "-->"));
+        break;
+    case PG_OUTPUT:
+        COL(0, "SMOOTH", cat(val[0], sp_smooth ? "ON" : "OFF"));
         break;
     default:
         break;
@@ -482,7 +485,7 @@ static void ui_draw(void)
     if (s != ui.sig_head || ui.force) { ui.sig_head = s; draw_head(); }
     s = sig_of(&sp_sound[ui.sel], sizeof(sp_sound_t), 2166136261u ^ ui.sel * 7u ^ ui.page * 131u ^ sq.bpm10 * 7919u ^ ui.multi);
     s = sig_of(ui.mix, sizeof ui.mix, s ^ ui.shift ^ ui.steps * 3u ^ ui.step_bar * 29u ^ ui.arm * 37u ^ ui.copy_to * 41u);
-    s = sig_of(&fxp, sizeof fxp, s ^ (uint32_t)(djf.v + 64) * 6151u ^ (uint32_t)djf.res * 97u ^ ui.back * 2203u);
+    s = sig_of(&fxp, sizeof fxp, s ^ (uint32_t)(djf.v + 64) * 6151u ^ (uint32_t)djf.res * 97u ^ ui.back * 2203u ^ sp_smooth * 4409u);
     s = sig_of(sq_songs, sizeof sq_songs, s ^ ui.song_cur * 31u ^ SQ_SONG_N * 17u ^ sq.song_mode ^ sq.song_sel * 7u);
     s ^= (sq.seg * 977u) ^ (sq.quant * 31u) ^ (sq.swing * 7u) ^ (sq.click * 3u) ^ sq_seg[sq.seg % SQ_NSEG].bars * 101u;
     s ^= sq.recording * 5u ^ sq.rec_arm * 11u;
@@ -783,6 +786,9 @@ static void knob(uint32_t n, int32_t d)
         if (n == 3u && d > 0 && !sq.playing && again(PG_SETUP + 1u))
             ui.factory_req = 1;                    /* (zp12.c: everything to the factory state, saved) */
         break;
+    case PG_OUTPUT:
+        if (n == 0u) sp_smooth = one > 0;         /* (right: on, left: off) */
+        break;
     default:
         break;
     }
@@ -832,7 +838,7 @@ static void button(uint32_t b)
     case B_FX: page(ui.page >= PG_FILT && ui.page < PG_REV ? ui.page + 1u : PG_FILT); break;
     case B_SEQ: page(ui.page == PG_SEG ? PG_SEG2 : ui.page == PG_SEG2 ? PG_SONG : PG_SEG); break;
     case B_SAVE: ui.save_req = 1; ui_say("SAVED"); break;
-    case B_GLO: page(PG_SETUP); break;
+    case B_GLO: page(ui.page == PG_SETUP ? PG_OUTPUT : PG_SETUP); break;
     case B_ENV: tap_tempo(); break;
     case B_PLAY: sq_post(sq.playing ? RQ_STOP : RQ_PLAY, 0, 0); break;
     case B_REC: sq_post(RQ_REC, 0, 0); break;
