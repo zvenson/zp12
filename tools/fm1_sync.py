@@ -68,6 +68,10 @@ FIRMWARES = [  # (the page's order: zp12 first, then by kind)
          src="github",
          what="A Telepathic Orchid-style chord instrument: one hand plays roots, the other shapes chords; voicings, "
               "performance modes, bass and a looper."),
+    dict(id="fimba", kind=["synth", "chords"], name="FiMba-1", author="jadamsowers", repo="jadamsowers/fm1-fimba",
+         ident=r"FM-1_800\d{4}", src="github", site="https://jadamsowers.github.io/fm1-fimba/",
+         what="A physically modelled kalimba: tines laid out like the real one, thumb-roll chords, mbira patterns, "
+              "a sound hole to cover, grains, tape and a plate reverb. Play it in the browser first."),
 ]
 
 
