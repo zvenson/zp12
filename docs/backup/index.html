@@ -54,10 +54,29 @@
   input[type=file] { display: none; }
   footer { font-size: 13.5px; color: var(--mute); padding: 0 0 40px; }
 </style>
+<style id="zp-nav">
+  .zpnav { position: sticky; top: 0; z-index: 50; background: rgba(206, 207, 201, 0.95); backdrop-filter: blur(8px);
+           border-bottom: 1px solid #b9bbb3; font: 16px/1.6 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  .zpnav .zw { max-width: 1320px; margin: 0 auto; padding: 0 32px; display: flex; align-items: center; height: 60px; gap: 22px; }
+  .zpnav .zm { font: italic 900 30px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: -1px; color: #1e3060; text-decoration: none; white-space: nowrap; }
+  .zpnav .zm small { font: italic 400 15px/1 "Helvetica Neue", Arial, sans-serif; letter-spacing: 0; margin-left: 8px; }
+  .zpnav .zr { flex: 1; height: 6px; border-top: 2px solid #c82e32; border-bottom: 2px solid #1e3060; }
+  .zpnav .zl { display: flex; gap: 20px; font-size: 14.5px; align-items: center; }
+  .zpnav .zl a { color: #1e3060; text-decoration: none; }
+  .zpnav .zl a:hover { text-decoration: underline; }
+  .zpnav .zl a.cur { font-weight: 700; box-shadow: inset 0 -2px 0 #c82e32; }
+  .zpnav .zl a.gh { background: #263e70; color: #fff; padding: 6px 14px; border-radius: 999px; font-weight: 650; }
+  @media (max-width: 980px) { .zpnav .zl a:not(.gh):not(.in) { display: none; } .zpnav .zr { display: none; } .zpnav .zw { justify-content: space-between; } }
+  @media (max-width: 620px) { .zpnav .zw { padding: 0 18px; } }
+</style>
 </head>
 <body>
-<nav><div class="wrap"><a class="mark" href="../">zp12<small>backup</small></a><div class="rule"></div>
-  <div class="links"><a href="../">zp12</a><a href="../install/">Install</a><a href="../editor/">Samples</a><a href="../#cheatsheet">Cheat sheet</a></div></div></nav>
+<nav class="zpnav"><div class="zw">
+  <a class="zm" href="../">zp12<small>sampling drums</small></a>
+  <span class="zr"></span>
+  <div class="zl"><a href="../#video">Video</a><a href="../#workflow">Workflow</a><a href="../#sound">Sound</a><a href="../#cheatsheet">Cheat sheet</a><a href="../editor/">Samples</a><a href="../backup/" class="cur">Backup</a>
+    <a class="in" href="../install/"><b>Install</b></a><a class="gh" href="https://github.com/zvenson/zp12">GitHub</a></div>
+</div></nav>
 <header><div class="wrap">
   <h1>Back up <b>zp12</b></h1>
   <p>Everything on your FM-1 in one file: loops, songs, sounds, mix, effects and your samples, and if you like
