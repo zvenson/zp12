@@ -279,6 +279,64 @@ int main(int argc, char **argv)
         for (i = 0; i < 400u; i++) block();
         check(djf.mode == 0, "DJ FILTER: back at 0 it is off");
     }
+    {   /* COUNT: 2 bars and off; DUB BAR: an overdub from the next 1 */
+        uint32_t ticks = 0, last;
+        sq.song_mode = 0; sq.seg = 5; sq_seg[5].bars = 2; sq.cin_bars = 2;
+        sq_post(RQ_REC, 0, 0);
+        sq_post(RQ_PLAY, 0, 0);
+        block();
+        check(sq.cin_len == 2u * SQ_BAR && sq.recording, "COUNT 2 BARS: a count-in of two bars");
+        while (sq.countin > 0) { block(); ticks++; }
+        check((ticks * (sq.bpm10 * 76087u / 10000u) >> 16) >= 2u * SQ_BAR - 12u, "COUNT 2 BARS: as long as two bars");
+        sq_post(RQ_STOP, 0, 0);
+        sq.cin_bars = 0;
+        sq_post(RQ_REC, 0, 0);
+        sq_post(RQ_PLAY, 0, 0);
+        block();
+        check(sq.countin <= 0 && sq.recording, "COUNT OFF: recording from the PLAY on");
+        sq_post(RQ_STOP, 0, 0);
+        sq.cin_bars = 1;
+        sq.dub_bar = 1;
+        sq_post(RQ_PLAY, 0, 0);
+        until_tick(SQ_PPQ + 10u);
+        sq_post(RQ_REC, 0, 0);
+        block();
+        check(sq.dub_wait && !sq.recording, "DUB BAR: REC while playing waits for the next 1");
+        sq_post(RQ_REC, 0, 0);
+        block();
+        check(!sq.dub_wait && !sq.recording, "DUB BAR: REC again while waiting: not");
+        sq_post(RQ_REC, 0, 0);
+        block();
+        last = tick();
+        while (sq.dub_wait) { last = tick(); block(); }
+        check(sq.recording && last >= SQ_BAR - SQ_PPQ / 8u - 30u && last < SQ_BAR, "DUB BAR: recording from the bar's 1");
+        sq_hit(2, 100, 0);                              /* (a hit just before the 1: it lands on it) */
+        check(sq_find(&sq_seg[5], SQ_BAR, 2) >= 0, "DUB BAR: a hit just early lands on the 1");
+        sq_post(RQ_REC, 0, 0);
+        sq_post(RQ_STOP, 0, 0);
+        block();
+        sq.dub_bar = 0;
+        sq.seg = 0;
+    }
+    {   /* MUTE / SOLO (the channel alone, no effects' tails): it goes silent in a few ms, comes back; a solo silences the others */
+        int32_t o[2 * SP_BLK], pk;
+        uint32_t j, ch = sp_sound[0].chan;
+        sp_mute = (uint8_t)(1u << ch);
+        sp_trigger(0, 127);
+        for (i = 0; i < 4u; i++) { memset(o, 0, sizeof o); sp_channel(ch, o); }
+        for (pk = 0, i = 0; i < 20u; i++) { memset(o, 0, sizeof o); sp_channel(ch, o); for (j = 0; j < 2u * SP_BLK; j++) if (abs(o[j]) > pk) pk = abs(o[j]); }
+        check(pk == 0, "MUTE: the kick's channel silent");
+        sp_mute = 0;
+        sp_trigger(0, 127);
+        for (pk = 0, i = 0; i < 20u; i++) { memset(o, 0, sizeof o); sp_channel(ch, o); for (j = 0; j < 2u * SP_BLK; j++) if (abs(o[j]) > pk) pk = abs(o[j]); }
+        check(pk > 1000, "MUTE off: heard again");
+        sp_solo = (uint8_t)(1u << ((ch + 1u) % SP_NCH));
+        sp_trigger(0, 127);
+        for (i = 0; i < 4u; i++) { memset(o, 0, sizeof o); sp_channel(ch, o); }
+        for (pk = 0, i = 0; i < 20u; i++) { memset(o, 0, sizeof o); sp_channel(ch, o); for (j = 0; j < 2u * SP_BLK; j++) if (abs(o[j]) > pk) pk = abs(o[j]); }
+        check(pk == 0, "SOLO of another channel: the kick silent");
+        sp_solo = 0;
+    }
     for (i = 0; i < SP_FS * 2u / SP_BLK; i++) block();  /* the reverb's tail */
     check(peak < 65536, "bounded");
     fseek(wf, 4, SEEK_SET); put32(36u + frames * 4u);

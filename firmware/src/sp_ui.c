@@ -29,25 +29,26 @@ static const uint16_t FAM_INK[5] = {RGB(255, 255, 255), RGB(30, 24, 10), RGB(8, 
 /* a page untouched this long: back to the faders (GLO > SETUP > BACK; 0: never) */
 static const uint8_t UI_BACK_S[5] = {6, 12, 30, 60, 0};
 static const char *const UI_BACK_NAME[5] = {"6 S", "12 S", "30 S", "60 S", "OFF"};
-#define UI_HOLD_MS 1300u                        /* REC held 0.7 s, then this much more: the loop cleared */
+#define UI_HOLD_MS 1300u                        /* REC held 0.7 s, then this much more (2 s in all): the loop cleared */
 #ifndef ZP12_VER
 #define ZP12_VER "0.0"                          /* build.py --release X.Y */
 #endif
 static const char ZP12_VERSION[] = ZP12_VER;
 
-enum { PG_HOME, PG_WAVE, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_FILT, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_OUTPUT, PG_N };
+enum { PG_HOME, PG_WAVE, PG_SOUND, PG_TRUNC, PG_OUT, PG_SFX, PG_FILT, PG_CHO, PG_DLY, PG_REV, PG_SEG, PG_SEG2, PG_SONG, PG_SETUP, PG_CLICK, PG_OUTPUT, PG_N };
 static const char *const PG_NAME[PG_N] = {"MIX", "WAVE", "SOUND", "TRUNC", "OUT", "SENDS", "FILTER", "CHORUS", "DELAY", "REVERB",
-                                          "LOOP", "TOOLS", "SONG", "SETUP", "OUTPUT"};
+                                          "LOOP", "TOOLS", "SONG", "SETUP", "CLICK", "OUTPUT"};
 /* buttons: the printed labels' matrix ids (as SLOOP's PANEL_DEFAULT); SEL is SLOOP's SCL */
 enum { B_OCTDN = 0, B_OCTUP = 1, B_FX = 2, B_SEL = 3, B_ENV = 4, B_LFO = 5, B_EDIT = 6, B_GLO = 7, B_HOME = 8,
        B_SAVE = 9, B_ARP = 10, B_SEQ = 11, B_PLAY = 12, B_REC = 13 };
 /* the page families (the button that opens them): their name, colour, pages; on a page the header says where
  * (EDIT > SOUND) and the tabs take the faders' place */
 static const char *const FAM_NAME[5] = {"MIX", "EDIT", "FX", "SEQ", "GLO"};
-static const uint8_t FAM_FIRST[5] = {PG_HOME, PG_WAVE, PG_FILT, PG_SEG, PG_SETUP}, FAM_N[5] = {1, 5, 4, 3, 2};
+static const uint8_t FAM_FIRST[5] = {PG_HOME, PG_WAVE, PG_FILT, PG_SEG, PG_SETUP}, FAM_N[5] = {1, 5, 4, 3, 3};
 static uint32_t fam_of(uint32_t pg) { return pg == PG_HOME ? 0u : pg <= PG_SFX ? 1u : pg <= PG_REV ? 2u : pg <= PG_SONG ? 3u : 4u; }
 static const char *const DTIME_NAME[6] = {"1/4", "1/8", "1/16", "1/32", "8T", "16T"};
 static const char *const CLICK_NAME[3] = {"OFF", "REC", "ON"};
+static const char *const CIN_NAME[3] = {"OFF", "1 BAR", "2 BARS"};
 
 static struct {
     uint8_t pair;                               /* 0: banks A + B on the keys, 1: C + D */
@@ -66,7 +67,8 @@ static struct {
     uint32_t turn_ms;                           /* ... and when (recording: its hits take them) */
     uint32_t held;                              /* the buttons held (bit = matrix id) */
     uint8_t rec_on, rec_prev, holding;          /* REC: pressed, the state before, held into a CLEAR */
-    uint8_t save_used, prev_page, fx_used;     /* ...; FX held: a key pressed (a punch, not the pages) */               /* SAVE held: a loop saved; the page before EDIT */
+    uint8_t save_used, prev_page, fx_used;     /* SAVE held: a loop saved; the page before EDIT; FX held: a key pressed (a punch, not the pages) */
+    uint8_t glo_used;                           /* GLO held: a key pressed (mute / solo, not the pages) */
     uint32_t rec_t0, hold_t0;
     uint8_t mix[SP_NCH];
     uint32_t arm_ms, touch_ms;
@@ -163,7 +165,7 @@ static void page_cols(char lab[4][8], char val[4][8])
     case PG_OUT:
         COL(0, "CHAN", num(val[0], s->chan + 1, 1, 0)); COL(1, "PAN", num(val[1], s->pan, 2, 1));
         if (s->chan < 2u) { COL(2, "CUT", num(val[2], s->cut, 3, 0)); COL(3, "RESO", num(val[3], s->reso, 3, 0)); }
-        else { COL(2, "FILT", cat(val[2], s->chan < 6u ? "FIX" : "OFF")); }
+        else { COL(2, "CUT", cat(val[2], "--")); COL(3, "RESO", cat(val[3], "--")); }   /* (only channels 1-2 filter) */
         break;
     case PG_SFX:
         COL(0, "DRIVE", num(val[0], s->drive, 3, 0)); COL(1, "CHO", num(val[1], s->send[0], 3, 0));
@@ -210,9 +212,12 @@ static void page_cols(char lab[4][8], char val[4][8])
         COL(3, "SONG", sq.song_mode ? (void)num(val[3], sq.song_sel + 1, 1, 0) : (void)cat(val[3], "OFF"));
         break;
     case PG_SETUP:
-        COL(0, "TEMPO", num(val[0], (int32_t)(sq.bpm10 / 10u), 3, 0)); COL(1, "CLICK", cat(val[1], CLICK_NAME[sq.click % 3u]));
-        COL(2, "BACK", cat(val[2], UI_BACK_NAME[ui.back % 5u]));
+        COL(0, "TEMPO", num(val[0], (int32_t)(sq.bpm10 / 10u), 3, 0)); COL(1, "BACK", cat(val[1], UI_BACK_NAME[ui.back % 5u]));
         COL(3, "RESET", cat(val[3], ui.arm == PG_SETUP + 1u ? "AGAIN" : "-->"));
+        break;
+    case PG_CLICK:
+        COL(0, "CLICK", cat(val[0], CLICK_NAME[sq.click % 3u])); COL(1, "COUNT", cat(val[1], CIN_NAME[sq.cin_bars % 3u]));
+        COL(2, "DUB", cat(val[2], sq.dub_bar ? "BAR" : "NOW"));
         break;
     case PG_OUTPUT:
         COL(0, "SMOOTH", cat(val[0], sp_smooth ? "ON" : "OFF"));
@@ -294,7 +299,7 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
     small[0] = 0;
     if (ui.holding) {                           /* REC held: what letting go late does, and how long it still takes */
         uint32_t w = (fm1_ms - ui.hold_t0) * 212u / UI_HOLD_MS;
-        p = cat(big, "CLEAR LOOP ");
+        p = cat(big, sq.seg + 1u >= 10u ? "CLEAR L" : "CLEAR LOOP ");
         num(p, sq.seg + 1, sq.seg + 1u >= 10u ? 2u : 1u, 0);
         cv_rect(10, 34, 212, 3, P_LCDDIM);
         cv_rect(10, 34, (int32_t)(w < 212u ? w : 212u), 3, P_LCDINK);
@@ -306,6 +311,14 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
         p = num(p, ui.step_bar + 1, 1, 0);
         p = cat(p, "/");
         num(p, sq_seg[sq.seg % SQ_NSEG].bars ? sq_seg[sq.seg % SQ_NSEG].bars : 1, 1, 0);
+    } else if (sq.playing && (sq.countin > 0 || sq.dub_wait)) {   /* COUNT 4: the beats until recording */
+        uint32_t left = sq.countin > 0 ? ((uint32_t)sq.countin + (SQ_PPQ << 16) - 1u) / (SQ_PPQ << 16)
+                                        : (SQ_BAR - (sq.pos >> 16) % SQ_BAR + SQ_PPQ - 1u) / SQ_PPQ;
+        p = cat(big, "COUNT ");
+        num(p, (int32_t)left, left >= 10u ? 2u : 1u, 0);
+    } else if (!sq.playing && sq.rec_arm) {     /* ARMED: PLAY starts the count-in */
+        p = cat(big, sq.seg + 1u >= 10u ? "ARMED L" : "ARMED LOOP ");   /* (12 letters fit) */
+        num(p, sq.seg + 1, sq.seg + 1u >= 10u ? 2u : 1u, 0);
     } else if (sq.playing) {                    /* SEG01 2.3 */
         uint32_t t = sq.countin > 0 ? 0u : sq.pos >> 16;
         if (sq.song_mode && SQ_SONG_N) {          /* S2.03 L4: song 2, its step 3, loop 4 */
@@ -326,7 +339,7 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
          * beside the big line is left out (the big line wins) */
         int32_t bw = 10 + text_w(&FONT_L, big) + 6;
         const char *pg = ui.page == PG_HOME ? "BPM" : PG_NAME[ui.page];
-        const char *st = sq.playing && sq.countin > 0 ? "COUNT " : sq.recording ? "REC " : sq.rec_arm ? "ARMED " : "";
+        const char *st = sq.playing && (sq.countin > 0 || sq.dub_wait) ? "COUNT " : sq.recording ? "REC " : sq.rec_arm ? "ARMED " : "";
         p = cat(small, st);
         num(p, (int32_t)(bpm / 10u), 3, 0);
         if (222 - text_w(&FONT_S, small) < bw)
@@ -360,11 +373,12 @@ static void draw_faders(void)                   /* the eight channel levels; a c
         int32_t cx = 14 + (int32_t)i * 29, y = (int32_t)fader_y(ui.mix[i]);
         int on = (int32_t)(fm1_ms - ui.chan_ms[i]) < 90 && sp_ch[i].on;
         int knobbed = ui.page == PG_HOME && (i >= 4u) == (ui.shift != 0);
-        char n[2] = {(char)('1' + i), 0};
+        int solo = (sp_solo >> i) & 1u, off = sp_solo ? !solo : (int)((sp_mute >> i) & 1u);
+        char n[2] = {(char)(solo ? 'S' : (sp_mute >> i) & 1u ? 'M' : '1' + i), 0};   /* M muted, S soloed */
         cv_rect(cx - 1, 3, 3, 46, P_SLOT);
-        cv_rect(cx - 9, y, 19, 7, on ? P_LED : P_CAP);
-        cv_rect(cx - 9, y + 3, 19, 1, on ? RGB(120, 10, 10) : RGB(90, 90, 96));
-        cv_text_on(cx - 4, 47, &FONT_S, n, knobbed ? C_WHITE : P_RULE, RGB(38, 62, 112));
+        cv_rect(cx - 9, y, 19, 7, on && !off ? P_LED : off ? RGB(84, 88, 98) : P_CAP);
+        cv_rect(cx - 9, y + 3, 19, 1, on && !off ? RGB(120, 10, 10) : RGB(90, 90, 96));
+        cv_text_on(cx - 4, 47, &FONT_S, n, solo ? P_STEP : (sp_mute >> i) & 1u ? P_LED : knobbed ? C_WHITE : P_RULE, RGB(38, 62, 112));
     }
     cv_blit(4, 100);
 }
@@ -445,7 +459,7 @@ static void draw_leds(void)                     /* banks A-D (the pair on the ke
     cv_text_on(132, 3, &FONT_S, "S", P_FRAME, P_NAVY);
     led(150, 8, sq.playing && (blink || sq.countin > 0));
     cv_text_on(158, 3, &FONT_S, "RUN", P_FRAME, P_NAVY);
-    led(190, 8, sq.recording || (sq.rec_arm && blink));
+    led(190, 8, sq.recording || ((sq.rec_arm || sq.dub_wait) && blink));
     cv_text_on(198, 3, &FONT_S, "REC", P_FRAME, P_NAVY);
     cv_blit(4, 214);
 }
@@ -488,9 +502,10 @@ static void ui_draw(void)
     s = sig_of(&fxp, sizeof fxp, s ^ (uint32_t)(djf.v + 64) * 6151u ^ (uint32_t)djf.res * 97u ^ ui.back * 2203u ^ sp_smooth * 4409u);
     s = sig_of(sq_songs, sizeof sq_songs, s ^ ui.song_cur * 31u ^ SQ_SONG_N * 17u ^ sq.song_mode ^ sq.song_sel * 7u);
     s ^= (sq.seg * 977u) ^ (sq.quant * 31u) ^ (sq.swing * 7u) ^ (sq.click * 3u) ^ sq_seg[sq.seg % SQ_NSEG].bars * 101u;
-    s ^= sq.recording * 5u ^ sq.rec_arm * 11u;
+    s ^= sq.recording * 5u ^ sq.rec_arm * 11u ^ sq.dub_wait * 19u ^ sq.cin_bars * 6007u ^ sq.dub_bar * 7121u;
     if (sq.playing)
-        s ^= ((sq.countin > 0 ? 0u : (sq.pos >> 16) / SQ_PPQ) + 1u) * 2654435761u ^ (sq.countin > 0) * 9u ^ sq.song_i * 13u;
+        s ^= ((sq.countin > 0 ? (uint32_t)sq.countin / (SQ_PPQ << 16) + 977u : (sq.pos >> 16) / SQ_PPQ) + 1u) * 2654435761u ^
+             (sq.countin > 0) * 9u ^ sq.song_i * 13u;
     if (ui.msg[0] && (int32_t)(fm1_ms - ui.msg_until) < 0)
         s = sig_of(ui.msg, sizeof ui.msg, s ^ 0x55u);
     if (ui.holding)
@@ -509,7 +524,7 @@ static void ui_draw(void)
         } else {                                 /* the faders */
             for (i = 0; i < SP_NCH; i++)
                 on |= (uint32_t)((int32_t)(fm1_ms - ui.chan_ms[i]) < 90 && sp_ch[i].on) << i;
-            s = sig_of(ui.mix, sizeof ui.mix, on * 2654435761u ^ ui.shift * 3u ^ (ui.page == PG_HOME) * 5u) | 1u;
+            s = sig_of(ui.mix, sizeof ui.mix, on * 2654435761u ^ ui.shift * 3u ^ (ui.page == PG_HOME) * 5u ^ (sp_mute | sp_solo << 8) * 40503u) | 1u;
             if (s != ui.sig_mid || ui.force) { ui.sig_mid = s; draw_faders(); }
         }
         for (i = 0; i < 8u; i++)
@@ -517,7 +532,7 @@ static void ui_draw(void)
         s = lit * 31u + ui.sel * 7919u + 1u;
         if (s != ui.sig_pad || ui.force) { ui.sig_pad = s; draw_pads(); }
     }
-    s = ui.pair + ui.multi * 2u + sq.playing * 4u + sq.recording * 8u + sq.rec_arm * 16u + sq.song_mode * 32u +
+    s = ui.pair + ui.multi * 2u + sq.playing * 4u + sq.recording * 8u + (sq.rec_arm | sq.dub_wait) * 16u + sq.song_mode * 32u +
         (sq.beat & 1u) * 64u + (sq.countin > 0) * 128u + 1u;
     if (s != ui.sig_led || ui.force) { ui.sig_led = s; draw_leds(); }
     ui.force = 0;
@@ -569,6 +584,20 @@ static void key_down(uint32_t k, int erase)
         ui.fx_used = 1;
         if (white_of(k) < 4u)
             ui_say(PUNCH[white_of(k)]);
+        return;
+    }
+    if ((ui.held >> B_GLO) & 1u) {               /* GLO held: white keys 1-8 mute channels 1-8, 9-16 solo them */
+        uint32_t w = white_of(k), c = w % 8u;
+        char m[24], *p;
+        ui.glo_used = 1;
+        if (w == 0xFFu)
+            return;
+        if (w < 8u) sp_mute ^= (uint8_t)(1u << c);
+        else sp_solo ^= (uint8_t)(1u << c);
+        p = cat(m, w < 8u ? "MUTE " : "SOLO ");
+        p = num(p, (int32_t)c + 1, 1, 0);
+        cat(p, ((w < 8u ? sp_mute : sp_solo) >> c) & 1u ? "" : " OFF");
+        ui_say(m);
         return;
     }
     if ((ui.held >> B_SAVE) & 1u) {              /* SAVE held: a black key saves the loop into that loop */
@@ -721,6 +750,8 @@ static void knob(uint32_t n, int32_t d)
     case PG_OUT:
         if (n == 0u) s->chan = (uint8_t)sp_clamp(s->chan + one, 0, SP_NCH - 1);
         if (n == 1u) s->pan = (int8_t)sp_clamp(s->pan + dd, -64, 63);
+        if (n == 0u) ui_say(s->chan < 2u ? "DYN. FILTER" : s->chan < 6u ? "FIXED LP" : "NO FILTER");
+        if (n >= 2u && s->chan >= 2u) { ui_say("FILTER CH1-2"); break; }   /* (3-8 have none to turn) */
         if (n == 2u) { s->cut = (uint8_t)sp_clamp(s->cut + dd, 0, 127); ui.turn_pad = ui.sel; ui.turn_ms = fm1_ms; }
         if (n == 3u) s->reso = (uint8_t)sp_clamp(s->reso + dd, 0, 127);
         break;
@@ -788,10 +819,14 @@ static void knob(uint32_t n, int32_t d)
         break;
     case PG_SETUP:
         if (n == 0u) sq.bpm10 = (uint16_t)sp_clamp(sq.bpm10 + dd * 3, 400, 2400);
-        if (n == 1u) sq.click = (uint8_t)sp_clamp(sq.click + one, 0, 2);
-        if (n == 2u) ui.back = (uint8_t)sp_clamp(ui.back + one, 0, 4);
+        if (n == 1u) ui.back = (uint8_t)sp_clamp(ui.back + one, 0, 4);
         if (n == 3u && d > 0 && !sq.playing && again(PG_SETUP + 1u))
             ui.factory_req = 1;                    /* (zp12.c: everything to the factory state, saved) */
+        break;
+    case PG_CLICK:
+        if (n == 0u) sq.click = (uint8_t)sp_clamp(sq.click + one, 0, 2);
+        if (n == 1u) sq.cin_bars = (uint8_t)sp_clamp(sq.cin_bars + one, 0, 2);
+        if (n == 2u) sq.dub_bar = one > 0;
         break;
     case PG_OUTPUT:
         if (n == 0u) sp_smooth = one > 0;         /* (right: on, left: off) */
@@ -845,7 +880,7 @@ static void button(uint32_t b)
     case B_FX: page(ui.page >= PG_FILT && ui.page < PG_REV ? ui.page + 1u : PG_FILT); break;
     case B_SEQ: page(ui.page == PG_SEG ? PG_SEG2 : ui.page == PG_SEG2 ? PG_SONG : PG_SEG); break;
     case B_SAVE: ui.save_req = 1; ui_say("SAVED"); break;
-    case B_GLO: page(ui.page == PG_SETUP ? PG_OUTPUT : PG_SETUP); break;
+    case B_GLO: page(ui.page >= PG_SETUP && ui.page < PG_OUTPUT ? ui.page + 1u : PG_SETUP); break;
     case B_ENV: tap_tempo(); break;
     case B_PLAY: sq_post(sq.playing ? RQ_STOP : RQ_PLAY, 0, 0); break;
     case B_REC: sq_post(RQ_REC, 0, 0); break;
@@ -853,27 +888,27 @@ static void button(uint32_t b)
     }
 }
 
-/* REC and SAVE, as on sloopDX. REC acts on the press (no lag); held 0.7 s the press is undone and a bar fills:
- * held to its end, the loop is cleared (EDIT + OCT- brings it back), let go before, nothing. SAVE tapped saves
+/* REC and SAVE, as on sloopDX. REC acts on the press (no lag); held 0.7 s a bar fills: held to its end (2 s in
+ * all), the press is undone and the loop cleared (EDIT + OCT- brings it back); let go before, it was a tap. SAVE tapped saves
  * now; held, a black key saves the loop into that loop (key_down). held: the buttons held now; returns pressed
  * without the two. */
 static uint32_t ui_holds(uint32_t held, uint32_t pressed, uint32_t released)
 {
     ui.held = held;
     if (pressed & (1u << B_REC)) {
-        ui.rec_prev = (uint8_t)(sq.recording | sq.rec_arm << 1);
+        ui.rec_prev = (uint8_t)(sq.recording | sq.rec_arm << 1 | sq.dub_wait << 2);
         ui.rec_t0 = fm1_ms;
         ui.rec_on = 1;
         sq_post(RQ_REC, 0, 0);
     }
     if ((held >> B_REC) & 1u) {
         if (ui.rec_on && !ui.holding && (uint32_t)(fm1_ms - ui.rec_t0) >= 700u) {
-            sq_post(RQ_RECSET, 0, ui.rec_prev); /* a hold: the press undone */
-            ui.holding = 1;
+            ui.holding = 1;                      /* a hold: the bar fills (the press stands unless it ends) */
             ui.hold_t0 = fm1_ms;
         }
         if (ui.holding && (uint32_t)(fm1_ms - ui.hold_t0) >= UI_HOLD_MS) {
             char m[24], *p = cat(m, "LOOP ");
+            sq_post(RQ_RECSET, 0, ui.rec_prev);  /* the press undone, the loop cleared */
             sq_post(RQ_CLEAR, 0, 0);
             p = num(p, sq.seg + 1, sq.seg + 1u >= 10u ? 2u : 1u, 0);
             cat(p, " CLEARED");
@@ -901,7 +936,7 @@ static void ui_leds(uint32_t *btn, uint32_t *keys, uint32_t *glow)
     uint32_t b = 0, k = 0, g = 0, i;
     int blink = (sq.beat & 1u) == 0u, fam;
     if (sq.playing) b |= 1u << B_PLAY;
-    if (sq.recording || (sq.rec_arm && (fm1_ms / 250u) & 1u)) b |= 1u << B_REC;
+    if (sq.recording || ((sq.rec_arm || sq.dub_wait) && (fm1_ms / 250u) & 1u)) b |= 1u << B_REC;
     if (ui.multi) b |= 1u << B_ARP;
     if (ui.shift) b |= 1u << B_SEL;
     if (sq.erase) b |= 1u << B_LFO;
@@ -910,7 +945,14 @@ static void ui_leds(uint32_t *btn, uint32_t *keys, uint32_t *glow)
     fam = ui.page;
     b |= 1u << (fam == PG_HOME ? B_HOME : fam <= PG_SFX ? B_EDIT : fam <= PG_REV ? B_FX : fam <= PG_SONG ? B_SEQ : B_GLO);
     b |= 1u << (ui.pair ? B_OCTUP : B_OCTDN);
-    if (ui.steps) {                              /* the selected pad's steps of the bar on the white keys */
+    if ((ui.held >> B_GLO) & 1u) {               /* GLO held: white keys 1-8 the muted channels, 9-16 the soloed */
+        for (i = 0; i < 27u; i++) {
+            uint32_t w = white_of(i);
+            if (w == 0xFFu) continue;
+            if (((w < 8u ? sp_mute : sp_solo) >> (w % 8u)) & 1u) k |= 1u << i;
+            g |= 1u << i;
+        }
+    } else if (ui.steps) {                       /* the selected pad's steps of the bar on the white keys */
         const sq_seg_t *s = &sq_seg[sq.seg % SQ_NSEG];
         uint32_t t0 = ui.step_bar * SQ_BAR, row = 0, len = s->bars ? s->bars * SQ_BAR : SQ_BAR;
         for (i = 0; i < s->n; i++)

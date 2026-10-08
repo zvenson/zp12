@@ -282,6 +282,12 @@ static void zp12_main(void)
         }
         if (rel & (1u << B_FX) && !ui.fx_used)
             button(B_FX);
+        if (b & (1u << B_GLO)) {                        /* GLO down: mute / solo on the white keys while held; tapped, the GLO pages */
+            ui.glo_used = 0;
+            b &= ~(1u << B_GLO);
+        }
+        if (rel & (1u << B_GLO) && !ui.glo_used)
+            button(B_GLO);
         if (b & (1u << B_SEQ)) {                        /* SEQ down: the step grid while held */
             seq_down = fm1_ms;
             seq_used = 0;
@@ -361,6 +367,7 @@ static void zp12_main(void)
             memset(sq_songs, 0, sizeof sq_songs);
             memset(sq_song_len, 0, sizeof sq_song_len);
             sq.seg = 0; sq.song_mode = 0; sq.song_sel = 0; sq.swing = 0; sq.quant = 3; sq.bpm10 = 900;
+            sq.click = 1; sq.cin_bars = 1; sq.dub_bar = 0; sp_mute = sp_solo = 0;
             ui.save_req = 1;
             ui.force = 1;
             ui_say("FACTORY RESET");

@@ -50,16 +50,20 @@ static struct {
     volatile uint8_t next_seg;                  /* a loop chosen while playing: from the end of this one (0xFF none) */
     uint8_t quant, swing;                       /* SQ_GRID index, SQ_SWING index */
     uint8_t click;                              /* 0 off, 1 while recording, 2 always */
+    uint8_t cin_bars;                           /* GLO > CLICK > COUNT: the count-in, 0..2 bars */
+    uint8_t dub_bar;                            /* GLO > CLICK > DUB: an overdub starts at the next bar's 1, not at once */
+    volatile uint8_t dub_wait;                  /* REC pressed while playing (dub_bar): recording from the next 1 */
     uint8_t song_sel, song_i, song_rep;
     uint16_t bpm10;
     volatile uint32_t pos;                      /* the playhead in the segment, ticks Q16 */
     volatile int32_t countin;                   /* ticks Q16 of count-in left (> 0: counting) */
+    uint32_t cin_len;                           /* ticks of the count-in started */
     volatile uint32_t erase;                    /* pads held with ERASE: their hits go as the playhead passes */
     volatile uint32_t beat;                     /* beats since PLAY (the UI's blink) */
     volatile uint32_t played;                   /* pads hit since the UI looked (their keys light) */
     volatile uint32_t gen;                      /* bumps on every change of a segment (the UI, the autosave) */
     volatile uint32_t turn;                     /* pads whose TUNE / DECAY / CUT is being turned: recorded with the hits */
-} sq = {0, 0, 0, 0, 0, 0xFF, 3, 0, 1, 0, 0, 0, 900, 0, 0, 0, 0, 0, 0};
+} sq = {0, 0, 0, 0, 0, 0xFF, 3, 0, 1, 1, 0, 0, 0, 0, 0, 900, 0, 0, SQ_BAR, 0, 0, 0, 0, 0};
 
 static uint32_t sq_lvl_vel(uint32_t lvl) { return (lvl + 1u) * 16u - 1u; }
 static uint32_t sq_vel_lvl(uint32_t vel) { return vel >= 127u ? 7u : vel / 16u; }
@@ -203,15 +207,18 @@ static void sq_play(uint32_t on)
         sq.song_i = sq.song_rep = 0;
         if (sq.song_mode && SQ_SONG_N)
             sq.seg = sq_song[0].seg;
-        sq.countin = sq.rec_arm ? (int32_t)(SQ_BAR << 16) : 0;
+        sq.cin_len = (sq.cin_bars > 2u ? 2u : sq.cin_bars) * SQ_BAR;
+        sq.countin = sq.rec_arm ? (int32_t)(sq.cin_len << 16) : 0;
         if (sq.rec_arm)
             sq.recording = 1;
         sq.rec_arm = 0;
+        sq.dub_wait = 0;
         sq.playing = 1;
     } else {
         sq_stop_rec();
         sq.playing = 0;
         sq.countin = 0;
+        sq.dub_wait = 0;
     }
 }
 
@@ -243,17 +250,20 @@ static void sq_request(uint32_t r)
     case RQ_STOP:
         sq_play(0);
         break;
-    case RQ_REC:                                /* REC: playing: overdub on / off; stopped: armed / not */
+    case RQ_REC:                                /* REC: playing: overdub on / off (DUB BAR: from the next 1); stopped: armed / not */
         if (sq.playing) {
             if (sq.recording) sq_stop_rec();
+            else if (sq.dub_wait) sq.dub_wait = 0;
+            else if (sq.dub_bar && sq.countin <= 0) sq.dub_wait = 1;
             else sq.recording = 1;
         } else {
             sq.rec_arm ^= 1u;
         }
         break;
-    case RQ_RECSET:                             /* REC held: its press undone (arg: recording | rec_arm << 1) */
+    case RQ_RECSET:                             /* REC held: its press undone (arg: recording | rec_arm << 1 | dub_wait << 2) */
         sq.recording = (uint8_t)(arg & 1u && sq.playing);
         sq.rec_arm = (uint8_t)((arg >> 1) & 1u && !sq.playing);
+        sq.dub_wait = (uint8_t)((arg >> 2) & 1u && sq.playing);
         break;
     case RQ_STEP: {                             /* step edit: the hit of pad at tick arg on / off */
         int k = sq_find(s, arg, pad);
@@ -364,13 +374,13 @@ static void sq_block(void)
         return;
     s = &sq_seg[sq.seg % SQ_NSEG];
     d = (uint32_t)sq.bpm10 * 76087u / 10000u;   /* ticks Q16 a block: bpm10 * 96 * 32 * 65536 / (600 * 44100) */
-    if (sq.countin > 0) {                        /* the count-in: a bar of clicks, whatever CLICK is */
-        uint32_t c0 = SQ_BAR - (uint32_t)(sq.countin >> 16), c1, b;
+    if (sq.countin > 0) {                        /* the count-in: its bars of clicks, whatever CLICK is */
+        uint32_t c0 = sq.cin_len - (uint32_t)(sq.countin >> 16), c1, b;
         sq.countin -= (int32_t)d;
-        c1 = sq.countin > 0 ? SQ_BAR - (uint32_t)(sq.countin >> 16) : SQ_BAR;
+        c1 = sq.countin > 0 ? sq.cin_len - (uint32_t)(sq.countin >> 16) : sq.cin_len;
         b = (c0 + SQ_PPQ - 1u) / SQ_PPQ * SQ_PPQ;
         if (b < c1) {
-            sp_click(b == 0u);
+            sp_click(b % SQ_BAR == 0u);
             sq.beat++;
         }
         if (sq.countin > 0)
@@ -384,6 +394,10 @@ static void sq_block(void)
     }
     len = sq_len(s);
     to = sq.pos >> 16;
+    if (sq.dub_wait && to + SQ_PPQ / 8u >= (from / SQ_BAR + 1u) * SQ_BAR) {
+        sq.dub_wait = 0;                         /* DUB BAR: recording from the next 1 (a 1/32 before it, so a */
+        sq.recording = 1;                        /* hit just early lands on it) */
+    }
     for (;;) {
         uint32_t end = to < len ? to : len;
         if (end > from)

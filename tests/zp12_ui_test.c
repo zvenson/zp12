@@ -117,10 +117,29 @@ int main(int argc, char **argv)
     if (ui.page != PG_FILT) { printf("zp12 ui: BACK 30 s went back after 20 s FAIL\n"); return 1; }
     fm1_ms += 11000; ui_draw();                                       /* ... and back after 31 */
     if (ui.page != PG_HOME) { printf("zp12 ui: BACK 30 s did not go back FAIL\n"); return 1; }
-    button(B_GLO); button(B_GLO); knob(0, -1); fm1_ms += 20; ui_draw(); ppm("zp12-output");   /* GLO twice: OUTPUT, SMOOTH */
+    button(B_GLO); button(B_GLO); button(B_GLO); knob(0, -1); fm1_ms += 20; ui_draw(); ppm("zp12-output");   /* GLO three times: OUTPUT, SMOOTH */
     if (ui.page != PG_OUTPUT || sp_smooth) { printf("zp12 ui: GLO > OUTPUT > SMOOTH off FAIL\n"); return 1; }
     knob(0, 1);
     if (!sp_smooth) { printf("zp12 ui: SMOOTH on again FAIL\n"); return 1; }
+    page(PG_HOME); sq_post(RQ_REC, 0, 0); sq_block(); fm1_ms += 2000; ui_draw(); ppm("zp12-armed");   /* ARMED big */
+    if (!sq.rec_arm) { printf("zp12 ui: REC did not arm FAIL\n"); return 1; }
+    sq_post(RQ_PLAY, 0, 0); sq_block(); fm1_ms += 20; ui_draw(); ppm("zp12-count");               /* COUNT 4 */
+    sq_post(RQ_STOP, 0, 0); sq_block();
+    ui_holds(1u << B_REC, 1u << B_REC, 0); fm1_ms += 1500; ui_holds(1u << B_REC, 0, 0); ui_holds(0, 0, 1u << B_REC); sq_block();
+    if (!sq.rec_arm) { printf("zp12 ui: REC held 1.5 s was not a tap FAIL\n"); return 1; }
+    sq_post(RQ_REC, 0, 0); sq_block();
+    page(PG_SETUP); button(B_GLO); knob(1, 1); knob(2, 1); fm1_ms += 20; ui_draw(); ppm("zp12-click");   /* GLO > CLICK */
+    if (ui.page != PG_CLICK || sq.cin_bars != 2u || !sq.dub_bar) { printf("zp12 ui: GLO > CLICK > COUNT / DUB FAIL\n"); return 1; }
+    sq.cin_bars = 1; sq.dub_bar = 0;
+    page(PG_HOME); ui.held = 1u << B_GLO; ui.glo_used = 0; key_down(4, 0); key_down(5, 0);        /* GLO held: white 3 mutes CH3 (a black key: nothing) */
+    { uint32_t l, kk, gg; ui_leds(&l, &kk, &gg); if (!((kk >> 4) & 1u) || kk != 1u << 4) { printf("zp12 ui: GLO held does not show the mutes FAIL\n"); return 1; } }
+    ui.held = 0; fm1_ms += 20; ui_draw(); ppm("zp12-mute");
+    if (sp_mute != 4u || sp_solo != 0u || !ui.glo_used) { printf("zp12 ui: GLO + white key 3 did not mute CH3 FAIL\n"); return 1; }
+    ui.held = 1u << B_GLO; key_down(21, 0); ui.held = 0; fm1_ms += 2000; ui_draw(); ppm("zp12-solo");   /* white 13: solo CH5 */
+    if (sp_solo != 16u) { printf("zp12 ui: GLO + white key 13 did not solo CH5 FAIL\n"); return 1; }
+    sp_mute = sp_solo = 0;
+    ui.sel = 2; sp_sound[2].chan = 4; page(PG_OUT); i = sp_sound[2].cut; knob(2, 3); fm1_ms += 20; ui_draw(); ppm("zp12-out");
+    if (sp_sound[2].cut != i || strcmp(ui.msg, "FILTER CH1-2")) { printf("zp12 ui: CUT on CH5 not refused FAIL\n"); return 1; }
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;
 }

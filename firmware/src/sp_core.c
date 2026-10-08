@@ -56,12 +56,14 @@ typedef struct {
     uint8_t on;
     uint8_t jump;                       /* the signal jumps next sample (a hit cut, a sample's end): SMOOTH bridges it */
     int32_t dc, last;                   /* SMOOTH: what bridges the jump, dying away; the last output */
+    int32_t quiet;                      /* MUTE / SOLO: how far down, Q12 (0 heard, 4096 silent), ramped */
 } sp_ch_t;
 
 static sp_wave_t sp_wave[64];
 static sp_sound_t sp_sound[SP_NSOUND];
 static sp_ch_t sp_ch[SP_NCH];
 static uint8_t sp_mix[SP_NCH] = {100, 100, 100, 100, 100, 100, 100, 100};   /* the channel faders, 0..127 */
+static uint8_t sp_mute, sp_solo;        /* GLO held + white key: channels muted, soloed (a solo silences the others) */
 static uint8_t sp_smooth = 1;            /* GLO > OUTPUT > SMOOTH: a jump in a channel's signal bridged in ~1 ms (no click) */
 static int32_t sp_bus[3][SP_BLK];       /* the send buses of the block: chorus, delay, reverb (mono, Q15) */
 
@@ -205,9 +207,14 @@ static void sp_channel(uint32_t ch, int32_t *out)
 {
     sp_ch_t *c = &sp_ch[ch];
     uint32_t i;
-    int32_t a1 = 0, k = 0, x, y, e0, e1, gl, gr;
-    if (!c->on && !c->tail)
+    int32_t a1 = 0, k = 0, x, y, e0, e1, gl, gr, q0 = c->quiet, q1;
+    int32_t qt = (sp_solo ? !((sp_solo >> ch) & 1u) : (sp_mute >> ch) & 1u) ? 4096 : 0;
+    q1 = q0 < qt ? (q0 + 1024 < qt ? q0 + 1024 : qt) : (q0 - 1024 > qt ? q0 - 1024 : qt);   /* (~3 ms: no click) */
+    c->quiet = q1;
+    if (!c->on && !c->tail) {
+        c->quiet = qt;                                /* (silent anyway: there at once) */
         return;
+    }
     e0 = c->env >> 9;                                 /* Q15: the envelope now, and at the block's end: the level */
     e1 = (int32_t)(((int64_t)c->env * c->emul) >> 16) >> 9;   /* ramps between them (no steps at the block rate) */
     gl = c->gl * sp_mix[ch] * sp_mix[ch] / 10000;     /* the fader, an audio taper as the original's sliders: */
@@ -264,6 +271,8 @@ static void sp_channel(uint32_t ch, int32_t *out)
         y += c->dc;
         c->dc -= c->dc / 24;                          /* (gone in ~1 ms: e^-1 every 24 samples) */
         c->last = y;
+        if (q0 | q1)                                  /* muted: the channel plays on, unheard (sends too) */
+            y = (y * (4096 - (q0 + (((q1 - q0) * (int32_t)i) >> 5)))) >> 12;
         out[2u * i] += (y * gl) >> 12;
         out[2u * i + 1u] += (y * gr) >> 12;
         if (c->snd[0] | c->snd[1] | c->snd[2]) {      /* the sends: post fader, before pan */

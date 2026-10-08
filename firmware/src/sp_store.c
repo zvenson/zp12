@@ -45,7 +45,7 @@ static uint32_t zs_pack(uint8_t *b)
     p = zs_put(p, sq_songs, sizeof sq_songs);
     p = zs_put(p, sq_song_len, sizeof sq_song_len);
     {
-        uint16_t u[4] = {ui.back, (uint16_t)(sp_smooth + 1u), 0, 0};   /* (room for more of the UI's settings) */
+        uint16_t u[4] = {ui.back, (uint16_t)(sp_smooth + 1u), (uint16_t)(sq.cin_bars + 1u), (uint16_t)(sq.dub_bar + 1u)};   /* (0: an older save) */
         p = zs_put(p, u, sizeof u);
     }
     for (i = 0; i < SQ_NSEG; i++) {
@@ -88,9 +88,13 @@ static int zs_unpack(const uint8_t *b, uint32_t len, uint32_t ver)
         p = zs_get(p, u, sizeof u);
         ui.back = (uint8_t)(u[0] < 5u ? u[0] : 1u);
         sp_smooth = (uint8_t)(u[1] != 1u);       /* (0: an older save: on; 1: off; 2: on) */
+        sq.cin_bars = (uint8_t)(u[2] ? (u[2] - 1u) % 3u : 1u);   /* (an older save: a bar, overdub at once) */
+        sq.dub_bar = (uint8_t)(u[3] == 2u);
     } else {
         ui.back = 1;                              /* (an older save: 12 s, SMOOTH on) */
         sp_smooth = 1;
+        sq.cin_bars = 1;
+        sq.dub_bar = 0;
     }
     sq.bpm10 = (uint16_t)sp_clamp(st[0], 400, 2400);
     sq.quant = (uint8_t)(st[1] % 7u);
