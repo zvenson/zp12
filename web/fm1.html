@@ -40,84 +40,105 @@
   {"@type": "Question", "name": "Why only open-source firmwares?", "acceptedAnswer": {"@type": "Answer", "text": "The hub lists only firmwares released as free software with their source (GPL-3.0), so every package can be mirrored, checked and kept available, and anyone can see what it does."}},
   {"@type": "Question", "name": "Is it always the newest version?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The hub checks every firmware's repository every night and offers the newest release, checked before it is listed."}}]}]}
 </script>
-<meta name="theme-color" content="#f6f5f1">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233b4bf5'/%3E%3Ctext x='16' y='21' font-family='Arial' font-weight='900' font-size='12' text-anchor='middle' fill='%23fff'%3EFM1%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#151213">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23151213'/%3E%3Ctext x='16' y='21' font-family='Arial' font-weight='900' font-size='12' text-anchor='middle' fill='%2342f5f5'%3EFM1%3C/text%3E%3C/svg%3E">
 <style>
-  :root { --bg: #f6f5f1; --paper: #ffffff; --ink: #1b1e27; --dim: #5d6474; --mute: #8a90a0; --line: #e6e4dd;
-          --pri: #3b4bf5; --ok: #11a36a; --err: #d93b3b; --warn: #b7791f; --shadow: 0 1px 2px rgba(20, 24, 40, .05), 0 12px 40px rgba(20, 24, 40, .07); }
+  /* designburgapps.com's look: warm dark, cyan / blue / pink / beige */
+  :root { --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435; --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9;
+          --cyan: #42f5f5; --blue: #afd9f4; --pink: #f4c0cb; --beige: #e6d1b9; --ok: #5fe3a1; --warn: #f2c46d; }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.65 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-  a { color: var(--pri); text-decoration: none; } a:hover { text-decoration: underline; }
-  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
-  header { padding: 88px 0 56px; text-align: center; }
-  .eyebrow { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin: 0 0 18px; font-weight: 700; }
-  h1 { font-size: clamp(40px, 6.4vw, 82px); line-height: 1.02; margin: 0 0 22px; font-weight: 300; letter-spacing: -1.5px; }
-  h1 b { font-weight: 900; position: relative; background: linear-gradient(100deg, #3b4bf5, #8a5cff 45%, #ff3b6b); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .lead { font-size: 20px; color: var(--dim); max-width: 36em; margin: 0 auto 34px; }
+  html { color-scheme: dark; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16.5px/1.65 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--cyan); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { margin: 0 auto; padding: 0 clamp(16px, 4vw, 72px); width: 100%; }   /* full width: the gutter grows with the window */
+  nav { border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+  .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; } .mark:hover { text-decoration: none; }
+  .mark b { font-weight: 800; color: var(--cyan); }
+  nav .home { font-size: 14px; color: var(--dim); }
+  .strip { display: flex; height: 4px; } .strip i { flex: 1; }
+  .strip i:nth-child(1) { background: var(--cyan); } .strip i:nth-child(2) { background: var(--blue); }
+  .strip i:nth-child(3) { background: var(--pink); } .strip i:nth-child(4) { background: var(--beige); }
+  header { padding: 72px 0 52px; text-align: center;
+           background: radial-gradient(900px 420px at 80% 20%, rgba(66, 245, 245, .10), transparent 70%),
+                       radial-gradient(700px 380px at 5% 100%, rgba(244, 192, 203, .08), transparent 70%); }
+  .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 16px; }
+  h1 { font-size: clamp(42px, 6.4vw, 84px); line-height: 1.04; font-weight: 300; margin: 0 0 22px; letter-spacing: -.5px; }
+  h1 b { font-weight: 800; background: linear-gradient(90deg, var(--cyan), var(--blue) 45%, var(--pink) 75%, var(--beige));
+         -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 20px; color: var(--text); max-width: 36em; margin: 0 auto 34px; }
   .lineup { display: flex; justify-content: center; gap: 14px; margin: 0 0 40px; flex-wrap: wrap; }
-  .lineup img { width: 76px; height: 76px; border-radius: 14px; object-fit: cover; box-shadow: var(--shadow); background: #0e1016; image-rendering: pixelated; }
+  .lineup img { width: 76px; height: 76px; border-radius: 12px; object-fit: cover; border: 1px solid var(--line); background: #0e0c0d; image-rendering: pixelated; }
   .bar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; align-items: center; }
-  button, .btn { font-family: inherit; font-weight: 700; font-size: 15.5px; line-height: 1; padding: 15px 24px; border-radius: 999px; border: 0;
-                 cursor: pointer; background: var(--pri); color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
-                 transition: transform .08s, filter .15s; }
-  button:hover, .btn:hover { filter: brightness(1.08); text-decoration: none; transform: translateY(-1px); }
-  button.ghost, .btn.ghost { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
-  button:disabled { opacity: .45; cursor: default; filter: none; transform: none; }
-  .status { font: 600 15px/1.4 ui-monospace, "SF Mono", Menlo, monospace; background: var(--paper); border-radius: 999px; padding: 14px 22px;
-            color: var(--dim); box-shadow: inset 0 0 0 1.5px var(--line); }
+  button, .btn { font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1; padding: 15px 24px; border-radius: 10px; border: 0;
+                 cursor: pointer; background: var(--cyan); color: #121011; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+                 text-decoration: none; transition: transform .08s, filter .15s; }
+  button:hover, .btn:hover { filter: brightness(1.1); text-decoration: none; transform: translateY(-1px); }
+  button.ghost, .btn.ghost { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); }
+  button.ghost:hover, .btn.ghost:hover { box-shadow: inset 0 0 0 1px var(--beige); }
+  button:disabled { opacity: .4; cursor: default; filter: none; transform: none; }
+  .status { font: 600 14.5px/1.4 ui-monospace, "SF Mono", Menlo, monospace; background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+            padding: 13px 20px; color: var(--dim); }
   .status b { color: var(--ok); }
-  .warn { background: #fff8e8; border-radius: 18px; padding: 18px 24px; color: #6b5a2e; margin: 46px auto 0; font-size: 15.5px; max-width: 900px; text-align: left; }
+  .warn { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--warn); border-radius: 12px; padding: 18px 24px;
+          color: var(--text); margin: 46px auto 0; font-size: 15px; max-width: 900px; text-align: left; }
   .warn b { color: var(--warn); }
-  main { padding: 20px 0 80px; }
-  h2.sec { font-size: 15px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin: 0 0 22px; font-weight: 700; text-align: center; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px; }
-  .fw { background: var(--paper); border-radius: 24px; padding: 0 28px 26px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow);
-        overflow: hidden; transition: transform .15s; }
-  .fw .shot { margin: 0 -28px 8px; height: 250px; background: #0e1016; display: grid; place-items: center; border-bottom: 5px solid var(--c); }
-  .fw .shot img { height: 210px; width: 210px; border-radius: 10px; image-rendering: pixelated; box-shadow: 0 6px 30px rgba(0, 0, 0, .5); }
-  .fw .shot.wide img { width: 100%; height: 100%; object-fit: contain; border-radius: 0; box-shadow: none; image-rendering: auto; }
-  .fw h3 .logo { width: 30px; height: 30px; vertical-align: -5px; margin-right: 8px; border-radius: 7px; }
-  .fw:hover { transform: translateY(-2px); }
-  .fw.now { box-shadow: 0 0 0 3px var(--ok), var(--shadow); }
+  main { padding: 24px 0 80px; }
+  h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 24px; font-weight: 600; text-align: center; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (min-width: 2000px) { .grid { grid-template-columns: repeat(6, 1fr); } }
+  @media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  .fw { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 0 26px 24px; display: flex;
+        flex-direction: column; gap: 12px; overflow: hidden; transition: transform .12s, border-color .15s, background .15s; }
+  .fw:hover { transform: translateY(-3px); border-color: var(--c); background: var(--panel2); }
+  .fw.now { border-color: var(--ok); box-shadow: 0 0 0 1px var(--ok); }
+  .fw .shot { --h: clamp(250px, 19vw, 340px); margin: 0 -26px 8px; height: var(--h); background: #0e0c0d; display: grid; place-items: center; border-bottom: 4px solid var(--c); }
+  .fw .shot img { height: calc(var(--h) * .82); width: calc(var(--h) * .82); border-radius: 8px; image-rendering: pixelated; box-shadow: 0 8px 34px rgba(0, 0, 0, .6); }
+  .fw .shot.wide img { width: 100%; height: var(--h); object-fit: contain; border-radius: 0; box-shadow: none; image-rendering: auto; }
   .fw .head { display: flex; gap: 18px; align-items: center; }
-  .fw h3 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.3px; line-height: 1.1; }
-  .fw h3 small { font-size: 14px; font-weight: 600; color: var(--mute); margin-left: 6px; }
-  .tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; }
-  .tag.now { background: #dff6ea; color: var(--ok); }
-  .tag.beta { background: #fff1d6; color: var(--warn); }
-  .by { color: var(--dim); font-size: 14.5px; margin-top: 2px; }
-  .what { color: #3a404d; font-size: 16px; flex: 1; margin: 4px 0 0; }
-  .meta { color: var(--mute); font-size: 13px; }
-  .meta a { color: var(--dim); }
-  .fw button.go { background: var(--c); width: 100%; margin-top: 6px; }
+  .fw h3 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -.3px; line-height: 1.1; color: var(--c); }
+  .fw h3 small { font-size: 14px; font-weight: 600; color: var(--dim); margin-left: 8px; }
+  .fw h3 .logo { width: 30px; height: 30px; vertical-align: -5px; margin-right: 8px; border-radius: 7px; }
+  .tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 6px; }
+  .tag.now { background: rgba(95, 227, 161, .14); color: var(--ok); }
+  .tag.beta { background: rgba(242, 196, 109, .14); color: var(--warn); }
+  .by { color: var(--dim); font-size: 14.5px; margin-top: 4px; }
+  .what { color: var(--text); font-size: 15.5px; flex: 1; margin: 4px 0 0; }
+  .meta { color: var(--dim); font-size: 13px; }
+  .meta a { color: var(--dim); text-decoration: underline; text-decoration-color: var(--line); }
+  .fw button.go { background: var(--c); color: #121011; width: 100%; margin-top: 6px; }
   progress { width: 100%; height: 8px; display: none; accent-color: var(--c); }
   .fw .msg { font-size: 14px; color: var(--dim); min-height: 1.2em; }
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 56px; }
-  .card { background: var(--paper); border-radius: 24px; padding: 32px; box-shadow: var(--shadow); }
-  .card h3 { margin: 0 0 10px; font-size: 22px; font-weight: 800; }
-  .card p { color: #3a404d; margin: 8px 0; }
-  .mailcta { background: linear-gradient(135deg, #3b4bf5, #8a5cff); color: #fff; }
-  .mailcta h3, .mailcta p { color: #fff; }
-  .mailcta .btn { background: #fff; color: #3b4bf5; }
-  .mailcta .meta, .mailcta .meta a { color: rgba(255, 255, 255, .85); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px; }
+  .card { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 30px 28px; overflow: hidden; }
+  .card::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--c, var(--beige)); }
+  .card h3 { margin: 0 0 10px; font-size: 24px; font-weight: 300; } .card h3 b { font-weight: 800; color: var(--c, var(--beige)); }
+  .card p { color: var(--text); margin: 8px 0; }
+  .card code { color: var(--cyan); }
+  .mailcta { --c: var(--pink); }
+  .mailcta .btn { background: var(--pink); }
   input[type=file] { color: var(--dim); font-size: 14px; }
-  label.chk { display: flex; gap: 10px; align-items: center; color: #3a404d; font-size: 15px; margin: 12px 0; }
-  .faq { margin-top: 72px; } .faq .qa { max-width: 820px; margin: 0 auto 26px; }
-  .faq h3 { font-size: 19px; margin: 0 0 6px; font-weight: 800; } .faq p { margin: 0; color: #3a404d; }
+  label.chk { display: flex; gap: 10px; align-items: center; color: var(--text); font-size: 15px; margin: 12px 0; }
+  .faq { margin-top: 72px; } .faq .qas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 48px; } .faq .qa { margin: 0 0 22px; }
+  .faq h3 { font-size: 19px; margin: 0 0 6px; font-weight: 700; color: var(--fg); } .faq p { margin: 0; color: var(--text); }
+  .faq b { color: var(--fg); }
   details { margin-top: 40px; text-align: center; } summary { cursor: pointer; color: var(--dim); }
   details p { max-width: 760px; margin: 12px auto; text-align: left; }
-  pre#log { white-space: pre-wrap; font-size: 12px; color: var(--mute); max-height: 180px; overflow: auto; text-align: left; }
-  footer { color: var(--mute); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
-  footer .wrap { max-width: 860px; } footer a { color: var(--dim); }
-  @media (max-width: 760px) { header { padding: 54px 0 36px; } .two { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; gap: 20px; }
-    .bar > * { width: 100%; } .fw, .card { padding: 24px; } .wrap { padding: 0 16px; } .lead { font-size: 17px; }
-    .lineup { gap: 8px; } .lineup img { width: 48px; height: 48px; border-radius: 10px; } .fw .shot { margin: 0 -24px 8px; }
-    .status { font-size: 13px; } .warn { padding: 16px 18px; font-size: 14.5px; } .eyebrow, h2.sec { letter-spacing: 1.5px; font-size: 12px; }
-    .fw .shot { height: 220px; } .fw .shot img { width: 190px; height: 190px; } }
+  pre#log { white-space: pre-wrap; font-size: 12px; color: var(--dim); max-height: 180px; overflow: auto; text-align: left; }
+  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
+  footer .wrap { max-width: 900px; } footer a { color: var(--text); }
+  @media (max-width: 760px) { header { padding: 52px 0 36px; } .two { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; gap: 18px; }
+    .bar > * { width: 100%; } .fw { padding: 0 22px 22px; } .card { padding: 26px 22px; } .wrap { padding: 0 16px; } .lead { font-size: 18px; }
+    .lineup { gap: 8px; } .lineup img { width: 48px; height: 48px; border-radius: 8px; } .fw .shot { margin: 0 -22px 8px; --h: 220px; }
+    .faq .qas { grid-template-columns: 1fr; } .status { font-size: 13px; } .warn { padding: 16px 18px; font-size: 14.5px; }
+    .eyebrow, h2.sec { letter-spacing: 1.5px; font-size: 12px; } nav .home { display: none; } }
 </style>
 </head>
 <body>
+<nav><div class="wrap"><a class="mark" href="https://fm1.designburgapps.com/">FM-1 <b>Firmware Hub</b></a>
+  <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
+<div class="strip"><i></i><i></i><i></i><i></i></div>
 <header><div class="wrap">
   <p class="eyebrow">The FM-1 Firmware Hub · open source only</p>
   <h1>Make <b>Firmware</b>,<br>Not War.</h1>
@@ -142,7 +163,7 @@
 
   <div class="two">
     <section class="card">
-      <h3>Back to the official firmware</h3>
+      <h3>Back to the <b>official firmware</b></h3>
       <p>Download <b>FM-1 V15</b> from <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>
          (PC Firmware → FM-1) and choose the file here: only that exact file is accepted.</p>
       <p><input type="file" id="stock-file" accept=".fwsc"></p>
@@ -151,7 +172,7 @@
       <p class="meta" id="stock-msg"></p>
     </section>
     <section class="card mailcta">
-      <h3>Want to show your firmware here?</h3>
+      <h3>Want to show <b>your firmware</b> here?</h3>
       <p>Made an open-source firmware for the FM-1? Free, with its source (GPL-3.0), released as a <code>.fwsc</code> on GitHub: join in. It goes on this
          page with your name and your links, and follows every release you make.</p>
       <p><a class="btn" href="mailto:sven@designburg.net?subject=FM-1%20Firmware%20Hub%3A%20my%20firmware&amp;body=Name%3A%0ARepository%3A%0AWhat%20it%20does%3A%0A">Send a mail to sven@designburg.net</a></p>
@@ -161,7 +182,7 @@
   </div>
 
   <section class="faq">
-    <h2 class="sec">Questions</h2>
+    <h2 class="sec">Questions</h2><div class="qas">
     <div class="qa"><h3>Which custom firmwares are there for the M-VAVE FM-1?</h3>
       <p>Six, all free and open source (GPL-3.0): <b>Felucca</b>, the custom firmware the others build on; <b>SLOOP</b>, a live
          groovebox; <b>sloopDX</b>, SLOOP with a DX7 inside; <b>zp12</b>, a 12-bit sampling drum machine; <b>X0X</b>, 909/808 drums and
@@ -178,7 +199,7 @@
     <div class="qa"><h3>How do I go back to the official firmware?</h3>
       <p>Download FM-1 V15 from m-vave.com and install it with the box above. If the FM-1 is stuck, hold OCT− while switching it on
          (USB rescue) and install again.</p></div>
-  </section>
+  </div></section>
 
   <details><summary>What happens when you press Install</summary>
     <p class="meta">The page talks to the FM-1 over USB MIDI with the same update protocol as M-VAVE's own updater (first the running
@@ -227,7 +248,7 @@ function showNow() {
 }
 
 // each firmware's colour and picture: its own screen, from its repository (SLOOP: its logo too)
-const LOOK = { felucca: "#2d8cff", sloop: "#16a571", sloopdx: "#00a3b4", zp12: "#ff8a00", x0x: "#ff3b6b", fomni: "#8a5cff" };
+const LOOK = { felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx: "#42f5f5", zp12: "#ff6a3d", x0x: "#f4c0cb", fomni: "#c9b6ff" };   // (designburgapps.com's palette)
 const LOGO = { sloop: "img/sloop-icon.png" };
 function lineup() {
   $("lineup").innerHTML = cat.map((f) => `<img src="img/${esc(f.id)}.png" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy">`).join("");
