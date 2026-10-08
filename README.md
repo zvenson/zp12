@@ -23,6 +23,9 @@
   <img src="web/img/mute.png" width="200" alt="mute and solo">
 </p>
 
+<p align="center"><a href="https://zp12.designburgapps.com/editor/"><img src="web/img/sampling.png" width="820" alt="New in 2.0: sampling in the browser"></a><br>
+<sub>New in 2.0: sample from a microphone, an interface or the line-in in the <a href="https://zp12.designburgapps.com/editor/">editor</a>, trim it, onto a pad.</sub></p>
+
 # zp12
 
 A 12-bit sampling drum machine for the **M-VAVE FM-1**: 32 sounds at 26.04 kHz (or 27.5 kHz), pitched
