@@ -54,7 +54,7 @@ static struct {
     uint8_t sel;                                /* the sound the knobs edit, 0..31 */
     uint8_t page;
     uint8_t multi;                              /* MULTI PITCH */
-    uint8_t shift;                              /* SEL held: the faders 5-8 */
+    uint8_t shift;                              /* SEL pressed (lit): the knobs are the faders 5-8 */
     uint8_t steps;                              /* SEQ held: the step grid on the keys */
     uint8_t step_bar;                           /* the bar the step grid shows */
     uint8_t song_cur;                           /* SONG page: the step under the knobs */
@@ -138,7 +138,7 @@ static void page_cols(char lab[4][8], char val[4][8])
     uint32_t i;
     for (i = 0; i < 4u; i++) lab[i][0] = val[i][0] = 0;
 #define COL(i, l, ...) do { cat(lab[i], l); __VA_ARGS__; } while (0)
-    switch (ui.shift ? (uint32_t)PG_HOME : ui.page) {   /* (SEL held: the faders 5-8 on every page) */
+    switch (ui.page) {
     case PG_HOME:
         for (i = 0; i < 4u; i++) {
             uint32_t c = (ui.shift ? 4u : 0u) + i;
@@ -221,7 +221,7 @@ static void page_cols(char lab[4][8], char val[4][8])
 }
 
 /* ---- the regions */
-static uint32_t on_page(void) { return ui.page != PG_HOME && !ui.shift; }   /* the knobs are a page's, not the faders */
+static uint32_t on_page(void) { return ui.page != PG_HOME; }   /* the knobs are a page's, not the faders */
 
 static void draw_head(void)                     /* the header: the name; on a page where you are (EDIT > SOUND) */
 {
@@ -322,7 +322,7 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
     {   /* top right, small: the tempo (REC / COUNT / ARMED before it), below it the page; what does not fit
          * beside the big line is left out (the big line wins) */
         int32_t bw = 10 + text_w(&FONT_L, big) + 6;
-        const char *pg = ui.page == PG_HOME || ui.shift ? "BPM" : PG_NAME[ui.page];
+        const char *pg = ui.page == PG_HOME ? "BPM" : PG_NAME[ui.page];
         const char *st = sq.playing && sq.countin > 0 ? "COUNT " : sq.recording ? "REC " : sq.rec_arm ? "ARMED " : "";
         p = cat(small, st);
         num(p, (int32_t)(bpm / 10u), 3, 0);
@@ -356,7 +356,7 @@ static void draw_faders(void)                   /* the eight channel levels; a c
     for (i = 0; i < SP_NCH; i++) {
         int32_t cx = 14 + (int32_t)i * 29, y = (int32_t)fader_y(ui.mix[i]);
         int on = (int32_t)(fm1_ms - ui.chan_ms[i]) < 90 && sp_ch[i].on;
-        int knobbed = (ui.page == PG_HOME || ui.shift) && (i >= 4u) == (ui.shift != 0);
+        int knobbed = ui.page == PG_HOME && (i >= 4u) == (ui.shift != 0);
         char n[2] = {(char)('1' + i), 0};
         cv_rect(cx - 1, 3, 3, 46, P_SLOT);
         cv_rect(cx - 9, y, 19, 7, on ? P_LED : P_CAP);
@@ -506,7 +506,7 @@ static void ui_draw(void)
         } else {                                 /* the faders */
             for (i = 0; i < SP_NCH; i++)
                 on |= (uint32_t)((int32_t)(fm1_ms - ui.chan_ms[i]) < 90 && sp_ch[i].on) << i;
-            s = sig_of(ui.mix, sizeof ui.mix, on * 2654435761u ^ ui.shift * 3u ^ (ui.page == PG_HOME || ui.shift) * 5u) | 1u;
+            s = sig_of(ui.mix, sizeof ui.mix, on * 2654435761u ^ ui.shift * 3u ^ (ui.page == PG_HOME) * 5u) | 1u;
             if (s != ui.sig_mid || ui.force) { ui.sig_mid = s; draw_faders(); }
         }
         for (i = 0; i < 8u; i++)
@@ -679,9 +679,9 @@ static void knob(uint32_t n, int32_t d)
     sp_sound_t *s = &sp_sound[ui.sel];
     int32_t one = d > 0 ? 1 : -1, dd = accel(d);
     ui.touch_ms = fm1_ms;
-    switch (ui.shift ? (uint32_t)PG_HOME : ui.page) {   /* SEL held: the faders 5-8, whatever page is open */
+    switch (ui.page) {
     case PG_HOME: {
-        uint32_t c = (ui.shift ? 4u : 0u) + n;     /* the faders: channels 1-4, SEL held 5-8 */
+        uint32_t c = (ui.shift ? 4u : 0u) + n;     /* the faders: channels 1-4, SEL lit 5-8 */
         ui.mix[c] = (uint8_t)sp_clamp(ui.mix[c] + dd, 0, 127);
         sp_mix[c] = ui.mix[c];
         break;
@@ -823,6 +823,11 @@ static void button(uint32_t b)
         break;
     case B_ARP: ui.multi ^= 1u; break;
     case B_HOME: page(PG_HOME); break;
+    case B_SEL:                                  /* the faders 5-8 (lit) or 1-4, until pressed again; from a page: the faders */
+        ui.shift ^= 1u;
+        page(PG_HOME);
+        ui_say(ui.shift ? "FADERS 5-8" : "FADERS 1-4");
+        break;
     case B_EDIT: ui.prev_page = ui.page; page(ui.page >= PG_WAVE && ui.page < PG_SFX ? ui.page + 1u : PG_WAVE); break;
     case B_FX: page(ui.page >= PG_FILT && ui.page < PG_REV ? ui.page + 1u : PG_FILT); break;
     case B_SEQ: page(ui.page == PG_SEG ? PG_SEG2 : ui.page == PG_SEG2 ? PG_SONG : PG_SEG); break;

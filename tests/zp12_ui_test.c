@@ -83,9 +83,16 @@ int main(int argc, char **argv)
     if (sq_seg[0].n != 5u || ui.page != PG_HOME) { printf("zp12 ui: EDIT + OCT- did not undo FAIL\n"); return 1; }
     fm1_ms += 2000; ui_holds(1u << B_SAVE, 1u << B_SAVE, 0); key_down(3, 0); sq_block(); ui_holds(0, 0, 1u << B_SAVE); ui_draw(); ppm("zp12-saveloop");
     if (sq_seg[1].n != 5u || ui.save_req != 1u) { printf("zp12 ui: SAVE + a black key did not save the loop FAIL\n"); return 1; }
-    page(PG_SEG); ui.shift = 1; i = ui.mix[4]; knob(0, -3); fm1_ms += 20; ui_draw(); ppm("zp12-sel");
-    if (ui.mix[4] == i || sq.seg != 0u) { printf("zp12 ui: SEL held on the LOOP page did not move fader 5 FAIL\n"); return 1; }
-    ui.shift = 0;
+    page(PG_SEG); ui.shift = 0; i = ui.mix[4]; button(B_SEL); knob(0, -3); fm1_ms += 20; ui_draw(); ppm("zp12-sel");
+    if (!ui.shift || ui.page != PG_HOME || ui.mix[4] == i || sq.seg != 0u) { printf("zp12 ui: SEL on the LOOP page did not give the faders 5-8 FAIL\n"); return 1; }
+    {   /* lit, a page open: the knobs are the page's, the faders stay */
+        uint8_t m = ui.mix[4];
+        page(PG_SOUND); knob(0, 1);
+        if (ui.mix[4] != m || ui.page != PG_SOUND) { printf("zp12 ui: a page with SEL lit FAIL\n"); return 1; }
+    }
+    { uint32_t l; ui_leds(&l, &i, &i); if (!((l >> B_SEL) & 1u)) { printf("zp12 ui: SEL not lit FAIL\n"); return 1; } }
+    button(B_SEL);                                          /* again: 1-4, and the faders */
+    if (ui.shift || ui.page != PG_HOME) { printf("zp12 ui: SEL again did not give 1-4 FAIL\n"); return 1; }
     {   /* an own sample (the web editor's): PRESETS finds it after the kit, shows its name, skips the empty places */
         static uint8_t snd[300];
         sp_wave[KIT_NWAVE + 3].d = snd; sp_wave[KIT_NWAVE + 3].n = 200; sp_wave[KIT_NWAVE + 3].rate = 26040;

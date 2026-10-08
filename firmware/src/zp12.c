@@ -253,7 +253,6 @@ static void zp12_main(void)
         prev_notes = n;
         {   /* SEL held: the faders 5-8; LFO held: ERASE (the pads held lose their hits as the playhead passes) */
             uint32_t bt = fm1_in.buttons, er = 0, k;
-            ui.shift = (uint8_t)((bt >> B_SEL) & 1u);
             ui.held = bt;                               /* (SAVE held + a black key: key_down) */
             if ((bt >> B_LFO) & 1u)
                 for (k = 0; k < 27u; k++)
