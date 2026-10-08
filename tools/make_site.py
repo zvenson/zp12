@@ -9,7 +9,7 @@
   the start page (web/cheatsheet.html's sheet and its scoped style, <!--CHEATSHEET-->), cheatsheet.html only sends
   old links there
 Usage: make_site.py <sloopdx repo> build/zp12-X.Y.fwsc X.Y [video.mp4]"""
-import shutil, sys
+import shutil, subprocess, sys
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parents[1]
@@ -64,6 +64,9 @@ def main(sloopdx, pkg, version, video=None):
     sheet = cs[cs.index("<!--cs-->"):cs.index("<!--/cs-->") + 10]
     page = page.replace("</head>", style + "\n</head>", 1).replace("<!--CHEATSHEET-->", sheet, 1)
     (docs / "index.html").write_text(page.replace("/*VER*/", version), encoding="utf-8")   # (the video by its hash: no stale cache)
+    snip = Path(sloopdx) / "tools" / "matomo_snippet.py"                                  # (the Matomo count, zp12's site ID)
+    if snip.exists():
+        subprocess.run([sys.executable, str(snip), *map(str, docs.rglob("*.html"))], check=True, capture_output=True)
     print(f"site: {docs} (start page, install/ {version}, cheat sheet, impressum, img/, video)")
 
 
