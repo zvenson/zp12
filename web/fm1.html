@@ -59,17 +59,18 @@
   .strip { display: flex; height: 4px; } .strip i { flex: 1; }
   .strip i:nth-child(1) { background: var(--cyan); } .strip i:nth-child(2) { background: var(--blue); }
   .strip i:nth-child(3) { background: var(--pink); } .strip i:nth-child(4) { background: var(--beige); }
-  header { padding: 72px 0 52px; text-align: center;
+  header { padding: 56px 0 44px;
            background: radial-gradient(900px 420px at 80% 20%, rgba(66, 245, 245, .10), transparent 70%),
                        radial-gradient(700px 380px at 5% 100%, rgba(244, 192, 203, .08), transparent 70%); }
   .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 16px; }
-  h1 { font-size: clamp(42px, 6.4vw, 84px); line-height: 1.04; font-weight: 300; margin: 0 0 22px; letter-spacing: -.5px; }
+  h1 { font-size: clamp(42px, 5.2vw, 88px); line-height: 1.04; font-weight: 300; margin: 0 0 22px; letter-spacing: -.5px; }
   h1 b { font-weight: 800; background: linear-gradient(90deg, var(--cyan), var(--blue) 45%, var(--pink) 75%, var(--beige));
          -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .lead { font-size: 20px; color: var(--text); max-width: 36em; margin: 0 auto 34px; }
-  .lineup { display: flex; justify-content: center; gap: 14px; margin: 0 0 40px; flex-wrap: wrap; }
-  .lineup img { width: 76px; height: 76px; border-radius: 12px; object-fit: cover; border: 1px solid var(--line); background: #0e0c0d; image-rendering: pixelated; }
-  .bar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; align-items: center; }
+  .hero { display: grid; grid-template-columns: 1fr minmax(0, 600px); gap: clamp(32px, 5vw, 96px); align-items: center; }
+  .lead { font-size: 18.5px; color: var(--text); max-width: 34em; margin: 0 0 28px; }
+  .lineup { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0 0 18px; }
+  .lineup img { width: 100%; height: auto; aspect-ratio: 1; border-radius: 12px; object-fit: cover; border: 1px solid var(--line); background: #0e0c0d; image-rendering: pixelated; }
+  .bar { display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap; align-items: center; }
   button, .btn { font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1; padding: 15px 24px; border-radius: 10px; border: 0;
                  cursor: pointer; background: var(--cyan); color: #121011; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
                  text-decoration: none; transition: transform .08s, filter .15s; }
@@ -81,7 +82,7 @@
             padding: 13px 20px; color: var(--dim); }
   .status b { color: var(--ok); }
   .warn { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--warn); border-radius: 12px; padding: 18px 24px;
-          color: var(--text); margin: 46px auto 0; font-size: 15px; max-width: 900px; text-align: left; }
+          color: var(--text); margin: 0; font-size: 14px; line-height: 1.55; }
   .warn b { color: var(--warn); }
   main { padding: 24px 0 80px; }
   h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 24px; font-weight: 600; text-align: center; }
@@ -138,9 +139,10 @@
   pre#log { white-space: pre-wrap; font-size: 12px; color: var(--dim); max-height: 180px; overflow: auto; text-align: left; }
   footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
   footer .wrap { max-width: 900px; } footer a { color: var(--text); }
-  @media (max-width: 760px) { header { padding: 52px 0 36px; } .two { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; gap: 18px; }
+  @media (max-width: 1000px) { .hero { grid-template-columns: 1fr; } .lineup { grid-template-columns: repeat(6, 1fr); } }
+  @media (max-width: 760px) { header { padding: 40px 0 32px; } .two { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; gap: 18px; }
     .bar > * { width: 100%; } .fw { padding: 0 22px 22px; } .card { padding: 26px 22px; } .wrap { padding: 0 16px; } .lead { font-size: 18px; }
-    .lineup { gap: 8px; } .lineup img { width: 48px; height: 48px; border-radius: 8px; } .fw .shot { margin: 0 -22px 8px; --h: 220px; }
+    .lineup { gap: 6px; } .lineup img { border-radius: 6px; } .fw .shot { margin: 0 -22px 8px; --h: 220px; }
     .faq .qas { grid-template-columns: 1fr; } .status { font-size: 13px; } .warn { padding: 16px 18px; font-size: 14.5px; }
     .eyebrow, h2.sec { letter-spacing: 1.5px; font-size: 12px; } nav .home { display: none; } }
 </style>
@@ -149,22 +151,22 @@
 <nav><div class="wrap"><a class="mark" href="https://fm1.designburgapps.com/">FM-1 <b>Firmware Hub</b></a>
   <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
 <div class="strip"><i></i><i></i><i></i><i></i></div>
-<header><div class="wrap">
+<header><div class="wrap hero"><div>
   <p class="eyebrow">The FM-1 Firmware Hub · open source only</p>
   <h1>Make <b>Firmware</b>,<br>Not War.</h1>
   <p class="lead">Every open-source firmware for the M-VAVE FM-1 in one place: Felucca, SLOOP, sloopDX, zp12, X0X, FoMni. No need to pick a side. Connect your FM-1 by USB, choose one,
      press Install: about a minute, and it is a different instrument. Try them all, keep the one you love, switch back tomorrow.
      Chrome or Edge.</p>
-  <div class="lineup" id="lineup"></div>
   <div class="bar">
     <button id="connect">Connect the FM-1</button>
     <div class="status" id="now">Not connected</div>
     <a class="btn ghost" href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a>
-  </div>
+  </div></div>
+  <div><div class="lineup" id="lineup"></div>
   <div class="warn"><b>Back up first.</b> The firmwares keep their projects, presets and samples in the same flash and in different
     ways: after a switch the new one may not read the old one's data, or start empty. Save what you made with the backup of the
     firmware you are on (each project's page says how) before you switch. <b>Stuck?</b> Hold OCT− while switching the FM-1 on
-    (USB rescue), then install again.</div>
+    (USB rescue), then install again.</div></div>
 </div></header>
 
 <main><div class="wrap">

@@ -28,6 +28,10 @@ BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 # id, name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
 # latest release's .fwsc) or a path in this machine's checkouts (our own, deployed from there)
 FIRMWARES = [
+    dict(id="zp12", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
+         src="zp12:docs/install/firmware", site="https://zp12.designburgapps.com",
+         what="A 12-bit sampling drum machine in the spirit of the 80s: 26 kHz, pitched with nothing smoothed, "
+              "loops and songs, your own samples from the browser."),
     dict(id="felucca", name="Felucca", author="Leo Kuroshita (Hügelton Instruments)", repo="hugelton/Felucca",
          ident=r"FM-1_91\d", src="github",
          what="The custom firmware the others build on: the FM-1's own synth engines, a sequencer, effects and a "
@@ -39,10 +43,6 @@ FIRMWARES = [
          src="sloopdx:docs/firmware", site="https://dx7.designburgapps.com",
          what="SLOOP's live workflow with a real DX7 inside: six operators, 32 algorithms, your own .syx banks, "
               "FM drums you program."),
-    dict(id="zp12", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
-         src="zp12:docs/install/firmware", site="https://zp12.designburgapps.com",
-         what="A 12-bit sampling drum machine in the spirit of the 80s: 26 kHz, pitched with nothing smoothed, "
-              "loops and songs, your own samples from the browser."),
     dict(id="x0x", name="X0X", author="Charles Vestal", repo="charlesvestal/fm1-x0x", ident=r"FM-1_900\d{4}",
          src="github",
          what="A groovebox: 909 and 808 drums, two 303s with TB-3PO, a breakbeat generator and song mode."),
@@ -116,7 +116,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
             "mirror": f"src/{f['id']}-{version}.tar.gz" if rel_url else None,
             "beta": bool(re.search(r"beta|alpha|rc", version, re.I) or version.startswith("0."))})
         print(f"fm1_sync: {f['name']:8} {version:14} {date}  {ident:14} {len(raw)} B")
-    if [old.get(f["id"]) for f in cat] == cat and len(old) == len(cat):
+    if list(old.values()) == cat:                     # (the order counts too: it is the page's)
         print("fm1_sync: unchanged")
         return
     for p in (out / "fw").glob("*.fwsc"):
