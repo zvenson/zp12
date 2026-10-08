@@ -27,12 +27,12 @@ def main(sloopdx, pkg, version, out, own_site=False):
     html = html.replace("/*LIB*/", lib).replace("/*META*/", meta)
     swaps = [
         (r"<title>.*?</title>", "<title>zp12: a 12-bit sampling drum machine for the M-VAVE FM-1</title>"),
-        (r'<meta name="description" content=".*?">', '<meta name="description" content="zp12: 12-bit sampling drums for the M-VAVE FM-1, installed from Chrome or Edge. Early test build.">\n<meta name="robots" content="noindex">'),
+        (r'<meta name="description" content=".*?">', '<meta name="description" content="zp12: 12-bit sampling drums for the M-VAVE FM-1, installed from Chrome or Edge, free and open source.">'),
         (r'<meta property="og:title" content=".*?">', '<meta property="og:title" content="zp12">'),
         ("<!--LOGO-->", "<b>zp<span style=\"color:var(--led)\">12</span></b>"),
         (r'<div class="links">.*?</div>', '<div class="links"><a href="../">sloopDX</a><a href="../webapp/installer/">Back to sloopDX</a>'
          '<a class="gh" href="https://github.com/zvenson/zp12">GitHub</a></div>'),
-        ('<p class="eyebrow">Firmware for the M-VAVE FM-1</p>', '<p class="eyebrow">Early test build for the M-VAVE FM-1</p>'),
+        ('<p class="eyebrow">Firmware for the M-VAVE FM-1</p>', '<p class="eyebrow">Free firmware for the M-VAVE FM-1</p>'),
         ("<h1>Install <b>sloopDX</b></h1>", "<h1>Install <b>zp12</b></h1>"),
         (r'<p class="lead">.*?</p>', '<p class="lead">12-bit sampling drums in the spirit of the 80s: 32 sounds at 26.04 kHz, pitched without interpolation, eight channels with their filters. With the sequencer of such a machine (loops up to 32 bars, eleven of them on the black keys, a song, real-time recording, step editing, swing), the reverb and delay of sloopDX, and sampled chords, horns and bass from CC0 sources; it keeps your work in flash. Your own samples from the <a href="../editor/">sample editor</a>, a <a href="../backup/">backup</a> in the browser. Back to sloopDX any time with its installer.</p>'),
         (r'<div class="dxanim".*?</div>', ""),
