@@ -104,7 +104,7 @@ def latest_github(repo):
     rel = next(r for r in rels if not r["draft"] and any(a["name"].endswith(".fwsc") for a in r["assets"]))
     asset = next(a for a in rel["assets"] if a["name"].endswith(".fwsc"))
     return (get(asset["browser_download_url"], "application/octet-stream"), re.sub(r"^\D*", "", rel["tag_name"]),   # (v1.2, drum-v0.14.0: from the first digit)
-            rel["published_at"][:10], f"https://github.com/{repo}/releases/tag/{rel['tag_name']}",
+            rel["published_at"], f"https://github.com/{repo}/releases/tag/{rel['tag_name']}",
             f"https://github.com/{repo}/tree/{rel['tag_name']}")
 
 
@@ -122,7 +122,7 @@ def latest_local(spec, sloopdx):
         raise SystemExit(f"fm1_sync: no package in {root}")
     p = pkgs[-1]
     version = re.sub(r"^[a-z0-9]+-|\.fwsc$", "", p.name)
-    date = datetime.fromtimestamp(p.stat().st_mtime, timezone.utc).strftime("%Y-%m-%d")
+    date = datetime.fromtimestamp(p.stat().st_mtime, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     return p.read_bytes(), version, date, None, None
 
 
@@ -160,13 +160,14 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
             star = old.get(f["id"], {}).get("stars")
         cat.append({k: f[k] for k in ("id", "kind", "name", "author", "repo", "ident", "what")} | {
             "editor": f.get("editor"), "play": f.get("play"), "stars": star,
-            "site": f.get("site") or f"https://github.com/{f['repo']}", "version": version, "date": date,
+            "site": f.get("site") or f"https://github.com/{f['repo']}", "version": version, "date": date[:10],
+            "published": date,                        # (the time too: the page's "Recently updated" order)
             "pkg": "fw/" + name, "product": ident, "size": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
             "release": rel_url or f.get("site"), "source": src_url or f"https://github.com/{f['repo']}",
             "tag": rel_url.rsplit("/", 1)[-1] if rel_url else None,
             "mirror": f"src/{f['id']}-{version}.tar.gz" if rel_url else None,
             "beta": bool(re.search(r"beta|alpha|rc", version, re.I) or version.startswith("0."))})
-        print(f"fm1_sync: {f['name']:8} {version:14} {date}  {ident:14} {len(raw)} B")
+        print(f"fm1_sync: {f['name']:8} {version:14} {date[:10]}  {ident:14} {len(raw)} B")
     if list(old.values()) == cat:                     # (the order counts too: it is the page's)
         print("fm1_sync: unchanged")
         return

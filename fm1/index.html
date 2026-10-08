@@ -114,6 +114,15 @@
   .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 6px; }
   .tag.now { background: rgba(95, 227, 161, .14); color: var(--ok); }
   .tag.beta { background: rgba(242, 196, 109, .14); color: var(--warn); }
+  .tag.new { background: var(--cyan); color: #121011; }
+  .tag.upd { background: rgba(66, 245, 245, .14); color: var(--cyan); }
+  .recent { border-bottom: 1px solid var(--line); background: rgba(239, 232, 225, .03); font-size: 14px; }
+  .recent .wrap { display: flex; align-items: center; gap: 10px 22px; padding-top: 10px; padding-bottom: 10px; overflow-x: auto; white-space: nowrap; }
+  .recent .lbl { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--beige); font-weight: 600; }
+  .recent a { color: var(--text); display: inline-flex; align-items: center; gap: 8px; }
+  .recent a b { color: var(--c); font-weight: 800; } .recent a span { color: var(--dim); }
+  .recent a:hover { text-decoration: none; } .recent a:hover span { color: var(--fg); }
+  .recent .tag { padding: 2px 7px; font-size: 10px; }
   .by { color: var(--dim); font-size: 14.5px; margin-top: 4px; }
   .what { color: var(--text); font-size: 15.5px; flex: 1; margin: 4px 0 0; }
   .meta { color: var(--dim); font-size: 13px; }
@@ -169,6 +178,7 @@
 <nav><div class="wrap"><a class="mark" href="https://fm1.designburgapps.com/">FM-1 <b>Firmware Hub</b></a>
   <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
 <div class="strip"><i></i><i></i><i></i><i></i></div>
+<div class="recent" id="recent" hidden></div>
 <header><div class="wrap hero"><div>
   <p class="eyebrow">The FM-1 Firmware Hub · open source only</p>
   <h1>Make <b>Firmware</b>,<br>Not War.</h1>
@@ -623,7 +633,7 @@ function render() {
       <div class="head"><div>
         <h3>${LOGO[f.id] ? `<img class="logo" src="${LOGO[f.id]}" alt="">` : ""}${esc(f.name)}<small>${esc(f.version)}</small></h3>
         <div class="by">by ${esc(f.author)}</div>
-        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${f.beta ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag kind">${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
+        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${badge(f)}${f.beta ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag kind">${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
       <p class="what">${esc(f.what)}</p>
       <div class="meta">${esc(f.date)} · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
@@ -637,6 +647,31 @@ function render() {
     el.hidden = kind !== "all" && !kindsOf(f).includes(kind) && !isNow;          // (the one on your FM-1 stays in view)
     $("grid").append(el);
   }
+}
+
+// UPDATE: another version than on this browser's last visit (kept only here, in
+// localStorage: the versions seen, nothing else, never sent anywhere), else NEW: released in the last 3 days)
+const DAY = 864e5, SEEN_KEY = "fm1hub.seen";
+let seen = {};
+try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || "{}") || {}; } catch (e) { seen = {}; }
+const isNew = (f) => f.date && Date.now() - Date.parse(f.date + "T00:00:00Z") < 3 * DAY;
+const isUpd = (f) => seen[f.id] && seen[f.id] !== f.version;
+function badge(f) {
+  return isUpd(f) ? `<span class="tag upd" title="A new version since your last visit (was ${esc(seen[f.id])})">update</span>`
+       : isNew(f) ? `<span class="tag new" title="Released ${esc(f.date)}, in the last 3 days">new</span>` : "";
+}
+function remember() {
+  try { localStorage.setItem(SEEN_KEY, JSON.stringify(Object.fromEntries(cat.map((f) => [f.id, f.version])))); } catch (e) {}
+}
+// the bar at the top: the five newest releases, each a link to its release notes
+function recent() {
+  const l = [...cat].filter((f) => f.date).sort((a, b) => (b.published || b.date).localeCompare(a.published || a.date)).slice(0, 5);
+  if (!l.length) return;
+  const day = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  $("recent").innerHTML = `<div class="wrap"><span class="lbl">Recently updated</span>${l.map((f) =>
+    `<a href="${esc(f.release || f.site)}" target="_blank" rel="noopener" style="--c: ${LOOK[f.id] || "#3b4bf5"}" title="${esc(f.name)} ${esc(f.version)}: the release notes">` +
+    `<b>${esc(f.name)}</b> ${esc(f.version)} <span>${day(f.date)}</span>${badge(f)}</a>`).join("")}</div>`;
+  $("recent").hidden = false;
 }
 
 async function midi() {
@@ -723,7 +758,7 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   .then((r) => r.json()).then((c) => {
   cat = ordered(c.firmwares);
   $("count").textContent = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve"][cat.length] || cat.length;
-  $("updated").textContent = "catalogue of " + c.updated; lineup(); chips(); render();
+  $("updated").textContent = "catalogue of " + c.updated; lineup(); chips(); render(); recent(); remember();
   // ?demo=connected|install|done&now=<id>&fw=<id>&pct=N: the page in a state, for a video (no FM-1 needed)
   const q = new URLSearchParams(location.search), st = q.get("demo");
   if (!st) return;
