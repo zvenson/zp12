@@ -156,7 +156,7 @@
     <div class="card"><h3>Eight channels</h3><p>Every pad plays on a channel, one sound at a time: a new hit cuts the last. Channels 1–2 have a resonant 4-pole low-pass, open at the hit and closing with the decay, 3–6 a fixed one, 7–8 none.</p></div>
     <div class="card"><h3>Faders on the knobs</h3><p>KNOB 1–4 are the channel faders, SEL switches to 5–8 (lit) and back. The LCD's four columns always say what the knobs do now; a page lets go of them by itself.</p></div>
     <div class="card"><h3>Eleven loops</h3><p>The black keys are loops: stopped they switch at once, playing they wait for the end of the loop. Each its own length, 1–32 bars, or AUTO from your first take.</p></div>
-    <div class="card"><h3>Record and step</h3><p>Real time with a count-in and AUTO CORRECT from 1/8 to 1/32T, overdub, erase while it plays. Hold SEQ: the white keys are the 16 steps of a pad.</p></div>
+    <div class="card"><h3>Record and step</h3><p>Real time with a count-in (off, 1 or 2 bars) and AUTO CORRECT from 1/8 to 1/32T, overdub at once or from the next 1, erase while it plays, mute and solo the channels. Hold SEQ: the white keys are the 16 steps of a pad.</p></div>
     <div class="card"><h3>Swing in steps</h3><p>50, 54, 58, 63, 67, 71 %: the classic steps on the 16ths (or the 8ths). Tap tempo on ENV, the click on REC only or always.</p></div>
     <div class="card"><h3>Songs</h3><p>Four songs, each a chain of loops with repeats. The LCD shows where you are: S2.03 L4, song two, step three, loop four.</p></div>
     <div class="card"><h3>Four punch-ins</h3><p>Hold FX and a white key 1–4: the last 1/8 or 1/16 rolled on the grid, the last beat reversed, or a tape stop, on the whole mix while you hold it. What hands did to the old machines with tape and a turntable, no more.</p></div>
@@ -169,7 +169,7 @@
   <div>
     <h2>Make a beat</h2>
     <ol class="steps" style="margin-top:24px">
-      <li><span class="k red">REC</span> then <span class="k">PLAY</span>: a bar of count-in.</li>
+      <li><span class="k red">REC</span> (the LCD says ARMED) then <span class="k">PLAY</span>: COUNT 4 3 2 1, and it records.</li>
       <li>Play kick and snare on the white keys. AUTO CORRECT puts them on the 16ths.</li>
       <li><span class="k red">REC</span> again at the end: the loop is as long as your take.</li>
       <li>Hit the hat, <b>hold</b> <span class="k">SEQ</span>: the white keys are its 16 steps. Tap to set them, <span class="k">OCT+</span> for the next bar.</li>
@@ -209,7 +209,7 @@
       <tr><td>Sequencer</td><td>96 ticks a quarter, 16 loops of 1–32 bars, 512 hits each, 4 songs</td></tr>
       <tr><td>Effects</td><td>stereo chorus, tempo delay, FDN reverb with pre-delay (from sloopDX), a drive per pad</td></tr>
       <tr><td>Memory</td><td>everything saved in 0xC4000–0xD7FFF, two copies; sloopDX's data untouched</td></tr>
-      <tr><td>Own samples</td><td>the <a href="editor/">sample editor</a> in the browser: drop a WAV, trim it, hear it as the FM-1 plays it (converted to 12 bit bit for bit as the device's own code does), put it on a pad. 2.5 s free, 6.3 s with sloopDX's bank room. Recording into the FM-1 itself is not possible: it has no audio input.</td></tr>
+      <tr><td>Own samples</td><td>the <a href="editor/">sample editor</a> in the browser: sample from a microphone, an audio interface or the line-in (a threshold starts it, as on the old samplers), or drop a WAV; trim it, hear it as the FM-1 plays it (converted to 12 bit bit for bit as the device's own code does), put it on a pad. 2.5 s free, 6.3 s with sloopDX's bank room. The FM-1 itself has no audio input: the browser samples for it.</td></tr>
     </table>
   </div>
   <div class="screens">
@@ -245,7 +245,7 @@
 
 <section id="faq"><div class="wrap">
   <h2>Questions</h2>
-  <details><summary>Can I record samples into the FM-1?</summary><p>No: the FM-1 has no audio input, and its USB audio only goes to the computer. Your own sounds come from the <a href="editor/">sample editor</a>: drop a WAV, trim it, put it on a pad.</p></details>
+  <details><summary>Can I sample with the FM-1?</summary><p>Not into the FM-1 itself (it has no audio input), but the <a href="editor/">sample editor</a> samples for it: choose a microphone, an audio interface or the line-in (on a phone its microphone), set the threshold, play the sound, and it starts by itself. It stops when you click or when the FM-1's free room is full. Then trim it, hear it as the FM-1 plays it and put it on a pad. Or drop a WAV.</p></details>
   <details><summary>How much sample time is there?</summary><p>For your own samples: 96 KB, about <b>2.5 s</b> at 26 kHz and 12 bit, or about <b>5 s</b> stored at ×2 (half speed, played an octave down: the old samplers' trick, and much of their sound). Give the editor sloopDX's DX7 bank room as well (it saves the banks to a file first) and it is about <b>6.3 s</b>, 12.6 s at ×2. Up to 24 own samples, on top of the factory kit. Short and punchy is the idea.</p></details>
   <details><summary>How many patterns and songs?</summary><p><b>16 loops</b> of 1 to 32 bars (or AUTO: the first take sets the length), 512 hits each; loops 1 to 11 on the black keys, switched at the loop's end. <b>4 songs</b>, each a chain of loops with repeats. All of it saves by itself when you stop.</p></details>
   <details><summary>Does it replace sloopDX?</summary><p>While it is installed, yes; your sloopDX projects, DX7 banks and kit stay in their own part of the flash, and the sloopDX installer puts sloopDX back.</p></details>

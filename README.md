@@ -1,15 +1,58 @@
+<p align="center"><a href="https://zp12.designburgapps.com/"><img src="web/img/zp12-logo.svg" width="560" alt="zp12 sampling drums"></a></p>
+
+<p align="center">
+  <a href="https://zp12.designburgapps.com/install/"><img src="https://img.shields.io/badge/firmware-2.0-c82e32" alt="firmware 2.0"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-263e70" alt="GPL-3.0"></a>
+  <img src="https://img.shields.io/badge/device-M--VAVE%20FM--1-1e3060" alt="M-VAVE FM-1">
+  <img src="https://img.shields.io/badge/install-Chrome%20%2F%20Edge%2C%20USB-56627e" alt="Chrome / Edge over USB">
+</p>
+
+<p align="center">
+  <b><a href="https://zp12.designburgapps.com/">Website</a></b> ·
+  <b><a href="https://zp12.designburgapps.com/install/">Install 2.0</a></b> ·
+  <a href="https://zp12.designburgapps.com/editor/">Sample editor (sample + drop)</a> ·
+  <a href="https://zp12.designburgapps.com/backup/">Backup</a> ·
+  <a href="https://zp12.designburgapps.com/#cheatsheet">Cheat sheet</a> (<a href="https://zp12.designburgapps.com/zp12-cheat-sheet.pdf">PDF</a>) ·
+  <a href="https://zp12.designburgapps.com/#video">Video</a>
+</p>
+
+<p align="center">
+  <img src="web/img/home.png" width="200" alt="the faders">
+  <img src="web/img/armed.png" width="200" alt="ARMED">
+  <img src="web/img/steps.png" width="200" alt="the step grid">
+  <img src="web/img/mute.png" width="200" alt="mute and solo">
+</p>
+
 # zp12
 
 A 12-bit sampling drum machine for the **M-VAVE FM-1**: 32 sounds at 26.04 kHz (or 27.5 kHz), pitched
 without interpolation, eight output channels with their filters, a panel-style screen. Inspired by the
 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation.
 
-> **Status: 1.9.3.** Cheat sheet: `web/cheatsheet.html` (on the site, with a PDF). The factory kit on the keys (bank C6–C8: a grand piano, Cm9 and F13 stabs and a note, VCSL CC0; bank D: E-piano chords, horns, vibes, bass,
+> **Status: 2.0** (2026-10-08). Install: **https://zp12.designburgapps.com/install/** · Sample editor (now with
+> sampling in the browser): **https://zp12.designburgapps.com/editor/** · Backup: **https://zp12.designburgapps.com/backup/** ·
+> Cheat sheet: **https://zp12.designburgapps.com/#cheatsheet** ([PDF](https://zp12.designburgapps.com/zp12-cheat-sheet.pdf)).
+>
+> The factory kit on the keys (bank C6–C8: a grand piano, Cm9 and F13 stabs and a note, VCSL CC0; bank D: E-piano chords, horns, vibes, bass,
 > scratches), eleven loops on the black keys, the sequencer (loops of 1–32 bars or AUTO, song, real-time recording with count-in and AUTO CORRECT, step editing, swing, erase, tap tempo), sloopDX's
-> chorus, delay and reverb, saved in flash (0xC4000.., a room sloopDX leaves free). Own samples (a web editor) next.
-> Plan: [CONCEPT.md](CONCEPT.md).
+> chorus, delay and reverb, saved in flash (0xC4000.., a room sloopDX leaves free), own samples from the web editor.
+> Plan: [CONCEPT.md](CONCEPT.md), open work: [TODO.md](TODO.md).
 
-Install from Chrome or Edge: https://dx7.designburgapps.com/zp12/ (later zp12.designburgapps.com).
+## New in 2.0
+
+- **Sampling in the browser**: the editor records from a microphone, an audio interface or the line-in (on a phone:
+  its microphone), with a level meter, a threshold start as on the old samplers, and a stop by click or when the
+  FM-1's free room is full (shown in seconds before you record). Then as before: trim, 26 / 27.5 kHz, 45→33, ×2,
+  hear it as the FM-1 plays it, onto a pad. No firmware needed for this part.
+- **Count-in that does what you expect**: GLO → CLICK → COUNT (OFF, 1 or 2 bars); DUB: an overdub while playing
+  starts at once or from the next bar's 1 (COUNT in the LCD). ARMED and COUNT 4 3 2 1 big in the LCD. A REC press
+  shorter than 2 s is always a tap; held 2 s it clears the loop.
+- **Mute / solo**: GLO held + white keys 1–8 mute channels 1–8, 9–16 solo them (in ~3 ms, no click, the pattern
+  plays on); M / S under the faders, the keys show the state while GLO is held.
+- **Filters made clear**: EDIT → OUT shows CUT / RESO as `--` on channels 3–8 (only 1–2 have the dynamic filter);
+  turning them says FILTER CH1-2, turning CHAN says what that channel has.
+
+Install from Chrome or Edge: https://zp12.designburgapps.com/install/ (also https://dx7.designburgapps.com/zp12/).
 Back to sloopDX or SLOOP any time with their installers; if the FM-1 does not answer, hold OCT− while
 switching it on (USB rescue).
 
@@ -20,20 +63,21 @@ switching it on (USB rescue).
 | White keys 1–8 · 9–16 | bank A · B pads (OCT+: C · D, OCT−: back) |
 | Black keys | loops 1–11 (segments): stopped at once, playing from the end of the loop |
 | KNOB 1–4 | the faders of channels 1–4 (SEL: 5–8, lit, until pressed again; from a page it goes to the faders); a page takes them (the header says which, its tabs show the others), untouched 12 s (GLO → SETUP → BACK: 6 s … OFF) or HOME gives them back |
-| EDIT | WAVE (the pad's sample · COPY> · COPY the sound to a pad), SOUND (TUNE · FINE · DECAY · LEVEL), TRUNC (START · END · DIR · SPEED 45/33), OUT (CHAN · PAN · CUT · RESO), SENDS (DRIVE · CHO · DLY · REV) of the last pad |
+| EDIT | WAVE (the pad's sample · COPY> · COPY the sound to a pad), SOUND (TUNE · FINE · DECAY · LEVEL), TRUNC (START · END · DIR · SPEED 45/33), OUT (CHAN · PAN · CUT · RESO; `--` on channels 3–8, which have no dynamic filter), SENDS (DRIVE · CHO · DLY · REV) of the last pad |
 | FX | FILTER (a DJ filter on the mix: LP · OFF · HP, RESO), CHORUS (RATE · DEPTH · MIX), DELAY (TIME · FDBK · COLOR · MIX), REVERB (SIZE · DAMP · PRE) |
 | SEQ tapped | LOOP (LOOP · BARS 1–32 / AUTO · QUANT · SWING), LOOP TOOLS (CLEAR · COPY> · COPY, turn twice), SONG (STEP · LOOP · REPEAT, 0 ends · SONG OFF / 1–4: four songs of the loops) |
 | SEQ held | the last pad's 16 steps of a bar on the white keys (lit = a hit); OCT− / OCT+: the bars |
-| PLAY · REC | run / stop · record (stopped: armed, PLAY counts a bar in; playing: overdub on / off); REC held 2 s: clear the loop |
+| PLAY · REC | run / stop · record (stopped: ARMED, PLAY counts in: GLO → CLICK → COUNT off / 1 / 2 bars; playing: overdub on / off, at once or from the next 1: DUB); a press under 2 s is always a tap, REC held 2 s: clear the loop |
+| GLO held + white keys | 1–8 mute channels 1–8, 9–16 solo them (M / S under the faders) |
 | Recording + TUNE / FINE / DECAY / CUT turned | the pad's hits keep the values turned (a lock per hit, a red dot in the step grid) |
 | EDIT + OCT− | undo the last clear / erase / copy (again: redo) |
 | LFO held + pad | erase that pad's hits as the playhead passes (stopped: at once) |
-| ENV · GLO · SAVE | tap tempo · TEMPO, CLICK, BACK (pages back after 6–60 s or never), RESET (turn twice: the factory state) · save now (it saves by itself when stopped and quiet); SAVE held + a black key: the loop into that loop |
+| ENV · GLO · SAVE | tap tempo · SETUP (TEMPO, BACK: pages back after 6–60 s or never, RESET: turn twice, the factory state), CLICK (CLICK · COUNT · DUB), OUTPUT (SMOOTH) · save now (it saves by itself when stopped and quiet); SAVE held + a black key: the loop into that loop |
 | ARP | MULTI PITCH: the last sound over all 27 keys (F4 as tuned) |
 | SELECT · ALGORITHM · PRESETS | tempo · the sound to edit · the sample of the last pad (one sample on many pads, each tuned its own way) |
 | USB MIDI | notes 36–67 play pads A1–D8 |
-| Own samples | zp12.designburgapps.com/editor: drop a WAV, trim, 26 / 27.5 kHz, 45→33, hear it as the FM-1 plays it, onto a pad (2.5 s free, 6.3 s with sloopDX's bank room; 1.4+) |
-| Backup | zp12.designburgapps.com/backup: loops, sounds, songs, samples and sloopDX's DX7 banks in one file, and back (Chrome / Edge, 1.3+) |
+| Own samples | https://zp12.designburgapps.com/editor/: sample (mic, interface, line-in, threshold start) or drop a WAV, trim, 26 / 27.5 kHz, 45→33, hear it as the FM-1 plays it, onto a pad (2.5 s free, 6.3 s with sloopDX's bank room; 1.4+) |
+| Backup | https://zp12.designburgapps.com/backup/: loops, sounds, songs, samples and sloopDX's DX7 banks in one file, and back (Chrome / Edge, 1.3+) |
 
 ## Sound
 

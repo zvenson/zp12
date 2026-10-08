@@ -71,6 +71,14 @@
   .pad b { display: block; font: 700 13px/1.2 "Courier New", monospace; color: var(--dim); }
   .pad select { width: 100%; margin-top: 4px; padding: 4px 2px; font: 700 13px "Courier New", monospace; background: var(--lcd); color: var(--lcdink);
                 border: 0; border-radius: 4px; }
+  .rec { border-top: 1px solid #3e5488; margin-top: 18px; padding-top: 12px; }
+  .meter { position: relative; height: 14px; background: var(--navy2); border-radius: 7px; overflow: hidden; margin-top: 12px; }
+  .meter i { display: block; height: 100%; width: 0; background: #9fe0b8; }
+  .meter i.hot { background: var(--led); }
+  .meter s { position: absolute; top: 0; bottom: 0; width: 2px; background: #fff; }
+  input[type=range] { accent-color: var(--led); width: 100%; }
+  button.on { animation: blink 0.5s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0.55; } }
   .bank { grid-column: 1 / -1; font-size: 13px; color: var(--dim); margin-top: 4px; }
   @media (max-width: 760px) { .pads { grid-template-columns: repeat(4, 1fr); } }
   footer { font-size: 13.5px; color: var(--mute); padding: 0 0 40px; }
@@ -83,7 +91,8 @@
 <header><div class="wrap">
   <h1>Your own <b>samples</b></h1>
   <p>Drop a sound, trim it, hear it as the FM-1 will play it (12 bit, 26 kHz, no interpolation), and put it on a pad.
-     Your samples then turn up on the FM-1 too: hit a pad, turn PRESETS. Chrome or Edge, over USB.</p>
+     Or sample it right here, from a microphone, an audio interface or the line-in. Your samples then turn up on the
+     FM-1 too: hit a pad, turn PRESETS. Chrome or Edge, over USB.</p>
   <p style="margin-top:12px;font-size:16px;color:#9fe0b8"><b>Your sounds never leave your computer:</b> everything happens in this page, and they go over the USB cable to the FM-1 only. Nothing is uploaded to a server.</p>
 </div></header>
 <main><div class="wrap">
@@ -119,6 +128,17 @@
     <h2>4 · Add a sample</h2>
     <label class="drop" id="drop" for="file">Drop a WAV, AIFF, MP3 or FLAC here, or click to choose one</label>
     <input type="file" id="file" accept="audio/*,.wav,.aif,.aiff,.mp3,.flac,.ogg">
+    <div class="rec">
+      <p><b>Or sample it</b>: a microphone, an audio interface, the line-in (on a phone: its microphone). As on the old
+         samplers, it can start by itself when the sound comes in (above the threshold), and it stops with a click or when the room is full.</p>
+      <div class="opts">
+        <label>Input<select id="src"><option value="">the default input</option></select></label>
+        <label>Start <span id="thrv"></span><input type="range" id="thr" min="-62" max="-6" value="-36"></label>
+      </div>
+      <div class="meter" title="the input level; the white line: the threshold"><i id="lvl"></i><s id="thrmark"></s></div>
+      <div class="info" id="room"></div>
+      <div class="row"><button id="rec">● Record</button><span id="recst" style="color:var(--dim)"></span></div>
+    </div>
     <div id="ed" style="display:none">
       <canvas id="wave" width="2000" height="300"></canvas>
       <p style="font-size:13.5px">Drag the left or right part of the picture to set where it starts and ends.</p>
@@ -133,6 +153,7 @@
       <div class="row">
         <button class="ghost" id="play-o">▶ Original</button>
         <button class="ghost" id="play-z">▶ As the FM-1 plays it</button>
+        <button class="ghost" id="savewav">WAV</button>
         <button id="upload" disabled>Onto the FM-1</button>
       </div>
       <p id="msg"></p>
@@ -141,6 +162,9 @@
 
   <section class="card">
     <h2>Good to know</h2>
+    <p>• Sampling here: the browser asks once for the microphone; pick the input (an interface, the line-in) after that.
+       Echo cancelling, noise suppression and automatic gain are switched off, so it sounds as it comes in. Turn the source up
+       until the meter nearly reaches the right end; Normalise does the rest.</p>
     <p>• Room: 96 KB free = about <b>2.5 s</b> at 26 kHz, 3.4 s at 45 → 33, <b>5 s</b> at ×2, 6.8 s at ×2.7 (with sloopDX's bank room 2.5 times that). Up to 24 samples.</p>
     <p>• <b>Stored fast, played slow</b> is the old samplers' trick and much of their sound: at ×2 the sample takes half the room, the pad plays it an octave down (TUNE −12, set for you), with half the bandwidth and twice the grit. Breaks and chords love it; a hat not so much.</p>
     <p>• Your samples are in the <a href="../backup/" style="color:#ffb4ab">backup</a>. Replacing one: delete it, add the new one.</p>
@@ -202,7 +226,7 @@ function showDir() {
   $("memtxt").innerHTML = `<b>${dir.slots.filter(Boolean).length}</b> of 24 places · <b>${Math.round(usedB / 1024)}</b> of ${Math.round(r.total / 1024)} KB used · ` +
     `the longest still fits: <b>${(r.longest / 26040).toFixed(2)} s</b> at 26 kHz, <b>${(r.longest / 26040 * 2).toFixed(2)} s</b> at ×2, <b>${(r.longest / 26040 * 2 * 45 / 33).toFixed(2)} s</b> at ×2.7`;
   $("banks").checked = useB;
-  refresh(); info();
+  refresh(); info(); showRoom();
 }
 // the 32 pads: what each plays, a choice of every sample there is; a file dropped on one opens for that pad
 function showPads() {
@@ -281,17 +305,112 @@ async function load(f) {
     const buf = await audio().decodeAudioData(await f.arrayBuffer());
     const m = new Float32Array(buf.length);
     for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); for (let i = 0; i < m.length; i++) m[i] += d[i] / buf.numberOfChannels; }
-    src = { x: m, rate: buf.sampleRate };
-    let a = 0, b = m.length;                       // the silence before and after off
-    while (a < b && Math.abs(m[a]) < 0.003) a++;
-    while (b > a && Math.abs(m[b - 1]) < 0.003) b--;
-    cut = [a, b];
-    $("name").value = Z.cleanName(f.name.replace(/\.[^.]*$/, ""));
-    $("ed").style.display = "block";
-    msg("");
-    info(); draw(); showPads();
+    useSound(m, buf.sampleRate, f.name.replace(/\.[^.]*$/, ""));
   } catch (e) { msg("That file could not be read: " + e.message, "err"); }
 }
+function useSound(m, rate, name) {                // a sound to edit: from a file or sampled
+  src = { x: m, rate };
+  let a = 0, b = m.length;                         // the silence before and after off
+  while (a < b && Math.abs(m[a]) < 0.003) a++;
+  while (b > a && Math.abs(m[b - 1]) < 0.003) b--;
+  cut = b - a >= 64 ? [a, b] : [0, m.length];
+  $("name").value = Z.cleanName(name);
+  $("ed").style.display = "block";
+  msg("");
+  info(); draw(); showPads();
+}
+
+// ---- sampling: an input, a threshold to start at, until clicked or the room is full
+const WORKLET = `registerProcessor("zp12-rec", class extends AudioWorkletProcessor {
+  process(ins) { const i = ins[0]; if (i && i.length) { const m = new Float32Array(i[0].length);
+    for (const c of i) for (let k = 0; k < m.length; k++) m[k] += c[k] / i.length; this.port.postMessage(m, [m.buffer]); } return true; } });`;
+let rec = null, recNo = 0;
+const thrDb = () => +$("thr").value, thrOff = () => thrDb() <= -61;
+const dbPos = (db) => Math.max(0, Math.min(100, (db + 60) / 60 * 100));
+function maxSecs() {                               // what fits on the FM-1 as stored now (not connected: 30 s)
+  if (!dir) return 30;
+  return Z.room(dir, $("banks").checked || !!(dir.flags & 1)).longest / +$("rate").value * Z.speedOf({ slow: slowOn(), oct: octOn() });
+}
+function showRoom() {
+  $("thrv").textContent = thrOff() ? "at once" : `when the sound passes ${thrDb()} dB`;
+  $("thrmark").style.left = thrOff() ? "-4px" : dbPos(thrDb()) + "%";
+  if (!dir) { $("room").textContent = "Connect the FM-1 to see how much room is left (without it: up to 30 s)."; return; }
+  const r = Z.room(dir, $("banks").checked || !!(dir.flags & 1)), t = r.longest / +$("rate").value;
+  $("room").innerHTML = r.longest < 64 ? '<span class="err">No room left on the FM-1: delete a sample first.</span>' :
+    `Room for <b>${(t * Z.speedOf({ slow: slowOn(), oct: octOn() })).toFixed(2)} s</b> as stored now${SPEED[speed()]} ` +
+    `(1×: ${t.toFixed(2)} s · ×2: ${(t * 2).toFixed(2)} s · ×2.7: ${(t * 2 * 45 / 33).toFixed(2)} s)`;
+  $("rec").disabled = !rec && r.longest < 64;
+}
+async function inputs() {                         // the inputs (their names once the microphone is allowed)
+  if (!navigator.mediaDevices?.enumerateDevices) return;
+  const v = $("src").value, ds = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "audioinput" && d.deviceId);
+  $("src").innerHTML = '<option value="">the default input</option>' +
+    ds.filter((d) => d.deviceId !== "default").map((d, i) => `<option value="${d.deviceId}">${(d.label || "input " + (i + 1)).replace(/</g, "")}</option>`).join("");
+  $("src").value = [...$("src").options].some((o) => o.value === v) ? v : "";
+}
+async function recStart() {
+  if (!navigator.mediaDevices?.getUserMedia) { $("recst").textContent = "This browser cannot record (it needs https and Chrome, Edge, Firefox or Safari)."; return; }
+  let stream;
+  try {
+    const id = $("src").value;
+    stream = await navigator.mediaDevices.getUserMedia({ audio: { deviceId: id ? { exact: id } : undefined,
+      echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  } catch (e) { $("recst").textContent = "No input: " + (e.name === "NotAllowedError" ? "the microphone was not allowed" : e.message); return; }
+  const ctx = new AudioContext(), url = URL.createObjectURL(new Blob([WORKLET], { type: "text/javascript" }));
+  await ctx.audioWorklet.addModule(url);
+  URL.revokeObjectURL(url);
+  const node = new AudioWorkletNode(ctx, "zp12-rec"), mute = ctx.createGain();
+  mute.gain.value = 0;
+  ctx.createMediaStreamSource(stream).connect(node);
+  node.connect(mute).connect(ctx.destination);       // (pulled, not heard)
+  rec = { ctx, stream, chunks: [], n: 0, on: thrOff(), pre: [], max: Math.floor(maxSecs() * ctx.sampleRate), peak: 0 };
+  node.port.onmessage = (e) => recFeed(e.data);
+  $("rec").textContent = "■ Stop"; $("rec").classList.add("on");
+  $("recst").textContent = rec.on ? "RECORDING" : "WAITING FOR THE SOUND";
+  inputs();
+  (function meter() {                               // the level, ~60 times a second
+    if (!rec) { $("lvl").style.width = "0"; return; }
+    const db = 20 * Math.log10(rec.peak + 1e-9);
+    $("lvl").style.width = dbPos(db) + "%"; $("lvl").className = db > -1 ? "hot" : "";
+    rec.peak *= 0.8;
+    if (rec.on) $("recst").textContent = `RECORDING ${(rec.n / rec.ctx.sampleRate).toFixed(1)} of ${(rec.max / rec.ctx.sampleRate).toFixed(1)} s`;
+    requestAnimationFrame(meter);
+  })();
+}
+function recFeed(m) {
+  let pk = 0;
+  for (let i = 0; i < m.length; i++) pk = Math.max(pk, Math.abs(m[i]));
+  rec.peak = Math.max(rec.peak, pk);
+  if (!rec.on) {                                     // waiting: 20 ms kept before the sound passed the threshold
+    rec.pre.push(m);
+    while (rec.pre.length * m.length > rec.ctx.sampleRate / 50) rec.pre.shift();
+    if (20 * Math.log10(pk + 1e-9) < thrDb()) return;
+    rec.on = true;
+    rec.chunks = rec.pre; rec.n = rec.pre.reduce((s, c) => s + c.length, 0);
+    return;
+  }
+  rec.chunks.push(m); rec.n += m.length;
+  if (rec.n >= rec.max) recStop(dir ? "the room on the FM-1 is full" : "30 s");
+}
+function recStop(why) {
+  const r = rec;
+  rec = null;
+  r.stream.getTracks().forEach((t) => t.stop());
+  r.ctx.close();
+  $("rec").textContent = "● Record"; $("rec").classList.remove("on");
+  if (!r.on || !r.n) { $("recst").textContent = "Nothing recorded."; showRoom(); return; }
+  const x = new Float32Array(Math.min(r.n, r.max));
+  let o = 0;
+  for (const c of r.chunks) { if (o >= x.length) break; x.set(c.subarray(0, x.length - o), o); o += c.length; }
+  $("recst").textContent = `${(x.length / r.ctx.sampleRate).toFixed(2)} s sampled` + (why ? `: stopped, ${why}` : "") + ". Trim it below.";
+  useSound(x, r.ctx.sampleRate, "REC " + ++recNo);
+  showRoom();
+  $("ed").scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+$("rec").onclick = () => (rec ? recStop("") : recStart());
+$("thr").oninput = showRoom;
+navigator.mediaDevices?.addEventListener?.("devicechange", inputs);
+inputs(); showRoom();
 function info() {
   if (!src) return;
   const slow = slowOn(), oct = octOn(), rate = +$("rate").value, flags = speed();
@@ -302,7 +421,7 @@ function info() {
     (r ? (fits ? ' · <span class="ok">fits</span>' : ' · <span class="err">too long: trim it, store it faster (×2), or the bank room</span>') : "");
   refresh();
 }
-for (const id of ["speed", "rate", "norm"]) $(id).onchange = info;
+for (const id of ["speed", "rate", "norm"]) $(id).onchange = () => { info(); showRoom(); };
 $("pad").onchange = showPads;
 function draw() {
   const c = $("wave"), g = c.getContext("2d"), W = c.width, H = c.height, x = src.x, n = x.length;
@@ -335,6 +454,8 @@ function draw() {
 }
 $("play-o").onclick = () => src && play(src.rate === 44100 ? src.x.slice(cut[0], cut[1]) : Z.zoh(Int16Array.from(src.x.slice(cut[0], cut[1]), (v) => Math.round(v * 2047)), src.rate, false));
 $("play-z").onclick = () => enc && play(Z.zoh(enc, +$("rate").value, slowOn(), octOn()));
+$("savewav").onclick = () => enc && save(Z.wav(enc, Math.round(+$("rate").value / Z.speedOf({ slow: slowOn(), oct: octOn() }))),
+                                         Z.cleanName($("name").value).toLowerCase().replace(/\W+/g, "-") + ".wav");
 $("upload").onclick = () => run(async () => {
   const name = Z.cleanName($("name").value), slow = slowOn(), oct = octOn(), pad = +$("pad").value;
   msg("Writing…");

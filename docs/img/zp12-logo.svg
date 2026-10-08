@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 140" width="640" height="140">
+  <rect width="640" height="140" rx="14" fill="#cecfc9"/>
+  <rect x="18" y="18" width="104" height="104" rx="14" fill="#263e70"/>
+  <circle cx="102" cy="38" r="9" fill="#ff2820"/>
+  <text x="70" y="100" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="50" text-anchor="middle" fill="#cecfc9">12</text>
+  <text x="146" y="88" font-family="'Helvetica Neue',Arial,Helvetica,sans-serif" font-style="italic" font-weight="900" font-size="72" letter-spacing="-2" fill="#1e3060">zp12</text>
+  <text x="318" y="86" font-family="'Helvetica Neue',Arial,Helvetica,sans-serif" font-style="italic" font-size="26" fill="#1e3060">sampling drums</text>
+  <rect x="146" y="104" width="470" height="3" fill="#c82e32"/>
+  <rect x="146" y="110" width="470" height="3" fill="#1e3060"/>
+  <text x="616" y="40" font-family="'Courier New',monospace" font-weight="700" font-size="15" text-anchor="end" fill="#1e3060">12 BIT · 26.04 KHZ</text>
+</svg>

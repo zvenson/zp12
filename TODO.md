@@ -11,6 +11,12 @@ Released: 0.9 (FM-1_979). Open, from the user's tests:
 - [x] 1.1: SEL held = faders 5-8 on any page; the header says where you are (EDIT > SOUND) and a page shows its
       family's tabs; FX > FILTER: sloopDX's DJ filter on the mix (not saved). Image 576 of 582 KB then; 565 KB after FONT_S was cut to ASCII (1.3+).
 - [ ] Factory hats quieter in the kit (`tools/gen_kit.py`, then bump `ZS_KIT_ID`).
+- [x] 2.0 (roadmap B, C, D, A): GLO > CLICK (CLICK · COUNT off/1/2 bars · DUB now / next 1), a REC press under 2 s
+      always a tap (held 2 s: clear), ARMED / COUNT 4 big; GLO held + white 1-8 mute, 9-16 solo (sp_core `quiet`, ~3 ms,
+      not saved); OUT: CUT / RESO `--` on CH 3-8; the editor samples (getUserMedia, AudioWorklet, threshold, stop when the
+      room is full). Not yet tried on the device.
+- [ ] Roadmap E: the loop length (BARS 1-32 / AUTO) shown while REC / ARMED, a knob changes it there.
+- [ ] Mute / solo saved? (now a performance state, gone at power-off, as the DJ filter.)
 - [x] 1.9.2: SMOOTH (GLO > OUTPUT, saved, ZS_VER 6): the jump at a cut / end / TRUNC start bridged in ~1 ms (the
       cuts were up to 11x a sound's own steps; the attacks unchanged); the editor fades trimmed ends (1 ms in, 2 ms out).
 - [x] 1.9.1: SEL latches the faders 5-8 (lit) / 1-4, and from a page it goes to the faders (it was held).

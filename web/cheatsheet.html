@@ -59,7 +59,7 @@
 <!--cs--><div class="cs"><div class="sheet">
 <header>
   <span class="mark">zp12</span><span class="sub">sampling drums</span><span class="rule"></span>
-  <span class="ver">firmware 1.9.3 for the M-VAVE FM-1 · zp12.designburgapps.com</span>
+  <span class="ver">firmware 2.0 for the M-VAVE FM-1 · zp12.designburgapps.com</span>
 </header>
 
 <div class="grid">
@@ -88,7 +88,7 @@
     <table>
       <tr><td>Channels</td><td>a pad plays on a channel 1–8 (OUT, CHAN); one sound at a time each: a new hit cuts the last (HAT and OHAT share 3)</td></tr>
       <tr><td>1–2</td><td>a 4-pole resonant low-pass: open as CUT at the hit, closing two octaves as the sound decays (RESO)</td></tr>
-      <tr><td>3–6 · 7–8</td><td>a fixed low-pass · no filter</td></tr>
+      <tr><td>3–6 · 7–8</td><td>a fixed low-pass · no filter (OUT: CUT / RESO --)</td></tr>
       <tr><td>45 → 33</td><td>TRUNC, SPEED: played at 33/45 of its rate: lower, grainier. Own samples also at ×2 (the editor): an octave down on the pad</td></tr>
     </table>
   </div></div>
@@ -99,7 +99,7 @@
     <div class="lcd">A1 KICK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;090<br><span style="font-weight:400">CH1 &nbsp;CH2 &nbsp;CH3 &nbsp;CH4</span><br>100 &nbsp;100 &nbsp;100 &nbsp;100</div>
     <table>
       <tr><td>KNOB 1–4</td><td>the <b>faders</b> of channels 1–4 (100 as set, 50 −12 dB); <span class="k">SEL</span>: <b>5–8</b> (lit) / 1–4, also from a page. The LCD's four columns always say what the knobs do.</td></tr>
-      <tr><td>A page</td><td>EDIT, FX, SEQ, GLO open one; untouched <b>12 s</b> (SETUP: BACK), or <span class="k">HOME</span>: the faders again</td></tr>
+      <tr><td>A page</td><td>EDIT, FX, SEQ, GLO open one (tap again: the next); untouched <b>12 s</b> (SETUP: BACK), or <span class="k">HOME</span>: the faders again</td></tr>
       <tr><td>SELECT</td><td>tempo</td></tr>
       <tr><td>ALGORITHM</td><td>the sound to edit (A1 … D8), without playing it</td></tr>
       <tr><td>PRESETS</td><td><b>the sample</b> of the pad you hit last: one sample on as many pads as you like, each with its own TUNE, DECAY …</td></tr>
@@ -112,7 +112,7 @@
       <tr><td><span class="k">EDIT</span> WAVE</td><td>the pad's sample · COPY> pad · COPY (turn twice) · –</td></tr>
       <tr><td>SOUND</td><td>TUNE (semitones) · FINE · DECAY · LEVEL</td></tr>
       <tr><td>TRUNC</td><td>START · END · DIR (fwd / rev) · SPEED (45 / 33)</td></tr>
-      <tr><td>OUT</td><td>CHAN · PAN · CUT · RESO (CUT / RESO on ch 1–2)</td></tr>
+      <tr><td>OUT</td><td>CHAN · PAN · CUT · RESO (only ch 1–2 filter: on 3–8 they show --)</td></tr>
       <tr><td>SENDS</td><td>DRIVE · CHO · DLY · REV: <b>the effects of this pad</b></td></tr>
       <tr><td><span class="k">FX</span> FILTER</td><td><b>DJ filter</b> on the whole mix: left a low-pass, right a high-pass, centre OFF · RESO</td></tr>
       <tr><td>CHORUS</td><td>RATE · DEPTH · MIX</td></tr>
@@ -121,20 +121,19 @@
       <tr><td><span class="k">SEQ</span> LOOP</td><td>LOOP · BARS (AUTO, 1–32) · QUANT (AUTO CORRECT) · SWING 50–71 %</td></tr>
       <tr><td>LOOP TOOLS</td><td>CLEAR (turn twice) · COPY> loop · COPY (turn twice)</td></tr>
       <tr><td>SONG</td><td>STEP · LOOP · REPEAT (0: the song ends here) · SONG OFF / 1–4</td></tr>
-      <tr><td><span class="k">GLO</span> SETUP</td><td>TEMPO · CLICK · BACK (6–60 s, OFF) · RESET (turn twice); tap again: OUTPUT, SMOOTH (no clicks at cuts)</td></tr>
+      <tr><td><span class="k">GLO</span> SETUP</td><td>TEMPO · BACK (6–60 s, OFF) · – · RESET (turn twice); tap: <b>CLICK</b>: CLICK · <b>COUNT</b> (off, 1, 2 bars) · <b>DUB</b> (now / next 1); tap: OUTPUT: SMOOTH</td></tr>
     </table>
-    <p class="dim" style="margin:3px 0 0">Each tap of EDIT, FX or SEQ: the next of its pages. The header says where you are (EDIT &gt; SOUND), the tabs below show the others.</p>
   </div></div>
 </div>
 
 <div>
   <div class="box"><h2>Make a beat</h2><div class="in">
     <ol>
-      <li><span class="k">REC</span> (it blinks: armed), <span class="k">PLAY</span>: a bar of count-in.</li>
+      <li><span class="k">REC</span> (<b>ARMED</b>), <span class="k">PLAY</span>: <b>COUNT 4 3 2 1</b>, then it records.</li>
       <li>Play kick and snare. <b>AUTO CORRECT</b> puts them on the grid.</li>
       <li><span class="k">REC</span> again at the end: an empty loop (BARS <b>AUTO</b>) is now as long as your take.</li>
       <li>Hats step by step: hit the hat, <b>hold</b> <span class="k">SEQ</span>: the white keys are its 16 steps (lit = a hit), tap to set / clear; <span class="k">OCT+</span> the next bar.</li>
-      <li><span class="k">REC</span> while it plays: overdub more on top; <span class="k">REC</span> again: off.</li>
+      <li><span class="k">REC</span> while it plays: overdub on top (DUB BAR: from the next 1); <span class="k">REC</span> again: off.</li>
       <li>Turn TUNE, DECAY (EDIT → SOUND) or CUT while recording: <b>the pad's hits keep what you turned</b> (a red dot in the step grid).</li>
       <li>A chord: <span class="k">OCT+</span>, white 9 (D1). Melodic: <span class="k">ARP</span> (MULTI PITCH).</li>
       <li>Another loop: a black key, record into it. Songs: SEQ → SONG.</li>
@@ -144,12 +143,13 @@
   <div class="box" style="margin-top:6px"><h2>Buttons</h2><div class="in">
     <table>
       <tr><td><span class="k">PLAY</span></td><td>run / stop (lit while it runs)</td></tr>
-      <tr><td><span class="k red">REC</span></td><td>stopped: armed (blinks); playing: overdub on / off; <b>hold 2 s</b>: clear the loop</td></tr>
-      <tr><td><span class="k">EDIT</span> + <span class="k">OCT−</span></td><td><b>undo</b> the last clear / erase / copy (again: redo)</td></tr>
+      <tr><td><span class="k red">REC</span></td><td>stopped: ARMED; playing: overdub on / off; <b>hold 2 s</b>: clear the loop</td></tr>
+      <tr><td><span class="k">GLO</span> held + white</td><td>1–8 <b>mute</b>, 9–16 <b>solo</b> ch 1–8 (M / S under the faders)</td></tr>
+      <tr><td><span class="k">EDIT</span> + <span class="k">OCT−</span></td><td><b>undo</b> clear / erase / copy (again: redo)</td></tr>
       <tr><td><span class="k">FX</span> held + white 1–4</td><td><b>punch-in</b> while held: 1 roll 1/8 · 2 roll 1/16 · 3 reverse · 4 tape stop (FX tapped: the FX pages)</td></tr>
-      <tr><td><span class="k">LFO</span> + pad</td><td><b>erase</b>: that pad's hits go as the playhead passes (stopped: all at once)</td></tr>
+      <tr><td><span class="k">LFO</span> + pad</td><td><b>erase</b> its hits as the playhead passes (stopped: all)</td></tr>
       <tr><td><span class="k">ENV</span></td><td>tap tempo (it blinks on the beat)</td></tr>
-      <tr><td><span class="k">SAVE</span></td><td>save now; <b>held + a black key</b>: the loop into that loop; stopped and quiet for 3 s it saves by itself</td></tr>
+      <tr><td><span class="k">SAVE</span></td><td>save now (also by itself when stopped); <b>held + a black key</b>: the loop into that loop</td></tr>
       <tr><td><span class="k">HOME</span></td><td>the faders</td></tr>
     </table>
   </div></div>
@@ -160,7 +160,7 @@
       <li><span class="k">EDIT</span> until the LCD says <b>SENDS</b>.</li>
       <li>KNOB 4 = REV, KNOB 3 = DLY. Shape them: <span class="k">FX</span>.</li>
     </ol>
-    <p class="dim" style="margin:4px 0 0"><b>Your start:</b> it plays A8, A7, A1 + B1: put your own sounds there. <b>In the browser</b> (Chrome / Edge, USB): <b>zp12.designburgapps.com/editor</b> drops your own samples onto the pads, <b>/backup</b> saves and restores everything. Back to sloopDX: its installer. No answer? Hold OCT− while switching on (USB rescue).</p>
+    <p class="dim" style="margin:4px 0 0"><b>Your start:</b> it plays A8, A7, A1 + B1: put your own sounds there. <b>In the browser</b> (Chrome / Edge, USB): <b>zp12.designburgapps.com/editor</b> samples (mic, interface, line-in) or drops your own sounds onto the pads, <b>/backup</b> saves and restores everything. No answer? Hold OCT− while switching on (USB rescue).</p>
   </div></div>
 </div>
 </div>
