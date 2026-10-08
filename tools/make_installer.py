@@ -54,8 +54,6 @@ def main(sloopdx, pkg, version, out, own_site=False):
         ("../../impressum.html", "../impressum.html"),
         ("../../", "../"),
         ("sloopDX is free and stays free", "zp12 is free and stays free"),
-        # the coffee where it is seen: in the install card, under the status (the template's footer line stays too)
-        ('<pre id="log"></pre>', '<pre id="log"></pre>\n        <p class="small">zp12 is free and stays free. <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a> if it made your day.</p>'),
     ]
     if own_site:                                        # zp12.designburgapps.com: sloopDX's pages by their address
         swaps += [("../webapp/installer/", "https://dx7.designburgapps.com/webapp/installer/"),
