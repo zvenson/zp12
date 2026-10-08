@@ -152,9 +152,21 @@ int main(int argc, char **argv)
         check(zs_unpack(keep, n, ZS_VER) == 0 && s0->ev[k].lk && sq_lk[0][k] == lk, "STORE: a lock saved and read back");
         check(ui.back == 4, "STORE: BACK (pages never back) saved and read back");
         memcpy(old, keep, at); memcpy(old + at, keep + at + 8u, n - at - 8u);
+        {   /* an older save's LEVEL (linear) becomes the one that sounds the same squared: 64 -> 90, 127 -> 127 */
+            uint32_t l = at;                         /* (the sounds are the record's first bytes) */
+            uint8_t l0 = sp_sound[0].level, l1 = sp_sound[1].level;
+            (void)l;
+            sp_sound[0].level = 64; sp_sound[1].level = 127;
+            n = zs_pack(keep);
+            memcpy(old, keep, at); memcpy(old + at, keep + at + 8u, n - at - 8u);
+            sp_sound[0].level = l0; sp_sound[1].level = l1;
+        }
         check(zs_unpack(old, n - 8u, 3) == 0 && s0->ev[k].lk && ui.back == 1, "STORE: a version 3 save: its locks, BACK 12 s");
+        check(sp_sound[0].level == 90u && sp_sound[1].level == 127u, "STORE: an older save's LEVEL in the audio taper (64 -> 90, 127 -> 127)");
         check(zs_unpack(old, n - 8u, 2) == 0 && !s0->ev[k].lk, "STORE: a version 2 save has no locks");
-        check(zs_unpack(keep, n, ZS_VER) == 0 && s0->ev[k].lk, "STORE: back as it was");
+        sp_sound[0].level = 64; sp_sound[1].level = 127;
+        check(zs_unpack(keep, n, ZS_VER) == 0 && s0->ev[k].lk && sp_sound[0].level == 64u, "STORE: back as it was (a version 5 save: LEVEL as it is)");
+        memcpy(sp_sound, KIT_PADS, sizeof sp_sound);
     }
 
     /* 3a'. CLEAR, then UNDO brings it back (locks too), UNDO again clears it again */

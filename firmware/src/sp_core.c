@@ -177,7 +177,7 @@ static void sp_trigger_lk(uint32_t k, uint32_t vel, int32_t semis, uint32_t lk)
     c->step = (uint32_t)(((uint64_t)(rate * 65536u / SP_FS) * sp_pow2_cents(cents)) >> 16);
     c->env = 1 << 24;
     c->emul = sp_decay_mul(lk ? (lk >> 12) & 127u : s->decay);
-    lv = (int32_t)s->level * (int32_t)vel / 127;      /* 0..127 */
+    lv = (int32_t)s->level * s->level / 127 * (int32_t)vel / 127;   /* 0..127: LEVEL in an audio taper (squared) */
     c->gl = lv * (64 - (s->pan > 0 ? s->pan : 0)) / 3;   /* Q12: 127 * 64 / 3 = 2709, -3.6 dB a channel */
     c->gr = lv * (64 + (s->pan < 0 ? s->pan : 0)) / 3;   /* (eight at once still fit the mix's headroom) */
     c->cut = lk ? (int32_t)((lk >> 19) & 127u) : s->cut;
@@ -203,8 +203,8 @@ static void sp_channel(uint32_t ch, int32_t *out)
         return;
     e0 = c->env >> 9;                                 /* Q15: the envelope now, and at the block's end: the level */
     e1 = (int32_t)(((int64_t)c->env * c->emul) >> 16) >> 9;   /* ramps between them (no steps at the block rate) */
-    gl = c->gl * sp_mix[ch] / 100;                    /* the fader, Q12 (100 = the level as set) */
-    gr = c->gr * sp_mix[ch] / 100;
+    gl = c->gl * sp_mix[ch] * sp_mix[ch] / 10000;     /* the fader, an audio taper as the original's sliders: */
+    gr = c->gr * sp_mix[ch] * sp_mix[ch] / 10000;     /* 100 as set, 50 -12 dB, 25 -24 dB, 127 +4 dB */
     if (ch < 2u) {                                    /* the dynamic filter: CUT at the hit, two octaves down as it decays */
         uint32_t hz = sp_cut_hz(c->cut) * sp_pow2_cents(-2400 + ((e0 * 2400) >> 15)) >> 16;
         a1 = sp_onepole(hz < 30u ? 30u : hz > 18000u ? 18000u : hz);

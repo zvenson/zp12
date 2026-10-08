@@ -177,17 +177,18 @@ def main(dst):
     lines += ["};", "/* the 32 pads: wave, tune, fine, decay, level, pan, chan, flags, start, end, cut, reso */",
               "static const sp_sound_t KIT_PADS[32] = {"]
     pads = []
+    taper = lambda l: min(127, round(math.sqrt(127 * l)))   # LEVEL is squared in the engine (an audio taper): the same loudness
     SENDS = {"SNARE": (0, 0, 45), "CLAP": (0, 35, 30), "RIM": (0, 0, 25), "OHAT": (0, 0, 15), "TOM L": (0, 0, 20),
              "TOM H": (0, 0, 20), "CONGA": (0, 0, 25), "CRASH": (0, 0, 20)}   # a little space on some (factory taste)
     for i, (name, f, secs, ch, dec, lvl, pan, cut, res) in enumerate(SOUNDS):
-        pads.append((i, 0, 0, dec, lvl, pan, ch, 0, 0, 1000, cut, res, 0, *SENDS.get(name, (0, 0, 0))))
+        pads.append((i, 0, 0, dec, taper(lvl), pan, ch, 0, 0, 1000, cut, res, 0, *SENDS.get(name, (0, 0, 0))))
     for i in range(5):                                 # C1-C5: bank A an octave down at 45->33, the filter on ch 1-2
         name, f, secs, ch, dec, lvl, pan, cut, res = SOUNDS[i]
-        pads.append((i, -7, 0, min(127, dec + 10), lvl, pan, ch, 2, 0, 1000, 90 if ch < 2 else 127, 40 if ch < 2 else 0, 0, 0, 0, 0))
+        pads.append((i, -7, 0, min(127, dec + 10), taper(lvl), pan, ch, 2, 0, 1000, 90 if ch < 2 else 127, 40 if ch < 2 else 0, 0, 0, 0, 0))
     for i, (name, notes, secs, ch, dec, lvl, pan, snd) in enumerate(PIANOS):   # C6-C8: the piano, at 33
-        pads.append((len(SOUNDS) + len(MELODIC) + i, 0, 0, dec, lvl, pan, ch, 2, 0, 1000, 127, 0, 0, *snd))
+        pads.append((len(SOUNDS) + len(MELODIC) + i, 0, 0, dec, taper(lvl), pan, ch, 2, 0, 1000, 127, 0, 0, *snd))
     for i, (name, notes, secs, ch, dec, lvl, pan, snd) in enumerate(MELODIC):   # D: the chords and sounds
-        pads.append((len(SOUNDS) + i, 0, 0, dec, lvl, pan, ch, 0, 0, 1000, 127, 0, 0, *snd))
+        pads.append((len(SOUNDS) + i, 0, 0, dec, taper(lvl), pan, ch, 0, 0, 1000, 127, 0, 0, *snd))
     lines += ["    {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d}," % p if len(p) == 12 else
               "    {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, {%d, %d, %d}}," % p for p in pads]
     lines += ["};", ""]

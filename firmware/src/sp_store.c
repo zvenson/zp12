@@ -8,7 +8,8 @@
 #define ZS_BASE 0xC4000u
 #define ZS_SLOT 0xA000u                          /* 40 KiB a copy */
 #define ZS_MAGIC 0x3231505Au                     /* "ZP12" */
-#define ZS_VER 4u                                /* 4: the UI's settings (BACK); 3: the hits' locks; 2: four songs (1: one) */
+#define ZS_VER 5u                                /* 5: LEVEL in an audio taper; 4: the UI's settings (BACK); 3: the hits'
+                                                 * locks; 2: four songs (1: one) */
 #define ZS_KIT_ID ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u ^ 0x0600u))   /* the factory kit the pads were saved with
                                                  * (0.6: changed once, so every older save gets the kit's pads) */
 
@@ -116,6 +117,13 @@ static int zs_unpack(const uint8_t *b, uint32_t len, uint32_t ver)
                 else
                     sq_seg[i].ev[j].lk = 0;
             }
+    if (ver < 5u)                                   /* LEVEL was linear: the value that sounds the same squared */
+        for (i = 0; i < SP_NSOUND; i++) {
+            uint32_t l = sp_sound[i].level * 127u, r = 0;
+            while ((r + 1u) * (r + 1u) <= l) r++;
+            if (l - r * r > r) r++;                         /* (rounded) */
+            sp_sound[i].level = (uint8_t)(r > 127u ? 127u : r);
+        }
     if (st[7] != ZS_KIT_ID)                         /* saved with another factory kit: the pads its new sounds */
         for (i = 0; i < SP_NSOUND; i++)
             sp_sound[i] = KIT_PADS[i];
