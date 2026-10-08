@@ -70,6 +70,11 @@
               padding: 20px 0; width: 100%; cursor: pointer; letter-spacing: 0.06em; text-transform: uppercase;
               box-shadow: 0 10px 34px rgba(66, 245, 245, 0.28); transition: filter 0.15s, transform 0.08s; }
   button#go:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+  /* the coffee: as big as INSTALL, right under it, always there (a plain link: no script, no cookie) */
+  a#coffee { display: block; width: 100%; box-sizing: border-box; margin-top: 10px; padding: 20px 0; text-align: center;
+             font-family: inherit; font-size: 19px; font-weight: 750; line-height: 1; background: var(--panel2);
+             color: var(--fg); border-radius: 10px; text-decoration: none; }
+  a#coffee:hover { filter: brightness(1.15); transform: translateY(-1px); }
   button#go:disabled { background: var(--panel2); color: var(--dim); cursor: default; box-shadow: none; }
   progress { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; margin-top: 18px; border: 0; border-radius: 4px;
              background: var(--panel2); overflow: hidden; }
@@ -105,8 +110,6 @@
   footer { padding: 32px 0 48px; color: var(--dim); font-size: 13px; border-top: 1px solid var(--line); }
   footer a { color: var(--blue); }
   @media (max-width: 980px) { .hero .wrap, .grid { grid-template-columns: 1fr; } nav.bar .links a:not(.gh) { display: none; } }
-  #coffee { display: block; margin-top: 10px; font-size: 19px; font-weight: 750; line-height: 1; padding: 20px 0; width: 100%; text-align: center; border-radius: 10px; background: var(--panel2); color: var(--fg); text-decoration: none; letter-spacing: 0.04em; transition: filter 0.15s, transform 0.08s; }
-  #coffee:hover { filter: brightness(1.15); transform: translateY(-1px); }
 </style>
 <!-- Matomo (self-hosted, matomo.designburgapps.com): one count for designburgapps.com, dx7. and zp12., the page
      title with its host; no cookies, IPs anonymised on the server, Do Not Track respected -->
@@ -199,7 +202,7 @@
 <footer><div class="wrap">
   zp12: based on SLOOP (isod89) and Felucca, on the FM-1 platform as sloopDX carries it (GPL-3.0). Factory sounds: CC0 (VSCO-2 CE, VCSL, Sonic Pi). Inspired by the 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation. Not affiliated with M-VAVE.<br>
   <span data-t="license"></span> <a href="https://github.com/zvenson/zp12" target="_blank" rel="noopener">github.com/zvenson/zp12</a> · <a href="../impressum.html">Impressum · Disclaimer · Datenschutz</a><br>
-  zp12 is free and stays free: <a href="https://paypal.me/zvenson" rel="noopener">☕ buy me a coffee</a> if it made your day.
+  sloopDX is free and stays free: <a href="https://paypal.me/zvenson" rel="noopener">☕ buy me a coffee</a> if it made your day.
 </div></footer>
 <script>
 /* the algorithm animation: the same layout as the FM-1's screen (ui_voice.c ve_draw_alg); op 0 = OP6 */
