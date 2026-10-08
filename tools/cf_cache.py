@@ -18,7 +18,9 @@ HOSTS = ["zp12.designburgapps.com", "dx7.designburgapps.com"]
 RULE_REF = "zp12-dx7-static"
 EDGE_TTL, BROWSER_TTL = 7200, 600
 API = "https://api.cloudflare.com/client/v4"
-DOCS = {"zp12.designburgapps.com": Path(__file__).resolve().parents[1] / "docs"}
+HERE = Path(__file__).resolve().parents[1]
+DOCS = {"zp12.designburgapps.com": HERE / "docs",           # (dx7: sloopDX's docs/, beside this repo: "repo" on the Pi)
+        "dx7.designburgapps.com": next((p for p in (HERE.parent / "repo" / "docs", HERE.parent / "sloopdx" / "docs") if p.is_dir()), None)}
 
 
 def token():
@@ -69,14 +71,17 @@ def urls():
     """every file of zp12's docs/ (its URL, directory index too), and dx7's pages that change on a deploy"""
     out = []
     for host, root in DOCS.items():
+        if root is None:
+            continue
         for p in sorted(root.rglob("*")):
             if p.is_file() and not p.name.startswith("."):
                 rel = p.relative_to(root).as_posix()
                 out.append(f"https://{host}/{rel}")
                 if p.name == "index.html":
                     out.append(f"https://{host}/{rel[:-len('index.html')]}")
-    out += [f"https://dx7.designburgapps.com/{p}" for p in ("", "index.html", "webapp/installer/", "webapp/editor/",
-                                                            "cheatsheet.html", "impressum.html")]
+    if DOCS["dx7.designburgapps.com"] is None:            # (no sloopDX checkout here: its pages that change)
+        out += [f"https://dx7.designburgapps.com/{p}" for p in ("", "index.html", "webapp/installer/", "webapp/editor/",
+                                                                "cheatsheet.html", "impressum.html")]
     return out
 
 
