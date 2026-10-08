@@ -38,6 +38,7 @@
   {"@type": "Question", "name": "How do I install a custom firmware on the FM-1?", "acceptedAnswer": {"@type": "Answer", "text": "Open fm1.designburgapps.com in Chrome or Edge, connect the FM-1 by USB, press Connect, choose a firmware and press Install. It takes about a minute."}},
   {"@type": "Question", "name": "Can I go back to the official FM-1 firmware?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Download FM-1 V15 from m-vave.com and install it on the same page. If the FM-1 is stuck, hold OCT- while switching it on (USB rescue) and install again."}},
   {"@type": "Question", "name": "Why only open-source firmwares?", "acceptedAnswer": {"@type": "Answer", "text": "The hub lists only firmwares released as free software with their source (GPL-3.0), so every package can be mirrored, checked and kept available, and anyone can see what it does."}},
+  {"@type": "Question", "name": "Why are Baud Girl and Groove OS not on the hub?", "acceptedAnswer": {"@type": "Answer", "text": "They are not open source: there is no published source and no license that allows passing the package on, so the hub may not mirror them. Install them from their makers, baudgirl.com and groove-os.com."}},
   {"@type": "Question", "name": "Is it always the newest version?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The hub checks every firmware's repository every night and offers the newest release, checked before it is listed."}}]}]}
 </script>
 <meta name="theme-color" content="#151213">
@@ -142,6 +143,8 @@
   .mailcta .btn { background: var(--pink); }
   input[type=file] { color: var(--dim); font-size: 14px; }
   label.chk { display: flex; gap: 10px; align-items: center; color: var(--text); font-size: 15px; margin: 12px 0; }
+  .elsewhere { text-align: center; color: var(--dim); font-size: 15px; margin: 34px auto 0; max-width: 820px; }
+  .elsewhere b { color: var(--text); } .elsewhere a { color: var(--text); text-decoration: underline; text-decoration-color: var(--line); }
   .faq { margin-top: 72px; } .faq .qas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 48px; } .faq .qa { margin: 0 0 22px; }
   .faq h3 { font-size: 19px; margin: 0 0 6px; font-weight: 700; color: var(--fg); } .faq p { margin: 0; color: var(--text); }
   .faq b { color: var(--fg); }
@@ -206,6 +209,10 @@
     </section>
   </div>
 
+  <p class="elsewhere">Looking for <b>Baud Girl</b> or <b>Groove OS</b>? They are not open source, so they cannot be mirrored
+     here: get them from their makers, <a href="https://baudgirl.com/work/FM-1+VA/install" target="_blank" rel="noopener">baudgirl.com</a> and
+     <a href="https://www.groove-os.com/" target="_blank" rel="noopener">groove-os.com</a>.</p>
+
   <section class="faq">
     <h2 class="sec">Questions</h2><div class="qas">
     <div class="qa"><h3>Which custom firmwares are there for the M-VAVE FM-1?</h3>
@@ -220,6 +227,12 @@
     <div class="qa"><h3>Why only open-source firmwares?</h3>
       <p>The hub lists firmwares that are free software, released with their source (GPL-3.0): so every package can be mirrored
          unchanged, checked and kept available, and anyone can see what it does. Closed or paid firmwares are not listed.</p></div>
+    <div class="qa"><h3>Where is Baud Girl? Where is Groove OS?</h3>
+      <p>Both are fine firmwares for the FM-1, but neither is open source: there is no published source and no license that allows
+         passing the package on, so this page may not mirror them, and it only lists firmware it can take unchanged from a public
+         release. Install them from their makers: <a href="https://baudgirl.com/work/FM-1+VA/install" target="_blank" rel="noopener">Baud Girl</a>
+         (free, tips on Ko-fi) and <a href="https://www.groove-os.com/" target="_blank" rel="noopener">Groove OS</a>. If either becomes open source
+         with a release on GitHub, it goes on here the next day.</p></div>
     <div class="qa"><h3>Is it always the newest version?</h3>
       <p>Yes. Every night the hub looks at each project's repository and offers its newest release, after checking that the
          package is an FM-1 firmware with the update loader. Betas are marked.</p></div>
