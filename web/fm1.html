@@ -282,11 +282,12 @@ const LOOK = { felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx: "#42f5f5", zp12: "
                salt: "#ff8f7a", choralroot: "#ffc46b", jangada: "#ff5fc8", melodee: "#8fe3b0", hortator: "#d8dde6" };
 const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"]];
 const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords" };
+const kindsOf = (f) => [].concat(f.kind || []);                         // (one kind or several: Felucca is a synth and a groovebox)
 let kind = (location.hash || "").slice(1);                             // (#drums: a link straight to one kind)
 function chips() {
   if (!KINDS.some(([k]) => k === kind)) kind = "all";
   $("chips").innerHTML = KINDS.map(([k, label]) => {
-    const n = k === "all" ? cat.length : cat.filter((f) => f.kind === k).length;
+    const n = k === "all" ? cat.length : cat.filter((f) => kindsOf(f).includes(k)).length;
     return n ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${n}</span></button>` : "";
   }).join("");
   $("chips").querySelectorAll("button").forEach((b) => b.onclick = () => {
@@ -312,7 +313,7 @@ function render() {
       <div class="head"><div>
         <h3>${LOGO[f.id] ? `<img class="logo" src="${LOGO[f.id]}" alt="">` : ""}${esc(f.name)}<small>${esc(f.version)}</small></h3>
         <div class="by">by ${esc(f.author)}</div>
-        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${f.beta ? '<span class="tag beta">beta</span>' : ""}${KIND_TAG[f.kind] ? `<span class="tag kind">${KIND_TAG[f.kind]}</span>` : ""}</div></div></div>
+        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${f.beta ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag kind">${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
       <p class="what">${esc(f.what)}</p>
       <div class="meta">${esc(f.date)} · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
@@ -322,7 +323,7 @@ function render() {
       <div class="msg"></div>`;
     el.querySelector("button").onclick = () => install(f, el);
     el.querySelector("button").disabled = writing;
-    el.hidden = kind !== "all" && f.kind !== kind && !isNow;          // (the one on your FM-1 stays in view)
+    el.hidden = kind !== "all" && !kindsOf(f).includes(kind) && !isNow;          // (the one on your FM-1 stays in view)
     $("grid").append(el);
   }
 }
