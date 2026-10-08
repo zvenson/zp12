@@ -23,24 +23,26 @@ All listed firmwares are GPL-3.0. Conveying their unchanged packages is allowed 
 source is at each project's repository and tag and a copy of it is kept next to the package (`/src/`, so it stays
 available even if a repository goes). The page does not claim the authors endorse it.
 
-## Messages to the authors (post as a GitHub Discussion, or an issue if Discussions are off)
+## Messages to the authors
 
-**Felucca** — github.com/hugelton/Felucca · **SLOOP** — github.com/isod89/sloop-fm1 ·
-**X0X / FoMni** — github.com/charlesvestal/fm1-x0x (one message for both)
+Where: **Felucca** — a Discussion, github.com/hugelton/Felucca/discussions (or the mail on github.com/hugelton) ·
+**SLOOP** — an issue, github.com/isod89/sloop-fm1/issues/new (no Discussions, no other contact) ·
+**X0X / FoMni** — one issue in github.com/charlesvestal/fm1-x0x/issues/new, naming FoMni too (or charles.pizza).
 
-> **Title:** Make Firmware, Not War: your firmware on the FM-1 Firmware Hub
+> **Title:** Make Firmware, Not War: [Felucca / SLOOP / X0X and FoMni] on the FM-1 Firmware Hub
 >
-> Hi! I made a small page where FM-1 owners can try every open-source firmware with one click and go back just as easily,
+> Hi! I made a page where FM-1 owners can try every open-source firmware with one click and go back just as easily,
 > no need to pick a side: https://fm1.designburgapps.com
 >
-> [Felucca / SLOOP / X0X and FoMni] is on it: your latest release, mirrored unchanged (same SHA-256 as on GitHub),
-> with your name, a short description, and links to your repo, the release and the source (a copy of the tagged
-> source is kept next to it, as GPL-3.0 asks). It installs through Felucca's own update path, the same one your
-> releases use. The page checks the package before writing and offers the USB rescue if anything goes wrong.
+> [Felucca / SLOOP / X0X and FoMni] is on it: your newest release, mirrored unchanged (same SHA-256 as your GitHub
+> release), with your name, a short description, a screenshot from your repository, and links to your repo, the
+> release and the source (a copy of the tagged source is kept next to it, as GPL-3.0 asks). The page checks your
+> repository every night, so a new release is on it the next morning. It installs through Felucca's own update
+> path, the same one your releases use, checks the package before writing, and points to the USB rescue.
 >
-> A script picks up your new releases, so the page follows you. If you would rather not be listed, or want the
-> description worded differently, a screenshot, a link to your docs, or anything else, just say so here or mail
-> sven@designburg.net and I will change it at once.
+> If you would rather not be listed, or want the description, the picture or anything else changed, just say so
+> here or mail sven@designburg.net and I will change it at once. I tested the switch on my FM-1
+> (zp12 -> Felucca -> zp12) and it works.
 >
 > Thanks for [Felucca: the foundation all of this stands on / SLOOP: the workflow sloopDX and zp12 are built on /
 > X0X and FoMni: two great ideas for the FM-1]!
