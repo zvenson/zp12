@@ -14,12 +14,12 @@ import json, os, sys, urllib.request
 from pathlib import Path
 
 ZONE = "designburgapps.com"
-HOSTS = ["zp12.designburgapps.com", "dx7.designburgapps.com"]
+HOSTS = ["zp12.designburgapps.com", "dx7.designburgapps.com", "fm1.designburgapps.com"]
 RULE_REF = "zp12-dx7-static"
 EDGE_TTL, BROWSER_TTL = 7200, 600
 API = "https://api.cloudflare.com/client/v4"
 HERE = Path(__file__).resolve().parents[1]
-DOCS = {"zp12.designburgapps.com": HERE / "docs",           # (dx7: sloopDX's docs/, beside this repo: "repo" on the Pi)
+DOCS = {"zp12.designburgapps.com": HERE / "docs", "fm1.designburgapps.com": HERE / "fm1",           # (dx7: sloopDX's docs/, beside this repo: "repo" on the Pi)
         "dx7.designburgapps.com": next((p for p in (HERE.parent / "repo" / "docs", HERE.parent / "sloopdx" / "docs") if p.is_dir()), None)}
 
 

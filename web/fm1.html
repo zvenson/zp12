@@ -1,0 +1,261 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only  (C) 2026 Sven Trogus
+     The FM-1 firmware switcher (fm1.designburgapps.com): tools/make_fm1.py writes it as fm1/index.html with
+     sloopDX's update path (fm1pkg.js, fm1ota.js) inlined at LIB; the catalogue is fm1/catalog.json
+     (tools/fm1_sync.py). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FM-1 Firmware Switcher</title>
+<meta name="description" content="Every custom firmware for the M-VAVE FM-1 in one place: Felucca, SLOOP, sloopDX, zp12, X0X, FoMni. Try any of them with one click from Chrome or Edge, and go back whenever you like.">
+<link rel="canonical" href="https://fm1.designburgapps.com/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="FM-1 Firmware Switcher">
+<meta property="og:description" content="Every custom firmware for the M-VAVE FM-1, one click each, and back.">
+<meta name="theme-color" content="#16171c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316171c'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='14' text-anchor='middle' fill='%23ffb347'%3EFM1%3C/text%3E%3C/svg%3E">
+<style>
+  :root { --bg: #16171c; --bg2: #1f2128; --card: #23262f; --line: #343845; --txt: #eceef3; --dim: #9aa1b2; --mute: #6d7487;
+          --acc: #ffb347; --acc2: #ff7a45; --ok: #6ee7a8; --err: #ff8a80; --warn: #ffd166; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--txt); font: 16px/1.6 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--acc); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+  header { padding: 56px 0 30px; background: radial-gradient(1200px 400px at 20% -10%, rgba(255, 179, 71, 0.16), transparent), var(--bg); }
+  .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--acc); margin: 0 0 10px; font-weight: 700; }
+  h1 { font-size: clamp(36px, 5.4vw, 64px); line-height: 1.04; margin: 0 0 14px; font-weight: 300; }
+  h1 b { font-weight: 900; }
+  .lead { font-size: 19px; color: #c9cdd8; max-width: 44em; margin: 0 0 22px; }
+  .bar { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+  button, .btn { font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1; padding: 13px 20px; border-radius: 10px; border: 0;
+                 cursor: pointer; background: var(--acc); color: #1a1205; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+  button:hover, .btn:hover { filter: brightness(1.08); text-decoration: none; }
+  button.ghost, .btn.ghost { background: transparent; color: var(--txt); border: 1px solid var(--line); }
+  button:disabled { opacity: 0.45; cursor: default; filter: none; }
+  .status { font: 600 15px/1.4 ui-monospace, "Courier New", monospace; background: #0f1014; border: 1px solid var(--line); border-radius: 10px;
+            padding: 11px 14px; min-width: 260px; color: var(--dim); }
+  .status b { color: var(--ok); }
+  .warn { background: rgba(255, 209, 102, 0.09); border: 1px solid rgba(255, 209, 102, 0.35); border-radius: 12px; padding: 14px 18px;
+          color: #f1e3bd; margin: 26px 0 0; font-size: 15px; }
+  .warn b { color: var(--warn); }
+  main { padding: 26px 0 50px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; }
+  .fw { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 20px 18px; display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .fw.now { border-color: var(--ok); box-shadow: 0 0 0 1px var(--ok) inset; }
+  .fw h2 { margin: 0; font-size: 24px; font-weight: 800; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+  .fw h2 small { font-size: 14px; font-weight: 600; color: var(--dim); }
+  .tag { font-size: 11.5px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+  .tag.now { background: var(--ok); color: #0b2a19; }
+  .tag.beta { background: rgba(255, 209, 102, 0.18); color: var(--warn); }
+  .by { color: var(--dim); font-size: 14px; margin-top: -4px; }
+  .what { color: #c9cdd8; font-size: 15px; flex: 1; margin: 0; }
+  .meta { color: var(--mute); font-size: 13px; }
+  .meta a { color: var(--dim); }
+  .fw .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  progress { width: 100%; height: 8px; accent-color: var(--acc); display: none; }
+  .fw .msg { font-size: 13.5px; color: var(--dim); min-height: 1.2em; }
+  .card { background: var(--bg2); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; margin-top: 22px; }
+  .card h3 { margin: 0 0 8px; font-size: 20px; }
+  .card p { color: #c9cdd8; margin: 6px 0; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .mailcta { background: linear-gradient(120deg, rgba(255, 179, 71, 0.16), rgba(255, 122, 69, 0.10)); border-color: rgba(255, 179, 71, 0.45); }
+  input[type=file] { color: var(--dim); }
+  label.chk { display: flex; gap: 10px; align-items: center; color: #c9cdd8; font-size: 15px; margin: 10px 0; }
+  details { margin-top: 10px; } summary { cursor: pointer; color: var(--dim); }
+  pre#log { white-space: pre-wrap; font-size: 12px; color: var(--mute); max-height: 180px; overflow: auto; }
+  footer { border-top: 1px solid var(--line); color: var(--mute); font-size: 13.5px; padding: 22px 0 40px; }
+  footer a { color: var(--dim); }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } .status { min-width: 0; width: 100%; } }
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <p class="eyebrow">M-VAVE FM-1 · custom firmwares</p>
+  <h1>FM-1 <b>Firmware Switcher</b></h1>
+  <p class="lead">Every custom firmware for the FM-1 in one place. Connect it by USB, pick one, press Install: about a minute, and the
+     FM-1 is something else. Try them all; going back is just as easy. Chrome or Edge.</p>
+  <div class="bar">
+    <button id="connect">Connect the FM-1</button>
+    <div class="status" id="now">Not connected</div>
+  </div>
+  <div class="warn"><b>Back up first.</b> The firmwares keep their projects, presets and samples in the same flash and in different
+    ways: after a switch the new one may not read the old one's data, or start empty. Save what you made with the backup of the
+    firmware you are on (each project's page says how) before you switch. <b>Stuck?</b> Hold OCT− while switching the FM-1 on
+    (USB rescue), then install again.</div>
+</div></header>
+
+<main><div class="wrap">
+  <div class="grid" id="grid"><p class="meta">Loading the catalogue…</p></div>
+
+  <div class="two">
+    <section class="card">
+      <h3>Back to the official firmware</h3>
+      <p>Download <b>FM-1 V15</b> from <a href="https://www.m-vave.com/download" target="_blank" rel="noopener">m-vave.com/download</a>
+         (PC Firmware → FM-1) and choose the file here: only that exact file is accepted.</p>
+      <p><input type="file" id="stock-file" accept=".fwsc"></p>
+      <label class="chk"><input type="checkbox" id="stock-saved"> I have saved what I want to keep</label>
+      <button id="stock-go" class="ghost" disabled>Install the official firmware</button>
+      <p class="meta" id="stock-msg"></p>
+    </section>
+    <section class="card mailcta">
+      <h3>Want to show your firmware here?</h3>
+      <p>Made a firmware for the FM-1? Free, with its source, released as a <code>.fwsc</code> on GitHub: it can be on this page,
+         with your name and your links, updated with every release.</p>
+      <p><a class="btn" href="mailto:sven@designburg.net?subject=FM-1%20Firmware%20Switcher%3A%20my%20firmware&amp;body=Name%3A%0ARepository%3A%0AWhat%20it%20does%3A%0A">Send a mail to sven@designburg.net</a></p>
+    </section>
+  </div>
+
+  <details><summary>What happens when you press Install</summary>
+    <p class="meta">The page talks to the FM-1 over USB MIDI with the same update protocol as M-VAVE's own updater (first the running
+      firmware stages the new package's update loader, then the loader writes the firmware). The package is checked first (its
+      SHA-256 against the catalogue). Nothing goes to a server: the packages come from this page, mirrored unchanged from each
+      project's GitHub release.</p>
+    <pre id="log"></pre>
+  </details>
+</div></main>
+
+<footer><div class="wrap">
+  The packages are the projects' own, mirrored unchanged from their GitHub releases (GPL-3.0); the source of each is at its repository,
+  linked on its card. Felucca by Leo Kuroshita (Hügelton Instruments); SLOOP by isod89; X0X and FoMni by Charles Vestal; sloopDX and zp12
+  by Sven Trogus. The update path is Felucca's, as sloopDX carries it. M-VAVE and FM-1 are trademarks of their owners; not affiliated
+  with M-VAVE. Unofficial firmware, free and without warranty: you install it at your own risk.
+  <br><a href="https://designburgapps.com/">designburgapps.com</a> · <a href="https://zp12.designburgapps.com/impressum.html">Impressum · Datenschutz</a>
+  · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a> · <span id="updated"></span>
+</div></footer>
+
+<script>
+"use strict";
+/*LIB*/
+
+const $ = (id) => document.getElementById(id);
+const log = (t) => { $("log").textContent += t + "\n"; };
+let cat = [], current = null, writing = false, stock = null;
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const sha256hexOf = async (b) => [...new Uint8Array(await crypto.subtle.digest("SHA-256", b))].map((x) => x.toString(16).padStart(2, "0")).join("");
+
+// which firmware the FM-1 runs: the identity it reports (FM-1_979 ...): the exact package first, then a family
+function whoIs(text) {
+  if (!text) return null;
+  if (text === "FM-1_015") return { name: "the official firmware (V15)" };
+  const exact = cat.find((f) => f.product === text);
+  if (exact) return { fw: exact, exact: true };
+  const fam = cat.find((f) => new RegExp("^" + f.ident + "$").test(text));
+  return fam ? { fw: fam, exact: false } : { name: text };
+}
+function showNow() {
+  const w = whoIs(current);
+  $("now").innerHTML = !current ? "Not connected" : w.fw
+    ? `On your FM-1: <b>${esc(w.fw.name)}</b> ${w.exact ? esc(w.fw.version) + " (the newest)" : "(another version: " + esc(current) + ")"}`
+    : `On your FM-1: <b>${esc(w.name)}</b>`;
+  render();
+}
+
+function render() {
+  const w = whoIs(current);
+  $("grid").innerHTML = "";
+  for (const f of cat) {
+    const isNow = w && w.fw === f;
+    const el = document.createElement("article");
+    el.className = "fw" + (isNow ? " now" : "");
+    el.innerHTML = `<h2>${esc(f.name)} <small>${esc(f.version)}</small>${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${f.beta ? '<span class="tag beta">beta</span>' : ""}</h2>
+      <div class="by">by ${esc(f.author)}</div>
+      <p class="what">${esc(f.what)}</p>
+      <div class="meta">${esc(f.date)} · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
+        <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
+        <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a></div>
+      <progress max="100" value="0"></progress>
+      <div class="row"><button>${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button></div>
+      <div class="msg"></div>`;
+    el.querySelector("button").onclick = () => install(f, el);
+    el.querySelector("button").disabled = writing;
+    $("grid").append(el);
+  }
+}
+
+async function midi() {
+  if (!navigator.requestMIDIAccess) throw Object.assign(new Error("This browser has no Web MIDI: use Chrome or Edge."), { code: "nomidi" });
+  try { return await navigator.requestMIDIAccess({ sysex: true }); }
+  catch (e) { throw new Error("MIDI access with SysEx was not allowed (the lock in the address bar)."); }
+}
+
+$("connect").onclick = async () => {
+  try {
+    const up = new Updater(await midi(), log);
+    const dev = await up.find(() => true);
+    if (!dev) { $("now").textContent = "No FM-1 found: plug it in, close other MIDI apps, try again"; return; }
+    dev.link.close();
+    current = dev.id.text;
+    log(`identity ${current}`);
+    showNow();
+  } catch (e) { $("now").textContent = e.message; }
+};
+
+const TOTAL = 74 + 1179;                        // the reads of a package: step 1, step 2 (as the installers count them)
+async function install(f, el) {
+  if (writing) return;
+  const msg = (t, cls) => { const m = el.querySelector(".msg"); m.textContent = t; m.style.color = cls === "err" ? "var(--err)" : cls === "ok" ? "var(--ok)" : ""; };
+  const was = whoIs(current);
+  if (!confirm(`Install ${f.name} ${f.version}${was && (was.fw || was.name) ? " over " + (was.fw ? was.fw.name : was.name) : ""}?\n\nSaved what you want to keep? The new firmware may not read the old one's projects.`)) return;
+  writing = true; render(); el = [...$("grid").children][cat.indexOf(f)];
+  const bar = el.querySelector("progress"); bar.style.display = "block";
+  try {
+    msg("Loading the package…");
+    const r = await fetch(f.pkg, { cache: "no-store" });
+    if (!r.ok) throw new Error(`the package: HTTP ${r.status}`);
+    const pkg = new Uint8Array(await r.arrayBuffer());
+    if (productOf(pkg) !== f.product || (await sha256hexOf(pkg)) !== f.sha256) throw new Error("the package does not match the catalogue: reload the page");
+    const image = logicalImage(pkg);
+    const step = (k, a) => {
+      log(`${f.id} ${k} ${a ?? ""}`);
+      if (k === "start") msg("Asking the FM-1…");
+      if (k === "verify") { msg("The FM-1 reads the package…"); bar.value = Math.min(100, a / TOTAL * 100); }
+      if (k === "loader") msg("The update loader starts (the FM-1 restarts)…");
+      if (k === "write") { msg("Writing… do not unplug"); bar.value = Math.min(100, (74 + a) / TOTAL * 100); }
+      if (k === "reboot") msg("Restarting…");
+      if (k === "done") { bar.value = 100; }
+    };
+    const up = new Updater(await midi(), log);
+    const ota = await up.find((id) => /^ota-/i.test(id.model));
+    if (ota) { ota.link.close(); if (!(await up.resume(image, step))) throw new Error("stopped"); }
+    else await up.install(image, f.product, step);
+    msg(`${f.name} ${f.version} is on your FM-1.`, "ok");
+    current = f.product; showNow();
+  } catch (e) {
+    msg((e && e.code ? `${e.code}: ` : "") + (e && e.message || e) + " · Stuck? Hold OCT− while switching on, then Install again.", "err");
+    log(String(e && e.stack || e));
+  }
+  writing = false;
+  [...$("grid").querySelectorAll("button")].forEach((b) => { b.disabled = false; });
+}
+
+// back to the official V15: only that exact file (validateStockPackage pins its SHA-256)
+$("stock-file").onchange = async () => {
+  stock = null; $("stock-go").disabled = true;
+  const file = $("stock-file").files[0];
+  if (!file) return;
+  try { stock = await validateStockPackage(new Uint8Array(await file.arrayBuffer())); $("stock-msg").textContent = "That is the official V15."; }
+  catch (e) { $("stock-msg").textContent = "Not the official V15 file: " + e.message; }
+  $("stock-go").disabled = !stock || !$("stock-saved").checked;
+};
+$("stock-saved").onchange = () => { $("stock-go").disabled = !stock || !$("stock-saved").checked; };
+$("stock-go").onclick = async () => {
+  if (writing || !stock || !confirm("Install the official M-VAVE firmware V15?")) return;
+  writing = true; render();
+  try {
+    const up = new Updater(await midi(), log);
+    const ota = await up.find((id) => /^ota-/i.test(id.model));
+    if (ota) { ota.link.close(); await up.resume(stock.image, () => {}, { product: stock.product }); }
+    else await up.install(stock.image, stock.product, (k) => { $("stock-msg").textContent = k === "write" ? "Writing… do not unplug" : k; });
+    $("stock-msg").textContent = "The official firmware is on your FM-1."; current = stock.product; showNow();
+  } catch (e) { $("stock-msg").textContent = (e.code ? e.code + ": " : "") + e.message; }
+  writing = false; render();
+};
+
+window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault(); e.returnValue = "An install is running"; } });
+fetch("catalog.json", { cache: "no-store" }).then((r) => r.json()).then((c) => {
+  cat = c.firmwares; $("updated").textContent = "catalogue of " + c.updated; render();
+}).catch((e) => { $("grid").innerHTML = `<p class="meta">The catalogue could not be loaded: ${esc(e.message)}</p>`; });
+</script>
+</body>
+</html>
