@@ -5,17 +5,22 @@ For the 1.6 video (`zp12-1.6-samples.mp4`, 111 s). Paste as they are; the chapte
 them before "more". Never use "SP-1200" or "E-mu" in the title as if it were theirs: "inspired by" and
 "in the spirit of" are fine, the names are their owners' trademarks.
 
-## Title (pick one, under 100 characters)
+## Title (pick one, under 100 characters; the words searched for first: YouTube cuts long titles)
 
-1. **zp12: turn the M-VAVE FM-1 into a 12-bit sampling drum machine (free firmware, your own samples)**
-2. zp12 1.6 · a 12-bit sampler drum machine on the M-VAVE FM-1 · own samples from the browser
-3. Free firmware: the M-VAVE FM-1 as an 80s-style 12-bit sampler (zp12)
+1. **M-VAVE FM-1 Firmware Wars: zp12 turns it into a 12-bit sampler (free, your own samples)**
+2. FM-1 Firmware Wars · zp12: a 12-bit sampling drum machine on the M-VAVE FM-1
+3. zp12: turn the M-VAVE FM-1 into a 12-bit sampling drum machine (free firmware, your own samples)
+
+Use 1 or 2 if "firmware wars" is how the FM-1 scene names it (a thread, a video series, a hashtag): then people who
+follow it find this. Other firmwares' names (Baud Girl, Felucca, SLOOP) belong in the description, not in the title.
 
 ## Description
 
 ```
 zp12 turns the M-VAVE FM-1 into a 12-bit sampling drum machine in the spirit of the 80s: 26 kHz, pitched with nothing smoothed, your own samples dropped in from the browser. Free firmware, installed from Chrome or Edge in a minute.
 Install, editor, backup, cheat sheet: https://zp12.designburgapps.com
+
+Part of the M-VAVE FM-1 firmware wars: after the stock firmware, Felucca, SLOOP, Baud Girl's FM-1+VA and sloopDX (the DX7), zp12 makes the FM-1 a 12-bit sampling drum machine. It installs over and back with the others' installers.
 
 Everything you see and hear in this video comes from the firmware's own code: the screens are rendered by it, the sounds come out of its engine, the knobs and keys are a script of what a hand would do.
 
@@ -60,15 +65,15 @@ Inspired by the 12-bit samplers of the 80s; their names are trademarks of their 
 #MVAVEFM1 #12bit #samplerdrummachine
 ```
 
-## Tags (the field takes 500 characters; this is 480)
+## Tags (the field takes 500 characters; this is 469)
 
 ```
-zp12, M-VAVE FM-1, MVAVE FM-1, FM-1 firmware, FM-1 custom firmware, 12-bit sampler, 12 bit drum machine, sampling drum machine, SP-1200 style, SP-12 style, 80s sampler sound, lo-fi drums, lofi hip hop drums, boom bap, drum n bass, free firmware, open source music hardware, groovebox, sampler, drum sampler, beat making, own samples, sample editor, web midi, sloopDX, SLOOP, Felucca, DX7 firmware FM-1, hip hop production, hardware sampler, cheap sampler, budget groovebox, 26 kHz, zero order hold, aliasing
+zp12, M-VAVE FM-1, MVAVE FM-1, FM-1 firmware wars, FM-1 firmware, FM-1 custom firmware, baud girl, Felucca, 12-bit sampler, 12 bit drum machine, sampling drum machine, SP-1200 style, SP-12 style, 80s sampler sound, lo-fi drums, lofi hip hop drums, boom bap, drum n bass, free firmware, groovebox, sampler, drum sampler, beat making, own samples, sample editor, web midi, sloopDX, SLOOP, Felucca, DX7 firmware FM-1, hip hop production, hardware sampler, budget groovebox
 ```
 
 ## Hashtags (above the title YouTube shows the first three)
 
-`#MVAVEFM1 #12bit #samplerdrummachine` (also fine: `#boombap #lofi #sampler`)
+`#MVAVEFM1 #FirmwareWars #12bit` (also fine: `#samplerdrummachine #boombap #lofi`)
 
 ## Thumbnail
 
@@ -95,7 +100,7 @@ zp12 1.6: the M-VAVE FM-1 as a 12-bit sampling drum machine, with your own sampl
 ## Deutsche Fassung (Beschreibung, falls der Kanal zweisprachig postet)
 
 ```
-zp12 macht aus dem M-VAVE FM-1 eine 12-Bit-Sampling-Drum-Machine im Geist der 80er: 26 kHz, Pitch über die Abspielrate ohne Glättung, eigene Samples aus dem Browser. Freie Firmware, in einer Minute aus Chrome oder Edge installiert.
+Teil der M-VAVE-FM-1-Firmware-Wars: nach der Original-Firmware, Felucca, SLOOP, Baud Girls FM-1+VA und sloopDX (DX7) macht zp12 aus dem FM-1 eine 12-Bit-Sampling-Drum-Machine im Geist der 80er: 26 kHz, Pitch über die Abspielrate ohne Glättung, eigene Samples aus dem Browser. Freie Firmware, in einer Minute aus Chrome oder Edge installiert.
 Installer, Sample-Editor, Backup, Cheat Sheet: https://zp12.designburgapps.com
 
 Alles im Video kommt aus dem Code der Firmware selbst: die Bildschirme, die Klänge, die Bedienung als Skript.
