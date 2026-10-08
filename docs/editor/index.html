@@ -124,7 +124,7 @@
       <div class="opts">
         <label>Name (8 letters)<input type="text" id="name" maxlength="8"></label>
         <label>Rate<select id="rate"><option value="26040">26.04 kHz (the SP-1200)</option><option value="27500">27.5 kHz (the SP-12)</option></select></label>
-        <label class="chk"><input type="checkbox" id="slow"> 45 → 33: a third more time, grainier</label>
+        <label>Stored at<select id="speed"><option value="0">1×, as it is</option><option value="1">45 → 33: a third more time, grainier</option><option value="2">×2: twice the time, an octave down on the pad</option><option value="3">×2.7: both (the most time, the most grit)</option></select></label>
         <label class="chk"><input type="checkbox" id="norm" checked> Normalise</label>
         <label>Then put it on<select id="pad"><option value="-1">no pad</option></select></label>
       </div>
@@ -140,7 +140,8 @@
 
   <section class="card">
     <h2>Good to know</h2>
-    <p>• Room: 96 KB free = about <b>2.5 s</b> at 26 kHz, <b>3.4 s</b> at 45 → 33 (with sloopDX's bank room 6.3 s / 8.6 s). Up to 24 samples.</p>
+    <p>• Room: 96 KB free = about <b>2.5 s</b> at 26 kHz, 3.4 s at 45 → 33, <b>5 s</b> at ×2, 6.8 s at ×2.7 (with sloopDX's bank room 2.5 times that). Up to 24 samples.</p>
+    <p>• <b>Stored fast, played slow</b> is the old samplers' trick and much of their sound: at ×2 the sample takes half the room, the pad plays it an octave down (TUNE −12, set for you), with half the bandwidth and twice the grit. Breaks and chords love it; a hat not so much.</p>
     <p>• Your samples are in the <a href="../backup/" style="color:#ffb4ab">backup</a>. Replacing one: delete it, add the new one.</p>
     <p>• On the FM-1 they come after the 27 factory samples: hit a pad, turn <b>PRESETS</b>, or EDIT → WAVE.</p>
     <p>• Please always check the latest firmware version: <a href="../install/" style="color:#ffb4ab">zp12.designburgapps.com/install</a>.</p>
@@ -158,7 +159,8 @@ for (const b of "ABCD") for (let i = 1; i <= 8; i++) PADS.push(b + i);
 PADS.forEach((p, i) => { const o = document.createElement("option"); o.value = i; o.textContent = p; $("pad").append(o); });
 const lcd = (s) => { $("lcd").textContent = s; };
 const msg = (s, cls = "") => { $("msg").textContent = s; $("msg").className = cls; };
-const secs = (n, rate, slow) => (n / (slow ? rate * 33 / 45 : rate)).toFixed(2) + " s";
+const secs = (n, rate, flags) => Z.playSecs(n, rate, flags).toFixed(2) + " s";
+const SPEED = ["", " · 45→33", " · ×2", " · ×2.7"], speed = () => +$("speed").value, slowOn = () => !!(speed() & 1), octOn = () => !!(speed() & 2);
 function audio() { if (!ac) ac = new AudioContext({ sampleRate: 44100 }); return ac; }
 function play(f32) {
   const a = audio(), b = a.createBuffer(1, f32.length, 44100);
@@ -179,14 +181,14 @@ function showDir() {
   const kit = link?.info?.kit || 27, useB = $("banks").checked || !!(dir.flags & 1), r = Z.room(dir, useB);
   dir.slots.forEach((s, i) => {
     if (!s) return;
-    const tr = document.createElement("tr"), slow = s.flags & 1;
-    tr.innerHTML = `<td class="n">${s.name}</td><td>${secs(s.n, s.rate, slow)}</td><td>${(s.rate / 1000).toFixed(2)} kHz${slow ? " · 45→33" : ""}</td><td class="act"></td>`;
+    const tr = document.createElement("tr"), slow = s.flags & 1, oct = s.flags & 2;
+    tr.innerHTML = `<td class="n">${s.name}</td><td>${secs(s.n, s.rate, s.flags)}</td><td>${(s.rate / 1000).toFixed(2)} kHz${SPEED[s.flags & 3]}</td><td class="act"></td>`;
     const act = tr.lastChild, btn = (t, f, cls = "ghost small") => { const b = document.createElement("button"); b.className = cls; b.textContent = t; b.onclick = f; act.append(b); };
-    btn("▶", () => run(async () => play(Z.zoh(await Z.fetchSample(link, s), s.rate, slow))));
+    btn("▶", () => run(async () => play(Z.zoh(await Z.fetchSample(link, s), s.rate, slow, oct))));
     const sel = document.createElement("select"); sel.innerHTML = PADS.map((p, k) => `<option value="${k}">${p}</option>`).join("");
     sel.style.padding = "5px"; act.append(sel);
     btn("On the pad", () => run(async () => { await link.assign(+sel.value, kit + i); lcd(`${PADS[+sel.value]} ${s.name}`); }));
-    btn("WAV", () => run(async () => save(Z.wav(await Z.fetchSample(link, s), slow ? Math.floor(s.rate * 33 / 45) : s.rate), s.name.toLowerCase().replace(/\W+/g, "-") + ".wav")));
+    btn("WAV", () => run(async () => save(Z.wav(await Z.fetchSample(link, s), Math.round(s.rate / Z.speedOf({ slow, oct }))), s.name.toLowerCase().replace(/\W+/g, "-") + ".wav")));
     btn("Delete", () => { if (confirm(`Delete ${s.name} from the FM-1? Pads that play it fall silent.`)) run(async () => { await Z.remove(link, dir, i); }); });
     tb.append(tr);
   });
@@ -194,7 +196,7 @@ function showDir() {
   const usedB = r.total - r.free;
   $("mem").innerHTML = `<i style="width:${(100 * usedB / r.total).toFixed(1)}%"></i>`;
   $("memtxt").innerHTML = `<b>${dir.slots.filter(Boolean).length}</b> of 24 places · <b>${Math.round(usedB / 1024)}</b> of ${Math.round(r.total / 1024)} KB used · ` +
-    `the longest still fits: <b>${(r.longest / 26040).toFixed(2)} s</b> at 26 kHz, <b>${(r.longest / 26040 * 45 / 33).toFixed(2)} s</b> at 45 → 33`;
+    `the longest still fits: <b>${(r.longest / 26040).toFixed(2)} s</b> at 26 kHz, <b>${(r.longest / 26040 * 2).toFixed(2)} s</b> at ×2, <b>${(r.longest / 26040 * 2 * 45 / 33).toFixed(2)} s</b> at ×2.7`;
   $("banks").checked = useB;
   refresh(); info();
 }
@@ -288,15 +290,15 @@ async function load(f) {
 }
 function info() {
   if (!src) return;
-  const slow = $("slow").checked, rate = +$("rate").value;
-  enc = Z.encode(src.x, src.rate, { start: cut[0], end: cut[1], slow, rate, normalize: $("norm").checked });
+  const slow = slowOn(), oct = octOn(), rate = +$("rate").value, flags = speed();
+  enc = Z.encode(src.x, src.rate, { start: cut[0], end: cut[1], slow, oct, rate, normalize: $("norm").checked });
   const kb = Z.bytesOf(enc.length) / 1024, r = dir ? Z.room(dir, $("banks").checked || !!(dir.flags & 1)) : null;
   const fits = !r || Z.bytesOf(enc.length) <= Math.ceil(r.longest * 1.5 / 4096) * 4096;
-  $("info").innerHTML = `${((cut[1] - cut[0]) / src.rate).toFixed(2)} s → ${secs(enc.length, rate, slow)} on the FM-1 · ${kb.toFixed(1)} KB` +
-    (r ? (fits ? ' · <span class="ok">fits</span>' : ' · <span class="err">too long: trim it, or 45 → 33, or the bank room</span>') : "");
+  $("info").innerHTML = `${((cut[1] - cut[0]) / src.rate).toFixed(2)} s → ${secs(enc.length, rate, flags)} on the FM-1 · ${kb.toFixed(1)} KB` +
+    (r ? (fits ? ' · <span class="ok">fits</span>' : ' · <span class="err">too long: trim it, store it faster (×2), or the bank room</span>') : "");
   refresh();
 }
-for (const id of ["slow", "rate", "norm"]) $(id).onchange = info;
+for (const id of ["speed", "rate", "norm"]) $(id).onchange = info;
 $("pad").onchange = showPads;
 function draw() {
   const c = $("wave"), g = c.getContext("2d"), W = c.width, H = c.height, x = src.x, n = x.length;
@@ -328,11 +330,11 @@ function draw() {
   c.onpointerup = () => { if (which >= 0) { which = -1; info(); } };
 }
 $("play-o").onclick = () => src && play(src.rate === 44100 ? src.x.slice(cut[0], cut[1]) : Z.zoh(Int16Array.from(src.x.slice(cut[0], cut[1]), (v) => Math.round(v * 2047)), src.rate, false));
-$("play-z").onclick = () => enc && play(Z.zoh(enc, +$("rate").value, $("slow").checked));
+$("play-z").onclick = () => enc && play(Z.zoh(enc, +$("rate").value, slowOn(), octOn()));
 $("upload").onclick = () => run(async () => {
-  const name = Z.cleanName($("name").value), slow = $("slow").checked, pad = +$("pad").value;
+  const name = Z.cleanName($("name").value), slow = slowOn(), oct = octOn(), pad = +$("pad").value;
   msg("Writing…");
-  const slot = await Z.upload(link, dir, { name, y: enc, rate: +$("rate").value, slow }, $("banks").checked,
+  const slot = await Z.upload(link, dir, { name, y: enc, rate: +$("rate").value, slow, oct }, $("banks").checked,
                               (d, t) => lcd(`WRITING ${name} ${Math.round(100 * d / t)} %`));
   if (pad >= 0) await link.assign(pad, link.info.kit + slot);
   lcd(pad >= 0 ? `${PADS[pad]} ${name}` : `${name} ON THE FM-1`);
@@ -345,7 +347,7 @@ if (new URLSearchParams(location.search).has("demo")) {
   lcd("CONNECTED\nZP12 1.5");
   dir = { gen: 3, flags: 0, copy: 0, slots: Array(24).fill(null) };
   dir.slots[0] = { off: 0xea000, n: 21000, rate: 26040, flags: 0, name: "BREAK 1" };
-  dir.slots[1] = { off: 0xef000, n: 9000, rate: 26040, flags: 1, name: "VOX HEY" };
+  dir.slots[1] = { off: 0xef000, n: 9000, rate: 26040, flags: 3, name: "VOX HEY" };
   dir.slots[2] = { off: 0xe5000, n: 6000, rate: 27500, flags: 0, name: "808 SUB" };
   showDir();
   pads = { kit: ["KICK", "SNARE", "RIM", "CLAP", "HAT", "OHAT", "TOM L", "TOM H", "CRASH", "RIDE", "COWBL", "TAMB", "SHAKR", "CONGA", "CLAVE", "WOOD",

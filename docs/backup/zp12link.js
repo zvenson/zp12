@@ -298,9 +298,11 @@
     return y;
   }
   // a sound from the computer as the FM-1 will hold it: mono -1..1 at srcRate, the part start..end (samples),
-  // normalised, at 45 (stored a 45->33 step fast: played at 33 it sounds as it was, a third more time) or not
+  // normalised; stored fast and played slow, the old trick: slow = at 45, played at 33 (a third more time),
+  // oct = at double speed, played an octave down on the pad (twice the time, half the bandwidth, the grit)
+  const speedOf = (o) => (o.slow ? 45 / 33 : 1) * (o.oct ? 2 : 1);
   function encode(x, srcRate, o = {}) {
-    const p = x.subarray(o.start || 0, o.end || x.length), from = Math.round(srcRate * (o.slow ? 45 / 33 : 1)), to = o.rate || RATES[0];
+    const p = x.subarray(o.start || 0, o.end || x.length), from = Math.round(srcRate * speedOf(o)), to = o.rate || RATES[0];
     const y = resample12(p, from, to);
     if (o.normalize === false) return y;
     let pk = 0;                                  // normalised as it comes out (the low-pass takes peaks off): once more
@@ -323,9 +325,10 @@
     }
     return y;
   }
-  // what the FM-1 plays: the samples held, no interpolation, at its rate (x 33/45 at 33), as 44.1 kHz floats
-  function zoh(y, rate, slow) {
-    const step = Math.floor(Math.floor((slow ? Math.floor(rate * 33 / 45) : rate) * 65536 / 44100));
+  // what the FM-1 plays: the samples held, no interpolation, at its rate (x 33/45 at 33, half an octave down), as
+  // 44.1 kHz floats
+  function zoh(y, rate, slow, oct) {
+    const step = Math.floor(Math.floor((slow ? Math.floor(rate * 33 / 45) : rate) * 65536 / 44100) * (oct ? 0.5 : 1));
     const out = new Float32Array(Math.floor(y.length * 65536 / step));
     let pos = 0, frac = 0;
     for (let i = 0; i < out.length && pos < y.length; i++) {
@@ -355,7 +358,7 @@
         progress(++done, steps);
       }
     }
-    d.slots[slot] = { off: at, n: s.y.length, rate: s.rate || RATES[0], flags: s.slow ? 1 : 0, name: cleanName(s.name) };
+    d.slots[slot] = { off: at, n: s.y.length, rate: s.rate || RATES[0], flags: (s.slow ? 1 : 0) | (s.oct ? 2 : 0), name: cleanName(s.name) };
     await writeDir(link, d);
     return slot;
   }
@@ -376,7 +379,8 @@
     return new Uint8Array(b);
   }
 
-  const api = { CMD, PARTS, SECT, Link, pack7, unpack7, frame, parse, crc32, backup, readBackup, restore,
+  const playSecs = (n, rate, flags) => n / ((flags & 1 ? rate * 33 / 45 : rate) * (flags & 2 ? 0.5 : 1));   // as the FM-1 plays it
+  const api = { CMD, PARTS, SECT, speedOf, playSecs, Link, pack7, unpack7, frame, parse, crc32, backup, readBackup, restore,
                 NSLOT, ROOMS, BANKROOM, RATES, readDir, writeDir, parseDir, buildDir, room, alloc, resample12, encode, pack12,
                 unpack12, zoh, upload, remove, rename, fetchSample, cleanName, wav, bytesOf };
   if (typeof module !== "undefined" && module.exports) module.exports = api;

@@ -7,10 +7,11 @@
  *           zero-order hold of a DAC clocked at the pitched rate); the aliasing is the sound
  *   sounds  32: a wave with TUNE / FINE, DECAY, LEVEL, PAN, START / END, REVERSE, 45->33, CHANNEL
  *   channels 8 outputs, one sound at a time each (a new hit on a channel cuts the last):
- *           1-2 a 4-pole resonant low-pass on the decay envelope (SSM2044-style, its cutoff follows
- *               the level as the original's dynamic filters do), 3-6 a fixed 2-pole low-pass each,
- *           7-8 no filter
- *   out     a stereo mix in Q15 (the caller adds it to the master) */
+ *           1-2 a 4-pole resonant low-pass (SSM2044-style): open as CUT at the hit, it follows the decay
+ *               envelope down two octaves, as the original's dynamic filters do; 3-6 a fixed 2-pole
+ *               low-pass each, 7-8 no filter. The order is the hardware's: sample, VCA (the decay),
+ *               DRIVE, the filter, then the channel's fader (the mixer's slider: it never changes the tone)
+ *   out     a stereo mix in Q15; sp_out makes the master's 16 bits of it (-6 dB, a soft knee) */
 #include <stdint.h>
 
 #define SP_NCH 8
@@ -197,12 +198,15 @@ static void sp_channel(uint32_t ch, int32_t *out)
 {
     sp_ch_t *c = &sp_ch[ch];
     uint32_t i;
-    int32_t a1 = 0, k = 0, x, y, e;
+    int32_t a1 = 0, k = 0, x, y, e0, e1, gl, gr;
     if (!c->on && !c->tail)
         return;
-    e = (c->env >> 9) * sp_mix[ch] / 100;   /* (100 = the level as set) */                                  /* Q15 */
-    if (ch < 2u) {                                    /* the dynamic filter: the cutoff follows the level */
-        uint32_t hz = sp_cut_hz(c->cut) * (uint32_t)(8192 + (e >> 2)) >> 15;   /* x 0.25 .. 0.5+ with it */
+    e0 = c->env >> 9;                                 /* Q15: the envelope now, and at the block's end: the level */
+    e1 = (int32_t)(((int64_t)c->env * c->emul) >> 16) >> 9;   /* ramps between them (no steps at the block rate) */
+    gl = c->gl * sp_mix[ch] / 100;                    /* the fader, Q12 (100 = the level as set) */
+    gr = c->gr * sp_mix[ch] / 100;
+    if (ch < 2u) {                                    /* the dynamic filter: CUT at the hit, two octaves down as it decays */
+        uint32_t hz = sp_cut_hz(c->cut) * sp_pow2_cents(-2400 + ((e0 * 2400) >> 15)) >> 16;
         a1 = sp_onepole(hz < 30u ? 30u : hz > 18000u ? 18000u : hz);
         k = c->res * 125;                             /* Q12 feedback, 0 .. ~3.9 (self-oscillation near 4) */
     } else if (ch < 6u) {
@@ -223,7 +227,7 @@ static void sp_channel(uint32_t ch, int32_t *out)
         } else {
             x = 0;
         }
-        x = (int32_t)(((int64_t)x * e) >> 15);
+        x = (x * (e0 + (((e1 - e0) * (int32_t)i) >> 5))) >> 15;   /* (|x| < 2^15, e < 2^15: 32 bits) */
         if (c->drv) {                                 /* DRIVE: louder into a soft clip, the level kept */
             x = sp_clamp((x * c->drv) >> 4, -49152, 49152);
             x = sp_soft(x);
@@ -245,10 +249,10 @@ static void sp_channel(uint32_t ch, int32_t *out)
         } else {
             y = x;
         }
-        out[2u * i] += (y * c->gl) >> 12;
-        out[2u * i + 1u] += (y * c->gr) >> 12;
+        out[2u * i] += (y * gl) >> 12;
+        out[2u * i + 1u] += (y * gr) >> 12;
         if (c->snd[0] | c->snd[1] | c->snd[2]) {      /* the sends: post fader, before pan */
-            int32_t m = (y * (c->gl + c->gr)) >> 13;
+            int32_t m = (y * (gl + gr)) >> 13;
             sp_bus[0][i] += (m * c->snd[0]) >> 15;
             sp_bus[1][i] += (m * c->snd[1]) >> 15;
             sp_bus[2][i] += (m * c->snd[2]) >> 15;
@@ -259,6 +263,23 @@ static void sp_channel(uint32_t ch, int32_t *out)
         c->on = 0;
     if (!c->on && c->tail && !--c->tail)
         c->z[0] = c->z[1] = c->z[2] = c->z[3] = 0;
+}
+
+/* the master: the Q15 mix to 16 bits at -6 dB (the full scale was too loud), with a soft knee above 3/4 so a
+ * pile of hits rounds off like a mixer's bus instead of clipping hard (tanh as u (27 + u^2) / (27 + 9 u^2)) */
+static inline int32_t sp_out(int32_t v)
+{
+    int32_t a, u, f;
+    v >>= 1;
+    a = v < 0 ? -v : v;
+    if (a <= 24576)
+        return v;
+    u = (a - 24576) >> 5;                              /* Q8 above the knee, 3.0 the most */
+    if (u > 768) u = 768;
+    f = u * (27 * 65536 + u * u) / (27 * 65536 + 9 * u * u);
+    a = 24576 + (f << 5);
+    if (a > 32767) a = 32767;
+    return v < 0 ? -a : a;
 }
 
 /* the mix of all channels for one block (stereo Q15, out zeroed by the caller or added to) */

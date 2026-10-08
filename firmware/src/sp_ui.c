@@ -117,7 +117,7 @@ static char *num(char *p, int32_t v, uint32_t digits, int sign) { put_int(p, v, 
 /* the samples: the kit's, then the own ones from the web editor (sp_samples.c fills their names and flags) */
 #define SP_NUSER 24
 static char ui_uname[SP_NUSER][9];
-static uint8_t ui_uflags[SP_NUSER];              /* bit 0: stored for 45->33 */
+static uint8_t ui_uflags[SP_NUSER];              /* bit 0: stored for 45->33, bit 1: at double speed (an octave down) */
 static const char *wave_name(uint32_t w)
 {
     return w < KIT_NWAVE ? KIT_WAVE[w].name : w < KIT_NWAVE + SP_NUSER && sp_wave[w].n ? ui_uname[w - KIT_NWAVE] : "-----";
@@ -634,9 +634,13 @@ static void wave_set(uint32_t pad, uint32_t w)
 {
     sp_sound_t *s = &sp_sound[pad % SP_NSOUND];
     char m[24];
+    uint32_t was = s->wave >= KIT_NWAVE && s->wave < KIT_NWAVE + SP_NUSER ? ui_uflags[s->wave - KIT_NWAVE] : 0u;
+    uint32_t now = w >= KIT_NWAVE ? ui_uflags[w - KIT_NWAVE] : 0u;
     s->wave = (uint8_t)w;
     if (w >= KIT_NWAVE)                          /* an own sample: 45->33 as it was stored */
-        s->flags = (uint8_t)((ui_uflags[w - KIT_NWAVE] & 1u) ? s->flags | SPF_33 : s->flags & ~SPF_33);
+        s->flags = (uint8_t)((now & 1u) ? s->flags | SPF_33 : s->flags & ~SPF_33);
+    if ((now ^ was) & 2u)                        /* stored at double speed: played an octave down (and back) */
+        s->tune = (now & 2u) ? -12 : 0;
     s->start = 0;
     s->end = 1000;
     ui.sel = (uint8_t)(pad % SP_NSOUND);

@@ -16,8 +16,9 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
 
 - `zp12.c`: main, audio ISR (output `sp_clamp(v >> 1, ...) << 8`, i.e. -6 dB).
 - `sp_core.c`: 12-bit packed samples (2 in 3 bytes) at 26.04 / 27.5 kHz, zero-order-hold pitch, 8 channels
-  (1-2 resonant 4-pole LP following the decay, 3-6 fixed LP 9/12 kHz, 7-8 none), mono choke, DRIVE, 3 sends,
-  click; `sp_trigger_at(k, vel, semis)`.
+  (1-2 resonant 4-pole LP: CUT at the hit, two octaves down with the decay; 3-6 fixed LP 9/12 kHz, 7-8 none),
+  order sample > VCA > DRIVE > filter > fader, mono choke, 3 sends, click; `sp_trigger_at(k, vel, semis)`;
+  `sp_out(v)`: the master's 16 bits (-6 dB, soft knee above 3/4). Own-sample flags: bit0 45->33, bit1 x2 (TUNE -12).
 - `sp_fx.c`: chorus / delay / reverb (sloopDX's fx_buses).
 - `sp_seq.c`: 96 PPQ, 16 segments ("loops") of 1-32 bars or AUTO (bars=0: first take sets the length),
   `sq_ev_t` {t:14, pad:5, lvl:3, skip:1, semis:6}, 512 events per segment; requests via `sq_post(op,pad,arg)`

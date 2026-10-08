@@ -160,8 +160,7 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
             sp_render(o + 2u * b);
         }
         for (i = 0; i < HALF_WORDS; i++) {
-            int32_t v = (o[i] * master_q12) >> 12;
-            o[i] = sp_clamp(v >> 1, -32767, 32767) << 8;   /* (-6 dBFS ceiling, as sloopDX: the full scale was too loud) */
+            o[i] = sp_out((o[i] * master_q12) >> 12) << 8;   /* (-6 dB, a soft knee: sp_core.c) */
         }
         fm1_audio_ack_half();
     }

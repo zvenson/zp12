@@ -95,6 +95,12 @@ int main(int argc, char **argv)
         if (sp_sound[0].wave != 0u) { printf("zp12 ui: PRESETS did not skip the empty places FAIL\n"); return 1; }
         ui_preset(-1);
         if (sp_sound[0].wave != KIT_NWAVE + 3) { printf("zp12 ui: PRESETS back did not find the own sample FAIL\n"); return 1; }
+        sp_wave[KIT_NWAVE + 5].d = snd; sp_wave[KIT_NWAVE + 5].n = 100; sp_wave[KIT_NWAVE + 5].rate = 26040;
+        strcpy(ui_uname[5], "BREAK"); ui_uflags[5] = 2; sp_sound[0].tune = -3;
+        ui_preset(1);                                      /* stored at double speed: an octave down on the pad ... */
+        if (sp_sound[0].wave != KIT_NWAVE + 5 || sp_sound[0].tune != -12) { printf("zp12 ui: a x2 sample did not set TUNE -12 FAIL\n"); return 1; }
+        ui_preset(1);                                      /* ... and back to 0 on a normal one */
+        if (sp_sound[0].wave != 0u || sp_sound[0].tune != 0) { printf("zp12 ui: leaving a x2 sample did not reset TUNE FAIL\n"); return 1; }
     }
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;

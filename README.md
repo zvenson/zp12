@@ -4,7 +4,7 @@ A 12-bit sampling drum machine for the **M-VAVE FM-1**: 32 sounds at 26.04 kHz (
 without interpolation, eight output channels with their filters, a panel-style screen. Inspired by the
 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation.
 
-> **Status: 1.5.** Cheat sheet: `web/cheatsheet.html` (on the site, with a PDF). The factory kit on the keys (bank C6–C8: a grand piano, Cm9 and F13 stabs and a note, VCSL CC0; bank D: E-piano chords, horns, vibes, bass,
+> **Status: 1.6.** Cheat sheet: `web/cheatsheet.html` (on the site, with a PDF). The factory kit on the keys (bank C6–C8: a grand piano, Cm9 and F13 stabs and a note, VCSL CC0; bank D: E-piano chords, horns, vibes, bass,
 > scratches), eleven loops on the black keys, the sequencer (loops of 1–32 bars or AUTO, song, real-time recording with count-in and AUTO CORRECT, step editing, swing, erase, tap tempo), sloopDX's
 > chorus, delay and reverb, saved in flash (0xC4000.., a room sloopDX leaves free). Own samples (a web editor) next.
 > Plan: [CONCEPT.md](CONCEPT.md).
@@ -39,8 +39,12 @@ switching it on (USB rescue).
 
 - 12-bit linear samples, packed, at 26.04 / 27.5 kHz; pitch by the playback rate with a zero-order hold
   (no interpolation): the aliasing is the sound. 45→33: stored fast, played slow.
-- Channels 1–2: a 4-pole resonant low-pass whose cutoff follows the decay; 3–6: a fixed low-pass; 7–8:
-  none. One sound per channel at a time (a new hit cuts the last).
+- Channels 1–2: a 4-pole resonant low-pass (SSM2044-style), open as CUT at the hit and closing two octaves
+  as the sound decays (the original's dynamic filters); 3–6: a fixed low-pass; 7–8: none. The order is the
+  hardware's: sample, VCA (decay), DRIVE, filter, then the channel's fader. One sound per channel at a time.
+- Stored fast, played slow (the old trick): 45→33 per sound, and own samples at ×2 (an octave down on the
+  pad, TUNE −12 set for you) or ×2.7: more time in the same memory, half the bandwidth, the grit.
+- The master: −6 dB and a soft knee above 3/4, so a pile of hits rounds off instead of clipping hard.
 - `firmware/src/sp_core.c`; host test `tests/sp_core_test.c` renders a demo WAV.
 
 ## Build

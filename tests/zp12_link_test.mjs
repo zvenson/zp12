@@ -128,6 +128,11 @@ check(e && /damaged/.test(e.message), "restore: a damaged file refused (CRC)");
   check(d.slots[sl].off >= 0xa0000 && d.slots[sl].off < 0xc4000 && d.flags === 1, "with sloopDX's bank room: it goes there, the directory says so");
   w = (await raw("WAVES")).trim().split(" ");
   check(w.includes("LONG"), "the firmware takes a sample in the bank room");
+  const so = await Z.upload(link, d, { name: "OCT", y: Z.encode(Float32Array.from(x), 44100, { oct: true, slow: true }), oct: true, slow: true });
+  check(/ OCT 3 /.test((await raw("WAVES")) + " ") && d.slots[so].n === Math.floor(3000 * 26040 / Math.round(44100 * 45 / 33 * 2)),
+        "stored at x2.7 (45->33 and double speed): a third of the samples, flags 3");
+  check(Math.abs(Z.playSecs(d.slots[so].n, 26040, 3) - 3000 / 44100) < 0.002 && Z.zoh(Z.unpack12(Z.pack12(y), y.length), 26040, true, true).length > y.length * 2,
+        "played back: as long as the original, the FM-1 stepping half as fast");
   const back = await Z.fetchSample(link, d.slots[1]);
   check(back.length === y.length && back.every((v, i) => v === y[i]), "fetchSample: read back as it was uploaded");
   const z = Z.zoh(y, 26040, false);

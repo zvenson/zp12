@@ -4,7 +4,7 @@
  * packed as the kit's (12 bit, 2 in 3 bytes) in the free rooms, read through the plain XIP window. Here they
  * are only read: at the start, and when the editor says RELOAD. They play as waves KIT_NWAVE + slot.
  *   directory: magic "ZPSM", gen, flags (bit 0: sloopDX's bank room holds samples), CRC32 of the slots,
- *              24 slots of {flash offset (0: empty), samples, rate Hz, flags (bit 0: stored for 45->33), -, name[8]} */
+ *              24 slots of {flash offset (0: empty), samples, rate Hz, flags (bit 0: stored for 45->33, bit 1: at double speed), -, name[8]} */
 #define ZU_DIR0 0xD8000u
 #define ZU_MAGIC 0x4D53505Au                     /* "ZPSM" */
 typedef struct { uint32_t off, n; uint16_t rate; uint8_t flags, rsv; char name[8]; } zu_slot_t;
