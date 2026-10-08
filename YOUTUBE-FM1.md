@@ -1,6 +1,6 @@
 # YouTube: "Make Firmware, Not War" (the FM-1 Firmware Hub)
 
-Videos: `../video/fm1v/FM1-Make-Firmware-Not-War.mp4` (16:9, ~73 s) and `FM1-Make-Firmware-Not-War-short.mp4` (9:16, ~39 s).
+Videos: `../video/fm1v/FM1-Make-Firmware-Not-War.mp4` (16:9, 1:57) and `FM1-Make-Firmware-Not-War-short.mp4` (9:16, 42 s).
 
 What works on YouTube right now (search "M-VAVE FM-1 firmware", 2026-10-08): "The Firmware Wars | M-Vave FM-1 New
 Firmwares" 22k views in 2 days; SLOOP tour 38k, Baud Girl overviews 30-40k; titles start with "M-VAVE FM-1", say
@@ -38,10 +38,14 @@ Why no Baud Girl or Groove OS? The hub lists open-source firmware only (GPL-3.0)
 
 Please always check the latest firmware version! Unofficial firmware, free and without warranty: you install it at your own risk. Back up first.
 
-0:00 The FM-1 Firmware Wars
-0:14 Six open-source firmwares, their own sounds
-0:47 The hub: install in one click
-1:04 Links
+0:00 Switch your FM-1 firmware in one click
+0:25 Firmware Wars → Make Firmware, Not War · zp12
+0:44 Felucca
+0:55 SLOOP
+1:06 sloopDX
+1:18 X0X
+1:29 FoMni
+1:40 The hub: back to stock, your firmware here, links
 
 ☕ Buy me a coffee: https://paypal.me/zvenson
 M-VAVE and FM-1 are trademarks of their owners; not affiliated with M-VAVE. Each firmware belongs to its authors.
