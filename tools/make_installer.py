@@ -48,11 +48,14 @@ def main(sloopdx, pkg, version, out, own_site=False):
         <p class="small">Open the <a href="../webapp/installer/">sloopDX installer</a> and press Install. If the FM-1 does not answer: hold OCT&minus; while switching it on (USB rescue), then install.</p>
       </section>
     </aside>'''),
-        (r"<footer><div class=\"wrap\">.*?<span data-t=\"license\">", '<footer><div class="wrap">\n  zp12: based on SLOOP (isod89) and Felucca, on the FM-1 platform as sloopDX carries it (GPL-3.0). Factory sounds: CC0 (VSCO-2 CE, VCSL, Sonic Pi). Inspired by the 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation. Not affiliated with M-VAVE. zp12 is free and stays free: <a href="https://paypal.me/zvenson" rel="noopener">☕ buy me a coffee</a> if it made your day.<br>\n  <span data-t="license">'),
+        (r"<footer><div class=\"wrap\">.*?<span data-t=\"license\">", '<footer><div class="wrap">\n  zp12: based on SLOOP (isod89) and Felucca, on the FM-1 platform as sloopDX carries it (GPL-3.0). Factory sounds: CC0 (VSCO-2 CE, VCSL, Sonic Pi). Inspired by the 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation. Not affiliated with M-VAVE.<br>\n  <span data-t="license">'),
         ("https://github.com/zvenson/dxsloop", "https://github.com/zvenson/zp12"),
         ("github.com/zvenson/dxsloop", "github.com/zvenson/zp12"),
         ("../../impressum.html", "../impressum.html"),
         ("../../", "../"),
+        ("sloopDX is free and stays free", "zp12 is free and stays free"),
+        # the coffee where it is seen: in the install card, under the status (the template's footer line stays too)
+        ('<pre id="log"></pre>', '<pre id="log"></pre>\n        <p class="small">zp12 is free and stays free. <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a> if it made your day.</p>'),
     ]
     if own_site:                                        # zp12.designburgapps.com: sloopDX's pages by their address
         swaps += [("../webapp/installer/", "https://dx7.designburgapps.com/webapp/installer/"),
