@@ -113,6 +113,7 @@ static void ota_commit(const uint8_t *parm)
 #include "sp_fx.c"
 #include "zp12_kit.h"
 #include "sp_seq.c"
+#include "sp_punch.c"
 /* pad hits go to the audio ISR as requests (sp_seq.c sq_post): sounded, and recorded when REC */
 #define SP_HIT(k, vel, semis) sq_post(RQ_HIT, k, (vel) | (uint32_t)((semis) + 64) << 8)
 #include "sp_ui.c"
@@ -159,6 +160,7 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
             sq_block();                                     /* the sequencer's hits of this block */
             sp_render(o + 2u * b);
         }
+        sp_punch(o, HALF_FRAMES);                           /* FX held + white key 1-4: roll, reverse, tape stop */
         for (i = 0; i < HALF_WORDS; i++) {
             o[i] = sp_out((o[i] * master_q12) >> 12) << 8;   /* (-6 dB, a soft knee: sp_core.c) */
         }
@@ -261,12 +263,25 @@ static void zp12_main(void)
                         if (pd < 32u) er |= 1u << pd;
                     }
             sq.erase = er;
+            {   /* FX held: white keys 1-4 punch in, the last one held wins (sp_punch.c) */
+                int32_t px = -1;
+                if ((bt >> B_FX) & 1u)
+                    for (k = 0; k < 27u; k++)
+                        if ((n >> k) & 1u && white_of(k) < PN_NFX) px = (int32_t)white_of(k);
+                pn.req = (int8_t)px;
+            }
             for (i = 0; down; i++, down >>= 1)          /* the keys: pads (ui decides which) */
                 if (down & 1u)
                     key_down(i, (bt >> B_LFO) & 1u);
         }
         b = fm1_input_edges(&rel);
         b = ui_holds(fm1_in.buttons, b, rel);           /* REC held: CLEAR; SAVE tapped / held + a black key */
+        if (b & (1u << B_FX)) {                         /* FX down: a punch-in layer while held; tapped, the FX pages */
+            ui.fx_used = 0;
+            b &= ~(1u << B_FX);
+        }
+        if (rel & (1u << B_FX) && !ui.fx_used)
+            button(B_FX);
         if (b & (1u << B_SEQ)) {                        /* SEQ down: the step grid while held */
             seq_down = fm1_ms;
             seq_used = 0;

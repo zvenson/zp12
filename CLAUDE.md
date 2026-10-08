@@ -20,6 +20,8 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   order sample > VCA > DRIVE > filter > fader, mono choke, 3 sends, click; `sp_trigger_at(k, vel, semis)`;
   `sp_out(v)`: the master's 16 bits (-6 dB, soft knee above 3/4). Own-sample flags: bit0 45->33, bit1 x2 (TUNE -12).
 - `sp_fx.c`: chorus / delay / reverb (sloopDX's fx_buses).
+- `sp_punch.c`: FX held + white 1-4: ROLL 1/8, ROLL 1/16, REVERSE, TAPE STOP on the whole mix (after SLOOP's punch.c),
+  mono ring of 0.74 s at 22 kHz in .pool (pool is then nearly full: ~0.8 KB left); test tests/sp_punch_test.c.
 - `sp_seq.c`: 96 PPQ, 16 segments ("loops") of 1-32 bars or AUTO (bars=0: first take sets the length),
   `sq_ev_t` {t:14, pad:5, lvl:3, skip:1, semis:6}, 512 events per segment; requests via `sq_post(op,pad,arg)`
   (RQ_HIT PLAY STOP REC STEP WIPE CLEAR COPY LOOP) processed in the ISR `sq_block()`; AUTO CORRECT, swing,

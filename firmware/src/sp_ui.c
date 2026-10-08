@@ -66,7 +66,7 @@ static struct {
     uint32_t turn_ms;                           /* ... and when (recording: its hits take them) */
     uint32_t held;                              /* the buttons held (bit = matrix id) */
     uint8_t rec_on, rec_prev, holding;          /* REC: pressed, the state before, held into a CLEAR */
-    uint8_t save_used, prev_page;               /* SAVE held: a loop saved; the page before EDIT */
+    uint8_t save_used, prev_page, fx_used;     /* ...; FX held: a key pressed (a punch, not the pages) */               /* SAVE held: a loop saved; the page before EDIT */
     uint32_t rec_t0, hold_t0;
     uint8_t mix[SP_NCH];
     uint32_t arm_ms, touch_ms;
@@ -564,6 +564,13 @@ static void key_down(uint32_t k, int erase)
     uint32_t pad;
     if (k >= 27u)
         return;
+    if ((ui.held >> B_FX) & 1u) {                /* FX held: white keys 1-4 punch in (zp12.c, sp_punch.c), no pad */
+        static const char *const PUNCH[4] = {"ROLL 1/8", "ROLL 1/16", "REVERSE", "TAPE STOP"};
+        ui.fx_used = 1;
+        if (white_of(k) < 4u)
+            ui_say(PUNCH[white_of(k)]);
+        return;
+    }
     if ((ui.held >> B_SAVE) & 1u) {              /* SAVE held: a black key saves the loop into that loop */
         if (white_of(k) == 0xFFu) {
             uint32_t b = 0, i;
