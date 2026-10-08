@@ -91,10 +91,6 @@
   h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 24px; font-weight: 600; text-align: center; }
   .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }   /* the firmwares + yours + the official one, 4 a row */
   .fws { display: contents; }
-  .fws .part { grid-column: 1 / -1; font-size: 13px; letter-spacing: 2.2px; text-transform: uppercase; color: var(--dim); font-weight: 600; margin: 0 0 -6px; }
-  .fws .part b { color: var(--beige); font-weight: 700; }
-  .fws .part + .part, .fws .fw + .part { margin-top: 22px; }
-  .fws .part[hidden] { display: none; }
   .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: -6px 0 28px; }
   .chips button { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 11px 18px; font-size: 14.5px; }
   .chips button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
@@ -328,22 +324,12 @@ function lineup() {
   $("lineup").innerHTML = cat.map((f) => `<img src="img/${esc(f.id)}.png" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy">`).join("");
 }
 
-// the order: ours first, as ours (the makers of this page), then every other one by its GitHub stars (each night's count)
-const OURS = ["zp12", "sloopdx"];
-const ordered = (l) => [...OURS.map((i) => l.find((f) => f.id === i)).filter(Boolean),
-                        ...l.filter((f) => !OURS.includes(f.id)).sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1))];
+// the order: by their GitHub stars (each night's count), ours among them
+const ordered = (l) => [...l].sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1));
 function render() {
   const w = whoIs(current);
   $("grid").innerHTML = "";
-  const part = (html) => { const h = document.createElement("div"); h.className = "part"; h.innerHTML = html; $("grid").append(h); return h; };
-  let head = null, shown = false;
   for (const f of cat) {
-    if (f === cat[0] || (OURS.includes(cat[cat.indexOf(f) - 1].id) && !OURS.includes(f.id))) {
-      if (head) head.hidden = !shown;
-      head = part(OURS.includes(f.id) ? '<b>From the makers of this hub</b> · zp12 and sloopDX by <a href="https://github.com/zvenson" rel="noopener">zvenson</a>'
-                                       : "<b>Every other open-source firmware</b> · by their GitHub stars");
-      shown = false;
-    }
     const isNow = w && w.fw === f;
     const el = document.createElement("article");
     el.className = "fw" + (isNow ? " now" : "");
@@ -365,10 +351,8 @@ function render() {
     el.querySelector("button").onclick = () => install(f, el);
     el.querySelector("button").disabled = writing;
     el.hidden = kind !== "all" && !kindsOf(f).includes(kind) && !isNow;          // (the one on your FM-1 stays in view)
-    shown ||= !el.hidden;
     $("grid").append(el);
   }
-  if (head) head.hidden = !shown;
 }
 
 async function midi() {

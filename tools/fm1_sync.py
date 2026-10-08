@@ -28,7 +28,7 @@ BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 # id, editor / play (its web editor, its version in the browser), kind (the page's filter, one or a list: synth,
 # groove, drums, chords), name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
 # latest release's .fwsc) or a path in this machine's checkouts (our own, deployed from there)
-FIRMWARES = [  # (the page orders them: zp12 + sloopDX first, the others by their GitHub stars)
+FIRMWARES = [  # (the page orders them by their GitHub stars)
     # (Salt, ChoralRoot, Jangada, Melodee, Hortator report numbers the others use too: their check is any FM-1
     # identity, the update loader is checked as for all; the page names the running one only when it is unambiguous)
     dict(id="zp12", editor="https://zp12.designburgapps.com/editor/",
