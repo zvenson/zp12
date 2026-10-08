@@ -3,6 +3,7 @@
 tested update path) with zp12's package and texts. Usage:
   make_installer.py <sloopdx repo> build/zp12-X.Y.fwsc <version> <out dir>
 writes <out>/index.html and <out>/firmware/zp12-<version>.fwsc (for now the page sits at dx7's /zp12/)."""
+import re
 import hashlib, json, os, re, shutil, sys
 from pathlib import Path
 
@@ -63,6 +64,13 @@ def main(sloopdx, pkg, version, out, own_site=False):
                   ('<link rel="icon" href="../favicon.svg" type="image/svg+xml">', '<link rel="icon" href="favicon.svg" type="image/svg+xml">'),
                   ('<link rel="icon" href="../favicon-32.png" sizes="32x32">\n', ""),
                   ('<link rel="apple-touch-icon" href="../apple-touch-icon.png">', '<link rel="apple-touch-icon" href="favicon.svg">')]
+    if 'id="coffee"' not in html:                   # until sloopDX's template has it: the coffee as a button under INSTALL
+        html = html.replace('<button id="go" disabled data-t="install"></button>',
+                            '<button id="go" disabled data-t="install"></button>\n        <a id="coffee" href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee · zp12 is free and stays free</a>')
+        html = re.sub(r'\s*<p class="small">(?:sloopDX|zp12) is free and stays free\. <a[^<]*</a> if it made your day\.</p>', "", html, count=1)
+        html = html.replace("</style>", "  #coffee { display: block; margin-top: 10px; font-size: 19px; font-weight: 750; line-height: 1; padding: 20px 0; width: 100%; "
+                            "text-align: center; border-radius: 10px; background: var(--panel2); color: COLOR; text-decoration: none; letter-spacing: 0.04em; "
+                            "transition: filter 0.15s, transform 0.08s; }\n  #coffee:hover { filter: brightness(1.15); transform: translateY(-1px); }\n</style>".replace("COLOR", "var(--fg)"), 1)
     for old, new in swaps:
         if old.startswith(("<", "../", "https", "github", "href")) and not any(c in old for c in "*?\\("):
             if old not in html:
