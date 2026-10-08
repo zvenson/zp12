@@ -64,6 +64,10 @@ FIRMWARES = [
               "filter), four tracks, a mod matrix, live effects."),
     dict(id="melodee", name="Melodee", author="keremimo", repo="keremimo/melodee", ident=r"FM-1_\d{3,8}", src="github",
          what="A multi-engine synthesizer in Felucca 1.0's design, with a complete backup before it installs."),
+    dict(id="hortator", name="Hortator", author="DEADACTIVE", repo="deadactive/hortator", ident=r"FM-1_\d{3,8}", src="github",
+         site="https://deadactive.github.io/hortator/",
+         what="A drum machine: eight tracks of drums, a step sequencer, Grids, a pumping compressor, LFOs, resonators and "
+              "live effects. Play it in the browser first."),
 ]
 
 
@@ -82,7 +86,7 @@ def latest_github(repo):
     rels = json.loads(get(f"https://api.github.com/repos/{repo}/releases?per_page=10"))   # (betas too: "latest" skips them)
     rel = next(r for r in rels if not r["draft"] and any(a["name"].endswith(".fwsc") for a in r["assets"]))
     asset = next(a for a in rel["assets"] if a["name"].endswith(".fwsc"))
-    return (get(asset["browser_download_url"], "application/octet-stream"), rel["tag_name"].lstrip("v"),
+    return (get(asset["browser_download_url"], "application/octet-stream"), re.sub(r"^\D*", "", rel["tag_name"]),   # (v1.2, drum-v0.14.0: from the first digit)
             rel["published_at"][:10], f"https://github.com/{repo}/releases/tag/{rel['tag_name']}",
             f"https://github.com/{repo}/tree/{rel['tag_name']}")
 
