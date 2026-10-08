@@ -142,7 +142,12 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
         except Exception as e:                        # (GitHub down, a broken release: the last good one stays)
             print(f"fm1_sync: {f['name']}: {e}", file=sys.stderr)
             if f["id"] in old and (out / old[f["id"]]["pkg"]).exists():
-                cat.append(old[f["id"]] | {k: f[k] for k in ("kind", "name", "author", "what")} | {k: f.get(k) for k in ("editor", "play")})
+                try:                                  # (the stars on their own: a new count even without the release)
+                    star = stars(f["repo"])
+                except Exception:
+                    star = old[f["id"]].get("stars")
+                cat.append(old[f["id"]] | {k: f[k] for k in ("kind", "name", "author", "what")} | {k: f.get(k) for k in ("editor", "play")}
+                           | {"stars": star})
                 keep.add(Path(old[f["id"]]["pkg"]).name)
             continue
         name = f"{f['id']}-{version}.fwsc"

@@ -322,7 +322,7 @@ function render() {
       <div class="meta">${esc(f.date)} · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
         <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}</div>
-      <div class="links">${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Play in the browser</a>` : ""}<a class="star" href="https://github.com/${esc(f.repo)}" target="_blank" rel="noopener" title="Star it on GitHub">★ ${f.stars ?? ""} on GitHub</a></div>
+      <div class="links">${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Play in the browser</a>` : ""}<a class="star" href="https://github.com/${esc(f.repo)}" target="_blank" rel="noopener" title="Star it on GitHub">${f.stars == null ? "★ Star on GitHub" : `★ ${f.stars} on GitHub`}</a></div>
       <progress max="100" value="0"></progress>
       <button class="go">${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button>
       <div class="msg"></div>`;
