@@ -66,7 +66,8 @@
   pre#log { white-space: pre-wrap; font-size: 12px; color: var(--mute); max-height: 180px; overflow: auto; }
   footer { border-top: 1px solid var(--line); color: var(--mute); font-size: 13.5px; padding: 22px 0 40px; }
   footer a { color: var(--dim); }
-  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } .status { min-width: 0; width: 100%; } }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } .status { min-width: 0; width: 100%; } .bar .btn, .bar button { flex: 1; justify-content: center; }
+    header { padding-top: 34px; } .grid { grid-template-columns: 1fr; } .card { padding: 18px; } .warn { font-size: 14px; } }
 </style>
 </head>
 <body>
@@ -79,6 +80,7 @@
   <div class="bar">
     <button id="connect">Connect the FM-1</button>
     <div class="status" id="now">Not connected</div>
+    <a class="btn ghost" href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a>
   </div>
   <div class="warn"><b>Back up first.</b> The firmwares keep their projects, presets and samples in the same flash and in different
     ways: after a switch the new one may not read the old one's data, or start empty. Save what you made with the backup of the
@@ -104,6 +106,8 @@
       <p>Made a firmware for the FM-1? Free, with its source, released as a <code>.fwsc</code> on GitHub: join in. It goes on this
          page with your name and your links, and follows every release you make.</p>
       <p><a class="btn" href="mailto:sven@designburg.net?subject=FM-1%20Firmware%20Switcher%3A%20my%20firmware&amp;body=Name%3A%0ARepository%3A%0AWhat%20it%20does%3A%0A">Send a mail to sven@designburg.net</a></p>
+      <p class="meta" style="margin-top:14px">The switcher is free and stays free. If it saved you an evening:
+         <a href="https://paypal.me/zvenson" rel="noopener">☕ buy me a coffee</a>.</p>
     </section>
   </div>
 
