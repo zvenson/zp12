@@ -8,7 +8,8 @@ line is the bottleneck, so Cloudflare keeps the files at its edge.
   tools/cf_cache.py check    what the edge says for a few of their files (HIT, MISS, ...)
 
 The API token (Zone: Cache Rules Edit, Cache Purge, Zone Read; designburgapps.com only) is read from
-$CF_TOKEN_FILE or ~/.config/designburg/cf-token and never printed."""
+$CF_TOKEN_FILE or ~/.config/designburg/cf-token and never printed. Without Zone Read: the zone's id (not a secret)
+in ~/.config/designburg/cf-zone."""
 import json, os, sys, urllib.request
 from pathlib import Path
 
@@ -41,6 +42,9 @@ def call(method, path, body=None, missing_ok=False):
 
 
 def zone_id():
+    zf = Path(os.environ.get("CF_ZONE_FILE", Path.home() / ".config/designburg/cf-zone"))   # (a token without Zone Read)
+    if zf.exists() and zf.read_text().strip():
+        return zf.read_text().strip()
     r = call("GET", f"/zones?name={ZONE}")
     if not r["result"]:
         sys.exit(f"cf_cache: zone {ZONE} not visible to the token")
