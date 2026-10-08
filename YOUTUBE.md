@@ -72,13 +72,10 @@ zp12, M-VAVE FM-1, MVAVE FM-1, FM-1 firmware, FM-1 custom firmware, 12-bit sampl
 
 ## Thumbnail
 
-The FM-1 screen big ("LOOP2 2.2" or "A1 MY KICK"), the panel's navy and the LCD green; text in two lines, white
-with the red LED accent:
-
-> **12-bit sampler**
-> for the M-VAVE FM-1 · free
-
-A second one for the editor part: the browser with the waveform next to the device: **your own samples**.
+Ready: `../video/zp12-thumb-A.jpg` (1280 x 720, ~230 KB) — the FM-1's real screen as the own sample lands on D4,
+"$60 SYNTH → 12-BIT SAMPLER", "FREE FIRMWARE". Alternative `zp12-thumb-B.jpg`: "80s SAMPLER SOUND FOR $60".
+Made by `../video/thumb.py` (the frame, the strings' waveform, the text): change the words there and run it again.
+A first, B for a later A/B test (YouTube Studio: "Test & compare").
 
 ## Pinned comment
 
