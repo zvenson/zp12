@@ -25,49 +25,49 @@ HERE = Path(__file__).resolve().parents[1]
 OUT = HERE / "fm1"
 BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 
-# id, name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
+# id, kind (the page's filter: synth, groove, drums, chords), name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
 # latest release's .fwsc) or a path in this machine's checkouts (our own, deployed from there)
-FIRMWARES = [
-    dict(id="zp12", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
+FIRMWARES = [  # (the page's order: zp12 first, then by kind)
+    # (Salt, ChoralRoot, Jangada, Melodee, Hortator report numbers the others use too: their check is any FM-1
+    # identity, the update loader is checked as for all; the page names the running one only when it is unambiguous)
+    dict(id="zp12", kind="drums", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
          src="zp12:docs/install/firmware", site="https://zp12.designburgapps.com",
          what="A 12-bit sampling drum machine in the spirit of the 80s: 26 kHz, pitched with nothing smoothed, "
               "loops and songs, your own samples from the browser."),
-    dict(id="felucca", name="Felucca", author="Leo Kuroshita (Hügelton Instruments)", repo="hugelton/Felucca",
-         ident=r"FM-1_91\d", src="github",
-         what="The custom firmware the others build on: the FM-1's own synth engines, a sequencer, effects and a "
-              "better panel, with an editor in the browser."),
-    dict(id="sloop", name="SLOOP", author="isod89", repo="isod89/sloop-fm1", ident=r"FM-1_900", src="github",
-         what="A live groovebox: tracks, layers, a step sequencer, song mode, punch-in effects and samples, played "
-              "on the FM-1 in real time."),
-    dict(id="sloopdx", name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_93\d",
-         src="sloopdx:docs/firmware", site="https://dx7.designburgapps.com",
-         what="SLOOP's live workflow with a real DX7 inside: six operators, 32 algorithms, your own .syx banks, "
-              "FM drums you program."),
-    dict(id="x0x", name="X0X", author="Charles Vestal", repo="charlesvestal/fm1-x0x", ident=r"FM-1_900\d{4}",
-         src="github",
-         what="A groovebox: 909 and 808 drums, two 303s with TB-3PO, a breakbeat generator and song mode."),
-    dict(id="fomni", name="FoMni", author="Charles Vestal", repo="charlesvestal/fm1-fomni", ident=r"FM-1_800\d{4}",
-         src="github",
-         what="A chord harp inspired by the Omnichord: strum the white keys, pick chords on the black ones."),
-    # (these four report numbers the others use too: the page names the running one only on an exact match or a
-    # single family match; their check is any FM-1 identity, the update loader is checked as for all)
-    dict(id="salt", name="Felucca [Salt]", author="Chance Roth (ChanceTheMaker)", repo="ChanceTheMaker/Felucca",
-         ident=r"FM-1_\d{3,8}", src="github",
-         what="Felucca with a hardware-inspired Studio in the browser (play it there without an FM-1): many engines, "
-              "presets, skins. A beta."),
-    dict(id="choralroot", name="ChoralRoot", author="Quixotic7", repo="Quixotic7/ChoralRootFM1", ident=r"FM-1_\d{3,8}",
-         src="github",
-         what="A Telepathic Orchid-style chord instrument: one hand plays roots, the other shapes chords; voicings, "
-              "performance modes, bass and a looper."),
-    dict(id="jangada", name="Jangada", author="zednaked", repo="zednaked/jangada", ident=r"FM-1_\d{3,8}", src="github",
-         what="Dark, industrial, Brazilian: drones that breathe, ten engines (6-op FM, a superwave analog with a ladder "
-              "filter), four tracks, a mod matrix, live effects."),
-    dict(id="melodee", name="Melodee", author="keremimo", repo="keremimo/melodee", ident=r"FM-1_\d{3,8}", src="github",
-         what="A multi-engine synthesizer in Felucca 1.0's design, with a complete backup before it installs."),
-    dict(id="hortator", name="Hortator", author="DEADACTIVE", repo="deadactive/hortator", ident=r"FM-1_\d{3,8}", src="github",
+    dict(id="hortator", kind="drums", name="Hortator", author="DEADACTIVE", repo="deadactive/hortator", ident=r"FM-1_\d{3,8}", src="github",
          site="https://deadactive.github.io/hortator/",
          what="A drum machine: eight tracks of drums, a step sequencer, Grids, a pumping compressor, LFOs, resonators and "
               "live effects. Play it in the browser first."),
+    dict(id="felucca", kind="synth", name="Felucca", author="Leo Kuroshita (Hügelton Instruments)", repo="hugelton/Felucca",
+         ident=r"FM-1_91\d", src="github",
+         what="The custom firmware the others build on: the FM-1's own synth engines, a sequencer, effects and a "
+              "better panel, with an editor in the browser."),
+    dict(id="salt", kind="synth", name="Felucca [Salt]", author="Chance Roth (ChanceTheMaker)", repo="ChanceTheMaker/Felucca",
+         ident=r"FM-1_\d{3,8}", src="github",
+         what="Felucca with a hardware-inspired Studio in the browser (play it there without an FM-1): many engines, "
+              "presets, skins. A beta."),
+    dict(id="jangada", kind="synth", name="Jangada", author="zednaked", repo="zednaked/jangada", ident=r"FM-1_\d{3,8}", src="github",
+         what="Dark, industrial, Brazilian: drones that breathe, ten engines (6-op FM, a superwave analog with a ladder "
+              "filter), four tracks, a mod matrix, live effects."),
+    dict(id="melodee", kind="synth", name="Melodee", author="keremimo", repo="keremimo/melodee", ident=r"FM-1_\d{3,8}", src="github",
+         what="A multi-engine synthesizer in Felucca 1.0's design, with a complete backup before it installs."),
+    dict(id="sloop", kind="groove", name="SLOOP", author="isod89", repo="isod89/sloop-fm1", ident=r"FM-1_900", src="github",
+         what="A live groovebox: tracks, layers, a step sequencer, song mode, punch-in effects and samples, played "
+              "on the FM-1 in real time."),
+    dict(id="sloopdx", kind="groove", name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_93\d",
+         src="sloopdx:docs/firmware", site="https://dx7.designburgapps.com",
+         what="SLOOP's live workflow with a real DX7 inside: six operators, 32 algorithms, your own .syx banks, "
+              "FM drums you program."),
+    dict(id="x0x", kind="groove", name="X0X", author="Charles Vestal", repo="charlesvestal/fm1-x0x", ident=r"FM-1_900\d{4}",
+         src="github",
+         what="A groovebox: 909 and 808 drums, two 303s with TB-3PO, a breakbeat generator and song mode."),
+    dict(id="fomni", kind="chords", name="FoMni", author="Charles Vestal", repo="charlesvestal/fm1-fomni", ident=r"FM-1_800\d{4}",
+         src="github",
+         what="A chord harp inspired by the Omnichord: strum the white keys, pick chords on the black ones."),
+    dict(id="choralroot", kind="chords", name="ChoralRoot", author="Quixotic7", repo="Quixotic7/ChoralRootFM1", ident=r"FM-1_\d{3,8}",
+         src="github",
+         what="A Telepathic Orchid-style chord instrument: one hand plays roots, the other shapes chords; voicings, "
+              "performance modes, bass and a looper."),
 ]
 
 
@@ -120,14 +120,14 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
         except Exception as e:                        # (GitHub down, a broken release: the last good one stays)
             print(f"fm1_sync: {f['name']}: {e}", file=sys.stderr)
             if f["id"] in old and (out / old[f["id"]]["pkg"]).exists():
-                cat.append(old[f["id"]] | {k: f[k] for k in ("name", "author", "what")})
+                cat.append(old[f["id"]] | {k: f[k] for k in ("kind", "name", "author", "what")})
                 keep.add(Path(old[f["id"]]["pkg"]).name)
             continue
         name = f"{f['id']}-{version}.fwsc"
         if not (out / "fw" / name).exists() or (out / "fw" / name).read_bytes() != raw:
             (out / "fw" / name).write_bytes(raw)
         keep.add(name)
-        cat.append({k: f[k] for k in ("id", "name", "author", "repo", "ident", "what")} | {
+        cat.append({k: f[k] for k in ("id", "kind", "name", "author", "repo", "ident", "what")} | {
             "site": f.get("site") or f"https://github.com/{f['repo']}", "version": version, "date": date,
             "pkg": "fw/" + name, "product": ident, "size": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
             "release": rel_url or f.get("site"), "source": src_url or f"https://github.com/{f['repo']}",

@@ -88,6 +88,13 @@
   h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 24px; font-weight: 600; text-align: center; }
   .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }   /* the firmwares + yours + the official one, 4 a row */
   .fws { display: contents; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: -6px 0 28px; }
+  .chips button { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 11px 18px; font-size: 14.5px; }
+  .chips button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
+  .chips button[aria-selected="true"] { background: var(--fg); color: #121011; box-shadow: none; }
+  .chips button span { opacity: .55; font-weight: 600; margin-left: 4px; }
+  .fw[hidden] { display: none; }
+  .tag.kind { background: rgba(239, 232, 225, .08); color: var(--dim); }
   @media (max-width: 1300px) { .grid { grid-template-columns: repeat(2, 1fr); } }
   .fw { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 0 26px 24px; display: flex;
         flex-direction: column; gap: 12px; overflow: hidden; transition: transform .12s, border-color .15s, background .15s; }
@@ -173,6 +180,7 @@
 
 <main><div class="wrap">
   <h2 class="sec"><span id="count">Eleven</span> open-source firmwares, one FM-1</h2>
+  <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
   <div class="grid"><div id="grid" class="fws"><p class="meta">Loading the catalogue…</p></div>
     <section class="fw mailcta" style="--c: var(--pink)">
       <div class="shot"><div class="slot">+</div></div>
@@ -554,6 +562,20 @@ function showNow() {
 // each firmware's colour and picture: its own screen, from its repository (SLOOP: its logo too)
 const LOOK = { felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx: "#42f5f5", zp12: "#ff6a3d", x0x: "#f4c0cb", fomni: "#c9b6ff",
                salt: "#ff8f7a", choralroot: "#ffc46b", jangada: "#ff5fc8", melodee: "#8fe3b0", hortator: "#d8dde6" };
+const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"]];
+const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords" };
+let kind = (location.hash || "").slice(1);                             // (#drums: a link straight to one kind)
+function chips() {
+  if (!KINDS.some(([k]) => k === kind)) kind = "all";
+  $("chips").innerHTML = KINDS.map(([k, label]) => {
+    const n = k === "all" ? cat.length : cat.filter((f) => f.kind === k).length;
+    return n ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${n}</span></button>` : "";
+  }).join("");
+  $("chips").querySelectorAll("button").forEach((b) => b.onclick = () => {
+    kind = b.dataset.k; history.replaceState(null, "", kind === "all" ? location.pathname + location.search : "#" + kind);
+    chips(); render();
+  });
+}
 const WIDE = new Set(["felucca", "salt", "melodee", "hortator"]);                  // (a landscape picture, not a square screen)   // (designburgapps.com's palette)
 const LOGO = { sloop: "img/sloop-icon.png" };
 function lineup() {
@@ -572,7 +594,7 @@ function render() {
       <div class="head"><div>
         <h3>${LOGO[f.id] ? `<img class="logo" src="${LOGO[f.id]}" alt="">` : ""}${esc(f.name)}<small>${esc(f.version)}</small></h3>
         <div class="by">by ${esc(f.author)}</div>
-        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${f.beta ? '<span class="tag beta">beta</span>' : ""}</div></div></div>
+        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${f.beta ? '<span class="tag beta">beta</span>' : ""}${KIND_TAG[f.kind] ? `<span class="tag kind">${KIND_TAG[f.kind]}</span>` : ""}</div></div></div>
       <p class="what">${esc(f.what)}</p>
       <div class="meta">${esc(f.date)} · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
@@ -582,6 +604,7 @@ function render() {
       <div class="msg"></div>`;
     el.querySelector("button").onclick = () => install(f, el);
     el.querySelector("button").disabled = writing;
+    el.hidden = kind !== "all" && f.kind !== kind && !isNow;          // (the one on your FM-1 stays in view)
     $("grid").append(el);
   }
 }
@@ -670,7 +693,7 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   .then((r) => r.json()).then((c) => {
   cat = c.firmwares;
   $("count").textContent = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve"][cat.length] || cat.length;
-  $("updated").textContent = "catalogue of " + c.updated; lineup(); render();
+  $("updated").textContent = "catalogue of " + c.updated; lineup(); chips(); render();
   // ?demo=connected|install|done&now=<id>&fw=<id>&pct=N: the page in a state, for a video (no FM-1 needed)
   const q = new URLSearchParams(location.search), st = q.get("demo");
   if (!st) return;
