@@ -937,7 +937,7 @@ static void ui_leds(uint32_t *btn, uint32_t *keys, uint32_t *glow)
 
 /* ---- the start: a kick is sampled into the LCD (the 12-bit steps drawn as they come in), then the name is
  * typed in big LCD pixels, each letter a drum: ba (tom), dum (tom), tss (kick + crash: "12"). t: ms since the
- * start; zp12.c draws it and plays SPLASH_HIT */
+ * start; zp12.c draws it and plays SPLASH_HIT: the pads A8, A7, A1 + B1 as they are (own sounds there: an own start) */
 #define SPLASH_MS 3000u
 static const struct { uint16_t t; uint8_t pad, vel; } SPLASH_HIT[4] = {{1350, 7, 84}, {1550, 6, 84}, {1850, 0, 100}, {1850, 8, 70}};
 

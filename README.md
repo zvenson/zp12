@@ -45,6 +45,7 @@ switching it on (USB rescue).
 - Stored fast, played slow (the old trick): 45→33 per sound, and own samples at ×2 (an octave down on the
   pad, TUNE −12 set for you) or ×2.7: more time in the same memory, half the bandwidth, the grit.
 - The master: −6 dB and a soft knee above 3/4, so a pile of hits rounds off instead of clipping hard.
+- The start (a key skips it) plays its ba-dum-tss on the pads A8, A7, A1 + B1: put your own sounds there for your own.
 - SMOOTH (GLO → OUTPUT, on by default): where a sound is cut mid-wave (a new hit on its channel, its end, a TRUNC
   start) the jump is bridged in ~1 ms, so it does not click; a sample from its own beginning keeps its attack.
 - Faders and LEVEL in an audio taper, as the original's sliders: 100 as set, 50 −12 dB, 25 −24 dB, 127 +4 dB.
