@@ -606,8 +606,10 @@ function lineup() {
   $("lineup").innerHTML = cat.map((f) => `<img src="img/${esc(f.id)}.png" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy">`).join("");
 }
 
-// the order: by their GitHub stars (each night's count), ours among them
-const ordered = (l) => [...l].sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1));
+// the order: ours first (zp12, sloopDX), then the others by their GitHub stars (each night's count)
+const OURS = ["zp12", "sloopdx"];
+const ordered = (l) => [...OURS.map((i) => l.find((f) => f.id === i)).filter(Boolean),
+                        ...l.filter((f) => !OURS.includes(f.id)).sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1))];
 function render() {
   const w = whoIs(current);
   $("grid").innerHTML = "";
