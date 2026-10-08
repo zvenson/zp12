@@ -1,6 +1,6 @@
 # zp12 on YouTube: the texts
 
-For the 1.6 video (`zp12-1.6-samples.mp4`, 111 s). Paste as they are; the chapters match the cut
+For the video `zp12-1.6-samples.mp4` (111 s; it shows 1.6, the install link always gives the latest). Paste as they are; the chapters match the cut
 (`../video/make_video12.py` EDIT). Keep the first two lines of the description as the hook: YouTube shows
 them before "more". Never use "SP-1200" or "E-mu" in the title as if it were theirs: "inspired by" and
 "in the spirit of" are fine, the names are their owners' trademarks.
@@ -94,7 +94,7 @@ zp12 is free and stays free; a coffee is welcome: https://paypal.me/zvenson
 ## Community post / short description (under 300 characters)
 
 ```
-zp12 1.6: the M-VAVE FM-1 as a 12-bit sampling drum machine, with your own samples from the browser. Free firmware, installed in a minute. https://zp12.designburgapps.com
+zp12: the M-VAVE FM-1 as a 12-bit sampling drum machine, with your own samples from the browser. Free firmware, installed in a minute. https://zp12.designburgapps.com
 ```
 
 ## Deutsche Fassung (Beschreibung, falls der Kanal zweisprachig postet)
