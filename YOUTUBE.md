@@ -50,6 +50,8 @@ sloopDX, the DX7 firmware for the FM-1 by the same author: https://dx7.designbur
 
 Please always check the latest firmware version before you install: https://zp12.designburgapps.com/install
 
+zp12 is free and stays free. If it made your day, a coffee is welcome: https://paypal.me/zvenson
+
 Credits
 Based on SLOOP by isod89 and Felucca by Leo Kuroshita (Hügelton Instruments), GPL-3.0.
 Samples: CC0 (VSCO-2 Community Edition, VCSL, Sonic Pi), the E-piano by Greg Sullivan (CC BY 3.0). No sound from a commercial record or another company's machine.
@@ -84,6 +86,7 @@ A second one for the editor part: the browser with the waveform next to the devi
 Install, editor, backup and the cheat sheet: https://zp12.designburgapps.com
 Please always check the latest firmware version before you install. Back to sloopDX or the stock firmware any time with their installers; USB rescue: hold OCT− while switching on.
 Questions and bugs: https://github.com/zvenson/zp12/issues
+zp12 is free and stays free; a coffee is welcome: https://paypal.me/zvenson
 ```
 
 ## Community post / short description (under 300 characters)
@@ -111,5 +114,6 @@ Kapitel
 1:37 Installation und Links
 
 Bitte vor dem Installieren immer die aktuelle Firmware-Version prüfen: https://zp12.designburgapps.com/install
+zp12 ist und bleibt kostenlos. Wenn es dir einen guten Tag gemacht hat: ein Kaffee ist willkommen: https://paypal.me/zvenson
 Basiert auf SLOOP (isod89) und Felucca (Leo Kuroshita), GPL-3.0. Samples CC0 (VSCO-2 CE, VCSL, Sonic Pi), E-Piano von Greg Sullivan (CC BY 3.0). Inspiriert von den 12-Bit-Samplern der 80er; die Namen sind Marken ihrer Inhaber. Keine Verbindung zu M-VAVE. Inoffizielle Firmware ohne Gewähr, Installation auf eigenes Risiko.
 ```
