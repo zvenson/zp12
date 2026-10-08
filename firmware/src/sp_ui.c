@@ -27,8 +27,8 @@ static const uint16_t FAM_COL[5] = {RGB(38, 62, 112), RGB(236, 166, 44), RGB(52,
 static const uint16_t FAM_INK[5] = {RGB(255, 255, 255), RGB(30, 24, 10), RGB(8, 30, 28), RGB(255, 255, 255), RGB(20, 24, 34)};
 
 /* a page untouched this long: back to the faders (GLO > SETUP > BACK; 0: never) */
-static const uint8_t UI_BACK_S[5] = {6, 15, 30, 60, 0};
-static const char *const UI_BACK_NAME[5] = {"6 S", "15 S", "30 S", "60 S", "OFF"};
+static const uint8_t UI_BACK_S[5] = {6, 12, 30, 60, 0};
+static const char *const UI_BACK_NAME[5] = {"6 S", "12 S", "30 S", "60 S", "OFF"};
 #define UI_HOLD_MS 1300u                        /* REC held 0.7 s, then this much more: the loop cleared */
 #ifndef ZP12_VER
 #define ZP12_VER "0.0"                          /* build.py --release X.Y */

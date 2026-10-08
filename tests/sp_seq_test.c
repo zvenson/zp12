@@ -152,7 +152,7 @@ int main(int argc, char **argv)
         check(zs_unpack(keep, n, ZS_VER) == 0 && s0->ev[k].lk && sq_lk[0][k] == lk, "STORE: a lock saved and read back");
         check(ui.back == 4, "STORE: BACK (pages never back) saved and read back");
         memcpy(old, keep, at); memcpy(old + at, keep + at + 8u, n - at - 8u);
-        check(zs_unpack(old, n - 8u, 3) == 0 && s0->ev[k].lk && ui.back == 2, "STORE: a version 3 save: its locks, BACK 30 s");
+        check(zs_unpack(old, n - 8u, 3) == 0 && s0->ev[k].lk && ui.back == 1, "STORE: a version 3 save: its locks, BACK 12 s");
         check(zs_unpack(old, n - 8u, 2) == 0 && !s0->ev[k].lk, "STORE: a version 2 save has no locks");
         check(zs_unpack(keep, n, ZS_VER) == 0 && s0->ev[k].lk, "STORE: back as it was");
     }

@@ -85,9 +85,9 @@ static int zs_unpack(const uint8_t *b, uint32_t len, uint32_t ver)
     if (ver >= 4u) {
         uint16_t u[4];
         p = zs_get(p, u, sizeof u);
-        ui.back = (uint8_t)(u[0] < 5u ? u[0] : 2u);
+        ui.back = (uint8_t)(u[0] < 5u ? u[0] : 1u);
     } else {
-        ui.back = 2;                              /* (an older save: 30 s) */
+        ui.back = 1;                              /* (an older save: 12 s) */
     }
     sq.bpm10 = (uint16_t)sp_clamp(st[0], 400, 2400);
     sq.quant = (uint8_t)(st[1] % 7u);

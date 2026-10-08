@@ -50,6 +50,7 @@ int main(int argc, char **argv)
     for (i = 0; i < KIT_NWAVE; i++) { sp_wave[i].d = KIT_DATA + KIT_WAVE[i].off; sp_wave[i].n = KIT_WAVE[i].n; sp_wave[i].rate = 26040; }
     memcpy(sp_sound, KIT_PADS, sizeof sp_sound);
     ui_init();
+    ui.back = 1;                                            /* (as zp12.c: pages back after 12 s) */
     for (i = 0; i < 27u; i++)                               /* the keys F3..G5: black where a piano has them */
         if ((white_of(i) == 0xFFu) != ((0x54Au >> ((i + 5u) % 12u)) & 1u)) { printf("zp12 ui: key %u black / white wrong FAIL\n", i); return 1; }
     fm1_ms = 1000;
@@ -59,7 +60,8 @@ int main(int argc, char **argv)
     sq.playing = 1; sq.recording = 1; sq.pos = (SQ_BAR + 2u * SQ_PPQ) << 16; sq_seg[0].bars = 2; fm1_ms += 10; ui_draw(); ppm("zp12-rec");
     sq.playing = 0; sq.recording = 0; button(B_EDIT); button(B_EDIT); button(B_EDIT); button(B_EDIT); knob(3, 60); fm1_ms += 2000; ui_draw(); ppm("zp12-sfx");
     button(B_FX); knob(0, -9); fm1_ms += 2000; ui_draw(); ppm("zp12-filter"); djf.v = 0; button(B_FX); button(B_FX); fm1_ms += 2000; ui_draw(); ppm("zp12-delay");
-    fm1_ms += 7000; ui_draw(); ppm("zp12-back");            /* untouched: the faders again */
+    fm1_ms += 13000; ui_draw(); ppm("zp12-back");           /* untouched 12 s: the faders again */
+    if (ui.page != PG_HOME) { printf("zp12 ui: a page did not go back after 12 s FAIL\n"); return 1; }
     sq_insert(&sq_seg[0], 0, 0, 7, 0, 0, 0); sq_insert(&sq_seg[0], 96, 1, 7, 0, 0, sp_lock_of(&sp_sound[1])); sq_insert(&sq_seg[0], 48, 4, 5, 0, 0, 0);
     sq_insert(&sq_seg[0], 144, 4, 5, 0, 0, 0); sq_insert(&sq_seg[0], 240, 0, 7, 0, 0, 0); sq_seg[0].bars = 2;
     ui.sel = 0; ui.steps = 1; ui.force = 1; sq.playing = 1; sq.pos = (5u * 24u) << 16; fm1_ms += 10; ui_draw(); ppm("zp12-steps");

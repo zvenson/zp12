@@ -11,6 +11,7 @@ Released: 0.9 (FM-1_979). Open, from the user's tests:
 - [x] 1.1: SEL held = faders 5-8 on any page; the header says where you are (EDIT > SOUND) and a page shows its
       family's tabs; FX > FILTER: sloopDX's DJ filter on the mix (not saved). Image 576 of 582 KB then; 565 KB after FONT_S was cut to ASCII (1.3+).
 - [ ] Factory hats quieter in the kit (`tools/gen_kit.py`, then bump `ZS_KIT_ID`).
+- [x] 1.8: BACK 12 s by default (6 / 12 / 30 / 60 s / OFF).
 - [x] 1.7: GLO > SETUP > BACK: pages go back after 6 / 15 / 30 / 60 s or never (30 s by default, saved: ZS_VER 4 with 8 bytes of UI settings); the version in the GLO header.
 - [x] 1.6: the engine against the original: the dynamic filter opens fully as CUT at the hit (it was half open) and
       closes two octaves with the decay; the fader after the filter (it changed the tone); the envelope ramped
