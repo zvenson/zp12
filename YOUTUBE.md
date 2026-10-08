@@ -1,0 +1,115 @@
+# zp12 on YouTube: the texts
+
+For the 1.6 video (`zp12-1.6-samples.mp4`, 108 s). Paste as they are; the chapters match the cut
+(`../video/make_video12.py` EDIT). Keep the first two lines of the description as the hook: YouTube shows
+them before "more". Never use "SP-1200" or "E-mu" in the title as if it were theirs: "inspired by" and
+"in the spirit of" are fine, the names are their owners' trademarks.
+
+## Title (pick one, under 100 characters)
+
+1. **zp12: turn the M-VAVE FM-1 into a 12-bit sampling drum machine (free firmware, your own samples)**
+2. zp12 1.6 · a 12-bit sampler drum machine on the M-VAVE FM-1 · own samples from the browser
+3. Free firmware: the M-VAVE FM-1 as an 80s-style 12-bit sampler (zp12)
+
+## Description
+
+```
+zp12 turns the M-VAVE FM-1 into a 12-bit sampling drum machine in the spirit of the 80s: 26 kHz, pitched with nothing smoothed, your own samples dropped in from the browser. Free firmware, installed from Chrome or Edge in a minute.
+Install, editor, backup, cheat sheet: https://zp12.designburgapps.com
+
+Everything you see and hear in this video comes from the firmware's own code: the screens are rendered by it, the sounds come out of its engine, the knobs and keys are a script of what a hand would do.
+
+What zp12 is
+• 32 pads at 26.04 kHz (SP-1200 rate) or 27.5 kHz (SP-12 rate), 12-bit linear
+• pitch by the playback rate, no interpolation: tuned up it skips samples, down it repeats them
+• stored fast, played slow: 45 → 33 per sound, own samples at ×2 or ×2.7 (an octave down on the pad)
+• 8 channels: 1–2 with a resonant 4-pole low-pass that follows the decay, 3–6 fixed, 7–8 raw
+• 16 loops on the black keys, songs, real-time recording with count-in and AUTO CORRECT, step editing, swing
+• TUNE / DECAY / CUT recorded per hit while you turn them
+• a DJ filter on the whole mix, chorus, delay in tempo, reverb, drive per pad
+• your own samples: drop a WAV, AIFF, MP3 or FLAC in the browser, trim it, hear it as the FM-1 plays it, put it on a pad
+• backup and restore in the browser; the sloopDX DX7 banks can stay or make room for samples
+
+Chapters
+0:00 The finished groove
+0:08 Your own samples: the web editor
+0:31 Recording the beat live
+0:45 Piano at 33, a bass over the keys, TUNE recorded per hit
+1:02 The own sample in the loop
+1:08 Jam: the DJ filter and the flute
+1:19 Loop 2: erase while it plays, double time
+1:33 Install and links
+
+Links
+Install (Chrome / Edge, over USB): https://zp12.designburgapps.com/install
+Sample editor: https://zp12.designburgapps.com/editor
+Backup: https://zp12.designburgapps.com/backup
+Cheat sheet: https://zp12.designburgapps.com/#cheatsheet
+Source (GPL-3.0): https://github.com/zvenson/zp12
+sloopDX, the DX7 firmware for the FM-1 by the same author: https://dx7.designburgapps.com
+
+Please always check the latest firmware version before you install: https://zp12.designburgapps.com/install
+
+Credits
+Based on SLOOP by isod89 and Felucca by Leo Kuroshita (Hügelton Instruments), GPL-3.0.
+Samples: CC0 (VSCO-2 Community Edition, VCSL, Sonic Pi), the E-piano by Greg Sullivan (CC BY 3.0). No sound from a commercial record or another company's machine.
+Inspired by the 12-bit samplers of the 80s; their names are trademarks of their owners. Not affiliated with M-VAVE. Unofficial firmware, free and without warranty: you install it at your own risk.
+
+#MVAVEFM1 #12bit #samplerdrummachine
+```
+
+## Tags (the field takes 500 characters; this is 480)
+
+```
+zp12, M-VAVE FM-1, MVAVE FM-1, FM-1 firmware, FM-1 custom firmware, 12-bit sampler, 12 bit drum machine, sampling drum machine, SP-1200 style, SP-12 style, 80s sampler sound, lo-fi drums, lofi hip hop drums, boom bap, drum n bass, free firmware, open source music hardware, groovebox, sampler, drum sampler, beat making, own samples, sample editor, web midi, sloopDX, SLOOP, Felucca, DX7 firmware FM-1, hip hop production, hardware sampler, cheap sampler, budget groovebox, 26 kHz, zero order hold, aliasing
+```
+
+## Hashtags (above the title YouTube shows the first three)
+
+`#MVAVEFM1 #12bit #samplerdrummachine` (also fine: `#boombap #lofi #sampler`)
+
+## Thumbnail
+
+The FM-1 screen big ("LOOP2 2.2" or "A1 MY KICK"), the panel's navy and the LCD green; text in two lines, white
+with the red LED accent:
+
+> **12-bit sampler**
+> for the M-VAVE FM-1 · free
+
+A second one for the editor part: the browser with the waveform next to the device: **your own samples**.
+
+## Pinned comment
+
+```
+Install, editor, backup and the cheat sheet: https://zp12.designburgapps.com
+Please always check the latest firmware version before you install. Back to sloopDX or the stock firmware any time with their installers; USB rescue: hold OCT− while switching on.
+Questions and bugs: https://github.com/zvenson/zp12/issues
+```
+
+## Community post / short description (under 300 characters)
+
+```
+zp12 1.6: the M-VAVE FM-1 as a 12-bit sampling drum machine, with your own samples from the browser. Free firmware, installed in a minute. https://zp12.designburgapps.com
+```
+
+## Deutsche Fassung (Beschreibung, falls der Kanal zweisprachig postet)
+
+```
+zp12 macht aus dem M-VAVE FM-1 eine 12-Bit-Sampling-Drum-Machine im Geist der 80er: 26 kHz, Pitch über die Abspielrate ohne Glättung, eigene Samples aus dem Browser. Freie Firmware, in einer Minute aus Chrome oder Edge installiert.
+Installer, Sample-Editor, Backup, Cheat Sheet: https://zp12.designburgapps.com
+
+Alles im Video kommt aus dem Code der Firmware selbst: die Bildschirme, die Klänge, die Bedienung als Skript.
+
+Kapitel
+0:00 Der fertige Groove
+0:08 Eigene Samples: der Web-Editor
+0:31 Der Beat, live eingespielt
+0:45 Klavier auf 33, Bass über die Tasten, TUNE pro Hit aufgenommen
+1:02 Das eigene Sample im Loop
+1:08 Jam: DJ-Filter und Flöte
+1:19 Loop 2: löschen im Lauf, Double Time
+1:33 Installation und Links
+
+Bitte vor dem Installieren immer die aktuelle Firmware-Version prüfen: https://zp12.designburgapps.com/install
+Basiert auf SLOOP (isod89) und Felucca (Leo Kuroshita), GPL-3.0. Samples CC0 (VSCO-2 CE, VCSL, Sonic Pi), E-Piano von Greg Sullivan (CC BY 3.0). Inspiriert von den 12-Bit-Samplern der 80er; die Namen sind Marken ihrer Inhaber. Keine Verbindung zu M-VAVE. Inoffizielle Firmware ohne Gewähr, Installation auf eigenes Risiko.
+```
