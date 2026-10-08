@@ -119,3 +119,25 @@ Bitte vor dem Installieren immer die aktuelle Firmware-Version prüfen: https://
 zp12 ist und bleibt kostenlos. Wenn es dir einen guten Tag gemacht hat: ein Kaffee ist willkommen: https://paypal.me/zvenson
 Basiert auf SLOOP (isod89) und Felucca (Leo Kuroshita), GPL-3.0. Samples CC0 (VSCO-2 CE, VCSL, Sonic Pi), E-Piano von Greg Sullivan (CC BY 3.0). Inspiriert von den 12-Bit-Samplern der 80er; die Namen sind Marken ihrer Inhaber. Keine Verbindung zu M-VAVE. Inoffizielle Firmware ohne Gewähr, Installation auf eigenes Risiko.
 ```
+
+## zp12 Short (`../video/zp12-short.mp4`, 9:16, ~40 s; thumbnail `../video/zp12-short-thumb.jpg`)
+
+**Title:** `An 80s Sampler on a $60 Synth? 🥁 zp12 for the M-VAVE FM-1 #shorts`
+
+**Description:**
+
+```
+12-bit sampling drums for the M-VAVE FM-1: free firmware, your own samples from the browser.
+Install: https://zp12.designburgapps.com (or with every other open-source firmware: https://fm1.designburgapps.com)
+Everything you hear is zp12 itself, rendered by its firmware code.
+Inspired by the 12-bit samplers of the 80s; not affiliated with E-mu or M-VAVE.
+#mvave #fm1 #sampler #drummachine #shorts
+```
+
+**Tags:**
+
+```
+M-VAVE FM-1, FM-1 firmware, FM-1 custom firmware, zp12, mvave fm1, 12 bit sampler, sampling drum machine, SP-1200 style, lo-fi drums, boom bap, pocket synth, drum machine, sampler, custom firmware, open source firmware, beat making, synth shorts, shorts
+```
+
+**Pinned comment:** `Free, one click: https://zp12.designburgapps.com 🥁 Which pad gets your own sample first?`
