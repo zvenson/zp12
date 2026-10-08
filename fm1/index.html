@@ -91,6 +91,10 @@
   h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 24px; font-weight: 600; text-align: center; }
   .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }   /* the firmwares + yours + the official one, 4 a row */
   .fws { display: contents; }
+  .fws .part { grid-column: 1 / -1; font-size: 13px; letter-spacing: 2.2px; text-transform: uppercase; color: var(--dim); font-weight: 600; margin: 0 0 -6px; }
+  .fws .part b { color: var(--beige); font-weight: 700; }
+  .fws .part + .part, .fws .fw + .part { margin-top: 22px; }
+  .fws .part[hidden] { display: none; }
   .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: -6px 0 28px; }
   .chips button { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 11px 18px; font-size: 14.5px; }
   .chips button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
@@ -606,13 +610,26 @@ function lineup() {
   $("lineup").innerHTML = cat.map((f) => `<img src="img/${esc(f.id)}.png" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy">`).join("");
 }
 
+// the order: ours first, as ours (the makers of this page), then every other one by its GitHub stars (each night's count)
+const OURS = ["zp12", "sloopdx"];
+const ordered = (l) => [...OURS.map((i) => l.find((f) => f.id === i)).filter(Boolean),
+                        ...l.filter((f) => !OURS.includes(f.id)).sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1))];
 function render() {
   const w = whoIs(current);
   $("grid").innerHTML = "";
+  const part = (html) => { const h = document.createElement("div"); h.className = "part"; h.innerHTML = html; $("grid").append(h); return h; };
+  let head = null, shown = false;
   for (const f of cat) {
+    if (f === cat[0] || (OURS.includes(cat[cat.indexOf(f) - 1].id) && !OURS.includes(f.id))) {
+      if (head) head.hidden = !shown;
+      head = part(OURS.includes(f.id) ? '<b>From the makers of this hub</b> · zp12 and sloopDX by <a href="https://github.com/zvenson" rel="noopener">zvenson</a>'
+                                       : "<b>Every other open-source firmware</b> · by their GitHub stars");
+      shown = false;
+    }
     const isNow = w && w.fw === f;
     const el = document.createElement("article");
     el.className = "fw" + (isNow ? " now" : "");
+    el.dataset.id = f.id;
     el.style.setProperty("--c", LOOK[f.id] || "#3b4bf5");
     el.innerHTML = `<div class="shot${WIDE.has(f.id) ? " wide" : ""}"><img src="img/${esc(f.id)}.png" alt="${esc(f.name)} for the M-VAVE FM-1: its screen" loading="lazy"></div>
       <div class="head"><div>
@@ -630,8 +647,10 @@ function render() {
     el.querySelector("button").onclick = () => install(f, el);
     el.querySelector("button").disabled = writing;
     el.hidden = kind !== "all" && !kindsOf(f).includes(kind) && !isNow;          // (the one on your FM-1 stays in view)
+    shown ||= !el.hidden;
     $("grid").append(el);
   }
+  if (head) head.hidden = !shown;
 }
 
 async function midi() {
@@ -658,7 +677,7 @@ async function install(f, el) {
   const msg = (t, cls) => { const m = el.querySelector(".msg"); m.textContent = t; m.style.color = cls === "err" ? "var(--err)" : cls === "ok" ? "var(--ok)" : ""; };
   const was = whoIs(current);
   if (!confirm(`Install ${f.name} ${f.version}${was && (was.fw || was.name) ? " over " + (was.fw ? was.fw.name : was.name) : ""}?\n\nSaved what you want to keep? The new firmware may not read the old one's projects.`)) return;
-  writing = true; render(); el = [...$("grid").children][cat.indexOf(f)];
+  writing = true; render(); el = $("grid").querySelector(`.fw[data-id="${f.id}"]`);
   const bar = el.querySelector("progress"); bar.style.display = "block";
   try {
     msg("Loading the package…");
@@ -716,7 +735,7 @@ $("stock-go").onclick = async () => {
 window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault(); e.returnValue = "An install is running"; } });
 fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-store" })   // (a new key each day, after the nightly sync)
   .then((r) => r.json()).then((c) => {
-  cat = c.firmwares;
+  cat = ordered(c.firmwares);
   $("count").textContent = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve"][cat.length] || cat.length;
   $("updated").textContent = "catalogue of " + c.updated; lineup(); chips(); render();
   // ?demo=connected|install|done&now=<id>&fw=<id>&pct=N: the page in a state, for a video (no FM-1 needed)
@@ -724,7 +743,7 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   if (!st) return;
   const by = (id) => cat.find((f) => f.id === id);
   current = (by(q.get("now") || "zp12") || {}).product || null; showNow();
-  const f = by(q.get("fw") || "felucca"), el = f && [...$("grid").children][cat.indexOf(f)];
+  const f = by(q.get("fw") || "felucca"), el = f && $("grid").querySelector(`.fw[data-id="${f.id}"]`);
   if (!el) return;
   if (st === "install") {
     const bar = el.querySelector("progress"); bar.style.display = "block"; bar.value = +(q.get("pct") || 40);
@@ -733,7 +752,7 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   }
   if (st === "done") {
     current = f.product; showNow();
-    const m = [...$("grid").children][cat.indexOf(f)].querySelector(".msg");
+    const m = $("grid").querySelector(`.fw[data-id="${f.id}"]`).querySelector(".msg");
     m.textContent = `${f.name} ${f.version} is on your FM-1.`; m.style.color = "var(--ok)";
   }
 }).catch((e) => { $("grid").innerHTML = `<p class="meta">The catalogue could not be loaded: ${esc(e.message)}</p>`; });
