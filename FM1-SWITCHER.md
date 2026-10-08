@@ -17,6 +17,14 @@ its pull, so they are listed as soon as they are deployed.
     git add web/fm1.html fm1 && git commit -m "Switcher: ..." && git push
     ssh pi-remote '~/docker/sloopdx-site/update.sh'             # pulls, syncs, purges Cloudflare
 
+## Which firmwares
+
+Music firmwares that are open source (GPL-3.0) and publish a `.fwsc` release (the nightly sync needs one). Not listed:
+games (DOOM, FM-1 NES, FM1-QUEST); Lunar Modulator (MIT, no release yet: add it to FIRMWARES once it has one, and
+show its licence on the card, which says GPL-3.0 for all now). Felucca [Salt], ChoralRoot, Jangada and Melodee report
+identity numbers the others use too: their check is any FM-1 identity (the loader is checked as for all), and the
+page names the running firmware only on an exact or a single match.
+
 ## Licence
 
 All listed firmwares are GPL-3.0. Conveying their unchanged packages is allowed (§4, §6): the licence is linked, the

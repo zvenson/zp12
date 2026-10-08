@@ -39,7 +39,7 @@ FIRMWARES = [
     dict(id="sloop", name="SLOOP", author="isod89", repo="isod89/sloop-fm1", ident=r"FM-1_900", src="github",
          what="A live groovebox: tracks, layers, a step sequencer, song mode, punch-in effects and samples, played "
               "on the FM-1 in real time."),
-    dict(id="sloopdx", name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_9[0-6]\d",
+    dict(id="sloopdx", name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_93\d",
          src="sloopdx:docs/firmware", site="https://dx7.designburgapps.com",
          what="SLOOP's live workflow with a real DX7 inside: six operators, 32 algorithms, your own .syx banks, "
               "FM drums you program."),
@@ -49,6 +49,21 @@ FIRMWARES = [
     dict(id="fomni", name="FoMni", author="Charles Vestal", repo="charlesvestal/fm1-fomni", ident=r"FM-1_800\d{4}",
          src="github",
          what="A chord harp inspired by the Omnichord: strum the white keys, pick chords on the black ones."),
+    # (these four report numbers the others use too: the page names the running one only on an exact match or a
+    # single family match; their check is any FM-1 identity, the update loader is checked as for all)
+    dict(id="salt", name="Felucca [Salt]", author="Chance Roth (ChanceTheMaker)", repo="ChanceTheMaker/Felucca",
+         ident=r"FM-1_\d{3,8}", src="github",
+         what="Felucca with a hardware-inspired Studio in the browser (play it there without an FM-1): many engines, "
+              "presets, skins. A beta."),
+    dict(id="choralroot", name="ChoralRoot", author="Quixotic7", repo="Quixotic7/ChoralRootFM1", ident=r"FM-1_\d{3,8}",
+         src="github",
+         what="A Telepathic Orchid-style chord instrument: one hand plays roots, the other shapes chords; voicings, "
+              "performance modes, bass and a looper."),
+    dict(id="jangada", name="Jangada", author="zednaked", repo="zednaked/jangada", ident=r"FM-1_\d{3,8}", src="github",
+         what="Dark, industrial, Brazilian: drones that breathe, ten engines (6-op FM, a superwave analog with a ladder "
+              "filter), four tracks, a mod matrix, live effects."),
+    dict(id="melodee", name="Melodee", author="keremimo", repo="keremimo/melodee", ident=r"FM-1_\d{3,8}", src="github",
+         what="A multi-engine synthesizer in Felucca 1.0's design, with a complete backup before it installs."),
 ]
 
 
