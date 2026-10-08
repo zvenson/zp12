@@ -7,76 +7,118 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The FM-1 Firmware Wars are over: every custom firmware, one click</title>
-<meta name="description" content="The M-VAVE FM-1 firmware wars are over: Felucca, SLOOP, sloopDX, zp12, X0X and FoMni on one page. No need to pick a side: install any of them with one click from Chrome or Edge, and switch back whenever you like.">
+<title>M-VAVE FM-1 Firmware Switcher: every custom firmware, one click | FM-1 Firmware Wars</title>
+<meta name="description" content="The M-VAVE FM-1 firmware switcher: install every FM-1 custom firmware (Felucca, SLOOP, sloopDX, zp12, X0X, FoMni) with one click in Chrome or Edge, always the newest release, and switch back to the official firmware any time. The FM-1 firmware wars are over.">
+<meta name="keywords" content="M-VAVE FM-1, FM-1 firmware, FM-1 custom firmware, FM-1 firmware switcher, FM-1 firmware wars, Felucca, SLOOP, sloopDX, zp12, X0X, FoMni, FM-1 update, FM-1 install firmware, fwsc">
+<meta name="author" content="zvenson">
+<meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://fm1.designburgapps.com/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="The FM-1 Firmware Wars are over">
-<meta property="og:description" content="Every custom firmware for the M-VAVE FM-1 on one page. No need to pick a side: one click each, and back.">
-<meta name="theme-color" content="#16171c">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2316171c'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='14' text-anchor='middle' fill='%23ffb347'%3EFM1%3C/text%3E%3C/svg%3E">
+<meta property="og:site_name" content="FM-1 Firmware Switcher">
+<meta property="og:url" content="https://fm1.designburgapps.com/">
+<meta property="og:title" content="The FM-1 Firmware Wars are over: the M-VAVE FM-1 Firmware Switcher">
+<meta property="og:description" content="Every custom firmware for the M-VAVE FM-1 on one page, always the newest release. No need to pick a side: one click each, and back.">
+<meta property="og:image" content="https://fm1.designburgapps.com/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The FM-1 Firmware Wars are over: Felucca, SLOOP, sloopDX, zp12, X0X, FoMni">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The FM-1 Firmware Wars are over">
+<meta name="twitter:description" content="Every M-VAVE FM-1 custom firmware, one click each, always the newest release.">
+<meta name="twitter:image" content="https://fm1.designburgapps.com/og.png">
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@graph": [
+ {"@type": "WebApplication", "name": "FM-1 Firmware Switcher", "alternateName": ["FM-1 Firmware Wars", "M-VAVE FM-1 firmware installer"],
+  "url": "https://fm1.designburgapps.com/", "applicationCategory": "MusicApplication", "operatingSystem": "Chrome, Edge (Web MIDI)",
+  "description": "Install every custom firmware for the M-VAVE FM-1 synthesizer with one click from the browser, always the newest release, and go back to the official firmware.",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "author": {"@type": "Person", "name": "zvenson", "url": "https://github.com/zvenson"},
+  "about": {"@type": "Product", "name": "M-VAVE FM-1"}},
+ {"@type": "FAQPage", "mainEntity": [
+  {"@type": "Question", "name": "Which custom firmwares are there for the M-VAVE FM-1?", "acceptedAnswer": {"@type": "Answer", "text": "Felucca (Hügelton Instruments), SLOOP (isod89), sloopDX and zp12 (zvenson), X0X and FoMni (Charles Vestal). All are free and open source (GPL-3.0) and can be installed from fm1.designburgapps.com."}},
+  {"@type": "Question", "name": "How do I install a custom firmware on the FM-1?", "acceptedAnswer": {"@type": "Answer", "text": "Open fm1.designburgapps.com in Chrome or Edge, connect the FM-1 by USB, press Connect, choose a firmware and press Install. It takes about a minute."}},
+  {"@type": "Question", "name": "Can I go back to the official FM-1 firmware?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Download FM-1 V15 from m-vave.com and install it on the same page. If the FM-1 is stuck, hold OCT- while switching it on (USB rescue) and install again."}},
+  {"@type": "Question", "name": "Is it always the newest version?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The switcher checks every firmware's repository every night and offers the newest release, checked before it is listed."}}]}]}
+</script>
+<meta name="theme-color" content="#f6f5f1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233b4bf5'/%3E%3Ctext x='16' y='21' font-family='Arial' font-weight='900' font-size='12' text-anchor='middle' fill='%23fff'%3EFM1%3C/text%3E%3C/svg%3E">
 <style>
-  :root { --bg: #16171c; --bg2: #1f2128; --card: #23262f; --line: #343845; --txt: #eceef3; --dim: #9aa1b2; --mute: #6d7487;
-          --acc: #ffb347; --acc2: #ff7a45; --ok: #6ee7a8; --err: #ff8a80; --warn: #ffd166; }
+  :root { --bg: #f6f5f1; --paper: #ffffff; --ink: #1b1e27; --dim: #5d6474; --mute: #8a90a0; --line: #e6e4dd;
+          --pri: #3b4bf5; --ok: #11a36a; --err: #d93b3b; --warn: #b7791f; --shadow: 0 1px 2px rgba(20, 24, 40, .05), 0 12px 40px rgba(20, 24, 40, .07); }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--txt); font: 16px/1.6 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
-  a { color: var(--acc); text-decoration: none; } a:hover { text-decoration: underline; }
-  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
-  header { padding: 56px 0 30px; background: radial-gradient(1200px 400px at 20% -10%, rgba(255, 179, 71, 0.16), transparent), var(--bg); }
-  .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--acc); margin: 0 0 10px; font-weight: 700; }
-  h1 { font-size: clamp(36px, 5.4vw, 64px); line-height: 1.04; margin: 0 0 14px; font-weight: 300; }
-  h1 b { font-weight: 900; }
-  .lead { font-size: 19px; color: #c9cdd8; max-width: 44em; margin: 0 0 22px; }
-  .bar { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
-  button, .btn { font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1; padding: 13px 20px; border-radius: 10px; border: 0;
-                 cursor: pointer; background: var(--acc); color: #1a1205; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
-  button:hover, .btn:hover { filter: brightness(1.08); text-decoration: none; }
-  button.ghost, .btn.ghost { background: transparent; color: var(--txt); border: 1px solid var(--line); }
-  button:disabled { opacity: 0.45; cursor: default; filter: none; }
-  .status { font: 600 15px/1.4 ui-monospace, "Courier New", monospace; background: #0f1014; border: 1px solid var(--line); border-radius: 10px;
-            padding: 11px 14px; min-width: 260px; color: var(--dim); }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.65 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--pri); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 28px; }
+  header { padding: 88px 0 56px; text-align: center; }
+  .eyebrow { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin: 0 0 18px; font-weight: 700; }
+  h1 { font-size: clamp(40px, 6.4vw, 82px); line-height: 1.02; margin: 0 0 22px; font-weight: 300; letter-spacing: -1.5px; }
+  h1 b { font-weight: 900; position: relative; background: linear-gradient(100deg, #3b4bf5, #8a5cff 45%, #ff3b6b); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 20px; color: var(--dim); max-width: 36em; margin: 0 auto 34px; }
+  .lineup { display: flex; justify-content: center; gap: 14px; margin: 0 0 40px; flex-wrap: wrap; }
+  .lineup span { width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center; box-shadow: var(--shadow); }
+  .bar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; align-items: center; }
+  button, .btn { font-family: inherit; font-weight: 700; font-size: 15.5px; line-height: 1; padding: 15px 24px; border-radius: 999px; border: 0;
+                 cursor: pointer; background: var(--pri); color: #fff; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none;
+                 transition: transform .08s, filter .15s; }
+  button:hover, .btn:hover { filter: brightness(1.08); text-decoration: none; transform: translateY(-1px); }
+  button.ghost, .btn.ghost { background: var(--paper); color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+  button:disabled { opacity: .45; cursor: default; filter: none; transform: none; }
+  .status { font: 600 15px/1.4 ui-monospace, "SF Mono", Menlo, monospace; background: var(--paper); border-radius: 999px; padding: 14px 22px;
+            color: var(--dim); box-shadow: inset 0 0 0 1.5px var(--line); }
   .status b { color: var(--ok); }
-  .warn { background: rgba(255, 209, 102, 0.09); border: 1px solid rgba(255, 209, 102, 0.35); border-radius: 12px; padding: 14px 18px;
-          color: #f1e3bd; margin: 26px 0 0; font-size: 15px; }
+  .warn { background: #fff8e8; border-radius: 18px; padding: 18px 24px; color: #6b5a2e; margin: 46px auto 0; font-size: 15.5px; max-width: 900px; text-align: left; }
   .warn b { color: var(--warn); }
-  main { padding: 26px 0 50px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; }
-  .fw { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px 20px 18px; display: flex; flex-direction: column; gap: 10px; position: relative; }
-  .fw.now { border-color: var(--ok); box-shadow: 0 0 0 1px var(--ok) inset; }
-  .fw h2 { margin: 0; font-size: 24px; font-weight: 800; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-  .fw h2 small { font-size: 14px; font-weight: 600; color: var(--dim); }
-  .tag { font-size: 11.5px; font-weight: 800; letter-spacing: 0.6px; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
-  .tag.now { background: var(--ok); color: #0b2a19; }
-  .tag.beta { background: rgba(255, 209, 102, 0.18); color: var(--warn); }
-  .by { color: var(--dim); font-size: 14px; margin-top: -4px; }
-  .what { color: #c9cdd8; font-size: 15px; flex: 1; margin: 0; }
+  main { padding: 20px 0 80px; }
+  h2.sec { font-size: 15px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin: 0 0 22px; font-weight: 700; text-align: center; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 28px; }
+  .fw { background: var(--paper); border-radius: 24px; padding: 30px 30px 26px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow);
+        border-top: 6px solid var(--c); transition: transform .15s; }
+  .fw:hover { transform: translateY(-2px); }
+  .fw.now { box-shadow: 0 0 0 3px var(--ok), var(--shadow); }
+  .fw .head { display: flex; gap: 18px; align-items: center; }
+  .fw .ico { width: 72px; height: 72px; border-radius: 20px; display: grid; place-items: center; background: var(--c); flex: none; }
+  .fw h3 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.3px; line-height: 1.1; }
+  .fw h3 small { font-size: 14px; font-weight: 600; color: var(--mute); margin-left: 6px; }
+  .tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 999px; }
+  .tag.now { background: #dff6ea; color: var(--ok); }
+  .tag.beta { background: #fff1d6; color: var(--warn); }
+  .by { color: var(--dim); font-size: 14.5px; margin-top: 2px; }
+  .what { color: #3a404d; font-size: 16px; flex: 1; margin: 4px 0 0; }
   .meta { color: var(--mute); font-size: 13px; }
   .meta a { color: var(--dim); }
-  .fw .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-  progress { width: 100%; height: 8px; accent-color: var(--acc); display: none; }
-  .fw .msg { font-size: 13.5px; color: var(--dim); min-height: 1.2em; }
-  .card { background: var(--bg2); border: 1px solid var(--line); border-radius: 14px; padding: 22px 24px; margin-top: 22px; }
-  .card h3 { margin: 0 0 8px; font-size: 20px; }
-  .card p { color: #c9cdd8; margin: 6px 0; }
-  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
-  .mailcta { background: linear-gradient(120deg, rgba(255, 179, 71, 0.16), rgba(255, 122, 69, 0.10)); border-color: rgba(255, 179, 71, 0.45); }
-  input[type=file] { color: var(--dim); }
-  label.chk { display: flex; gap: 10px; align-items: center; color: #c9cdd8; font-size: 15px; margin: 10px 0; }
-  details { margin-top: 10px; } summary { cursor: pointer; color: var(--dim); }
-  pre#log { white-space: pre-wrap; font-size: 12px; color: var(--mute); max-height: 180px; overflow: auto; }
-  footer { border-top: 1px solid var(--line); color: var(--mute); font-size: 13.5px; padding: 22px 0 40px; }
-  footer a { color: var(--dim); }
-  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } .status { min-width: 0; width: 100%; } .bar .btn, .bar button { flex: 1; justify-content: center; }
-    header { padding-top: 34px; } .grid { grid-template-columns: 1fr; } .card { padding: 18px; } .warn { font-size: 14px; } }
+  .fw button.go { background: var(--c); width: 100%; margin-top: 6px; }
+  progress { width: 100%; height: 8px; display: none; accent-color: var(--c); }
+  .fw .msg { font-size: 14px; color: var(--dim); min-height: 1.2em; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 56px; }
+  .card { background: var(--paper); border-radius: 24px; padding: 32px; box-shadow: var(--shadow); }
+  .card h3 { margin: 0 0 10px; font-size: 22px; font-weight: 800; }
+  .card p { color: #3a404d; margin: 8px 0; }
+  .mailcta { background: linear-gradient(135deg, #3b4bf5, #8a5cff); color: #fff; }
+  .mailcta h3, .mailcta p { color: #fff; }
+  .mailcta .btn { background: #fff; color: #3b4bf5; }
+  .mailcta .meta, .mailcta .meta a { color: rgba(255, 255, 255, .85); }
+  input[type=file] { color: var(--dim); font-size: 14px; }
+  label.chk { display: flex; gap: 10px; align-items: center; color: #3a404d; font-size: 15px; margin: 12px 0; }
+  .faq { margin-top: 72px; } .faq .qa { max-width: 820px; margin: 0 auto 26px; }
+  .faq h3 { font-size: 19px; margin: 0 0 6px; font-weight: 800; } .faq p { margin: 0; color: #3a404d; }
+  details { margin-top: 40px; text-align: center; } summary { cursor: pointer; color: var(--dim); }
+  details p { max-width: 760px; margin: 12px auto; text-align: left; }
+  pre#log { white-space: pre-wrap; font-size: 12px; color: var(--mute); max-height: 180px; overflow: auto; text-align: left; }
+  footer { color: var(--mute); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
+  footer .wrap { max-width: 860px; } footer a { color: var(--dim); }
+  @media (max-width: 760px) { header { padding: 54px 0 36px; } .two { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; gap: 20px; }
+    .bar > * { width: 100%; } .fw, .card { padding: 24px; } .wrap { padding: 0 16px; } .lead { font-size: 17px; }
+    .lineup { gap: 8px; } .lineup span { width: 44px; height: 44px; border-radius: 12px; } .lineup svg { width: 30px; height: 30px; }
+    .status { font-size: 13px; } .warn { padding: 16px 18px; font-size: 14.5px; } }
 </style>
 </head>
 <body>
 <header><div class="wrap">
   <p class="eyebrow">M-VAVE FM-1 · the firmware switcher</p>
-  <h1>The <b>Firmware Wars</b> are over.</h1>
+  <h1>The <b>Firmware Wars</b><br>are over.</h1>
   <p class="lead">Felucca, SLOOP, sloopDX, zp12, X0X, FoMni: no need to pick a side any more. Connect your FM-1 by USB, choose one,
      press Install: about a minute, and it is a different instrument. Try them all, keep the one you love, switch back tomorrow.
      Chrome or Edge.</p>
+  <div class="lineup" id="lineup"></div>
   <div class="bar">
     <button id="connect">Connect the FM-1</button>
     <div class="status" id="now">Not connected</div>
@@ -89,6 +131,7 @@
 </div></header>
 
 <main><div class="wrap">
+  <h2 class="sec">Six firmwares, one FM-1</h2>
   <div class="grid" id="grid"><p class="meta">Loading the catalogue…</p></div>
 
   <div class="two">
@@ -106,10 +149,27 @@
       <p>Made a firmware for the FM-1? Free, with its source, released as a <code>.fwsc</code> on GitHub: join in. It goes on this
          page with your name and your links, and follows every release you make.</p>
       <p><a class="btn" href="mailto:sven@designburg.net?subject=FM-1%20Firmware%20Switcher%3A%20my%20firmware&amp;body=Name%3A%0ARepository%3A%0AWhat%20it%20does%3A%0A">Send a mail to sven@designburg.net</a></p>
-      <p class="meta" style="margin-top:14px">The switcher is free and stays free. If it saved you an evening:
+      <p class="meta" style="margin-top:18px">The switcher is free and stays free. If it saved you an evening:
          <a href="https://paypal.me/zvenson" rel="noopener">☕ buy me a coffee</a>.</p>
     </section>
   </div>
+
+  <section class="faq">
+    <h2 class="sec">Questions</h2>
+    <div class="qa"><h3>Which custom firmwares are there for the M-VAVE FM-1?</h3>
+      <p>Six, all free and open source (GPL-3.0): <b>Felucca</b>, the custom firmware the others build on; <b>SLOOP</b>, a live
+         groovebox; <b>sloopDX</b>, SLOOP with a DX7 inside; <b>zp12</b>, a 12-bit sampling drum machine; <b>X0X</b>, 909/808 drums and
+         two 303s; <b>FoMni</b>, a chord harp. The firmware wars are over: you do not have to choose one for good.</p></div>
+    <div class="qa"><h3>How do I install a firmware on the FM-1?</h3>
+      <p>In Chrome or Edge (they speak Web MIDI): connect the FM-1 by USB, press <b>Connect the FM-1</b>, then <b>Install</b> on the
+         firmware you want. About a minute, the FM-1 restarts as a different instrument. No app, no driver, no file to download.</p></div>
+    <div class="qa"><h3>Is it always the newest version?</h3>
+      <p>Yes. Every night the switcher looks at each project's repository and offers its newest release, after checking that the
+         package is an FM-1 firmware with the update loader. Betas are marked.</p></div>
+    <div class="qa"><h3>How do I go back to the official firmware?</h3>
+      <p>Download FM-1 V15 from m-vave.com and install it with the box above. If the FM-1 is stuck, hold OCT− while switching it on
+         (USB rescue) and install again.</p></div>
+  </section>
 
   <details><summary>What happens when you press Install</summary>
     <p class="meta">The page talks to the FM-1 over USB MIDI with the same update protocol as M-VAVE's own updater (first the running
@@ -124,7 +184,7 @@
   The packages are the projects' own, mirrored unchanged from their GitHub releases (GPL-3.0,
   <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">the license</a>); the source of each is at its
   repository and tag, linked on its card, and a copy of that source is kept here next to the package. Felucca by Leo Kuroshita (Hügelton Instruments); SLOOP by isod89; X0X and FoMni by Charles Vestal; sloopDX and zp12
-  by Sven Trogus. The update path is Felucca's, as sloopDX carries it. M-VAVE and FM-1 are trademarks of their owners; not affiliated
+  by <a href="https://github.com/zvenson" rel="noopener">zvenson</a>. The update path is Felucca's, as sloopDX carries it. M-VAVE and FM-1 are trademarks of their owners; not affiliated
   with M-VAVE. Unofficial firmware, free and without warranty: you install it at your own risk.
   <br><a href="https://designburgapps.com/">designburgapps.com</a> · <a href="https://zp12.designburgapps.com/impressum.html">Impressum · Datenschutz</a>
   · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a> · <span id="updated"></span>
@@ -439,6 +499,20 @@ function showNow() {
   render();
 }
 
+// each firmware's colour and picture (our own drawings: the names are boats, or what they do)
+const LOOK = {
+  felucca: ["#2d8cff", '<path d="M14 44h36l-5 7H19z" fill="#fff"/><path d="M33 12v31" stroke="#fff" stroke-width="3"/><path d="M33 12l14 28H20z" fill="#fff" opacity=".95"/>'],
+  sloop: ["#16a571", '<path d="M14 44h36l-5 7H19z" fill="#fff"/><path d="M31 10v33" stroke="#fff" stroke-width="3"/><path d="M33 12l13 28H33z" fill="#fff"/><path d="M29 15l-12 25h12z" fill="#fff" opacity=".7"/>'],
+  sloopdx: ["#00a3b4", '<rect x="10" y="12" width="13" height="10" rx="2" fill="#fff"/><rect x="26" y="12" width="13" height="10" rx="2" fill="#fff" opacity=".75"/><rect x="18" y="28" width="13" height="10" rx="2" fill="#fff"/><rect x="34" y="28" width="13" height="10" rx="2" fill="#fff" opacity=".75"/><path d="M24 38v8h16v-8" stroke="#fff" stroke-width="3" fill="none"/><text x="32" y="58" font-family="Arial" font-weight="900" font-size="9" fill="#fff" text-anchor="middle">DX7</text>'],
+  zp12: ["#ff8a00", '<path d="M8 34h5v-14h5v26h5V12h5v34h5V22h5v18h5v-8h5v4h5" stroke="#fff" stroke-width="3.5" fill="none" stroke-linejoin="miter"/>'],
+  x0x: ["#ff3b6b", '<g fill="#fff">' + [0,1,2,3,4,5,6,7].map((i) => `<rect x="${9 + (i % 4) * 12}" y="${18 + Math.floor(i / 4) * 14}" width="9" height="10" rx="2" opacity="${[1,.45,1,1,.45,1,.45,1][i]}"/>`).join("") + '</g><text x="32" y="56" font-family="Arial" font-weight="900" font-size="9" fill="#fff" text-anchor="middle">303</text>'],
+  fomni: ["#8a5cff", '<g stroke="#fff" stroke-width="2.5">' + [0,1,2,3,4,5,6].map((i) => `<path d="M${14 + i * 6} 12 q${i % 2 ? 3 : -3} 20 0 40"/>`).join("") + '</g><circle cx="49" cy="18" r="5" fill="#fff"/>'],
+};
+const icon = (id, px) => `<svg width="${px}" height="${px}" viewBox="0 0 64 64" aria-hidden="true">${(LOOK[id] || ["", ""])[1]}</svg>`;
+function lineup() {
+  $("lineup").innerHTML = cat.map((f) => `<span style="background:${(LOOK[f.id] || ["#888"])[0]}" title="${esc(f.name)}">${icon(f.id, 40)}</span>`).join("");
+}
+
 function render() {
   const w = whoIs(current);
   $("grid").innerHTML = "";
@@ -446,14 +520,17 @@ function render() {
     const isNow = w && w.fw === f;
     const el = document.createElement("article");
     el.className = "fw" + (isNow ? " now" : "");
-    el.innerHTML = `<h2>${esc(f.name)} <small>${esc(f.version)}</small>${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${f.beta ? '<span class="tag beta">beta</span>' : ""}</h2>
-      <div class="by">by ${esc(f.author)}</div>
+    el.style.setProperty("--c", (LOOK[f.id] || ["#3b4bf5"])[0]);
+    el.innerHTML = `<div class="head"><div class="ico">${icon(f.id, 48)}</div><div>
+        <h3>${esc(f.name)}<small>${esc(f.version)}</small></h3>
+        <div class="by">by ${esc(f.author)}</div>
+        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${f.beta ? '<span class="tag beta">beta</span>' : ""}</div></div></div>
       <p class="what">${esc(f.what)}</p>
       <div class="meta">${esc(f.date)} · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
         <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}</div>
       <progress max="100" value="0"></progress>
-      <div class="row"><button>${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button></div>
+      <button class="go">${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button>
       <div class="msg"></div>`;
     el.querySelector("button").onclick = () => install(f, el);
     el.querySelector("button").disabled = writing;
@@ -541,8 +618,26 @@ $("stock-go").onclick = async () => {
 };
 
 window.addEventListener("beforeunload", (e) => { if (writing) { e.preventDefault(); e.returnValue = "An install is running"; } });
-fetch("catalog.json", { cache: "no-store" }).then((r) => r.json()).then((c) => {
-  cat = c.firmwares; $("updated").textContent = "catalogue of " + c.updated; render();
+fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-store" })   // (a new key each day, after the nightly sync)
+  .then((r) => r.json()).then((c) => {
+  cat = c.firmwares; $("updated").textContent = "catalogue of " + c.updated; lineup(); render();
+  // ?demo=connected|install|done&now=<id>&fw=<id>&pct=N: the page in a state, for a video (no FM-1 needed)
+  const q = new URLSearchParams(location.search), st = q.get("demo");
+  if (!st) return;
+  const by = (id) => cat.find((f) => f.id === id);
+  current = (by(q.get("now") || "zp12") || {}).product || null; showNow();
+  const f = by(q.get("fw") || "felucca"), el = f && [...$("grid").children][cat.indexOf(f)];
+  if (!el) return;
+  if (st === "install") {
+    const bar = el.querySelector("progress"); bar.style.display = "block"; bar.value = +(q.get("pct") || 40);
+    el.querySelector(".msg").textContent = bar.value < 8 ? "The FM-1 reads the package…" : "Writing… do not unplug";
+    [...$("grid").querySelectorAll("button")].forEach((b) => { b.disabled = true; });
+  }
+  if (st === "done") {
+    current = f.product; showNow();
+    const m = [...$("grid").children][cat.indexOf(f)].querySelector(".msg");
+    m.textContent = `${f.name} ${f.version} is on your FM-1.`; m.style.color = "var(--ok)";
+  }
 }).catch((e) => { $("grid").innerHTML = `<p class="meta">The catalogue could not be loaded: ${esc(e.message)}</p>`; });
 </script>
 <!-- Matomo (self-hosted, matomo.designburgapps.com): one count for designburgapps.com, dx7. and zp12., the page

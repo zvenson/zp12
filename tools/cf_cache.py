@@ -5,6 +5,7 @@ line is the bottleneck, so Cloudflare keeps the files at its edge.
   tools/cf_cache.py rule     the cache rule: the two hosts eligible for cache, 2 h at the edge (HTML too; the
                              browser asks the edge again after 10 min)
   tools/cf_cache.py purge    after a deploy: the two sites' files out of the edge (by URL: only these sites)
+  tools/cf_cache.py purge-url URL...   just these (fm1_sync.py: a changed catalogue)
   tools/cf_cache.py check    what the edge says for a few of their files (HIT, MISS, ...)
 
 The API token (Zone: Cache Rules Edit, Cache Purge, Zone Read; designburgapps.com only) is read from
@@ -92,6 +93,11 @@ def purge():
     print(f"cf_cache: {len(u)} URLs purged")
 
 
+def purge_url():
+    call("POST", f"/zones/{zone_id()}/purge_cache", {"files": sys.argv[2:32]})
+    print(f"cf_cache: {len(sys.argv[2:32])} URL(s) purged")
+
+
 def check():
     for u in ("https://zp12.designburgapps.com/", "https://zp12.designburgapps.com/zp12-beat.mp4",
               "https://zp12.designburgapps.com/editor/", "https://dx7.designburgapps.com/"):
@@ -102,4 +108,4 @@ def check():
 
 
 if __name__ == "__main__":
-    {"rule": rule, "purge": purge, "check": check}.get(sys.argv[1] if len(sys.argv) > 1 else "", lambda: sys.exit(__doc__))()
+    {"rule": rule, "purge": purge, "purge-url": purge_url, "check": check}.get(sys.argv[1] if len(sys.argv) > 1 else "", lambda: sys.exit(__doc__))()

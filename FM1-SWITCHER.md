@@ -4,12 +4,18 @@ A page that installs any of the FM-1's custom firmwares with one click: `fm1/` i
 `tools/make_fm1.py` from `web/fm1.html`), its catalogue and packages by `tools/fm1_sync.py`. On the Pi, nginx serves
 `zp12repo/fm1` as fm1.designburgapps.com and `~/docker/sloopdx-site/fm1src` (the source copies, outside git) as `/src/`.
 
-## Updating the catalogue
+## The catalogue: always the newest release
 
-    python3 tools/fm1_sync.py && python3 tools/make_fm1.py     # here: the newest packages, the page
-    git add fm1 && git commit -m "Switcher: ..." && git push
-    ssh pi-remote '~/docker/sloopdx-site/update.sh'             # pulls, then purges Cloudflare
-    ssh pi-remote 'cd ~/docker/sloopdx-site/zp12repo && python3 tools/fm1_sync.py --sources ../fm1src'
+Every night at 4:00 the Pi's cron runs `tools/fm1_sync.py` into `~/docker/sloopdx-site/fm1live` (outside git; nginx
+serves it as `/catalog.json` and `/fw/`), and the source copies into `fm1src`. GitHub does not let a browser download
+release files (no CORS header), so the packages are passed through the Pi, checked first (FM-1 identity, the update
+loader); a release that fails keeps the last good package. A changed catalogue is purged from Cloudflare. sloopDX and
+zp12 come from the Pi's checkouts (`repo/docs/firmware`, `zp12repo/docs/install/firmware`): update.sh syncs after
+its pull, so they are listed as soon as they are deployed.
+
+    python3 tools/fm1_sync.py && python3 tools/make_fm1.py     # here: the page, with a local catalogue to look at
+    git add web/fm1.html fm1 && git commit -m "Switcher: ..." && git push
+    ssh pi-remote '~/docker/sloopdx-site/update.sh'             # pulls, syncs, purges Cloudflare
 
 ## Licence
 
@@ -39,4 +45,4 @@ available even if a repository goes). The page does not claim the authors endors
 > Thanks for [Felucca: the foundation all of this stands on / SLOOP: the workflow sloopDX and zp12 are built on /
 > X0X and FoMni: two great ideas for the FM-1]!
 >
-> Sven (sloopDX, zp12)
+> zvenson (sloopDX, zp12)

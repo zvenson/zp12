@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /fw/
+Disallow: /src/
+Sitemap: https://fm1.designburgapps.com/sitemap.xml
