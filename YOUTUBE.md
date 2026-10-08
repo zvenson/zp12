@@ -1,6 +1,6 @@
 # zp12 on YouTube: the texts
 
-For the 1.6 video (`zp12-1.6-samples.mp4`, 108 s). Paste as they are; the chapters match the cut
+For the 1.6 video (`zp12-1.6-samples.mp4`, 111 s). Paste as they are; the chapters match the cut
 (`../video/make_video12.py` EDIT). Keep the first two lines of the description as the hook: YouTube shows
 them before "more". Never use "SP-1200" or "E-mu" in the title as if it were theirs: "inspired by" and
 "in the spirit of" are fine, the names are their owners' trademarks.
@@ -31,14 +31,14 @@ What zp12 is
 • backup and restore in the browser; the sloopDX DX7 banks can stay or make room for samples
 
 Chapters
-0:00 The finished groove
-0:08 Your own samples: the web editor
-0:31 Recording the beat live
-0:45 Piano at 33, a bass over the keys, TUNE recorded per hit
-1:02 The own sample in the loop
-1:08 Jam: the DJ filter and the flute
-1:19 Loop 2: erase while it plays, double time
-1:33 Install and links
+0:00 The classic, and the finished groove
+0:12 Your own samples: the web editor
+0:35 Recording the beat live
+0:49 Piano at 33, a bass over the keys, TUNE recorded per hit
+1:06 The own sample in the loop
+1:12 Jam: the DJ filter and the flute
+1:23 Loop 2: erase while it plays, double time
+1:37 Install and links
 
 Links
 Install (Chrome / Edge, over USB): https://zp12.designburgapps.com/install
@@ -101,14 +101,14 @@ Installer, Sample-Editor, Backup, Cheat Sheet: https://zp12.designburgapps.com
 Alles im Video kommt aus dem Code der Firmware selbst: die Bildschirme, die Klänge, die Bedienung als Skript.
 
 Kapitel
-0:00 Der fertige Groove
-0:08 Eigene Samples: der Web-Editor
-0:31 Der Beat, live eingespielt
-0:45 Klavier auf 33, Bass über die Tasten, TUNE pro Hit aufgenommen
-1:02 Das eigene Sample im Loop
-1:08 Jam: DJ-Filter und Flöte
-1:19 Loop 2: löschen im Lauf, Double Time
-1:33 Installation und Links
+0:00 Der Klassiker, und der fertige Groove
+0:12 Eigene Samples: der Web-Editor
+0:35 Der Beat, live eingespielt
+0:49 Klavier auf 33, Bass über die Tasten, TUNE pro Hit aufgenommen
+1:06 Das eigene Sample im Loop
+1:12 Jam: DJ-Filter und Flöte
+1:23 Loop 2: löschen im Lauf, Double Time
+1:37 Installation und Links
 
 Bitte vor dem Installieren immer die aktuelle Firmware-Version prüfen: https://zp12.designburgapps.com/install
 Basiert auf SLOOP (isod89) und Felucca (Leo Kuroshita), GPL-3.0. Samples CC0 (VSCO-2 CE, VCSL, Sonic Pi), E-Piano von Greg Sullivan (CC BY 3.0). Inspiriert von den 12-Bit-Samplern der 80er; die Namen sind Marken ihrer Inhaber. Keine Verbindung zu M-VAVE. Inoffizielle Firmware ohne Gewähr, Installation auf eigenes Risiko.
