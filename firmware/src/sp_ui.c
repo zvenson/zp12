@@ -26,7 +26,9 @@
 static const uint16_t FAM_COL[5] = {RGB(38, 62, 112), RGB(236, 166, 44), RGB(52, 176, 160), RGB(200, 46, 50), RGB(150, 156, 172)};
 static const uint16_t FAM_INK[5] = {RGB(255, 255, 255), RGB(30, 24, 10), RGB(8, 30, 28), RGB(255, 255, 255), RGB(20, 24, 34)};
 
-#define UI_PAGE_MS 6000u
+/* a page untouched this long: back to the faders (GLO > SETUP > BACK; 0: never) */
+static const uint8_t UI_BACK_S[5] = {6, 15, 30, 60, 0};
+static const char *const UI_BACK_NAME[5] = {"6 S", "15 S", "30 S", "60 S", "OFF"};
 #define UI_HOLD_MS 1300u                        /* REC held 0.7 s, then this much more: the loop cleared */
 #ifndef ZP12_VER
 #define ZP12_VER "0.0"                          /* build.py --release X.Y */
@@ -59,6 +61,7 @@ static struct {
     uint8_t copy_to;                            /* SEG TOOLS: the target */
     uint8_t copy_pad;                           /* WAVE: the pad the sound goes to */
     uint8_t arm;                                /* a destructive knob turned once (it wants AGAIN): its page + 1 */
+    uint8_t back;                               /* UI_BACK_S index (saved) */
     uint8_t turn_pad;                           /* the pad whose TUNE / DECAY / CUT was turned last ... */
     uint32_t turn_ms;                           /* ... and when (recording: its hits take them) */
     uint32_t held;                              /* the buttons held (bit = matrix id) */
@@ -208,7 +211,7 @@ static void page_cols(char lab[4][8], char val[4][8])
         break;
     case PG_SETUP:
         COL(0, "TEMPO", num(val[0], (int32_t)(sq.bpm10 / 10u), 3, 0)); COL(1, "CLICK", cat(val[1], CLICK_NAME[sq.click % 3u]));
-        COL(2, "VER", cat(val[2], ZP12_VERSION));
+        COL(2, "BACK", cat(val[2], UI_BACK_NAME[ui.back % 5u]));
         COL(3, "RESET", cat(val[3], ui.arm == PG_SETUP + 1u ? "AGAIN" : "-->"));
         break;
     default:
@@ -252,6 +255,8 @@ static void draw_tabs(void)
         pad_label(p, ui.sel);
         p[2] = ' ';
         cat(p + 3, sound_name(ui.sel));
+    } else if (fm == 4u) {                       /* GLO: the version */
+        cat(cat(p, "zp12 "), ZP12_VERSION);
     } else if (fm == 3u) {
         p = cat(p, "LOOP ");
         num(p, sq.seg + 1, sq.seg + 1u >= 10u ? 2u : 1u, 0);
@@ -465,7 +470,7 @@ static void ui_draw(void)
     uint32_t i, s, lit = 0, on = 0, bank = ui.sel / 8u;
     ui_note_played();
     sq.turn = sq.recording && (uint32_t)(fm1_ms - ui.turn_ms) < 600u ? 1u << ui.turn_pad : 0u;
-    if (ui.page != PG_HOME && (uint32_t)(fm1_ms - ui.touch_ms) > UI_PAGE_MS && !ui.steps)
+    if (ui.page != PG_HOME && UI_BACK_S[ui.back % 5u] && (uint32_t)(fm1_ms - ui.touch_ms) > UI_BACK_S[ui.back % 5u] * 1000u && !ui.steps)
         ui.page = PG_HOME;                      /* untouched: the knobs are the faders again */
     if (ui.arm && (uint32_t)(fm1_ms - ui.arm_ms) > 1500u)
         ui.arm = 0;
@@ -477,7 +482,7 @@ static void ui_draw(void)
     if (s != ui.sig_head || ui.force) { ui.sig_head = s; draw_head(); }
     s = sig_of(&sp_sound[ui.sel], sizeof(sp_sound_t), 2166136261u ^ ui.sel * 7u ^ ui.page * 131u ^ sq.bpm10 * 7919u ^ ui.multi);
     s = sig_of(ui.mix, sizeof ui.mix, s ^ ui.shift ^ ui.steps * 3u ^ ui.step_bar * 29u ^ ui.arm * 37u ^ ui.copy_to * 41u);
-    s = sig_of(&fxp, sizeof fxp, s ^ (uint32_t)(djf.v + 64) * 6151u ^ (uint32_t)djf.res * 97u);
+    s = sig_of(&fxp, sizeof fxp, s ^ (uint32_t)(djf.v + 64) * 6151u ^ (uint32_t)djf.res * 97u ^ ui.back * 2203u);
     s = sig_of(sq_songs, sizeof sq_songs, s ^ ui.song_cur * 31u ^ SQ_SONG_N * 17u ^ sq.song_mode ^ sq.song_sel * 7u);
     s ^= (sq.seg * 977u) ^ (sq.quant * 31u) ^ (sq.swing * 7u) ^ (sq.click * 3u) ^ sq_seg[sq.seg % SQ_NSEG].bars * 101u;
     s ^= sq.recording * 5u ^ sq.rec_arm * 11u;
@@ -774,6 +779,7 @@ static void knob(uint32_t n, int32_t d)
     case PG_SETUP:
         if (n == 0u) sq.bpm10 = (uint16_t)sp_clamp(sq.bpm10 + dd * 3, 400, 2400);
         if (n == 1u) sq.click = (uint8_t)sp_clamp(sq.click + one, 0, 2);
+        if (n == 2u) ui.back = (uint8_t)sp_clamp(ui.back + one, 0, 4);
         if (n == 3u && d > 0 && !sq.playing && again(PG_SETUP + 1u))
             ui.factory_req = 1;                    /* (zp12.c: everything to the factory state, saved) */
         break;

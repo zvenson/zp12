@@ -102,6 +102,12 @@ int main(int argc, char **argv)
         ui_preset(1);                                      /* ... and back to 0 on a normal one */
         if (sp_sound[0].wave != 0u || sp_sound[0].tune != 0) { printf("zp12 ui: leaving a x2 sample did not reset TUNE FAIL\n"); return 1; }
     }
+    page(PG_FILT); ui.back = 4; fm1_ms += 120000; ui_draw();     /* BACK OFF: the page stays ... */
+    if (ui.page != PG_FILT) { printf("zp12 ui: BACK OFF did not keep the page FAIL\n"); return 1; }
+    ui.back = 2; ui.touch_ms = fm1_ms; fm1_ms += 20000; ui_draw();  /* ... 30 s: still there after 20 ... */
+    if (ui.page != PG_FILT) { printf("zp12 ui: BACK 30 s went back after 20 s FAIL\n"); return 1; }
+    fm1_ms += 11000; ui_draw();                                       /* ... and back after 31 */
+    if (ui.page != PG_HOME) { printf("zp12 ui: BACK 30 s did not go back FAIL\n"); return 1; }
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;
 }

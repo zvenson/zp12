@@ -8,7 +8,7 @@
 #define ZS_BASE 0xC4000u
 #define ZS_SLOT 0xA000u                          /* 40 KiB a copy */
 #define ZS_MAGIC 0x3231505Au                     /* "ZP12" */
-#define ZS_VER 3u                                /* 3: the hits' locks; 2: four songs (1: one; read, it becomes song 1) */
+#define ZS_VER 4u                                /* 4: the UI's settings (BACK); 3: the hits' locks; 2: four songs (1: one) */
 #define ZS_KIT_ID ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u ^ 0x0600u))   /* the factory kit the pads were saved with
                                                  * (0.6: changed once, so every older save gets the kit's pads) */
 
@@ -43,6 +43,10 @@ static uint32_t zs_pack(uint8_t *b)
     p = zs_put(p, st, sizeof st);
     p = zs_put(p, sq_songs, sizeof sq_songs);
     p = zs_put(p, sq_song_len, sizeof sq_song_len);
+    {
+        uint16_t u[4] = {ui.back, 0, 0, 0};      /* (room for more of the UI's settings) */
+        p = zs_put(p, u, sizeof u);
+    }
     for (i = 0; i < SQ_NSEG; i++) {
         const sq_seg_t *s = &sq_seg[i];
         p = zs_put(p, s, 4u);                    /* bars, rsv, n */
@@ -77,6 +81,13 @@ static int zs_unpack(const uint8_t *b, uint32_t len, uint32_t ver)
         p = zs_get(p, sq_song_len, sizeof sq_song_len);
         for (i = 0; i < SQ_SONGS; i++)
             if (sq_song_len[i] > SQ_NSONG) sq_song_len[i] = 0;
+    }
+    if (ver >= 4u) {
+        uint16_t u[4];
+        p = zs_get(p, u, sizeof u);
+        ui.back = (uint8_t)(u[0] < 5u ? u[0] : 2u);
+    } else {
+        ui.back = 2;                              /* (an older save: 30 s) */
     }
     sq.bpm10 = (uint16_t)sp_clamp(st[0], 400, 2400);
     sq.quant = (uint8_t)(st[1] % 7u);

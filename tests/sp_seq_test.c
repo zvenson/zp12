@@ -17,6 +17,7 @@ static void st_read(uint32_t a, void *d, uint32_t n) { (void)a; (void)d; (void)n
 static int fl_erase4k(uint32_t a, uint32_t *t) { (void)a; (void)t; return -1; }
 static int fl_write(uint32_t a, const void *d, uint32_t n) { (void)a; (void)d; (void)n; return -1; }
 static void fm1_wdt_feed(void) {}
+static struct { uint8_t back; } ui;                   /* (what sp_store.c saves of the UI) */
 #include "../firmware/src/sp_store.c"
 
 static int bad;
@@ -139,14 +140,21 @@ int main(int argc, char **argv)
         block();
     }
 
-    /* 3a store: the locks saved and read back; a version 2 save has none */
+    /* 3a store: the locks and the UI's BACK saved and read back; older saves (3: no settings, 2: no locks either):
+     * the same bytes without the 8 of the settings */
     {
-        uint32_t n = zs_pack(zs_buf), k = (uint32_t)sq_find(s0, 96, 1), lk = sq_lk[0][k];
-        sq_lk[0][k] = 0;
-        check(zs_unpack(zs_buf, n, 3) == 0 && s0->ev[k].lk && sq_lk[0][k] == lk, "STORE: a lock saved and read back");
-        n = zs_pack(zs_buf);
-        check(zs_unpack(zs_buf, n, 2) == 0 && !s0->ev[k].lk, "STORE: a version 2 save has no locks");
-        zs_unpack(zs_buf, n, 3);
+        static uint8_t keep[ZS_SLOT], old[ZS_SLOT];
+        uint32_t n, k = (uint32_t)sq_find(s0, 96, 1), lk = sq_lk[0][k];
+        uint32_t at = sizeof sp_sound + sizeof sp_mix + sizeof fxp + 16u + sizeof sq_songs + sizeof sq_song_len;
+        ui.back = 4;
+        n = zs_pack(keep);
+        sq_lk[0][k] = 0; ui.back = 1;
+        check(zs_unpack(keep, n, ZS_VER) == 0 && s0->ev[k].lk && sq_lk[0][k] == lk, "STORE: a lock saved and read back");
+        check(ui.back == 4, "STORE: BACK (pages never back) saved and read back");
+        memcpy(old, keep, at); memcpy(old + at, keep + at + 8u, n - at - 8u);
+        check(zs_unpack(old, n - 8u, 3) == 0 && s0->ev[k].lk && ui.back == 2, "STORE: a version 3 save: its locks, BACK 30 s");
+        check(zs_unpack(old, n - 8u, 2) == 0 && !s0->ev[k].lk, "STORE: a version 2 save has no locks");
+        check(zs_unpack(keep, n, ZS_VER) == 0 && s0->ev[k].lk, "STORE: back as it was");
     }
 
     /* 3a'. CLEAR, then UNDO brings it back (locks too), UNDO again clears it again */
