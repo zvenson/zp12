@@ -86,8 +86,8 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
     dict(id="sloopdx", editor="https://dx7.designburgapps.com/webapp/editor/",
          kind=["groove", "synth"], name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_93\d",
          src="sloopdx:docs/firmware", site="https://dx7.designburgapps.com",
-         what="SLOOP's live workflow with Dexed's DX7 engine inside: six operators, 32 algorithms, your own .syx banks, "
-              "every voice edited on the FM-1, FM drums you program, 128 steps a track."),
+         what="SLOOP's live workflow with Dexed's DX7 engine and 128 steps a track: six operators, 32 algorithms, "
+              "your own .syx banks, every voice edited on the FM-1, FM drums you program."),
     dict(id="x0x", play="https://charlesvestal.github.io/fm1-x0x/emu/",
          kind="groove", name="X0X", author="Charles Vestal", repo="charlesvestal/fm1-x0x", ident=r"FM-1_900\d{4}",
          src="github",
