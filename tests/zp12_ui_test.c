@@ -132,7 +132,12 @@ int main(int argc, char **argv)
     if (ui.page != PG_CLICK || sq.cin_bars != 2u || !sq.dub_bar) { printf("zp12 ui: GLO > CLICK > COUNT / DUB FAIL\n"); return 1; }
     sq.cin_bars = 1; sq.dub_bar = 0;
     page(PG_HOME); ui.held = 1u << B_GLO; ui.glo_used = 0; key_down(4, 0); key_down(5, 0);        /* GLO held: white 3 mutes CH3 (a black key: nothing) */
-    { uint32_t l, kk, gg; ui_leds(&l, &kk, &gg); if (!((kk >> 4) & 1u) || kk != 1u << 4) { printf("zp12 ui: GLO held does not show the mutes FAIL\n"); return 1; } }
+    {   /* GLO held: keys 1-8 lit while heard: all but 3 (2.1: lit = on, dark = muted) */
+        uint32_t l, kk, gg, want = 0, q;
+        for (q = 0; q < 27u; q++) if (white_of(q) < 8u && white_of(q) != 2u) want |= 1u << q;
+        ui_leds(&l, &kk, &gg);
+        if (kk != want) { printf("zp12 ui: GLO held does not show the mutes FAIL\n"); return 1; }
+    }
     ui.held = 0; fm1_ms += 20; ui_draw(); ppm("zp12-mute");
     if (sp_mute != 4u || sp_solo != 0u || !ui.glo_used) { printf("zp12 ui: GLO + white key 3 did not mute CH3 FAIL\n"); return 1; }
     ui.held = 1u << B_GLO; key_down(21, 0); ui.held = 0; fm1_ms += 2000; ui_draw(); ppm("zp12-solo");   /* white 13: solo CH5 */

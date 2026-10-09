@@ -71,7 +71,7 @@ switching it on (USB rescue).
 | SEQ tapped | LOOP (LOOP · BARS 1–32 / AUTO · QUANT · SWING), LOOP TOOLS (CLEAR · COPY> · COPY, turn twice), SONG (STEP · LOOP · REPEAT, 0 ends · SONG OFF / 1–4: four songs of the loops) |
 | SEQ held | the last pad's 16 steps of a bar on the white keys (lit = a hit); OCT− / OCT+: the bars |
 | PLAY · REC | run / stop · record (stopped: ARMED, PLAY counts in: GLO → CLICK → COUNT off / 1 / 2 bars; playing: overdub on / off, at once or from the next 1: DUB); a press under 2 s is always a tap, REC held 2 s: clear the loop |
-| GLO held + white keys | 1–8 mute channels 1–8, 9–16 solo them (M / S under the faders) |
+| GLO held + white keys | 1–8 mute channels 1–8, 9–16 solo them (M / S under the faders; keys 1–8 lit while heard, dark when muted) |
 | Recording + TUNE / FINE / DECAY / CUT turned | the pad's hits keep the values turned (a lock per hit, a red dot in the step grid) |
 | EDIT + OCT− | undo the last clear / erase / copy (again: redo) |
 | LFO held + pad | erase that pad's hits as the playhead passes (stopped: at once) |

@@ -944,11 +944,14 @@ static void ui_leds(uint32_t *btn, uint32_t *keys, uint32_t *glow)
     fam = ui.page;
     b |= 1u << (fam == PG_HOME ? B_HOME : fam <= PG_SFX ? B_EDIT : fam <= PG_REV ? B_FX : fam <= PG_SONG ? B_SEQ : B_GLO);
     b |= 1u << (ui.pair ? B_OCTUP : B_OCTDN);
-    if ((ui.held >> B_GLO) & 1u) {               /* GLO held: white keys 1-8 the muted channels, 9-16 the soloed */
+    if ((ui.held >> B_GLO) & 1u) {               /* GLO held: white keys 1-8 lit while their channel is heard (dark:
+                                                  * muted, or another soloed), 9-16 lit while soloed */
         for (i = 0; i < 27u; i++) {
-            uint32_t w = white_of(i);
+            uint32_t w = white_of(i), c, heard;
             if (w == 0xFFu) continue;
-            if (((w < 8u ? sp_mute : sp_solo) >> (w % 8u)) & 1u) k |= 1u << i;
+            c = w % 8u;
+            heard = !((sp_mute >> c) & 1u) && (!sp_solo || ((sp_solo >> c) & 1u));
+            if (w < 8u ? heard : (sp_solo >> c) & 1u) k |= 1u << i;
             g |= 1u << i;
         }
     } else if (ui.steps) {                       /* the selected pad's steps of the bar on the white keys */
