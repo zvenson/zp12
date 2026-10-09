@@ -1,5 +1,18 @@
 # zp12 TODO
 
+## 2.1 (built, not released: build/zp12-2.1-test.fwsc, identity FM-1_971)
+- A pad's channel = its position (pad % 8, every bank), as on the SP-1200: fader, mute / solo, the filter (pads 1-2)
+  and the choke follow the pad. The kit laid out by role (tools/gen_kit.py LAYOUT_A-D); a 2.0 save's pads and loop
+  hits move with KIT_MOVED (tests/sp_seq_test.c). Why: the user found mute / faders by channel confusing and heard
+  sounds cut by others (the shaker cut the piano chords on channel 8, the bass the kick on 1).
+- To do: test on the device (an old 2.0 save: the loops sound as before; mute 1-8 = the pads' positions), then
+  release 2.1 (make_site.py with the video), the cheat sheet PDF and screenshots, the hub picks it up at night.
+
+## Ideas
+- USB audio at 48 kHz for phones (sloopDX 3.4's uac_fir.h / usb.c port): recording the FM-1 INTO a phone.
+- Sampling IN the device over USB (the phone plays into the FM-1): a UAC OUT interface, recording to flash while the
+  audio runs (96 KB RAM: no buffer for 2.5 s): a project of its own, check RAM / flash timing first.
+
 Released: 0.9 (FM-1_979). Open, from the user's tests:
 
 - [x] Parameter changes recordable: TUNE / FINE / DECAY / CUT turned while recording lock onto the pad's hits

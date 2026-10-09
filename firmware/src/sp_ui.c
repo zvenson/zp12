@@ -163,8 +163,8 @@ static void page_cols(char lab[4][8], char val[4][8])
         COL(3, "SPEED", cat(val[3], (s->flags & SPF_33) ? "33" : "45"));
         break;
     case PG_OUT:
-        COL(0, "CHAN", num(val[0], s->chan + 1, 1, 0)); COL(1, "PAN", num(val[1], s->pan, 2, 1));
-        if (s->chan < 2u) { COL(2, "CUT", num(val[2], s->cut, 3, 0)); COL(3, "RESO", num(val[3], s->reso, 3, 0)); }
+        COL(0, "CHAN", num(val[0], (int32_t)SP_CH_OF(ui.sel) + 1, 1, 0)); COL(1, "PAN", num(val[1], s->pan, 2, 1));
+        if (SP_CH_OF(ui.sel) < 2u) { COL(2, "CUT", num(val[2], s->cut, 3, 0)); COL(3, "RESO", num(val[3], s->reso, 3, 0)); }
         else { COL(2, "CUT", cat(val[2], "--")); COL(3, "RESO", cat(val[3], "--")); }   /* (only channels 1-2 filter) */
         break;
     case PG_SFX:
@@ -478,7 +478,7 @@ static void ui_note_played(void)                /* the pads the sequencer or the
     for (k = 0; m; k++, m >>= 1)
         if (m & 1u) {
             ui.hit_ms[k] = fm1_ms;
-            ui.chan_ms[sp_sound[k].chan % SP_NCH] = fm1_ms;
+            ui.chan_ms[SP_CH_OF(k)] = fm1_ms;
         }
 }
 
@@ -555,7 +555,7 @@ static void pad_hit_at(uint32_t k, uint32_t vel, int32_t semis)
     k %= SP_NSOUND;
     ui.sel = (uint8_t)k;
     ui.hit_ms[k] = fm1_ms;
-    ui.chan_ms[sp_sound[k].chan % SP_NCH] = fm1_ms;
+    ui.chan_ms[SP_CH_OF(k)] = fm1_ms;
     SP_HIT(k, vel, semis);
 }
 static void pad_hit(uint32_t k, uint32_t vel) { pad_hit_at(k, vel, 0); }
@@ -748,10 +748,9 @@ static void knob(uint32_t n, int32_t d)
         if (n == 3u) s->flags = (uint8_t)(one > 0 ? s->flags | SPF_33 : s->flags & ~SPF_33);
         break;
     case PG_OUT:
-        if (n == 0u) s->chan = (uint8_t)sp_clamp(s->chan + one, 0, SP_NCH - 1);
+        if (n == 0u) { ui_say(SP_CH_OF(ui.sel) < 2u ? "CH = PAD: FILTER" : "CH = PAD 1-8"); break; }   /* (2.1: the position) */
         if (n == 1u) s->pan = (int8_t)sp_clamp(s->pan + dd, -64, 63);
-        if (n == 0u) ui_say(s->chan < 2u ? "DYN. FILTER" : s->chan < 6u ? "FIXED LP" : "NO FILTER");
-        if (n >= 2u && s->chan >= 2u) { ui_say("FILTER CH1-2"); break; }   /* (3-8 have none to turn) */
+        if (n >= 2u && SP_CH_OF(ui.sel) >= 2u) { ui_say("FILTER: PADS 1-2"); break; }   /* (3-8 have none to turn) */
         if (n == 2u) { s->cut = (uint8_t)sp_clamp(s->cut + dd, 0, 127); ui.turn_pad = ui.sel; ui.turn_ms = fm1_ms; }
         if (n == 3u) s->reso = (uint8_t)sp_clamp(s->reso + dd, 0, 127);
         break;

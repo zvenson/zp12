@@ -121,6 +121,12 @@ PIANOS = [
 ]
 SLOW = 45 / 33
 
+# 2.1: the pads by bank, positions 1-8 (= channels 1-8; 1-2 have the resonant filter)
+LAYOUT_A = ["KICK", "SNARE", "HAT", "CLAP", "TOM H", "CRASH", "BASS", "PNO Cm9"]
+LAYOUT_B = ["KICK-7", "SNARE-7", "OHAT", "CLAP-7", "CONGA", "RIDE", "SCRCH", "PNO F13"]
+LAYOUT_C = ["TOM L", "RIM-7", "HAT-7", "SNAP", "CLAVE", "COWBL", "WOOD", "EP Dm9"]
+LAYOUT_D = ["SPIN", "RIM", "SHAKR", "PIANO", "VIBES", "HORNS", "TAMB", "EP Gm9"]
+
 
 def chord(notes, secs, src=HIP, up=1.0, top=6500):
     out = None
@@ -189,9 +195,22 @@ def main(dst):
         pads.append((len(SOUNDS) + len(MELODIC) + i, 0, 0, dec, taper(lvl), pan, ch, 2, 0, 1000, 127, 0, 0, *snd))
     for i, (name, notes, secs, ch, dec, lvl, pan, snd) in enumerate(MELODIC):   # D: the chords and sounds
         pads.append((len(SOUNDS) + i, 0, 0, dec, taper(lvl), pan, ch, 0, 0, 1000, 127, 0, 0, *snd))
+    # 2.1: a pad's channel is its position (1-8 in every bank, as on the SP-1200): fader, mute, solo, the filter
+    # (1-2) and the choke follow the pad. The kit laid out by role: each position holds sounds that may cut each
+    # other (the three hats and the shaker on 3), bank A a groove of its own. KIT_MOVED: an old pad's new place
+    # (sp_store.c moves a 2.0 save's loops and pads with it).
+    old = [x[0] for x in SOUNDS] + [SOUNDS[i][0] + "-7" for i in range(5)] + [x[0] for x in PIANOS] + [x[0] for x in MELODIC]
+    layout = LAYOUT_A + LAYOUT_B + LAYOUT_C + LAYOUT_D
+    assert sorted(layout) == sorted(old) and len(layout) == 32, "the layout: every pad once"
+    newpads = []
+    for i, name in enumerate(layout):
+        p = list(pads[old.index(name)])
+        p[6] = i % 8
+        newpads.append(tuple(p))
     lines += ["    {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d}," % p if len(p) == 12 else
-              "    {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, {%d, %d, %d}}," % p for p in pads]
-    lines += ["};", ""]
+              "    {%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, {%d, %d, %d}}," % p for p in newpads]
+    lines += ["};", "/* 2.0's pad i is 2.1's pad KIT_MOVED[i] (the kit laid out by position = channel) */",
+              "static const uint8_t KIT_MOVED[32] = {" + ", ".join(str(layout.index(n)) for n in old) + "};", ""]
     Path(dst).parent.mkdir(parents=True, exist_ok=True)
     Path(dst).write_text("\n".join(lines))
     secs = sum(n for _, n, _ in waves) / RATE

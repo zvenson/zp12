@@ -170,6 +170,27 @@ int main(int argc, char **argv)
         sp_smooth = 1;
     }
 
+    /* 3a''. a 2.0 save (the kit laid out the old way): every pad and every loop's hit moves to its 2.1 place
+     * (KIT_MOVED), the pads' edits with them; a 2.1 save stays as it is */
+    {
+        static uint8_t now[ZS_SLOT], was[ZS_SLOT];
+        uint32_t n, i, ok = 1, at = sizeof sp_sound + sizeof sp_mix + sizeof fxp + 14u;   /* (st[7]: the kit's id) */
+        uint16_t id20 = ZS_KIT_ID_20;
+        uint8_t pads[SQ_MAXEV];
+        for (i = 0; i < SP_NSOUND; i++) sp_sound[i].level = (uint8_t)(10u + i);   /* (a mark on every pad) */
+        for (i = 0; i < s0->n; i++) pads[i] = (uint8_t)s0->ev[i].pad;
+        n = zs_pack(now);
+        memcpy(was, now, n); memcpy(was + at, &id20, 2u);
+        check(zs_unpack(was, n, ZS_VER) == 0, "KIT 2.1: a 2.0 save read");
+        for (i = 0; i < SP_NSOUND; i++) ok &= sp_sound[KIT_MOVED[i]].level == 10u + i;
+        check(ok, "KIT 2.1: a 2.0 save's pads moved to their new places, their edits with them");
+        ok = s0->n > 0u;
+        for (i = 0; i < s0->n; i++) ok &= s0->ev[i].pad == KIT_MOVED[pads[i]];
+        check(ok, "KIT 2.1: a 2.0 save's hits play the same sounds (their pads moved)");
+        check(zs_unpack(now, n, ZS_VER) == 0 && s0->ev[0].pad == pads[0] && sp_sound[0].level == 10u, "KIT 2.1: a 2.1 save as it is");
+        memcpy(sp_sound, KIT_PADS, sizeof sp_sound);
+    }
+
     /* 3a'. CLEAR, then UNDO brings it back (locks too), UNDO again clears it again */
     {
         uint32_t n = s0->n, k1 = (uint32_t)sq_find(s0, 96, 1);
@@ -267,7 +288,7 @@ int main(int argc, char **argv)
             djf.v = (int8_t)v[m];
             djf.res = m == 2u ? 127 : 40;               /* (the high-pass with the resonance up: still bounded) */
             for (i = 0; i < 300u; i++) block();          /* (the glide) */
-            sp_trigger(4, 127);
+            sp_trigger(KIT_MOVED[4], 127);               /* (the hat: 2.0's pad 4, 2.1's pad 3) */
             for (i = 0; i < 200u; i++) {
                 memset(o, 0, sizeof o); sp_render(o);
                 for (j = 0; j < 2u * SP_BLK; j++) if (abs(o[j]) > pk[m]) pk[m] = abs(o[j]);

@@ -10,8 +10,10 @@
 #define ZS_MAGIC 0x3231505Au                     /* "ZP12" */
 #define ZS_VER 6u                                /* 6: SMOOTH; 5: LEVEL in an audio taper; 4: the UI's settings (BACK); 3: the hits'
                                                  * locks; 2: four songs (1: one) */
-#define ZS_KIT_ID ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u ^ 0x0600u))   /* the factory kit the pads were saved with
-                                                 * (0.6: changed once, so every older save gets the kit's pads) */
+#define ZS_KIT_ID ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u ^ 0x0700u))   /* the factory kit the pads were saved with
+                                                 * (0.6: changed once, so every older save gets the kit's pads;
+                                                 * 2.1: laid out by position = channel) */
+#define ZS_KIT_ID_20 ((uint16_t)(KIT_BYTES ^ KIT_NWAVE * 4099u ^ 0x0600u))   /* 2.0's layout: moved, not reset */
 
 typedef struct { uint32_t magic, ver, gen, len, crc; } zs_head_t;
 static uint8_t zs_buf[ZS_SLOT] __attribute__((section(".pool"), aligned(4)));
@@ -130,7 +132,29 @@ static int zs_unpack(const uint8_t *b, uint32_t len, uint32_t ver)
             if (l - r * r > r) r++;                         /* (rounded) */
             sp_sound[i].level = (uint8_t)(r > 127u ? 127u : r);
         }
-    if (st[7] != ZS_KIT_ID)                         /* saved with another factory kit: the pads its new sounds */
+    /* 2.0's layout: every pad (its edits, own samples) and the loops' hits move to 2.1's places: they sound
+     * the same, the channel now the position. In place, cycle by cycle (no buffer: the RAM is tight) */
+    if (st[7] == ZS_KIT_ID_20) {
+        uint32_t done = 0, j;
+        for (i = 0; i < SP_NSOUND; i++) {
+            sp_sound_t carry;
+            uint32_t at = i;
+            if ((done >> i) & 1u)
+                continue;
+            carry = sp_sound[i];
+            do {                                    /* the sound at `at` goes to KIT_MOVED[at] */
+                uint32_t to = KIT_MOVED[at];
+                sp_sound_t t = sp_sound[to];
+                sp_sound[to] = carry;
+                carry = t;
+                done |= 1u << at;
+                at = to;
+            } while (!((done >> at) & 1u));
+        }
+        for (i = 0; i < SQ_NSEG; i++)
+            for (j = 0; j < sq_seg[i].n; j++)
+                sq_seg[i].ev[j].pad = KIT_MOVED[sq_seg[i].ev[j].pad % 32u];
+    } else if (st[7] != ZS_KIT_ID)                  /* saved with another factory kit: the pads its new sounds */
         for (i = 0; i < SP_NSOUND; i++)
             sp_sound[i] = KIT_PADS[i];
     for (i = 0; i < SP_NSOUND; i++)                 /* (a sound's wave must exist) */

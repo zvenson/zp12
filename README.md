@@ -52,8 +52,8 @@ without interpolation, eight output channels with their filters, a panel-style s
   shorter than 2 s is always a tap; held 2 s it clears the loop.
 - **Mute / solo**: GLO held + white keys 1–8 mute channels 1–8, 9–16 solo them (in ~3 ms, no click, the pattern
   plays on); M / S under the faders, the keys show the state while GLO is held.
-- **Filters made clear**: EDIT → OUT shows CUT / RESO as `--` on channels 3–8 (only 1–2 have the dynamic filter);
-  turning them says FILTER CH1-2, turning CHAN says what that channel has.
+- **Filters made clear**: EDIT → OUT shows CUT / RESO as `--` on pads 3–8 (only 1–2 have the dynamic filter);
+  turning them says FILTER: PADS 1-2.
 
 Install from Chrome or Edge: https://zp12.designburgapps.com/install/ (also https://dx7.designburgapps.com/zp12/).
 Back to sloopDX or SLOOP any time with their installers; if the FM-1 does not answer, hold OCT− while
@@ -66,7 +66,7 @@ switching it on (USB rescue).
 | White keys 1–8 · 9–16 | bank A · B pads (OCT+: C · D, OCT−: back) |
 | Black keys | loops 1–11 (segments): stopped at once, playing from the end of the loop |
 | KNOB 1–4 | the faders of channels 1–4 (SEL: 5–8, lit, until pressed again; from a page it goes to the faders); a page takes them (the header says which, its tabs show the others), untouched 12 s (GLO → SETUP → BACK: 6 s … OFF) or HOME gives them back |
-| EDIT | WAVE (the pad's sample · COPY> · COPY the sound to a pad), SOUND (TUNE · FINE · DECAY · LEVEL), TRUNC (START · END · DIR · SPEED 45/33), OUT (CHAN · PAN · CUT · RESO; `--` on channels 3–8, which have no dynamic filter), SENDS (DRIVE · CHO · DLY · REV) of the last pad |
+| EDIT | WAVE (the pad's sample · COPY> · COPY the sound to a pad), SOUND (TUNE · FINE · DECAY · LEVEL), TRUNC (START · END · DIR · SPEED 45/33), OUT (CHAN: the pad's position · PAN · CUT · RESO; `--` on pads 3–8, which have no dynamic filter), SENDS (DRIVE · CHO · DLY · REV) of the last pad |
 | FX | FILTER (a DJ filter on the mix: LP · OFF · HP, RESO), CHORUS (RATE · DEPTH · MIX), DELAY (TIME · FDBK · COLOR · MIX), REVERB (SIZE · DAMP · PRE) |
 | SEQ tapped | LOOP (LOOP · BARS 1–32 / AUTO · QUANT · SWING), LOOP TOOLS (CLEAR · COPY> · COPY, turn twice), SONG (STEP · LOOP · REPEAT, 0 ends · SONG OFF / 1–4: four songs of the loops) |
 | SEQ held | the last pad's 16 steps of a bar on the white keys (lit = a hit); OCT− / OCT+: the bars |
@@ -88,7 +88,8 @@ switching it on (USB rescue).
   (no interpolation): the aliasing is the sound. 45→33: stored fast, played slow.
 - Channels 1–2: a 4-pole resonant low-pass (SSM2044-style), open as CUT at the hit and closing two octaves
   as the sound decays (the original's dynamic filters); 3–6: a fixed low-pass; 7–8: none. The order is the
-  hardware's: sample, VCA (decay), DRIVE, filter, then the channel's fader. One sound per channel at a time.
+  hardware's: sample, VCA (decay), DRIVE, filter, then the channel's fader. One sound per channel at a time. A pad's channel
+  is its position, 1–8 in every bank (2.1, as on the SP-1200): fader, mute, solo, the filter and the choke follow the pad.
 - Stored fast, played slow (the old trick): 45→33 per sound, and own samples at ×2 (an octave down on the
   pad, TUNE −12 set for you) or ×2.7: more time in the same memory, half the bandwidth, the grit.
 - The master: −6 dB and a soft knee above 3/4, so a pile of hits rounds off instead of clipping hard.

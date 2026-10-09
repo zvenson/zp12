@@ -6,7 +6,8 @@
  *   pitch   the playback rate, no interpolation: tuned up it skips samples, down it repeats them (the
  *           zero-order hold of a DAC clocked at the pitched rate); the aliasing is the sound
  *   sounds  32: a wave with TUNE / FINE, DECAY, LEVEL, PAN, START / END, REVERSE, 45->33, CHANNEL
- *   channels 8 outputs, one sound at a time each (a new hit on a channel cuts the last):
+ *   channels 8 outputs, one sound at a time each (a new hit on a channel cuts the last); a pad's channel is its
+ *           position, 1-8 in every bank (2.1, as the SP-1200: bank A's pad 3 and bank D's pad 3 share channel 3):
  *           1-2 a 4-pole resonant low-pass (SSM2044-style): open as CUT at the hit, it follows the decay
  *               envelope down two octaves, as the original's dynamic filters do; 3-6 a fixed 2-pole
  *               low-pass each, 7-8 no filter. The order is the hardware's: sample, VCA (the decay),
@@ -62,6 +63,7 @@ typedef struct {
 static sp_wave_t sp_wave[64];
 static sp_sound_t sp_sound[SP_NSOUND];
 static sp_ch_t sp_ch[SP_NCH];
+#define SP_CH_OF(k) ((k) % SP_NCH)       /* the pad's channel: its position (2.1; sp_sound_t.chan only kept for the saves) */
 static uint8_t sp_mix[SP_NCH] = {100, 100, 100, 100, 100, 100, 100, 100};   /* the channel faders, 0..127 */
 static uint8_t sp_mute, sp_solo;        /* GLO held + white key: channels muted, soloed (a solo silences the others) */
 static uint8_t sp_smooth = 1;            /* GLO > OUTPUT > SMOOTH: a jump in a channel's signal bridged in ~1 ms (no click) */
@@ -163,7 +165,7 @@ static void sp_trigger_lk(uint32_t k, uint32_t vel, int32_t semis, uint32_t lk)
     if (s->wave >= 64u || !sp_wave[s->wave].n)
         return;
     w = &sp_wave[s->wave];
-    c = &sp_ch[s->chan % SP_NCH];
+    c = &sp_ch[SP_CH_OF(k)];
     a = w->n / 1000u * s->start + w->n % 1000u * s->start / 1000u;   /* (32 bits, no 64-bit division) */
     b = s->end ? w->n / 1000u * s->end + w->n % 1000u * s->end / 1000u : w->n;
     if (b > w->n) b = w->n;

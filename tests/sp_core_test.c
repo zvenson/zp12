@@ -110,7 +110,7 @@ static void sound(uint32_t k, uint32_t w, int tune, uint32_t decay, uint32_t lev
     s->decay = (uint8_t)decay;
     s->level = (uint8_t)level;
     s->pan = (int8_t)pan;
-    s->chan = (uint8_t)ch;
+    s->chan = (uint8_t)ch;                              /* (2.1: the channel is the pad's position; k chosen = ch) */
     s->end = 1000;
     s->cut = 127;
 }
@@ -161,48 +161,48 @@ int main(int argc, char **argv)
         check(sp_pow2_cents(1200) == 131072u && sp_pow2_cents(-1200) == 32768u && sp_pow2_cents(0) == 65536u,
               "2^(cents/1200): octaves exact");
     }
-    sound(0, 0, 0, 110, 127, 0, 6);                     /* kick: ch 7 (no filter) */
-    sound(1, 1, 0, 90, 110, 0, 2);                      /* snare: ch 3 (fixed filter) */
-    sound(2, 2, 0, 40, 80, 20, 4);                      /* hat: ch 5 */
+    sound(6, 0, 0, 110, 127, 0, 6);                     /* kick: ch 7 (no filter) */
+    sound(2, 1, 0, 90, 110, 0, 2);                      /* snare: ch 3 (fixed filter) */
+    sound(4, 2, 0, 40, 80, 20, 4);                      /* hat: ch 5 */
     sound(3, 3, 0, 80, 100, -10, 3);                    /* clap: ch 4 */
-    sound(4, 4, -12, 100, 120, 0, 0);                   /* tom an octave down: ch 1, the dynamic filter */
-    sp_sound[4].cut = 70; sp_sound[4].reso = 90;
+    sound(0, 4, -12, 100, 120, 0, 0);                   /* tom an octave down: ch 1, the dynamic filter */
+    sp_sound[0].cut = 70; sp_sound[0].reso = 90;
     sound(5, 5, 0, 70, 70, 20, 5);                      /* open hat: ch 6 */
-    sound(6, 6, -6, 127, 120, 0, 7);                    /* the tom at 45, played at 33: ch 8 */
-    sp_sound[6].flags = SPF_33;
+    sound(7, 6, -6, 127, 120, 0, 7);                    /* the tom at 45, played at 33: ch 8 */
+    sp_sound[7].flags = SPF_33;
 
     /* 1. a beat, 2 bars */
     for (st = 0; st < 32u; st++) {
-        if (st % 8u == 0u || st == 10u || st == 27u) sp_trigger(0, 127);
-        if (st % 8u == 4u) sp_trigger(1, 120);
-        if (st % 2u == 0u) sp_trigger(2, st % 4u ? 70 : 110);
+        if (st % 8u == 0u || st == 10u || st == 27u) sp_trigger(6, 127);
+        if (st % 8u == 4u) sp_trigger(2, 120);
+        if (st % 2u == 0u) sp_trigger(4, st % 4u ? 70 : 110);
         if (st == 14u || st == 30u) sp_trigger(5, 100);
-        if (st == 3u || st == 19u || st == 22u) sp_trigger(4, 120);
+        if (st == 3u || st == 19u || st == 22u) sp_trigger(0, 120);
         run(BEAT);
     }
     /* 2. the crunch: the snare from +12 down to -24 semitones, a hit each */
     for (i = 0; i < 12u; i++) {
-        sp_sound[1].tune = (int8_t)(12 - (int)i * 3);
-        sp_trigger(1, 120);
+        sp_sound[2].tune = (int8_t)(12 - (int)i * 3);
+        sp_trigger(2, 120);
         run(BEAT * 2u);
     }
-    sp_sound[1].tune = 0;
+    sp_sound[2].tune = 0;
     /* 3. channel 1: the low tom, the cutoff swept up with resonance */
     for (i = 0; i < 16u; i++) {
-        sp_sound[4].cut = (uint8_t)(20 + i * 6);
-        sp_trigger(4, 120);
-        if (i % 4u == 0u) sp_trigger(0, 127);
+        sp_sound[0].cut = (uint8_t)(20 + i * 6);
+        sp_trigger(0, 120);
+        if (i % 4u == 0u) sp_trigger(6, 127);
         run(BEAT * 2u);
     }
     /* 4. 45 -> 33: the same tom, straight, then the trick */
-    sp_sound[4].cut = 127; sp_sound[4].reso = 0; sp_sound[4].tune = -6;
-    for (i = 0; i < 4u; i++) { sp_trigger(i & 1u ? 6 : 4, 120); run(BEAT * 4u); }
+    sp_sound[0].cut = 127; sp_sound[0].reso = 0; sp_sound[0].tune = -6;
+    for (i = 0; i < 4u; i++) { sp_trigger(i & 1u ? 7 : 0, 120); run(BEAT * 4u); }
     {   /* the zero-order hold: an octave down repeats every source sample exactly twice */
         sp_ch_t *c = &sp_ch[6];
-        sound(7, 0, 0, 127, 127, 0, 6);
+        sound(6, 0, 0, 127, 127, 0, 6);
         sp_wave[0].rate = 22050;                        /* (22050 * 2^-1 = 11025: a sample every 4 outputs) */
-        sp_sound[7].tune = -12;
-        sp_trigger(7, 127);
+        sp_sound[6].tune = -12;
+        sp_trigger(6, 127);
         check(c->step == 16384u, "an octave down at 22.05 kHz: 1/4 source sample a step");
         sp_wave[0].rate = 26040;
         c->on = 0;

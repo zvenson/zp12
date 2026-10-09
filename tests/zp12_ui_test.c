@@ -138,8 +138,8 @@ int main(int argc, char **argv)
     ui.held = 1u << B_GLO; key_down(21, 0); ui.held = 0; fm1_ms += 2000; ui_draw(); ppm("zp12-solo");   /* white 13: solo CH5 */
     if (sp_solo != 16u) { printf("zp12 ui: GLO + white key 13 did not solo CH5 FAIL\n"); return 1; }
     sp_mute = sp_solo = 0;
-    ui.sel = 2; sp_sound[2].chan = 4; page(PG_OUT); i = sp_sound[2].cut; knob(2, 3); fm1_ms += 20; ui_draw(); ppm("zp12-out");
-    if (sp_sound[2].cut != i || strcmp(ui.msg, "FILTER CH1-2")) { printf("zp12 ui: CUT on CH5 not refused FAIL\n"); return 1; }
+    ui.sel = 4; page(PG_OUT); i = sp_sound[4].cut; knob(2, 3); fm1_ms += 20; ui_draw(); ppm("zp12-out");   /* (pad 5: channel 5, 2.1) */
+    if (sp_sound[4].cut != i || strcmp(ui.msg, "FILTER: PADS 1-2")) { printf("zp12 ui: CUT on CH5 not refused FAIL\n"); return 1; }
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;
 }
