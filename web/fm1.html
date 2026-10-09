@@ -114,7 +114,7 @@
   .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 6px; }
   .tag.now { background: rgba(95, 227, 161, .14); color: var(--ok); }
   .tag.beta { background: rgba(242, 196, 109, .14); color: var(--warn); }
-  .tag.new { background: var(--cyan); color: #121011; }
+  .tag.new { background: var(--cyan); color: #121011; white-space: nowrap; }
   .tag.upd { background: rgba(66, 245, 245, .14); color: var(--cyan); }
   .recent { border-bottom: 1px solid var(--line); background: rgba(239, 232, 225, .03); font-size: 14px; }
   .recent .wrap { display: flex; align-items: center; gap: 10px 22px; padding-top: 10px; padding-bottom: 10px; overflow-x: auto; white-space: nowrap; }
@@ -376,7 +376,7 @@ const isNew = (f) => f.date && Date.now() - Date.parse(f.date + "T00:00:00Z") < 
 const isUpd = (f) => seen[f.id] && seen[f.id] !== f.version;
 function badge(f) {
   return isUpd(f) ? `<span class="tag upd" title="A new version since your last visit (was ${esc(seen[f.id])})">update</span>`
-       : isNew(f) ? `<span class="tag new" title="Released ${esc(f.date)}, in the last 3 days">new</span>` : "";
+       : isNew(f) ? `<span class="tag new" title="Released ${esc(f.date)}, in the last 3 days">new version</span>` : "";
 }
 function remember() {
   try { localStorage.setItem(SEEN_KEY, JSON.stringify(Object.fromEntries(cat.map((f) => [f.id, f.version])))); } catch (e) {}
