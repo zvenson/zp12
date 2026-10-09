@@ -66,8 +66,8 @@ int main(int argc, char **argv)
     sq_insert(&sq_seg[0], 144, 4, 5, 0, 0, 0); sq_insert(&sq_seg[0], 240, 0, 7, 0, 0, 0); sq_seg[0].bars = 2;
     ui.sel = 0; ui.steps = 1; ui.force = 1; sq.playing = 1; sq.pos = (5u * 24u) << 16; fm1_ms += 10; ui_draw(); ppm("zp12-steps");
     ui.steps = 0; ui.force = 1; sq.playing = 0;            /* the sample: D1, WAVE */
-    ui.pair = 1; key_down(21, 0); ui.sel = 24; page(PG_WAVE); fm1_ms += 2000; ui_draw(); ppm("zp12-wave");
-    key_down(14, 0); ui.sel = 24; page(PG_HOME); fm1_ms += 20; ui_draw(); ppm("zp12-chord");
+    ui.pair = 1; key_down(12, 0); ui.sel = 23; page(PG_WAVE); fm1_ms += 2000; ui_draw(); ppm("zp12-wave");   /* C8: EP Dm9 (2.1) */
+    key_down(12, 0); ui.sel = 23; page(PG_HOME); fm1_ms += 20; ui_draw(); ppm("zp12-chord");
     sq.playing = 1; sq.recording = 0; sq.seg = 2; sq.pos = (SQ_BAR + 3u * SQ_PPQ) << 16; page(PG_SEG); fm1_ms += 2000; ui_draw(); ppm("zp12-loop");
     sq.playing = 0; ui.sel = 1; page(PG_SFX); fm1_ms += 2000; ui_draw(); ppm("zp12-sends");
     ui.sel = 0; page(PG_SETUP); fm1_ms += 2000; ui_draw(); ppm("zp12-setup");

@@ -988,9 +988,10 @@ static void ui_leds(uint32_t *btn, uint32_t *keys, uint32_t *glow)
 
 /* ---- the start: a kick is sampled into the LCD (the 12-bit steps drawn as they come in), then the name is
  * typed in big LCD pixels, each letter a drum: ba (tom), dum (tom), tss (kick + crash: "12"). t: ms since the
- * start; zp12.c draws it and plays SPLASH_HIT: the pads A8, A7, A1 + B1 as they are (own sounds there: an own start) */
+ * start; zp12.c draws it and plays SPLASH_HIT: the pads A5, C1, A1 + A6 as they are (own sounds there: an own start;
+ * 2.1: TOM H, TOM L, KICK + CRASH's places in the kit by position, where KIT_MOVED takes 2.0's A8, A7, A1, B1) */
 #define SPLASH_MS 3000u
-static const struct { uint16_t t; uint8_t pad, vel; } SPLASH_HIT[4] = {{1350, 7, 84}, {1550, 6, 84}, {1850, 0, 100}, {1850, 8, 70}};
+static const struct { uint16_t t; uint8_t pad, vel; } SPLASH_HIT[4] = {{1350, 4, 84}, {1550, 16, 84}, {1850, 0, 100}, {1850, 5, 70}};
 
 static void cv_big(int32_t x, int32_t y, const char *s, int32_t k, uint16_t c)   /* FONT_S, k x k pixels a dot */
 {

@@ -141,3 +141,32 @@ M-VAVE FM-1, FM-1 firmware, FM-1 custom firmware, zp12, mvave fm1, 12 bit sample
 ```
 
 **Pinned comment:** `Free, one click: https://zp12.designburgapps.com 🥁 Which pad gets your own sample first?`
+
+---
+
+# zp12 2.1 video (video/zp12-2.1.mp4, 1:26, make_video17.py / zp12av11.c)
+
+**Title**
+zp12 2.1: boom bap on a $60 synth – Rhodes, upright bass, crackle (free FM-1 firmware)
+
+**Description**
+zp12 turns the M-VAVE FM-1 into a 12-bit sampling drum machine, inspired by the E-mu SP-1200. Free firmware,
+installed from the browser: https://zp12.designburgapps.com/install
+
+In this video, boom bap at 90 in F minor, every sound from the firmware's own code:
+00:00 The groove
+00:11 Sample anything: a Fender Rhodes through an overdrive, a double bass, a record's crackle (Freesound, CC0),
+      stored dirty at ×2.7, onto the pads
+00:27 New in 2.1: a pad's channel is its position. The Rhodes chords on position 1, through the resonant filter
+00:38 Count-in and a turnaround
+00:51 Mute and solo with GLO held: the keys lit while heard
+01:02 Punch-in: roll, reverse, tape stop
+
+Like and subscribe for the next firmware video: https://www.youtube.com/@sonzven
+Every open-source firmware for the FM-1, one click each: https://fm1.designburgapps.com
+Please always check the latest firmware version!
+
+Made from SLOOP 2.3 (isod89) and Felucca (Hügelton Instruments), GPL-3.0. E-mu and SP-1200 are trademarks of their
+owner; not affiliated. Samples: Freesound CC0 (rheynemusic, elzozo, hello_flowers). Not affiliated with M-VAVE.
+
+#FM1 #MVAVE #SP1200 #boombap #sampler #lofi #synth

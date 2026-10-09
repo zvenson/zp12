@@ -1,7 +1,7 @@
 <p align="center"><a href="https://zp12.designburgapps.com/"><img src="web/img/zp12-logo.svg" width="560" alt="zp12 sampling drums"></a></p>
 
 <p align="center">
-  <a href="https://zp12.designburgapps.com/install/"><img src="https://img.shields.io/badge/firmware-2.0-c82e32" alt="firmware 2.0"></a>
+  <a href="https://zp12.designburgapps.com/install/"><img src="https://img.shields.io/badge/firmware-2.1-c82e32" alt="firmware 2.1"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-263e70" alt="GPL-3.0"></a>
   <img src="https://img.shields.io/badge/device-M--VAVE%20FM--1-1e3060" alt="M-VAVE FM-1">
   <img src="https://img.shields.io/badge/install-Chrome%20%2F%20Edge%2C%20USB-56627e" alt="Chrome / Edge over USB">
@@ -9,7 +9,7 @@
 
 <p align="center">
   <b><a href="https://zp12.designburgapps.com/">Website</a></b> ·
-  <b><a href="https://zp12.designburgapps.com/install/">Install 2.0</a></b> ·
+  <b><a href="https://zp12.designburgapps.com/install/">Install 2.1</a></b> ·
   <a href="https://zp12.designburgapps.com/editor/">Sample editor (sample + drop)</a> ·
   <a href="https://zp12.designburgapps.com/backup/">Backup</a> ·
   <a href="https://zp12.designburgapps.com/#cheatsheet">Cheat sheet</a> (<a href="https://zp12.designburgapps.com/zp12-cheat-sheet.pdf">PDF</a>) ·
@@ -32,7 +32,7 @@ A 12-bit sampling drum machine for the **M-VAVE FM-1**: 32 sounds at 26.04 kHz (
 without interpolation, eight output channels with their filters, a panel-style screen. Inspired by the
 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation.
 
-> **Status: 2.0** (2026-10-08). Install: **https://zp12.designburgapps.com/install/** · Sample editor (now with
+> **Status: 2.1** (2026-10-09). Install: **https://zp12.designburgapps.com/install/** · Sample editor (now with
 > sampling in the browser): **https://zp12.designburgapps.com/editor/** · Backup: **https://zp12.designburgapps.com/backup/** ·
 > Cheat sheet: **https://zp12.designburgapps.com/#cheatsheet** ([PDF](https://zp12.designburgapps.com/zp12-cheat-sheet.pdf)).
 >
@@ -40,6 +40,19 @@ without interpolation, eight output channels with their filters, a panel-style s
 > scratches), eleven loops on the black keys, the sequencer (loops of 1–32 bars or AUTO, song, real-time recording with count-in and AUTO CORRECT, step editing, swing, erase, tap tempo), sloopDX's
 > chorus, delay and reverb, saved in flash (0xC4000.., a room sloopDX leaves free), own samples from the web editor.
 > Plan: [CONCEPT.md](CONCEPT.md), open work: [TODO.md](TODO.md).
+
+## New in 2.1
+
+- **A pad's channel is its position**, 1–8 in every bank, as on the SP-1200: fader 3, mute 3, solo 3 and the
+  choke are always the pads on position 3. Pads 1–2 have the resonant filter (put a chord there for the mumpf).
+  OUT → CHAN shows it (no longer set by hand). Before, sounds on one channel cut each other unexpectedly (the shaker
+  the piano chords on 8, the bass the kick on 1).
+- **The kit laid out by position**: the sounds sharing a position are the ones that may cut each other (the hats
+  and the shaker on 3); bank A is a groove of its own (kick, snare, hat, clap, tom, crash, bass, piano stab).
+- **A 2.0 save moves along**: its pads (edits, own samples) and its loops' hits go to the new places; they sound
+  as before.
+- **GLO held**: keys 1–8 light while their channel is heard, dark when muted (or another is soloed); 9–16 light
+  while soloed.
 
 ## New in 2.0
 
@@ -93,7 +106,7 @@ switching it on (USB rescue).
 - Stored fast, played slow (the old trick): 45→33 per sound, and own samples at ×2 (an octave down on the
   pad, TUNE −12 set for you) or ×2.7: more time in the same memory, half the bandwidth, the grit.
 - The master: −6 dB and a soft knee above 3/4, so a pile of hits rounds off instead of clipping hard.
-- The start (a key skips it) plays its ba-dum-tss on the pads A8, A7, A1 + B1: put your own sounds there for your own.
+- The start (a key skips it) plays its ba-dum-tss on the pads A5, C1, A1 + A6: put your own sounds there for your own.
 - SMOOTH (GLO → OUTPUT, on by default): where a sound is cut mid-wave (a new hit on its channel, its end, a TRUNC
   start) the jump is bridged in ~1 ms, so it does not click; a sample from its own beginning keeps its attack.
 - Faders and LEVEL in an audio taper, as the original's sliders: 100 as set, 50 −12 dB, 25 −24 dB, 127 +4 dB.
