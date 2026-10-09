@@ -8,6 +8,23 @@
 - To do: test on the device (an old 2.0 save: the loops sound as before; mute 1-8 = the pads' positions), then
   release 2.1 (make_site.py with the video), the cheat sheet PDF and screenshots, the hub picks it up at night.
 
+## 2.2: Chop to pads (in progress, web only so far; not deployed)
+- [x] Editor (web/editor.html "Chop to pads", web/zp12link.js chop*): SLOOP 2.5's CHOP (identical to 2.3's) at the
+      sound's own rate: TAP (space) + snap, Find hits (sensitivity), Equal 2-16, a tempo grid (BPM from the length),
+      markers dragged / nudged, keep, length per chop, Fit to room (whole sectors, the 24 places: `plan`), level
+      together / each / as is; chops onto consecutive pads (16 at most), each heard as the FM-1 plays it; channel /
+      filter per chop shown; the pads that get overwritten asked first; `uploadMany`: all sectors, then the directory
+      once, then the pads (a Stop before the directory leaves the FM-1 as it was). Tests: tests/zp12_chop_test.mjs,
+      tests/zp12_link_test.mjs section 6.
+- [ ] On the device: 16 chops sent, all playable, channels right, a Stop leaves the old pads. Open: ASSIGN keeps the
+      pad's TUNE (only ±12 for ×2 changes): a chop on a tuned kit pad plays detuned; reset TUNE on ASSIGN?
+- [ ] Later: a slice mode for one pad (START per key, no extra memory), slice marks in TRUNC; resampling (REC + SEL +
+      pad: N bars of the mix to a pad) after the flash write test of sampling in the device.
+- [ ] Video "Sample, Chop, Flip": a soul loop sampled in the browser, 8 chops, a boom bap of them (`?demo=loaded&chop=`).
+- Checked 2026-10-09 (the user's doubt "the filter acts on all tracks"): in sp_core.c CUT / RESO filter only channels
+  1-2 (pads 1-2 of every bank), nothing else is dulled (tests/sp_core_test.c "CUT: pads 1-2 ..."). What does act on
+  the whole mix: FX > FILTER (the DJ filter, kept until power-off). Still to listen to on the device.
+
 ## Ideas
 - USB audio at 48 kHz for phones (sloopDX 3.4's uac_fir.h / usb.c port): recording the FM-1 INTO a phone.
 - Sampling IN the device over USB (the phone plays into the FM-1): a UAC OUT interface, recording to flash while the

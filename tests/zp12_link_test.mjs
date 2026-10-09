@@ -146,6 +146,31 @@ check(e && /damaged/.test(e.message), "restore: a damaged file refused (CRC)");
   check(w.includes("SNARE2") && w.includes("LONG"), "backup + restore: the samples come back");
 }
 
+// 6. chop to pads: 16 chops as one; a stop half way leaves the FM-1 as it was
+{
+  let d = await Z.readDir(link);
+  const pads0 = (await raw("PADS")).trim(), waves0 = (await raw("WAVES")).trim(), gen0 = d.gen;
+  const x = Float32Array.from({ length: 16 * 4000 }, (_, i) => Math.sin(i * 0.02) * Math.exp(-(i % 4000) / 800));
+  const list = Array.from({ length: 16 }, (_, j) => ({ name: "BRK" + String(j + 1).padStart(2, "0"),
+    y: Z.encode(x, 44100, { start: j * 4000, end: (j + 1) * 4000 }), rate: 26040, pad: 8 + j }));
+  let steps = 0, e = null;
+  try { await Z.uploadMany(link, d, list, false, (k) => { steps = k; }, () => steps > 40); } catch (x) { e = x; }
+  check(e && /stopped/.test(e.message) && (await raw("PADS")).trim() === pads0 && (await raw("WAVES")).trim() === waves0 &&
+        (await Z.readDir(link)).gen === gen0, "chops: stopped half way: the samples, the directory and the pads as they were");
+  d = await Z.readDir(link);
+  const slots = await Z.uploadMany(link, d, list);
+  const w = (await raw("WAVES")).trim(), p = (await raw("PADS")).trim().split(" ").map(Number);
+  check(slots.length === 16 && list.every((s) => w.includes(s.name)) && (await Z.readDir(link)).gen === gen0 + 1,
+        "chops: 16 samples on the FM-1, the directory written once");
+  check(list.every((s, j) => p[8 + j] === info.kit + slots[j]), "chops: B1..D8 each play their chop (channels 1-8 twice)");
+  check(p.slice(0, 8).join() === pads0.split(" ").slice(0, 8).join(), "chops: the other pads untouched");
+  const back = await Z.fetchSample(link, d.slots[slots[7]]);
+  check(back.length === list[7].y.length && back.every((v, i) => v === list[7].y[i]), "chops: the 8th read back as sent");
+  e = null;
+  try { await Z.uploadMany(link, d, list); } catch (x) { e = x; }
+  check(e && /places free|room/.test(e.message), `chops: 16 more do not fit: refused before writing (${e && e.message})`);
+}
+
 dev.stdin.end();
 console.log(bad ? "LINK TEST FAILED" : "link test passed");
 process.exit(bad ? 1 : 0);

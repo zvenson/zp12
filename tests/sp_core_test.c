@@ -220,6 +220,33 @@ int main(int argc, char **argv)
     fseek(wf, 40, SEEK_SET); put32(frames * 4u);
     fclose(wf);
     printf("sp: %.1f s, peak %d, hash %08x\n", frames / (double)SP_FS, peak, hash);
+    {   /* CUT only where the filter is: pads 1-2 of every bank; no other channel dulled, not even beside one shut */
+        static int16_t nz[8000];
+        static uint8_t nd[12000];
+        uint32_t k, b, j, okc = 1;
+        double e[2];
+        for (i = 0; i < 8000u; i++) nz[i] = (int16_t)((int32_t)((i * 2654435761u) >> 20) % 3000 - 1500);
+        sp_pack(nd, nz, 8000);
+        sp_wave[0].d = nd; sp_wave[0].n = 8000; sp_wave[0].rate = 26040;
+        for (k = 0; k < SP_NSOUND; k++) {
+            for (j = 0; j < 2u; j++) {
+                int32_t last = 0;
+                sound(k, 0, 0, 127, 100, 0, k % 8u);
+                sp_sound[k].cut = j ? 127 : 10;
+                for (b = 0; b < 400u; b++) { int32_t o[2 * SP_BLK]; memset(o, 0, sizeof o); sp_render(o); }   /* (the last one gone) */
+                sp_trigger(k, 127);
+                e[j] = 0;
+                for (b = 0; b < SP_FS / 8u / SP_BLK; b++) {
+                    int32_t o[2 * SP_BLK];
+                    memset(o, 0, sizeof o);
+                    sp_render(o);
+                    for (i = 0; i < SP_BLK; i++) { double d = o[2u * i] - last; e[j] += d * d; last = o[2u * i]; }
+                }
+            }
+            if ((k % 8u < 2u) != (e[0] < e[1] * 0.5)) okc = 0;
+        }
+        check(okc, "CUT: pads 1-2 of each bank filtered, the other 24 pads not");
+    }
     printf(bad ? "SP CORE TEST FAILED\n" : "sp core test passed\n");
     return bad != 0;
 }

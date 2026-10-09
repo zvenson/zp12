@@ -387,10 +387,166 @@
     return new Uint8Array(b);
   }
 
+  // ---- chop to pads: a loop or break cut into pieces, each on a pad of its own. The marker functions are
+  // SLOOP 2.5's CHOP (web/editor.html, by isod89), with its frames, fades and windows in seconds instead of
+  // samples at 22.05 kHz: here they work at the sound's own rate. Positions in samples of the source.
+  const CHOP = { HOP: 128 / 22050, PRE: 32 / 22050, MAX: 16 };
+  const hopOf = (rate) => Math.max(16, Math.round(CHOP.HOP * rate));
+
+  // onset novelty per frame: the rise of the log energy of the signal's first difference (the attack of a
+  // hit, not its body), over the louder of the two frames before; .level: log10 power, 0 = the loudest frame
+  function chopNovelty(x, rate) {
+    const H = hopOf(rate), F = Math.ceil(x.length / H), L = new Float64Array(F), P = new Float64Array(F), nov = new Float64Array(F);
+    let top = 1e-12, ptop = 1e-12;
+    for (let f = 0; f < F; f++) {
+      let e = 0, p = 0;
+      for (let i = f * H, n = Math.min(x.length, i + H); i < n; i++) { const d = x[i] - (i ? x[i - 1] : 0); e += d * d; p += x[i] * x[i]; }
+      L[f] = e; P[f] = p;
+      if (e > top) top = e;
+      if (p > ptop) ptop = p;
+    }
+    for (let f = 0; f < F; f++) { L[f] = Math.log10(L[f] / top + 1e-9); P[f] = Math.log10(P[f] / ptop + 1e-9); }
+    for (let f = 0; f < F; f++) {
+      const before = Math.max(f ? L[f - 1] : -9, f > 1 ? L[f - 2] : -9);
+      nov[f] = L[f] > -3.5 ? Math.max(0, L[f] - before) : 0;            // (under -35 dB: no hit)
+    }
+    nov.level = P; nov.hop = H; nov.rate = rate;
+    return nov;
+  }
+  // the first sample of the hit in frame f: where the signal first reaches 30 % of its peak over the frames
+  // f-1..f+2, then 1.5 ms earlier (the attack kept whole)
+  function chopAttack(x, nov, f) {
+    const H = nov.hop, a = Math.max(0, (f - 1) * H), b = Math.min(x.length, (f + 3) * H);
+    let pk = 0;
+    for (let i = a; i < b; i++) pk = Math.max(pk, Math.abs(x[i]));
+    for (let i = a; i < b; i++) if (Math.abs(x[i]) >= 0.3 * pk) return Math.max(0, i - Math.round(CHOP.PRE * nov.rate));
+    return a;
+  }
+  // hits: sens 1 (only the hardest and loudest) .. 10 (every small one); at least 60 ms apart. A hit is a sharp
+  // rise (nov over thr) to a level (its loudest frame within 3) over the gate
+  function chopHits(x, nov, sens) {
+    const k = Math.max(1, Math.min(10, sens)), thr = 0.15 + (10 - k) * 0.08, gate = -(0.5 + k * 0.35);
+    const gap = Math.round(0.06 * nov.rate / nov.hop), L = nov.level, out = [];
+    let last = -1e9;
+    for (let f = 0; f < nov.length - 1; f++) {
+      if (nov[f] < thr || (f && nov[f] < nov[f - 1]) || nov[f] < nov[f + 1]) continue;
+      if (Math.max(L[f], L[Math.min(L.length - 1, f + 1)], L[Math.min(L.length - 1, f + 2)]) < gate) continue;
+      if (f - last < gap) {
+        if (out.length && nov[f] > nov[last]) { out[out.length - 1] = chopAttack(x, nov, f); last = f; }
+        continue;
+      }
+      out.push(chopAttack(x, nov, f));
+      last = f;
+    }
+    return out;
+  }
+  // a tap at pos (as heard) moved to the hit it meant: the strongest attack within +-win s, if any
+  function chopSnap(x, nov, pos, win = 0.05) {
+    const w = Math.round(win * nov.rate / nov.hop), c = Math.round(pos / nov.hop);
+    let best = -1, bv = 0.12;
+    for (let f = Math.max(1, c - w); f <= Math.min(nov.length - 1, c + w); f++) if (nov[f] > bv) { bv = nov[f]; best = f; }
+    return best < 0 ? Math.max(0, Math.min(x.length - 1, Math.round(pos))) : chopAttack(x, nov, best);
+  }
+  // markers every `beats` beats at bpm from start to end; n equal parts of start..end
+  function chopGrid(start, end, bpm, beats, rate) {
+    const step = rate * 60 / bpm * beats, out = [];
+    for (let p = start; p < end - step * 0.25 && out.length < 64; p += step) out.push(Math.round(p));
+    return out;
+  }
+  const chopEqual = (start, end, n) => Array.from({ length: n }, (_, i) => Math.round(start + (end - start) * i / n));
+  // the tempo of a loop start..end that is `bars` bars of 4/4, folded into 70-180 BPM
+  function chopBpm(start, end, rate, bars) {
+    let b = bars * 4 * 60 * rate / Math.max(1, end - start);
+    while (b < 70) b *= 2;
+    while (b > 180) b /= 2;
+    return Math.round(b * 10) / 10;
+  }
+  // the chops of sorted markers: each to the next marker (the last to `end`) -> [{start, end, i, off, full}];
+  // opt[i] = {off: left out, len: its own length in samples}; never longer than up to the next marker (`full`)
+  function chopList(marks, end, opt = null) {
+    return marks.map((m, i) => {
+      const full = Math.max(m + 1, i + 1 < marks.length ? marks[i + 1] : end), o = (opt && opt[i]) || {};
+      const e = o.len > 0 ? Math.min(full, m + o.len) : full;
+      return { start: m, end: Math.max(m + 1, e), i, off: !!o.off, full };
+    });
+  }
+
+  // what n source samples become on the FM-1 (as encode: resample12's length)
+  const encLen = (n, srcRate, o = {}) => Math.floor(n * (o.rate || RATES[0]) / Math.round(srcRate * speedOf(o)));
+  // where samples of these lengths (12-bit values) would go, as upload() places them one after the other:
+  // [at...] or null when one does not fit (or the places run out)
+  function plan(d, lens, banks) {
+    const t = { slots: d.slots.slice() };
+    const out = [];
+    for (const n of lens) {
+      const slot = t.slots.findIndex((x) => !x), at = slot < 0 ? -1 : alloc(t, bytesOf(n), banks);
+      if (at < 0) return null;
+      t.slots[slot] = { off: at, n };
+      out.push(at);
+    }
+    return out;
+  }
+  // the longest common length L (source samples) so the chops, each cut at L, all fit on the FM-1; Infinity
+  // when they fit as they are, 0 when not even the shortest pieces do
+  function chopFit(d, chops, srcRate, o, banks) {
+    const len = chops.map((c) => c.end - c.start), ok = (L) => !!plan(d, len.map((n) => encLen(Math.min(n, L), srcRate, o)), banks);
+    if (ok(Infinity)) return Infinity;
+    let lo = 0, hi = Math.max(...len);
+    while (lo < hi) { const L = (lo + hi + 1) >> 1; if (ok(L)) lo = L; else hi = L - 1; }
+    return lo;
+  }
+
+  // several samples onto the FM-1 as one: all their sectors written first, then the directory once, then the
+  // pads. Until the directory is written nothing changes for the FM-1 (the sectors were free): a stop
+  // (cancelled() true) or an error before it leaves the old samples and pads as they were.
+  // list: [{name, y, rate, slow, oct, pad (-1: none)}] -> the slots
+  async function uploadMany(link, d, list, banks = false, progress = () => {}, cancelled = () => false) {
+    const at = plan(d, list.map((s) => s.y.length), banks);
+    if (!at) {
+      const free = d.slots.filter((x) => !x).length;
+      throw new Error(list.length > free ? `${list.length} samples, ${free} places free: delete some first` : "not enough room on the FM-1: shorten the chops (Fit to room)");
+    }
+    const parts = list.map((s) => pack12(s.y)), steps = parts.reduce((a, b) => a + Math.ceil(b.length / SECT) * (1 + SECT / CHUNK), 0) + list.length;
+    let done = 0;
+    const stop = () => { if (cancelled()) throw new Error("stopped: nothing changed on the FM-1"); };
+    await link.hold();
+    for (let j = 0; j < list.length; j++) {
+      const bytes = parts[j];
+      for (let k = 0; k < Math.ceil(bytes.length / SECT); k++) {
+        stop();
+        const a = at[j] + k * SECT;
+        await link.erase(a); progress(++done, steps);
+        for (let o = 0; o < SECT; o += CHUNK) {
+          const part = bytes.subarray(k * SECT + o, k * SECT + o + CHUNK);
+          if (part.length && !part.every((b) => b === 0xff)) await link.write(a + o, [...part]);
+          progress(++done, steps);
+        }
+      }
+    }
+    stop();
+    const slots = [], was = d.slots.slice();
+    list.forEach((s, j) => {
+      const slot = d.slots.findIndex((x) => !x);
+      d.slots[slot] = { off: at[j], n: s.y.length, rate: s.rate || RATES[0], flags: (s.slow ? 1 : 0) | (s.oct ? 2 : 0), name: cleanName(s.name) };
+      slots.push(slot);
+    });
+    try { await writeDir(link, d); } catch (e) { d.slots = was; throw e; }
+    for (let j = 0; j < list.length; j++) {
+      if (list[j].pad >= 0) await link.assign(list[j].pad, link.info.kit + slots[j]);
+      progress(++done, steps);
+    }
+    return slots;
+  }
+  // the channel a pad plays on (2.1: its position, as the SP-1200) and the filter there (firmware sp_core.c)
+  const chanOf = (pad) => (pad & 7) + 1;
+  const filterOf = (ch) => (ch <= 2 ? "filter (CUT, RESO)" : ch <= 4 ? "fixed low-pass 9 kHz" : ch <= 6 ? "fixed low-pass 12 kHz" : "open");
+
   const playSecs = (n, rate, flags) => n / ((flags & 1 ? rate * 33 / 45 : rate) * (flags & 2 ? 0.5 : 1));   // as the FM-1 plays it
   const api = { CMD, PARTS, SECT, speedOf, playSecs, Link, pack7, unpack7, frame, parse, crc32, backup, readBackup, restore,
                 NSLOT, ROOMS, BANKROOM, RATES, readDir, writeDir, parseDir, buildDir, room, alloc, resample12, encode, pack12,
-                unpack12, zoh, upload, remove, rename, fetchSample, cleanName, wav, bytesOf };
+                unpack12, zoh, upload, remove, rename, fetchSample, cleanName, wav, bytesOf,
+                CHOP, chopNovelty, chopHits, chopSnap, chopGrid, chopEqual, chopBpm, chopList, encLen, plan, chopFit, uploadMany,
+                chanOf, filterOf };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.ZP12Link = api;
 })(typeof self !== "undefined" ? self : this);

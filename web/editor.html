@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>zp12 sample editor</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<meta name="description" content="Your own samples on zp12 for the M-VAVE FM-1: drop a WAV, trim it, hear it as the FM-1 plays it (12 bit, 26 kHz, 45 to 33), put it on a pad. Chrome or Edge over USB MIDI.">
+<meta name="description" content="Your own samples on zp12 for the M-VAVE FM-1: drop a WAV, trim it or chop a loop to pads, hear it as the FM-1 plays it (12 bit, 26 kHz, 45 to 33), put it on a pad. Chrome or Edge over USB MIDI.">
 <link rel="canonical" href="https://zp12.designburgapps.com/editor/">
 <meta name="theme-color" content="#263e70">
 <style>
@@ -81,6 +81,22 @@
   @keyframes blink { 50% { opacity: 0.55; } }
   .bank { grid-column: 1 / -1; font-size: 13px; color: var(--dim); margin-top: 4px; }
   @media (max-width: 760px) { .pads { grid-template-columns: repeat(4, 1fr); } }
+  .modes { display: flex; gap: 0; margin-top: 16px; }
+  .modes button { border-radius: 0; background: transparent; color: var(--txt); border: 1px solid rgba(238, 241, 248, 0.4); }
+  .modes button:first-child { border-radius: 8px 0 0 8px; } .modes button:last-child { border-radius: 0 8px 8px 0; }
+  .modes button.sel { background: var(--txt); color: var(--navy); }
+  #cwave { height: 170px; cursor: default; }
+  #cwave:focus { outline: 2px solid #6f8fcf; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .chip { font: 700 13px/1.25 "Courier New", monospace; background: #0e1220; color: var(--txt); border: 2px solid #33497c; border-radius: 6px;
+          padding: 4px 7px; cursor: pointer; user-select: none; text-align: left; }
+  .chip small { display: block; font-weight: 400; color: var(--dim); font-size: 11.5px; }
+  .chip.f1 { border-color: #e0a84f; } .chip.f2 { border-color: #6f8fcf; }
+  .chip.sel { box-shadow: 0 0 0 3px rgba(255, 52, 36, 0.55); }
+  .chip.off { opacity: 0.45; text-decoration: line-through; }
+  .opts label button { align-self: flex-start; }
+  .legend { font-size: 13px; color: var(--dim); margin-top: 6px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border: 2px solid; border-radius: 2px; margin: 0 4px 0 10px; vertical-align: -1px; }
   footer { font-size: 13.5px; color: var(--mute); padding: 0 0 40px; }
   @media (max-width: 700px) { td.act { justify-content: flex-start; } th:nth-child(3), td:nth-child(3) { display: none; } }
 </style>
@@ -139,6 +155,58 @@
       <div class="info" id="room"></div>
       <div class="row"><button id="rec">● Record</button><span id="recst" style="color:var(--dim)"></span></div>
     </div>
+    <div class="modes" id="modes" style="display:none"><button id="m-one" class="sel">One pad</button><button id="m-chop">Chop to pads</button></div>
+    <div id="chop" style="display:none">
+      <canvas id="cwave" width="2000" height="340" tabindex="0"></canvas>
+      <p style="font-size:13.5px">Space: play, then <b>tap</b> along (each tap a marker; space while stopped plays) · click a chop: hear it as the FM-1 plays it ·
+         double-click: a marker · drag: move it · ← →: nudge · Del: remove · K: keep / leave out · 1–9, 0: hear a chop · wheel: zoom ·
+         the handle at the bottom: the chop's length</p>
+      <div class="row">
+        <button class="ghost small" id="c-play">▶ Play</button><button class="ghost small" id="c-tap">TAP</button>
+        <label class="chk" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="c-snap" checked> snap to the hit</label>
+        <button class="ghost small" id="c-clear">Clear markers</button>
+      </div>
+      <div class="opts">
+        <label>Hits: sensitivity<input type="range" id="c-sens" min="1" max="10" value="5"></label>
+        <label>&nbsp;<button class="ghost small" id="c-hits">Find hits</button></label>
+        <label>Equal parts<select id="c-n"><option>2</option><option>4</option><option selected>8</option><option>12</option><option>16</option></select></label>
+        <label>&nbsp;<button class="ghost small" id="c-equal">Cut in equal parts</button></label>
+        <label>Tempo (BPM)<input type="text" id="c-bpm" value="90" inputmode="decimal"></label>
+        <label>The loop is<select id="c-bars"><option value="1">1 bar</option><option value="2" selected>2 bars</option><option value="4">4 bars</option><option value="8">8 bars</option></select></label>
+        <label>&nbsp;<button class="ghost small" id="c-guess">BPM from its length</button></label>
+        <label>Grid<select id="c-div"><option value="4">1 bar</option><option value="2">1/2</option><option value="1" selected>1/4</option><option value="0.5">1/8</option><option value="0.25">1/16</option></select></label>
+        <label>&nbsp;<button class="ghost small" id="c-grid">Cut on the grid</button></label>
+      </div>
+      <p style="font-size:13.5px">Equal parts and the grid cut the part between the first and the last marker (with fewer than two: all of it);
+         the last marker then ends the last chop.</p>
+      <div class="chips" id="chips"></div>
+      <div class="legend">Each pad plays on its own channel (pad 1–8 = channel 1–8 in every bank):
+        <i style="border-color:#e0a84f"></i>1–2 the filter (CUT, RESO) <i style="border-color:#6f8fcf"></i>3–6 a fixed low-pass (9 / 12 kHz)
+        <i style="border-color:#33497c"></i>7–8 open. Two pads on one channel cut each other (A1 and B1).</div>
+      <div class="row" id="c-selrow" style="display:none">
+        <b id="c-selname" style="font-family:'Courier New',monospace"></b>
+        <label class="chk" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="c-keep"> keep</label>
+        <span style="color:var(--dim)">length</span><input type="range" id="c-len" min="10" max="1000" style="width:200px"><span id="c-lentxt" style="color:var(--dim)"></span>
+        <button class="ghost small" id="c-selplay">▶</button><button class="ghost small" id="c-full">Up to the next marker</button>
+      </div>
+      <div class="opts">
+        <label>Names (6 letters + number)<input type="text" id="c-name" maxlength="6"></label>
+        <label>Onto the pads from<select id="c-pad"></select></label>
+        <label>Rate<select id="c-rate"><option value="26040">26.04 kHz (the SP-1200)</option><option value="27500">27.5 kHz (the SP-12)</option></select></label>
+        <label>Stored at<select id="c-speed"><option value="0">1×, as it is</option><option value="1">45 → 33</option><option value="2">×2: an octave down on the pad</option><option value="3">×2.7: both</option></select></label>
+        <label>Level<select id="c-norm"><option value="1">all together (the loudest at full)</option><option value="2">each chop at full</option><option value="0">as it is</option></select></label>
+      </div>
+      <div class="mem" id="c-mem"></div>
+      <div class="info" id="c-room"></div>
+      <div class="row">
+        <button class="ghost small" id="c-keepall">Keep all</button><button class="ghost small" id="c-keepnone">Keep none</button>
+        <button class="ghost small" id="c-fit">Fit to room</button>
+      </div>
+      <div class="row">
+        <button id="c-send" disabled>Onto the FM-1</button><button class="ghost" id="c-stop" style="display:none">■ Stop</button>
+      </div>
+      <p id="c-msg"></p>
+    </div>
     <div id="ed" style="display:none">
       <canvas id="wave" width="2000" height="300"></canvas>
       <p style="font-size:13.5px">Drag the left or right part of the picture to set where it starts and ends.</p>
@@ -167,6 +235,11 @@
        until the meter nearly reaches the right end; Normalise does the rest.</p>
     <p>• Room: 96 KB free = about <b>2.5 s</b> at 26 kHz, 3.4 s at 45 → 33, <b>5 s</b> at ×2, 6.8 s at ×2.7 (with sloopDX's bank room 2.5 times that). Up to 24 samples.</p>
     <p>• <b>Stored fast, played slow</b> is the old samplers' trick and much of their sound: at ×2 the sample takes half the room, the pad plays it an octave down (TUNE −12, set for you), with half the bandwidth and twice the grit. Breaks and chords love it; a hat not so much.</p>
+    <p>• <b>Chop to pads</b>: load or sample a loop, then <b>Chop to pads</b>. Tap along (space), find the hits, or cut it in equal
+       parts or on a tempo grid; drag the markers, leave chops out, shorten them. Every chop goes onto its own pad, from the
+       pad you choose on (16 at most), all in one go. A pad's channel is its position (1–8 in every bank): chops on pads 1–2
+       get the filter (CUT, RESO), 3–6 a fixed low-pass, 7–8 none, and A1 and B1 cut each other as the original's channels do.
+       Stopped while writing, the FM-1 stays as it was. Each chop takes one of the 24 places.</p>
     <p>• Your samples are in the <a href="../backup/" style="color:#ffb4ab">backup</a>. Replacing one: delete it, add the new one.</p>
     <p>• Private: the sounds are read and converted in your browser and sent over USB to the FM-1; nothing goes to our server (the page only counts its visits, without cookies).</p>
     <p>• Trimmed inside the sound, the ends are faded (1 ms in, 2 ms out): no click where you cut.</p>
@@ -202,6 +275,7 @@ function refresh() {
   $("upload").disabled = !on || !enc;
   $("banks").disabled = !on || (dir && dir.flags & 1);
   document.querySelectorAll("#list button, #pads select").forEach((b) => { b.disabled = !on; });
+  if (src && mode === "chop") chopRender();
 }
 function showDir() {
   const tb = $("list"); tb.innerHTML = "";
@@ -315,8 +389,9 @@ function useSound(m, rate, name) {                // a sound to edit: from a fil
   while (b > a && Math.abs(m[b - 1]) < 0.003) b--;
   cut = b - a >= 64 ? [a, b] : [0, m.length];
   $("name").value = Z.cleanName(name);
-  $("ed").style.display = "block";
+  $("modes").style.display = "flex";
   msg("");
+  chopNew(); setMode(mode);
   info(); draw(); showPads();
 }
 
@@ -466,6 +541,325 @@ $("upload").onclick = () => run(async () => {
   msg(`${name} is on the FM-1${pad >= 0 ? ", on pad " + PADS[pad] : ""}. Hit a pad and turn PRESETS to find it.`, "ok");
 });
 
+// ---- chop to pads: markers on the sound (CH.marks, in its samples; CH.opt[i] = {off, len} with marker i), the
+// kept chops one per pad from the first pad on, all sent as one (Z.uploadMany)
+const CH = { marks: [], opt: [], sel: -1, end: 0, nov: null, v0: 0, v1: 1, play: null, raf: 0, drag: -1, dragEnd: false, stop: false, enc: new Map() };
+let mode = "one";
+function setMode(m) {
+  mode = m;
+  $("m-one").classList.toggle("sel", m === "one"); $("m-chop").classList.toggle("sel", m === "chop");
+  $("ed").style.display = src && m === "one" ? "block" : "none";
+  $("chop").style.display = src && m === "chop" ? "block" : "none";
+  if (m === "chop") chopRender();
+}
+$("m-one").onclick = () => setMode("one");
+$("m-chop").onclick = () => setMode("chop");
+PADS.forEach((p, i) => { const o = document.createElement("option"); o.value = i; o.textContent = p; $("c-pad").append(o); });
+const cOpt = () => ({ rate: +$("c-rate").value, slow: !!(+$("c-speed").value & 1), oct: !!(+$("c-speed").value & 2) });
+const cSecs = (n) => (n / src.rate).toFixed(2) + " s";
+const useB = () => !!dir && ($("banks").checked || !!(dir.flags & 1));
+function chopNew() {                               // a new sound: no markers yet
+  chopHalt();
+  Object.assign(CH, { marks: [], opt: [], sel: -1, end: cut[1], nov: Z.chopNovelty(src.x, src.rate), v0: 0, v1: src.x.length });
+  CH.enc.clear();
+  $("c-name").value = Z.cleanName($("name").value).replace(/ /g, "").slice(0, 6) || "CHOP";
+  if (+$("pad").value >= 0) $("c-pad").value = $("pad").value;
+}
+const chops = () => (src ? Z.chopList(CH.marks, CH.end || src.x.length, CH.opt) : []);
+function used() {                                   // the chops that go to pads, and the pad of each
+  const all = chops(), p0 = +$("c-pad").value, max = Math.min(Z.CHOP.MAX, 32 - p0);
+  const use = all.filter((c) => !c.off).slice(0, max), pad = new Map();
+  use.forEach((c, j) => pad.set(c.i, p0 + j));
+  return { all, use, pad, n: use.reduce((a, c) => a + c.end - c.start, 0), skipped: all.filter((c) => !c.off).length - use.length };
+}
+function setMarks(m, opt = null) {                  // new markers; each keeps the options of the marker it was
+  const was = new Map(CH.marks.map((v, i) => [v, CH.opt[i]])), seen = new Set(), pairs = [];
+  m.forEach((v, i) => {
+    const p = Math.max(0, Math.min(src.x.length - 1, Math.round(v)));
+    if (seen.has(p)) return;
+    seen.add(p);
+    const o = opt ? opt[i] : was.get(p);
+    pairs.push([p, o ? { ...o } : { off: false, len: 0 }]);
+  });
+  pairs.sort((a, b) => a[0] - b[0]);
+  CH.marks = pairs.map((q) => q[0]); CH.opt = pairs.map((q) => q[1]);
+  if (CH.sel >= CH.marks.length) CH.sel = CH.marks.length - 1;
+  if (CH.marks.length && CH.end <= CH.marks[CH.marks.length - 1]) CH.end = src.x.length;
+  chopRender();
+}
+function addMark(pos) {                             // a new marker; one within 30 ms is moved there instead
+  const near = CH.marks.findIndex((m) => Math.abs(m - pos) < 0.03 * src.rate);
+  const m = CH.marks.slice(), opt = CH.opt.slice();
+  if (near >= 0) m[near] = pos; else { m.push(pos); opt.push(null); }
+  setMarks(m, opt);
+  CH.sel = CH.marks.indexOf(Math.round(pos));
+  chopRender();
+}
+const optOf = (i) => CH.opt[i] || (CH.opt[i] = { off: false, len: 0 });
+function region() {                                 // first..last marker when there are two, else the sound
+  const m = CH.marks;
+  return m.length >= 2 ? [m[0], m[m.length - 1]] : [m[0] || cut[0], cut[1]];
+}
+function cutRegion(m, b) { CH.end = b; setMarks(m); CH.end = b; chopRender(); }
+
+// a chop as the FM-1 will hold it (cached until a setting or the chop changes)
+function chopEnc(c, gain) {
+  const o = cOpt(), norm = +$("c-norm").value, key = [c.start, c.end, o.rate, o.slow, o.oct, norm, gain].join();
+  if (CH.enc.has(key)) return CH.enc.get(key);
+  if (norm === 1 && (!CH.scaled || CH.scaled.gain !== gain || CH.scaled.of !== src.x)) CH.scaled = { gain, of: src.x, x: src.x.map((v) => v * gain) };
+  const x = norm === 1 ? CH.scaled.x : src.x;
+  const y = Z.encode(x, src.rate, { ...o, start: c.start, end: c.end, normalize: norm === 2 });
+  CH.enc.set(key, y);
+  return y;
+}
+function gainOf(use) {                               // all together: the loudest kept chop at full
+  let pk = 1e-9;
+  for (const c of use) for (let i = c.start; i < c.end; i++) pk = Math.max(pk, Math.abs(src.x[i]));
+  return 0.97 / pk;
+}
+function audition(i) {
+  const c = chops()[i];
+  if (!c) return;
+  chopHalt();
+  CH.sel = i;
+  const o = cOpt(), u = used();
+  play(Z.zoh(chopEnc(c, gainOf(u.use.length ? u.use : [c])), o.rate, o.slow, o.oct));
+  chopRender();
+}
+
+// the transport: the sound as it is, a playhead, TAP marks where it is heard
+function chopHalt() {
+  if (CH.play) { try { CH.play.s.stop(); } catch (e) { /* ended */ } CH.play = null; }
+  cancelAnimationFrame(CH.raf);
+  $("c-play").textContent = "▶ Play";
+}
+function chopPlay() {
+  if (CH.play) { chopHalt(); chopDraw(); return; }
+  const a = audio(), from = Math.round(CH.v0), n = src.x.length - from, b = a.createBuffer(1, n, src.rate);
+  b.copyToChannel(src.x.subarray(from), 0);
+  const s = a.createBufferSource(); s.buffer = b; s.connect(a.destination);
+  const t0 = a.currentTime + 0.01;
+  s.start(t0);
+  CH.play = { s, t0: t0 - from / src.rate };
+  s.onended = () => { if (CH.play && CH.play.s === s) { chopHalt(); chopDraw(); } };
+  $("c-play").textContent = "■ Stop";
+  const tick = () => { chopDraw(); if (CH.play && CH.play.s === s) CH.raf = requestAnimationFrame(tick); };
+  CH.raf = requestAnimationFrame(tick);
+}
+function heard(ev) {                                // where the listener is now (what comes out, not what is computed)
+  const a = audio();
+  let t = a.currentTime - (a.outputLatency || a.baseLatency || 0);
+  if (ev && a.getOutputTimestamp) {
+    const ts = a.getOutputTimestamp();
+    if (ts.performanceTime > 0) t = ts.contextTime + (ev.timeStamp - ts.performanceTime) / 1000;
+  }
+  return (t - CH.play.t0) * src.rate;
+}
+function tap(ev) {
+  if (!CH.play) return;
+  const p = heard(ev);
+  if (p >= 0 && p < src.x.length) addMark($("c-snap").checked ? Z.chopSnap(src.x, CH.nov, p) : Math.round(p));
+}
+
+const chName = (p) => { const ch = Z.chanOf(p); return `CH ${ch}${ch <= 2 ? " filter" : ch <= 6 ? " LP" : ""}`; };
+function chopRender() {
+  if (!src || mode !== "chop") return;
+  const u = used(), o = cOpt(), box = $("chips");
+  box.innerHTML = "";
+  u.all.forEach((c, i) => {
+    const b = document.createElement("button"), p = u.pad.get(i), ch = p != null ? Z.chanOf(p) : 0;
+    b.className = "chip" + (c.off || p == null ? " off" : "") + (i === CH.sel ? " sel" : "") + (ch && ch <= 2 ? " f1" : ch && ch <= 6 ? " f2" : "");
+    b.innerHTML = `${i + 1} → ${p != null ? PADS[p] : "—"}<small>${cSecs(c.end - c.start)}${p != null ? " · " + chName(p) : ""}</small>`;
+    b.title = p != null ? `${PADS[p]}: channel ${Z.chanOf(p)}, ${Z.filterOf(Z.chanOf(p))}` : c.off ? "left out" : "no pad left for it";
+    b.onclick = () => audition(i);
+    box.append(b);
+  });
+  const sc = u.all[CH.sel];
+  $("c-selrow").style.display = sc ? "flex" : "none";
+  if (sc) {
+    const full = Math.floor((sc.full - sc.start) / src.rate * 1000);
+    $("c-selname").textContent = `Chop ${CH.sel + 1}${u.pad.has(CH.sel) ? " → " + PADS[u.pad.get(CH.sel)] : ""}`;
+    $("c-keep").checked = !sc.off;
+    $("c-len").max = String(Math.max(10, full));
+    $("c-len").value = String(Math.round((sc.end - sc.start) / src.rate * 1000));
+    $("c-lentxt").textContent = `${cSecs(sc.end - sc.start)} of ${cSecs(sc.full - sc.start)}`;
+  }
+  // the room: the chops as stored against what is free on the FM-1
+  const lens = u.use.map((c) => Z.encLen(c.end - c.start, src.rate, o)), bytes = lens.reduce((a, n) => a + Z.bytesOf(n), 0);
+  const fl = { slow: o.slow, oct: o.oct }, onFM = lens.reduce((a, n) => a + Z.playSecs(n, o.rate, (o.slow ? 1 : 0) | (o.oct ? 2 : 0)), 0);
+  let txt = !CH.marks.length ? "No chops yet: tap along, find the hits or cut in equal parts." :
+    `<b>${u.use.length}</b> chop${u.use.length === 1 ? "" : "s"} onto ${u.use.length ? PADS[u.pad.get(u.use[0].i)] + "–" + PADS[u.pad.get(u.use[u.use.length - 1].i)] : "no pads"} · ` +
+    `${onFM.toFixed(2)} s · ${(bytes / 1024).toFixed(0)} KB`;
+  if (u.skipped > 0) txt += ` · <span class="err">${u.skipped} more than the pads from ${PADS[+$("c-pad").value]} hold (16 at most): left out</span>`;
+  let fits = true;
+  if (dir && u.use.length) {
+    const r = Z.room(dir, useB()), free = dir.slots.filter((s) => !s).length;
+    fits = !!Z.plan(dir, lens, useB());
+    $("c-mem").innerHTML = `<i style="width:${(100 * (r.total - r.free) / r.total).toFixed(1)}%"></i><i class="b" style="width:${Math.min(100, 100 * bytes / r.total).toFixed(1)}%"></i>`;
+    txt += ` of ${(r.free / 1024).toFixed(0)} KB free (about ${(r.free / 1.5 / o.rate * Z.speedOf(fl)).toFixed(1)} s as stored now), ${free} places` +
+      (fits ? ' · <span class="ok">fits</span>' : u.use.length > free ? ' · <span class="err">more chops than free places: delete samples or keep fewer</span>' :
+        ' · <span class="err">too long: Fit to room, shorten chops, store at ×2 or use the bank room</span>');
+  } else { $("c-mem").innerHTML = ""; if (!dir && u.use.length) txt += " · connect the FM-1 to see the room"; }
+  $("c-room").innerHTML = txt;
+  $("c-fit").disabled = !dir || fits || !u.use.length;
+  $("c-send").disabled = !link || busy || !dir || !fits || !u.use.length;
+  $("c-send").textContent = u.use.length ? `Onto the FM-1: ${u.use.length} pad${u.use.length === 1 ? "" : "s"}` : "Onto the FM-1";
+  chopDraw();
+}
+function chopDraw() {
+  const c = $("cwave"), g = c.getContext("2d"), W = c.width, H = c.height, x = src.x, v0 = CH.v0, span = CH.v1 - CH.v0;
+  const X = (p) => (p - v0) / span * W, u = used(), mid = H / 2 + 12;
+  g.fillStyle = "#0e1220"; g.fillRect(0, 0, W, H);
+  u.all.forEach((ch, i) => {                         // the chops: kept ones lit, the selected one brighter
+    const a = X(ch.start), b = X(ch.end), p = u.pad.get(i);
+    if (p == null) return;
+    const k = Z.chanOf(p);
+    g.fillStyle = i === CH.sel ? "rgba(255,106,92,0.28)" : k <= 2 ? "rgba(224,168,79,0.13)" : k <= 6 ? "rgba(111,143,207,0.13)" : "rgba(238,241,248,0.07)";
+    g.fillRect(a, 24, b - a, H - 24);
+  });
+  for (let px = 0; px < W; px++) {
+    const a = Math.floor(v0 + px / W * span), b = Math.min(x.length, Math.max(a + 1, Math.floor(v0 + (px + 1) / W * span)));
+    let lo = 0, hi = 0;
+    for (let i = a; i < b; i += Math.max(1, (b - a) >> 6)) { if (x[i] < lo) lo = x[i]; if (x[i] > hi) hi = x[i]; }
+    const inChop = u.all.some((q, i) => u.pad.has(i) && a >= q.start && a < q.end);
+    g.fillStyle = inChop ? "#ff6a5c" : "#3b4a72";
+    g.fillRect(px, mid - hi * (H / 2 - 16), 1, Math.max(1, (hi - lo) * (H / 2 - 16)));
+  }
+  g.font = "bold 22px Courier New, monospace";
+  CH.marks.forEach((m, i) => {
+    const px = X(m);
+    if (px < -1 || px > W + 1) return;
+    g.fillStyle = "#ffffff";
+    g.fillRect(Math.round(px) - (i === CH.sel ? 2 : 1), 0, i === CH.sel ? 4 : 2, H);
+    g.fillText(`${i + 1}${u.pad.has(i) ? " " + PADS[u.pad.get(i)] : ""}`, px + 5, 19);
+  });
+  const end = X(CH.end || x.length);
+  if (CH.marks.length && end < W) { g.fillStyle = "rgba(255,255,255,0.5)"; g.fillRect(end - 1, 0, 2, H); }
+  const sc = u.all[CH.sel];
+  if (sc) {                                          // the selected chop's end: a handle at the bottom
+    const px = Math.round(X(sc.end));
+    g.fillStyle = "#ffffff";
+    g.fillRect(px - 2, H - 50, 4, 50);
+    g.beginPath(); g.moveTo(px, H - 50); g.lineTo(px - 14, H - 64); g.lineTo(px - 14, H - 36); g.closePath(); g.fill();
+  }
+  if (CH.play) { g.fillStyle = "#9fe0b8"; g.fillRect(Math.round(X(heard())), 24, 2, H - 24); }
+}
+{
+  const c = $("cwave"), posAt = (e) => { const r = c.getBoundingClientRect(); return CH.v0 + (e.clientX - r.left) / r.width * (CH.v1 - CH.v0); };
+  const per = () => (CH.v1 - CH.v0) / c.getBoundingClientRect().width;
+  const markAt = (e) => CH.marks.findIndex((m) => Math.abs(m - posAt(e)) < 6 * per());
+  const endAt = (e) => {
+    const s = chops()[CH.sel], r = c.getBoundingClientRect();
+    return !!s && e.clientY - r.top > r.height * 0.7 && Math.abs(s.end - posAt(e)) < 8 * per();
+  };
+  c.onpointerdown = (e) => {
+    if (!src) return;
+    c.focus();
+    if (endAt(e)) { CH.dragEnd = true; c.setPointerCapture(e.pointerId); return; }
+    const k = markAt(e);
+    if (k >= 0) { CH.drag = k; CH.sel = k; c.setPointerCapture(e.pointerId); chopRender(); return; }
+    const p = posAt(e), i = chops().findIndex((q) => p >= q.start && p < q.end);
+    if (i >= 0) audition(i);
+  };
+  c.onpointermove = (e) => {
+    if (CH.dragEnd) {
+      const s = chops()[CH.sel];
+      if (!s) return;
+      const n = Math.round(Math.max(0.01 * src.rate, Math.min(s.full - s.start, posAt(e) - s.start)));
+      optOf(CH.sel).len = n >= s.full - s.start ? 0 : n;
+      chopDraw();
+      return;
+    }
+    if (CH.drag < 0) { c.style.cursor = markAt(e) >= 0 || endAt(e) ? "ew-resize" : "default"; return; }
+    const m = CH.marks, k = CH.drag, lo = k ? m[k - 1] + 1 : 0, hi = k + 1 < m.length ? m[k + 1] - 1 : (CH.end || src.x.length) - 1;
+    m[k] = Math.round(Math.max(lo, Math.min(hi, posAt(e))));
+    chopDraw();
+  };
+  c.onpointerup = () => { if (CH.dragEnd || CH.drag >= 0) { CH.dragEnd = false; CH.drag = -1; CH.enc.clear(); chopRender(); } };
+  c.ondblclick = (e) => src && addMark($("c-snap").checked ? Z.chopSnap(src.x, CH.nov, posAt(e), 0.02) : Math.round(posAt(e)));
+  c.addEventListener("wheel", (e) => {
+    if (!src) return;
+    e.preventDefault();
+    const n = src.x.length, span = CH.v1 - CH.v0;
+    if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+      const v0 = Math.max(0, Math.min(n - span, CH.v0 + (e.deltaX || e.deltaY) / 400 * span));
+      CH.v0 = v0; CH.v1 = v0 + span;
+    } else {
+      const p = posAt(e), ns = Math.max(src.rate * 0.05, Math.min(n, span * Math.exp(e.deltaY / 300)));
+      CH.v0 = Math.max(0, Math.min(n - ns, p - (p - CH.v0) / span * ns)); CH.v1 = CH.v0 + ns;
+    }
+    chopDraw();
+  }, { passive: false });
+  c.onkeydown = (e) => {
+    if (!src) return;
+    const k = e.key, s = CH.sel;
+    if (k === " ") { e.preventDefault(); if (CH.play) tap(e); else chopPlay(); }
+    else if (k === "Enter" || k === "Escape") { e.preventDefault(); chopPlay(); }
+    else if (/^[0-9]$/.test(k)) audition(k === "0" ? 9 : +k - 1);
+    else if ((k === "Delete" || k === "Backspace") && s >= 0) { e.preventDefault(); setMarks(CH.marks.filter((_, i) => i !== s), CH.opt.filter((_, i) => i !== s)); }
+    else if ((k === "ArrowLeft" || k === "ArrowRight") && s >= 0) {
+      e.preventDefault();
+      const m = CH.marks.slice(), d = Math.round(src.rate * (e.shiftKey ? 0.01 : 0.001)) * (k === "ArrowLeft" ? -1 : 1);
+      m[s] = Math.max(s ? m[s - 1] + 1 : 0, Math.min(s + 1 < m.length ? m[s + 1] - 1 : src.x.length - 1, m[s] + d));
+      CH.marks = m; CH.enc.clear(); chopRender();
+    } else if ((k === "k" || k === "K") && s >= 0) { optOf(s).off = !optOf(s).off; chopRender(); }
+  };
+}
+$("c-play").onclick = () => src && chopPlay();
+$("c-tap").onpointerdown = (e) => { e.preventDefault(); tap(e); };
+$("c-clear").onclick = () => { if (src) { CH.end = cut[1]; setMarks([]); } };
+$("c-hits").onclick = () => src && setMarks(Z.chopHits(src.x, CH.nov, +$("c-sens").value).filter((m) => m >= cut[0] && m < cut[1]));
+$("c-equal").onclick = () => { if (src) { const [a, b] = region(); cutRegion(Z.chopEqual(a, b, +$("c-n").value), b); } };
+$("c-guess").onclick = () => { if (src) { const [a, b] = region(); $("c-bpm").value = String(Z.chopBpm(a, b, src.rate, +$("c-bars").value)); } };
+$("c-grid").onclick = () => {
+  if (!src) return;
+  const [a, b] = region(), bpm = Math.max(40, Math.min(300, parseFloat($("c-bpm").value) || 90));
+  cutRegion(Z.chopGrid(a, b, bpm, +$("c-div").value, src.rate), b);
+};
+$("c-keep").onchange = () => { if (CH.sel >= 0) { optOf(CH.sel).off = !$("c-keep").checked; chopRender(); } };
+$("c-len").oninput = () => {
+  const s = chops()[CH.sel];
+  if (!s) return;
+  const ms = +$("c-len").value, full = Math.floor((s.full - s.start) / src.rate * 1000);
+  optOf(CH.sel).len = ms >= full ? 0 : Math.round(ms * src.rate / 1000);
+  chopRender();
+};
+$("c-selplay").onclick = () => audition(CH.sel);
+$("c-full").onclick = () => { if (CH.sel >= 0) { optOf(CH.sel).len = 0; chopRender(); } };
+$("c-keepall").onclick = () => { CH.opt = CH.marks.map((_, i) => ({ ...optOf(i), off: false })); chopRender(); };
+$("c-keepnone").onclick = () => { CH.opt = CH.marks.map((_, i) => ({ ...optOf(i), off: true })); chopRender(); };
+$("c-fit").onclick = () => {                        // the longest kept chops shortened until all fit
+  const u = used(), L = Z.chopFit(dir, u.use, src.rate, cOpt(), useB());
+  if (!isFinite(L)) return;
+  if (L < src.rate * 0.01) { $("c-msg").textContent = "Even short they do not fit: keep fewer chops or delete samples."; $("c-msg").className = "err"; return; }
+  for (const c of u.use) if (c.end - c.start > L) optOf(c.i).len = L;
+  $("c-msg").textContent = `The longest chops shortened to ${cSecs(L)}.`; $("c-msg").className = "";
+  chopRender();
+};
+for (const id of ["c-pad", "c-rate", "c-speed", "c-norm"]) $(id).onchange = chopRender;
+$("c-stop").onclick = () => { CH.stop = true; $("c-stop").disabled = true; };
+$("c-send").onclick = () => {
+  const u = used(), o = cOpt(), base = Z.cleanName($("c-name").value).replace(/ /g, "").slice(0, 6) || "CHOP";
+  const pads0 = u.use.map((c) => u.pad.get(c.i)), taken = pads0.filter((p) => pads && pads.waves[p] !== 255);
+  if (taken.length && !confirm(`These pads get a chop instead of what they play now:\n\n` +
+      taken.map((p) => `${PADS[p]}  ${(pads.waves[p] < pads.kit.length ? pads.kit[pads.waves[p]] : "★ " + (dir.slots[pads.waves[p] - pads.kit.length]?.name || "?"))}`).join("\n") +
+      `\n\n(The samples themselves stay on the FM-1.) Go on?`)) return;
+  const say = (s, cls = "") => { $("c-msg").textContent = s; $("c-msg").className = cls; };
+  CH.stop = false;
+  $("c-stop").style.display = ""; $("c-stop").disabled = false;
+  run(async () => {
+    try {
+      say("Getting the chops ready…");
+      const g = gainOf(u.use), list = u.use.map((c, j) => ({ name: base + String(c.i + 1).padStart(2, "0"), y: chopEnc(c, g), rate: o.rate, slow: o.slow, oct: o.oct, pad: pads0[j] }));
+      say("Writing… (Stop leaves the FM-1 as it was)");
+      await Z.uploadMany(link, dir, list, useB(), (d, t) => lcd(`WRITING ${list.length} CHOPS ${Math.round(100 * d / t)} %`), () => CH.stop);
+      lcd(`${PADS[pads0[0]]}-${PADS[pads0[pads0.length - 1]]} ${base}`);
+      say(`${list.length} chops on ${PADS[pads0[0]]}–${PADS[pads0[pads0.length - 1]]}. Play them, record a new groove.`, "ok");
+    } catch (e) { say(e.message, "err"); throw e; }
+    finally { $("c-stop").style.display = "none"; }
+  });
+};
+
 // ?demo=drop|loaded|writing|done: the page in a state for the video's screenshots (no FM-1). own=NAME:PAD:FLAGS,...
 // what is on the FM-1 already; wav=url name= pad= speed= cut=t0,t1 (s): the sound loaded (the real file, trimmed)
 {
@@ -492,7 +886,19 @@ $("upload").onclick = () => run(async () => {
       cut = c.length === 2 && c[1] > c[0] ? [Math.round(c[0] * src.rate), Math.round(c[1] * src.rate)] : [0, src.x.length];
       $("name").value = q.get("name") || "SAMPLE"; $("pad").value = String(padNo); $("speed").value = q.get("speed") || "0";
       $("ed").style.display = "block";
+      $("modes").style.display = "flex";
+      chopNew();
       info(); draw(); showPads();
+      const ch = q.get("chop");                        // chop=hits|equal:N|grid:BPM: the chop page with its markers
+      if (ch) {
+        setMode("chop");
+        const [how, v] = ch.split(":");
+        if (how === "hits") $("c-hits").onclick();
+        if (how === "equal") { $("c-n").value = v || "8"; $("c-equal").onclick(); }
+        if (how === "grid") { $("c-bpm").value = v || "90"; $("c-div").value = "0.5"; $("c-grid").onclick(); }
+        if (q.get("sel")) { CH.sel = +q.get("sel") - 1; chopRender(); }
+        if (q.get("fit")) $("c-fit").onclick();
+      }
     }
     if (st === "writing") { busy = true; refresh(); lcd(`WRITING ${$("name").value} 64 %`); msg("Writing…"); }
     if (st === "done") {
