@@ -72,6 +72,11 @@ def main(sloopdx, pkg, version, video=None):
                   '<link rel="canonical" href="https://zp12.designburgapps.com/install/">'),
                  ('<div class="links"><a href="https://dx7.designburgapps.com/">sloopDX</a>', '<div class="links"><a href="../">zp12</a><a href="https://dx7.designburgapps.com/">sloopDX</a>')):
         h = h.replace(a, b)
+    # SLOOP keeps its own samples where zp12 saves (0xC4000..0xDBFFF): say so before the install
+    h = h.replace("Back to sloopDX any time with its installer.</p>",
+                  "Back to sloopDX any time with its installer.</p>\n    <p class=\"small\"><b>Coming from SLOOP with your own samples?</b> "
+                  "zp12 saves where SLOOP keeps them: back them up first. zp12 writes only to the flash areas meant for data, "
+                  "never to the app, the Bluetooth data or the MAC; sloopDX's projects, banks and kit stay where they are.</p>", 1)
     h = put_nav(h, "Install", extra='\n  <button class="lang" id="lang" hidden></button>')   # (the installer's script wants #lang)
     (inst / "index.html").write_text(h, encoding="utf-8")
     for f in ("cheatsheet.html", "zp12-cheat-sheet.pdf", "favicon.svg", "zp12-beat.mp4"):
