@@ -2,22 +2,27 @@
 """Cloudflare in front of the two static sites (zp12.designburgapps.com, dx7.designburgapps.com): the Pi's home
 line is the bottleneck, so Cloudflare keeps the files at its edge.
 
-  tools/cf_cache.py rule     the cache rule: the two hosts eligible for cache, 2 h at the edge (HTML too; the
-                             browser asks the edge again after 10 min)
-  tools/cf_cache.py purge    after a deploy: the two sites' files out of the edge (by URL: only these sites)
+  tools/cf_cache.py rule     the cache rule: the hosts eligible for cache, 2 h at the edge for pages, 30 days for
+                             files (pictures, videos, packages: a deploy purges what changed; the browser asks
+                             the edge again after 10 min)
+  tools/cf_cache.py purge    after a deploy: the files that changed since the last purge out of the edge (their
+                             hashes in ~/.cache/designburg/cf-purged.json; every edge refills from the home line)
   tools/cf_cache.py purge-url URL...   just these (fm1_sync.py: a changed catalogue)
   tools/cf_cache.py check    what the edge says for a few of their files (HIT, MISS, ...)
 
 The API token (Zone: Cache Rules Edit, Cache Purge, Zone Read; designburgapps.com only) is read from
 $CF_TOKEN_FILE or ~/.config/designburg/cf-token and never printed. Without Zone Read: the zone's id (not a secret)
 in ~/.config/designburg/cf-zone."""
-import json, os, sys, urllib.request
+import hashlib, json, os, sys, urllib.error, urllib.request
 from pathlib import Path
 
 ZONE = "designburgapps.com"
 HOSTS = ["zp12.designburgapps.com", "dx7.designburgapps.com", "fm1.designburgapps.com"]
 RULE_REF = "zp12-dx7-static"
 EDGE_TTL, BROWSER_TTL = 7200, 600
+FILE_TTL = 30 * 86400                                 # (not a page: a picture, a video, a package; purged when it changes)
+PAGES = ("html", "json", "txt", "xml", "webmanifest")
+SEEN = Path.home() / ".cache/designburg/cf-purged.json"
 API = "https://api.cloudflare.com/client/v4"
 HERE = Path(__file__).resolve().parents[1]
 DOCS = {"zp12.designburgapps.com": HERE / "docs", "fm1.designburgapps.com": HERE / "fm1",           # (dx7: sloopDX's docs/, beside this repo: "repo" on the Pi)
@@ -61,36 +66,51 @@ def rule():
             "expression": expr, "action": "set_cache_settings",
             "action_parameters": {"cache": True, "edge_ttl": {"mode": "override_origin", "default": EDGE_TTL},
                                   "browser_ttl": {"mode": "override_origin", "default": BROWSER_TTL}}}
+    files = {"ref": RULE_REF + "-files", "description": "zp12 + dx7 + fm1: pictures, videos, packages, 30 days at the edge",
+             "expression": expr[:-1] + " and http.request.uri.path.extension ne \"\" and not http.request.uri.path.extension in {"
+                           + " ".join(f'"{e}"' for e in PAGES) + "})",
+             "action": "set_cache_settings",
+             "action_parameters": {"cache": True, "edge_ttl": {"mode": "override_origin", "default": FILE_TTL},
+                                   "browser_ttl": {"mode": "override_origin", "default": BROWSER_TTL}}}
     r = call("GET", f"/zones/{z}/rulesets/phases/http_request_cache_settings/entrypoint", missing_ok=True)   # (none yet: 404)
-    rules = [x for x in r.get("result", {}).get("rules", []) if x.get("ref") != RULE_REF] if r.get("success") else []
+    rules = [x for x in r.get("result", {}).get("rules", []) if x.get("ref") not in (RULE_REF, files["ref"])] if r.get("success") else []
     keep = [{k: x[k] for k in ("ref", "description", "expression", "action", "action_parameters", "enabled") if k in x} for x in rules]
-    call("PUT", f"/zones/{z}/rulesets/phases/http_request_cache_settings/entrypoint", {"rules": keep + [mine]})
+    call("PUT", f"/zones/{z}/rulesets/phases/http_request_cache_settings/entrypoint", {"rules": keep + [mine, files]})   # (the later wins)
     print(f"cf_cache: rule {RULE_REF} set for {', '.join(HOSTS)} (edge {EDGE_TTL} s, browser {BROWSER_TTL} s); {len(keep)} other rule(s) kept")
 
 
 def urls():
-    """every file of zp12's docs/ (its URL, directory index too), and dx7's pages that change on a deploy"""
-    out = []
+    """every file of the sites (its URL, directory index too) with its hash, and dx7's pages without a checkout"""
+    out = {}
     for host, root in DOCS.items():
         if root is None:
             continue
         for p in sorted(root.rglob("*")):
             if p.is_file() and not p.name.startswith("."):
                 rel = p.relative_to(root).as_posix()
-                out.append(f"https://{host}/{rel}")
+                h = hashlib.sha1(p.read_bytes()).hexdigest()
+                out[f"https://{host}/{rel}"] = h
                 if p.name == "index.html":
-                    out.append(f"https://{host}/{rel[:-len('index.html')]}")
+                    out[f"https://{host}/{rel[:-len('index.html')]}"] = h
     if DOCS["dx7.designburgapps.com"] is None:            # (no sloopDX checkout here: its pages that change)
-        out += [f"https://dx7.designburgapps.com/{p}" for p in ("", "index.html", "webapp/installer/", "webapp/editor/",
-                                                                "cheatsheet.html", "impressum.html")]
+        out |= {f"https://dx7.designburgapps.com/{p}": None for p in ("", "index.html", "webapp/installer/", "webapp/editor/",
+                                                                      "cheatsheet.html", "impressum.html")}
     return out
 
 
 def purge():
-    z, u = zone_id(), urls()
+    """only what changed: a purge empties every edge, and each one fetches it again from the Pi"""
+    z, now = zone_id(), urls()
+    try:
+        seen = json.loads(SEEN.read_text())
+    except (OSError, ValueError):
+        seen = {}
+    u = [k for k, h in now.items() if h is None or seen.get(k) != h]
     for i in range(0, len(u), 30):                    # (30 URLs a call on the free plan)
         call("POST", f"/zones/{z}/purge_cache", {"files": u[i:i + 30]})
-    print(f"cf_cache: {len(u)} URLs purged")
+    SEEN.parent.mkdir(parents=True, exist_ok=True)
+    SEEN.write_text(json.dumps({k: h for k, h in now.items() if h}))
+    print(f"cf_cache: {len(u)} of {len(now)} URLs purged (changed)")
 
 
 def purge_url():
