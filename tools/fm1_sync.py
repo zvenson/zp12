@@ -17,7 +17,7 @@ CORS), checked (the FM-1 package identity, the Felucca update loader), with its 
 
 GPL-3.0 projects only (each package's source is at the project's repository and tag, linked on the page).
 A firmware is added to FIRMWARES below; its author asked first."""
-import hashlib, json, re, subprocess, sys, urllib.request
+import hashlib, json, re, subprocess, sys, urllib.error, urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -110,8 +110,27 @@ def get(url, accept="application/vnd.github+json"):
         return r.read()
 
 
+def latest_feed(repo):
+    """as latest_github from the releases feed and the assets' page: no API, so no 60 an hour (PC and Pi share one)"""
+    feed = get(f"https://github.com/{repo}/releases.atom", "application/atom+xml").decode()
+    for entry in re.findall(r"<entry>(.*?)</entry>", feed, re.S)[:10]:
+        tag = re.search(r'href="https://github\.com/[^"]+/releases/tag/([^"]+)"', entry).group(1)
+        page = get(f"https://github.com/{repo}/releases/expanded_assets/{tag}", "text/html").decode()
+        asset = re.search(r'href="(/[^"]+/releases/download/[^"]+\.fwsc)"', page)
+        if asset:
+            return (get("https://github.com" + asset.group(1), "application/octet-stream"), re.sub(r"^\D*", "", tag),
+                    re.search(r"<updated>([^<]+)</updated>", entry).group(1)[:19] + "Z",
+                    f"https://github.com/{repo}/releases/tag/{tag}", f"https://github.com/{repo}/tree/{tag}")
+    raise ValueError("no release with a .fwsc")
+
+
 def latest_github(repo):
-    rels = json.loads(get(f"https://api.github.com/repos/{repo}/releases?per_page=10"))   # (betas too: "latest" skips them)
+    try:
+        rels = json.loads(get(f"https://api.github.com/repos/{repo}/releases?per_page=10"))   # (betas too: "latest" skips them)
+    except urllib.error.HTTPError as e:
+        if e.code not in (403, 429):
+            raise
+        return latest_feed(repo)                      # (the API's limit reached)
     rel = next(r for r in rels if not r["draft"] and any(a["name"].endswith(".fwsc") for a in r["assets"]))
     asset = next(a for a in rel["assets"] if a["name"].endswith(".fwsc"))
     return (get(asset["browser_download_url"], "application/octet-stream"), re.sub(r"^\D*", "", rel["tag_name"]),   # (v1.2, drum-v0.14.0: from the first digit)
