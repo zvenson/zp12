@@ -684,6 +684,9 @@ async function midi() {
   catch (e) { throw new Error("MIDI access with SysEx was not allowed (the lock in the address bar)."); }
 }
 
+// Matomo events (Behaviour > Events): which firmware is installed how often; no cookies, as the page views
+const ev = (action, name) => { try { (window._paq = window._paq || []).push(["trackEvent", "Firmware", action, name]); } catch (e) {} };
+
 $("connect").onclick = async () => {
   try {
     const up = new Updater(await midi(), log);
@@ -693,6 +696,7 @@ $("connect").onclick = async () => {
     current = dev.id.text;
     log(`identity ${current}`);
     showNow();
+    const w = whoIs(current); ev("Connect", w && (w.fw ? w.fw.name : w.name) || current);
   } catch (e) { $("now").textContent = e.message; }
 };
 
@@ -702,6 +706,7 @@ async function install(f, el) {
   const msg = (t, cls) => { const m = el.querySelector(".msg"); m.textContent = t; m.style.color = cls === "err" ? "var(--err)" : cls === "ok" ? "var(--ok)" : ""; };
   const was = whoIs(current);
   if (!confirm(`Install ${f.name} ${f.version}${was && (was.fw || was.name) ? " over " + (was.fw ? was.fw.name : was.name) : ""}?\n\nSaved what you want to keep? The new firmware may not read the old one's projects.`)) return;
+  ev("Install", `${f.name} ${f.version}`);
   writing = true; render(); el = $("grid").querySelector(`.fw[data-id="${f.id}"]`);
   const bar = el.querySelector("progress"); bar.style.display = "block";
   try {
@@ -725,10 +730,12 @@ async function install(f, el) {
     if (ota) { ota.link.close(); if (!(await up.resume(image, step))) throw new Error("stopped"); }
     else await up.install(image, f.product, step);
     msg(`${f.name} ${f.version} is on your FM-1.`, "ok");
+    ev("Install OK", `${f.name} ${f.version}`);
     current = f.product; showNow();
   } catch (e) {
     msg((e && e.code ? `${e.code}: ` : "") + (e && e.message || e) + " · Stuck? Hold OCT− while switching on, then Install again.", "err");
     log(String(e && e.stack || e));
+    ev("Install Error", `${f.name} ${f.version}: ${e && e.code || e && e.message || e}`);
   }
   writing = false;
   [...$("grid").querySelectorAll("button")].forEach((b) => { b.disabled = false; });
@@ -746,6 +753,7 @@ $("stock-file").onchange = async () => {
 $("stock-saved").onchange = () => { $("stock-go").disabled = !stock || !$("stock-saved").checked; };
 $("stock-go").onclick = async () => {
   if (writing || !stock || !confirm("Install the official M-VAVE firmware V15?")) return;
+  ev("Install", "M-VAVE V15");
   writing = true; render();
   try {
     const up = new Updater(await midi(), log);
@@ -753,7 +761,8 @@ $("stock-go").onclick = async () => {
     if (ota) { ota.link.close(); await up.resume(stock.image, () => {}, { product: stock.product }); }
     else await up.install(stock.image, stock.product, (k) => { $("stock-msg").textContent = k === "write" ? "Writing… do not unplug" : k; });
     $("stock-msg").textContent = "The official firmware is on your FM-1."; current = stock.product; showNow();
-  } catch (e) { $("stock-msg").textContent = (e.code ? e.code + ": " : "") + e.message; }
+    ev("Install OK", "M-VAVE V15");
+  } catch (e) { ev("Install Error", "M-VAVE V15: " + (e.code || e.message)); $("stock-msg").textContent = (e.code ? e.code + ": " : "") + e.message; }
   writing = false; render();
 };
 
