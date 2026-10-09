@@ -26,7 +26,7 @@ OUT = HERE / "fm1"
 BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 
 # id, editor / play (its web editor, its version in the browser), kind (the page's filter, one or a list: synth,
-# groove, drums, chords), name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
+# groove, drums, chords, dev), name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
 # latest release's .fwsc) or a path in this machine's checkouts (our own, deployed from there)
 FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their GitHub stars)
     # (Salt, ChoralRoot, Jangada, Melodee, Hortator, GHOULBOX, Bubba, Floyd, DX7 Banks, WaveLoop report numbers the others use too: their check is any FM-1
@@ -106,6 +106,10 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://eli7vh.github.io/Felucca/mod/",
          what="Felucca played from an Arturia MiniLab 3: track faders, a DJ filter, momentary effect pads; 32 patches a "
               "bank, 12 evolving songs, revoiced 808 and CR78 kits."),
+    dict(id="dinghy",
+         kind="dev", name="Dinghy", author="zvenson", repo="zvenson/dinghy", ident=r"FM-1_99\d", src="github",
+         what="Your base for your own FM-1 firmware: everything under it done and documented (updates, USB rescue, "
+              "USB-MIDI, USB audio, keys, screen, settings), a 4-voice sine on top. Fork it, replace the sine."),
     dict(id="fimba", play="https://jadamsowers.github.io/fm1-fimba/",
          kind=["synth", "chords"], name="FiMba-1", author="jadamsowers", repo="jadamsowers/fm1-fimba",
          ident=r"FM-1_800\d{4}", src="github", site="https://jadamsowers.github.io/fm1-fimba/",

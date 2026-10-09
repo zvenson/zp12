@@ -206,7 +206,7 @@
     <a class="btn coffee" href="https://link.amazon/B0axzqKZf" target="_blank" rel="sponsored noopener" title="Affiliate link (ad): as an Amazon Associate we earn from qualifying purchases">🎹 Buy the FM-1*</a>
   </div></div>
   <div><div class="lineup" id="lineup"></div>
-  <div class="warn"><b>Not ours, not checked by us.</b> Except zp12 and sloopDX, these firmwares are their authors' work: this page
+  <div class="warn"><b>Not ours, not checked by us.</b> Except zp12, sloopDX and Dinghy, these firmwares are their authors' work: this page
     takes each one unchanged from its GitHub release and checks only that it is an FM-1 package. We do not test, support or answer
     for them: questions and bugs go to each project. <b>Back to stock any time:</b> the official V15 installs from
     <a href="#official">this page too</a>. <b>Back up first.</b> The firmwares keep their projects, presets and samples in the same flash and in different
@@ -223,7 +223,9 @@
       <div class="shot"><div class="slot">+</div></div>
       <h3>Your firmware</h3>
       <p class="what">Made an open-source firmware for the FM-1? Free, with its source (GPL-3.0), released as a <code>.fwsc</code> on
-         GitHub: join in. It goes here with your name and your links, and follows every release you make.</p>
+         GitHub: join in. It goes here with your name and your links, and follows every release you make.
+         Want to make one? Start from <a href="https://github.com/zvenson/dinghy#readme" target="_blank" rel="noopener">Dinghy</a>:
+         the plumbing done and documented, a sine wave on top, yours to replace.</p>
       <p class="meta">The hub is free and stays free. If it saved you an evening: <a href="https://paypal.me/zvenson" rel="noopener">☕ buy me a coffee</a>.</p>
       <a class="btn go" href="mailto:sven@designburg.net?subject=FM-1%20Firmware%20Hub%3A%20my%20firmware&amp;body=Name%3A%0ARepository%3A%0AWhat%20it%20does%3A%0A">Mail sven@designburg.net</a>
     </section>
@@ -283,7 +285,7 @@
 <footer><div class="wrap">
   <b>Disclaimer.</b> Every firmware here belongs to its authors and is taken automatically and unchanged from their GitHub
   releases (each under its own license, GPL-3.0; <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">the license</a>);
-  only zp12 and sloopDX are ours (<a href="https://github.com/zvenson" rel="noopener">zvenson</a>). We do not develop, test or support the
+  only zp12, sloopDX and Dinghy are ours (<a href="https://github.com/zvenson" rel="noopener">zvenson</a>). We do not develop, test or support the
   others and take no responsibility for them, for what they do on your FM-1 or for lost data: questions and bug reports go to each project,
   linked on its card. The page only checks that a package is an FM-1 firmware with the update loader before it writes it.
   The source of each is at its repository and tag, and a copy of it is kept here next to the package; the pictures on the cards are
@@ -327,10 +329,10 @@ function showNow() {
 }
 
 // each firmware's colour and picture: its own screen, from its repository (SLOOP: its logo too)
-const LOOK = { felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx: "#42f5f5", zp12: "#ff6a3d", x0x: "#f4c0cb", fomni: "#c9b6ff",
+const LOOK = { dinghy: "#ffd84a", felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx: "#42f5f5", zp12: "#ff6a3d", x0x: "#f4c0cb", fomni: "#c9b6ff",
                salt: "#ff8f7a", choralroot: "#ffc46b", jangada: "#ff5fc8", melodee: "#8fe3b0", hortator: "#d8dde6", fimba: "#f0a35e", ghoulbox: "#ffb000", bubba: "#ffc83d", floyd: "#ffb347", sloopbanks: "#7fd4ff", waveloop: "#b58cff" };
-const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"]];
-const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords" };
+const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"]];
+const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords", dev: "for developers" };
 const kindsOf = (f) => [].concat(f.kind || []);                         // (one kind or several: Felucca is a synth and a groovebox)
 let kind = (location.hash || "").slice(1);                             // (#drums: a link straight to one kind)
 function chips() {
@@ -345,7 +347,7 @@ function chips() {
   });
 }
 const WIDE = new Set(["felucca", "salt", "melodee", "hortator", "ghoulbox", "waveloop"]);                  // (a landscape picture, not a square screen)   // (designburgapps.com's palette)
-const LOGO = { sloop: "img/sloop-icon.png" };
+const LOGO = { sloop: "img/sloop-icon.png", dinghy: "img/dinghy-icon.png" };
 function lineup() {
   $("lineup").innerHTML = cat.map((f) => `<img src="img/${esc(f.id)}.png" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy">`).join("");
 }
@@ -372,7 +374,7 @@ function render() {
       <div class="meta">${esc(f.date)} · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
         <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}</div>
-      ${f.editor || f.play ? `<div class="links">${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Play in the browser</a>` : ""}</div>` : ""}
+      ${f.editor || f.play || kindsOf(f).includes("dev") ? `<div class="links">${kindsOf(f).includes("dev") ? `<a href="https://github.com/${esc(f.repo)}#readme" target="_blank" rel="noopener">⚓ Build your own on it</a>` : ""}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Play in the browser</a>` : ""}</div>` : ""}
       <progress max="100" value="0"></progress>
       <button class="go">${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button>
       <div class="msg"></div>`;
