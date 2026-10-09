@@ -333,7 +333,8 @@ const LOOK = { dinghy: "#8f62f0", felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx:
                salt: "#ff8f7a", choralroot: "#ffc46b", jangada: "#ff5fc8", melodee: "#8fe3b0", hortator: "#d8dde6", fimba: "#f0a35e", ghoulbox: "#ffb000", bubba: "#ffc83d", floyd: "#ffb347", sloopbanks: "#7fd4ff", waveloop: "#b58cff" };
 const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"]];
 const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords", dev: "for developers" };
-const kindsOf = (f) => [].concat(f.kind || []);                         // (one kind or several: Felucca is a synth and a groovebox)
+const kindsOf = (f) => [].concat(f.kind || []);
+const devOnly = (f) => kindsOf(f).length === 1 && kindsOf(f)[0] === "dev";   // (a base to build on, not an instrument: no install, the repo)                         // (one kind or several: Felucca is a synth and a groovebox)
 let kind = (location.hash || "").slice(1);                             // (#drums: a link straight to one kind)
 function chips() {
   if (!KINDS.some(([k]) => k === kind)) kind = "all";
@@ -369,17 +370,18 @@ function render() {
       <div class="head"><div>
         <h3>${LOGO[f.id] ? `<img class="logo" src="${LOGO[f.id]}" alt="">` : ""}${esc(f.name)}<small title="${esc(f.version)}">${esc(short(f.version))}</small><a class="star" href="https://github.com/${esc(f.repo)}" target="_blank" rel="noopener" title="Star it on GitHub">★ Star${f.stars == null ? "" : ` · ${f.stars}`}</a></h3>
         <div class="by">by ${esc(f.author)}</div>
-        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${badge(f)}${f.beta ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag kind">${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
+        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${badge(f)}${f.beta && !devOnly(f) ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag kind">${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
       <p class="what">${esc(f.what)}</p>
       <div class="meta">${esc(f.date)} · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
         <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}</div>
-      ${f.editor || f.play || kindsOf(f).includes("dev") ? `<div class="links">${kindsOf(f).includes("dev") ? `<a href="https://github.com/${esc(f.repo)}#readme" target="_blank" rel="noopener">⚓ Build your own on it</a>` : ""}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Play in the browser</a>` : ""}</div>` : ""}
-      <progress max="100" value="0"></progress>
+      ${f.editor || f.play || kindsOf(f).includes("dev") && !devOnly(f) ? `<div class="links">${kindsOf(f).includes("dev") && !devOnly(f) ? `<a href="https://github.com/${esc(f.repo)}#readme" target="_blank" rel="noopener">⚓ Build your own on it</a>` : ""}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Play in the browser</a>` : ""}</div>` : ""}
+      ${devOnly(f) ? `<a class="btn go" href="https://github.com/${esc(f.repo)}#readme" target="_blank" rel="noopener">Make it your own</a>` :
+      `<progress max="100" value="0"></progress>
       <button class="go">${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button>
-      <div class="msg"></div>`;
-    el.querySelector("button").onclick = () => install(f, el);
-    el.querySelector("button").disabled = writing;
+      <div class="msg"></div>`}`;
+    const go = el.querySelector("button");
+    if (go) { go.onclick = () => install(f, el); go.disabled = writing; }
     el.hidden = kind !== "all" && !kindsOf(f).includes(kind) && !isNow;          // (the one on your FM-1 stays in view)
     $("grid").append(el);
   }
