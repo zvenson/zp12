@@ -17,7 +17,7 @@ import hashlib, json, os, sys, urllib.error, urllib.request
 from pathlib import Path
 
 ZONE = "designburgapps.com"
-HOSTS = ["zp12.designburgapps.com", "dx7.designburgapps.com", "fm1.designburgapps.com"]
+HOSTS = ["zp12.designburgapps.com", "dx7.designburgapps.com", "fm1.designburgapps.com", "designburgapps.com"]   # (our static sites; the apps and the WordPress sites on the zone keep Cloudflare's default: files yes, pages no)
 RULE_REF = "zp12-dx7-static"
 EDGE_TTL, BROWSER_TTL = 7200, 600
 FILE_TTL = 30 * 86400                                 # (not a page: a picture, a video, a package; purged when it changes)
@@ -26,7 +26,9 @@ SEEN = Path.home() / ".cache/designburg/cf-purged.json"
 API = "https://api.cloudflare.com/client/v4"
 HERE = Path(__file__).resolve().parents[1]
 DOCS = {"zp12.designburgapps.com": HERE / "docs", "fm1.designburgapps.com": HERE / "fm1",           # (dx7: sloopDX's docs/, beside this repo: "repo" on the Pi)
-        "dx7.designburgapps.com": next((p for p in (HERE.parent / "repo" / "docs", HERE.parent / "sloopdx" / "docs") if p.is_dir()), None)}
+        "dx7.designburgapps.com": next((p for p in (HERE.parent / "repo" / "docs", HERE.parent / "sloopdx" / "docs") if p.is_dir()), None),
+        "designburgapps.com": next((p for p in (HERE.parent / "repo" / "deploy" / "designburgapps",       # (sloopDX's deploy/: the entry page)
+                                                HERE.parent / "sloopdx" / "deploy" / "designburgapps") if p.is_dir()), None)}
 
 
 def token():
