@@ -119,13 +119,24 @@
   .tag.beta { background: rgba(242, 196, 109, .14); color: var(--warn); }
   .tag.new { background: var(--cyan); color: #121011; white-space: nowrap; }
   .tag.upd { background: rgba(66, 245, 245, .14); color: var(--cyan); }
-  .recent { border-bottom: 1px solid var(--line); background: rgba(239, 232, 225, .03); font-size: 14px; }
-  .recent .wrap { display: flex; align-items: center; gap: 10px 22px; padding-top: 10px; padding-bottom: 10px; overflow-x: auto; white-space: nowrap; }
-  .recent .lbl { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--beige); font-weight: 600; }
-  .recent a { color: var(--text); display: inline-flex; align-items: center; gap: 8px; }
-  .recent a b { color: var(--c); font-weight: 800; } .recent a span { color: var(--dim); }
-  .recent a:hover { text-decoration: none; } .recent a:hover span { color: var(--fg); }
+  .recent { border-bottom: 1px solid var(--line); background: linear-gradient(180deg, rgba(239, 232, 225, .04), transparent); font-size: 14px; }
+  .recent .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 12px; padding-bottom: 12px; }
+  .recent .lbl { display: inline-flex; align-items: center; gap: 8px; margin-right: 6px; font-size: 11.5px; letter-spacing: 2px;
+                 text-transform: uppercase; color: var(--beige); font-weight: 700; white-space: nowrap; }
+  .recent .lbl::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); animation: live 2.4s ease-out infinite; }
+  @keyframes live { 0% { box-shadow: 0 0 0 0 rgba(95, 227, 161, .55); } 70%, 100% { box-shadow: 0 0 0 8px rgba(95, 227, 161, 0); } }
+  .recent a { color: var(--text); display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px 5px 10px; border-radius: 999px;
+              white-space: nowrap; background: rgba(239, 232, 225, .04); box-shadow: inset 0 0 0 1px var(--line);
+              transition: box-shadow .15s, background .15s, transform .12s; }
+  .recent a::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
+  .recent a b { color: var(--fg); font-weight: 800; } .recent a span { color: var(--dim); font-size: 12.5px; }
+  .recent a:hover { text-decoration: none; transform: translateY(-1px); box-shadow: inset 0 0 0 1px var(--c);
+                    background: color-mix(in srgb, var(--c) 10%, transparent); }
+  .recent a:hover span { color: var(--fg); }
   .recent .tag { padding: 2px 7px; font-size: 10px; }
+  @media (max-width: 600px) { .recent .wrap { gap: 6px; } .recent .lbl { flex-basis: 100%; }
+    .recent a { padding: 4px 10px 4px 8px; font-size: 13px; } .recent a span { display: none; } .recent a:nth-of-type(n+6) { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .recent .lbl::before { animation: none; } .recent a { transition: none; } }
   .by { color: var(--dim); font-size: 14.5px; margin-top: 4px; }
   .what { color: var(--text); font-size: 15.5px; flex: 1; margin: 4px 0 0; }
   .meta { color: var(--dim); font-size: 13px; }
@@ -394,7 +405,7 @@ function recent() {
   const day = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
   $("recent").innerHTML = `<div class="wrap"><span class="lbl">Recently updated</span>${l.map((f) =>
     `<a href="${esc(f.release || f.site)}" target="_blank" rel="noopener" style="--c: ${LOOK[f.id] || "#3b4bf5"}" title="${esc(f.name)} ${esc(f.version)}: the release notes">` +
-    `<b>${esc(f.name)}</b> ${esc(f.version)} <span>${day(f.date)}</span>${isUpd(f) ? badge(f) : ""}</a>`).join("")}</div>`;
+    `<b>${esc(f.name)}</b> ${esc(f.version)} <span>· ${day(f.date)}</span>${isUpd(f) ? badge(f) : ""}</a>`).join("")}</div>`;
   $("recent").hidden = false;
 }
 
