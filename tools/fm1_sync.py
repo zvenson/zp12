@@ -149,6 +149,7 @@ def latest_github(repo, pkg=r"[^/\"]+\.fwsc"):
         if e.code not in (403, 429):
             raise
         return latest_feed(repo, pkg)                      # (the API's limit reached)
+    rels.sort(key=lambda r: r.get("published_at") or "", reverse=True)   # (the API goes by the tags, not by the release)
     rel = next(r for r in rels if not r["draft"] and any(re.fullmatch(pkg, a["name"]) for a in r["assets"]))
     asset = next(a for a in rel["assets"] if re.fullmatch(pkg, a["name"]))
     return (get(asset["browser_download_url"], "application/octet-stream"), re.sub(r"^\D*", "", rel["tag_name"]),   # (v1.2, drum-v0.14.0: from the first digit)
