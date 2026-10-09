@@ -143,6 +143,17 @@ def stars(repo):
     return json.loads(get(f"https://api.github.com/repos/{repo}")).get("stargazers_count")
 
 
+def stars_daily(f, was):
+    """the stars once a day (a deploy runs the sync too: the API's 60 an hour go to the releases), else the last count"""
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    if was.get("starsDay") == today:
+        return {"stars": was.get("stars"), "starsDay": today}
+    try:
+        return {"stars": stars(f["repo"]), "starsDay": today}
+    except Exception:                                 # (GitHub busy: the last count, tried again next run)
+        return {"stars": was.get("stars"), "starsDay": was.get("starsDay")}
+
+
 def latest_local(spec, sloopdx):
     where, sub = spec.split(":", 1)
     root = (Path(sloopdx) if where == "sloopdx" else HERE) / sub
@@ -172,24 +183,16 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
         except Exception as e:                        # (GitHub down, a broken release: the last good one stays)
             print(f"fm1_sync: {f['name']}: {e}", file=sys.stderr)
             if f["id"] in old and (out / old[f["id"]]["pkg"]).exists():
-                try:                                  # (the stars on their own: a new count even without the release)
-                    star = stars(f["repo"])
-                except Exception:
-                    star = old[f["id"]].get("stars")
                 cat.append(old[f["id"]] | {k: f[k] for k in ("kind", "name", "author", "what")} | {k: f.get(k) for k in ("editor", "play")}
-                           | {"stars": star})
+                           | stars_daily(f, old[f["id"]]))   # (the stars on their own: a new count even without the release)
                 keep.add(Path(old[f["id"]]["pkg"]).name)
             continue
         name = f"{f['id']}-{version}.fwsc"
         if not (out / "fw" / name).exists() or (out / "fw" / name).read_bytes() != raw:
             (out / "fw" / name).write_bytes(raw)
         keep.add(name)
-        try:
-            star = stars(f["repo"])
-        except Exception:                             # (GitHub busy: the last count)
-            star = old.get(f["id"], {}).get("stars")
         cat.append({k: f[k] for k in ("id", "kind", "name", "author", "repo", "ident", "what")} | {
-            "editor": f.get("editor"), "play": f.get("play"), "stars": star,
+            "editor": f.get("editor"), "play": f.get("play"), **stars_daily(f, old.get(f["id"], {})),
             "site": f.get("site") or f"https://github.com/{f['repo']}", "version": version, "date": date[:10],
             "published": date,                        # (the time too: the page's "Recently updated" order)
             "pkg": "fw/" + name, "product": ident, "size": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
