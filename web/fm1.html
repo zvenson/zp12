@@ -381,14 +381,15 @@ function badge(f) {
 function remember() {
   try { localStorage.setItem(SEEN_KEY, JSON.stringify(Object.fromEntries(cat.map((f) => [f.id, f.version])))); } catch (e) {}
 }
-// the bar at the top: the five newest releases, each a link to its release notes
+// the bar at the top: the newest releases (those of the last 3 days, 3 to 8), each a link to its release notes
 function recent() {
-  const l = [...cat].filter((f) => f.date).sort((a, b) => (b.published || b.date).localeCompare(a.published || a.date)).slice(0, 5);
+  const all = [...cat].filter((f) => f.date).sort((a, b) => (b.published || b.date).localeCompare(a.published || a.date));
+  const l = all.slice(0, Math.min(8, Math.max(3, all.filter(isNew).length)));   // (all of the last 3 days: 3 to 8)
   if (!l.length) return;
   const day = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
   $("recent").innerHTML = `<div class="wrap"><span class="lbl">Recently updated</span>${l.map((f) =>
     `<a href="${esc(f.release || f.site)}" target="_blank" rel="noopener" style="--c: ${LOOK[f.id] || "#3b4bf5"}" title="${esc(f.name)} ${esc(f.version)}: the release notes">` +
-    `<b>${esc(f.name)}</b> ${esc(f.version)} <span>${day(f.date)}</span>${badge(f)}</a>`).join("")}</div>`;
+    `<b>${esc(f.name)}</b> ${esc(f.version)} <span>${day(f.date)}</span>${isUpd(f) ? badge(f) : ""}</a>`).join("")}</div>`;
   $("recent").hidden = false;
 }
 
