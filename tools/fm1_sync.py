@@ -42,7 +42,7 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          what="A drum machine: eight tracks of drums, a step sequencer, Grids, a pumping compressor, LFOs, resonators and "
               "live effects. Play it in the browser first."),
     dict(id="felucca", editor="https://hugelton.github.io/Felucca/webapp/editor/", play="https://hugelton.github.io/Felucca/webapp/try/",
-         kind=["synth", "groove"], name="Felucca", author="Leo Kuroshita (Hügelton Instruments)", repo="hugelton/Felucca",
+         kind=["synth", "groove", "dev"], name="Felucca", author="Leo Kuroshita (Hügelton Instruments)", repo="hugelton/Felucca",
          ident=r"FM-1_91\d", src="github",
          what="The custom firmware the others build on: the FM-1's own synth engines, a sequencer, effects and a "
               "better panel, with an editor in the browser."),
