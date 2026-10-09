@@ -34,8 +34,8 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
     dict(id="zp12", editor="https://zp12.designburgapps.com/editor/",
          kind="drums", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
          src="zp12:docs/install/firmware", site="https://zp12.designburgapps.com",
-         what="A standalone 12-bit sampler in the spirit of the 80s: sample your sounds in the browser (mic, line-in, "
-              "a file), then the FM-1 plays them on its own: 26 kHz, pitched with nothing smoothed, loops and songs."),
+         what="A standalone 12-bit sampler inspired by the E-mu SP-1200: sample in the browser (mic, line-in or a "
+              "file), unplug, and the FM-1 plays on its own: nothing smoothed, loops and songs."),
     dict(id="hortator", play="https://deadactive.github.io/hortator/",
          kind="drums", name="Hortator", author="DEADACTIVE", repo="deadactive/hortator", ident=r"FM-1_\d{3,8}", src="github",
          site="https://deadactive.github.io/hortator/",
