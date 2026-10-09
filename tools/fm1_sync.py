@@ -29,7 +29,7 @@ BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 # groove, drums, chords), name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
 # latest release's .fwsc) or a path in this machine's checkouts (our own, deployed from there)
 FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their GitHub stars)
-    # (Salt, ChoralRoot, Jangada, Melodee, Hortator, GHOULBOX, Bubba report numbers the others use too: their check is any FM-1
+    # (Salt, ChoralRoot, Jangada, Melodee, Hortator, GHOULBOX, Bubba, Floyd, DX7 Banks, WaveLoop report numbers the others use too: their check is any FM-1
     # identity, the update loader is checked as for all; the page names the running one only when it is unambiguous)
     dict(id="zp12", editor="https://zp12.designburgapps.com/editor/",
          kind="drums", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
@@ -73,6 +73,16 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://erbubar23.github.io/sloop-fm1/",
          what="An eight-track groovebox you play live: seven synths and a drum machine, 38 kits, a sampler that slices "
               "your loops on the device and a looper on every track. No factory patterns: everything you hear, you play."),
+    dict(id="floyd", editor="https://isod89.github.io/sloop-fm1/webapp/editor/",
+         kind="synth", name="SLOOP Floyd FM", author="René Bohne", repo="renebohne/sloop-fm1", ident=r"FM-1_\d{3,8}",
+         src="github", pkg=r"sloop-[^/\"]+\.fwsc",              # (its release carries a felucca-*.fwsc too: the sloop one)
+         what="SLOOP with a visual four-operator FM engine after Floyd Steinberg's 4-OP idea: an ADSR per operator, "
+              "seven pages, a live oscilloscope that draws the envelopes as you play."),
+    dict(id="sloopbanks", editor="https://isod89.github.io/sloop-fm1/webapp/editor/",
+         kind=["groove", "synth"], name="SLOOP DX7 Banks", author="majnikool", repo="majnikool/sloop-fm1", ident=r"FM-1_\d{3,8}",
+         src="github",
+         what="SLOOP 2.4 with up to twelve DX7 voice banks, kept and named in the editor, presets by kind. Test builds: "
+              "back up first."),
     dict(id="sloopdx", editor="https://dx7.designburgapps.com/webapp/editor/",
          kind=["groove", "synth"], name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_93\d",
          src="sloopdx:docs/firmware", site="https://dx7.designburgapps.com",
@@ -91,6 +101,11 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github",
          what="A Telepathic Orchid-style chord instrument: one hand plays roots, the other shapes chords; voicings, "
               "performance modes, bass and a looper."),
+    dict(id="waveloop", editor="https://eli7vh.github.io/Felucca/webapp/editor/",
+         kind=["synth", "groove"], name="WaveLoop FM-1", author="ELI7VH", repo="ELI7VH/Felucca", ident=r"FM-1_\d{3,8}",
+         src="github", site="https://eli7vh.github.io/Felucca/mod/",
+         what="Felucca played from an Arturia MiniLab 3: track faders, a DJ filter, momentary effect pads; 32 patches a "
+              "bank, 12 evolving songs, revoiced 808 and CR78 kits."),
     dict(id="fimba", play="https://jadamsowers.github.io/fm1-fimba/",
          kind=["synth", "chords"], name="FiMba-1", author="jadamsowers", repo="jadamsowers/fm1-fimba",
          ident=r"FM-1_800\d{4}", src="github", site="https://jadamsowers.github.io/fm1-fimba/",
@@ -110,13 +125,15 @@ def get(url, accept="application/vnd.github+json"):
         return r.read()
 
 
-def latest_feed(repo):
+def latest_feed(repo, pkg=r"[^/\"]+\.fwsc"):
     """as latest_github from the releases feed and the assets' page: no API, so no 60 an hour (PC and Pi share one)"""
     feed = get(f"https://github.com/{repo}/releases.atom", "application/atom+xml").decode()
-    for entry in re.findall(r"<entry>(.*?)</entry>", feed, re.S)[:10]:
+    entries = sorted(re.findall(r"<entry>(.*?)</entry>", feed, re.S),   # (newest first: the feed goes by the tags)
+                     key=lambda e: re.search(r"<updated>([^<]+)</updated>", e).group(1), reverse=True)
+    for entry in entries[:10]:
         tag = re.search(r'href="https://github\.com/[^"]+/releases/tag/([^"]+)"', entry).group(1)
         page = get(f"https://github.com/{repo}/releases/expanded_assets/{tag}", "text/html").decode()
-        asset = re.search(r'href="(/[^"]+/releases/download/[^"]+\.fwsc)"', page)
+        asset = re.search(r'href="(/[^"]+/releases/download/[^/"]+/' + pkg + ')"', page)
         if asset:
             return (get("https://github.com" + asset.group(1), "application/octet-stream"), re.sub(r"^\D*", "", tag),
                     re.search(r"<updated>([^<]+)</updated>", entry).group(1)[:19] + "Z",
@@ -124,15 +141,16 @@ def latest_feed(repo):
     raise ValueError("no release with a .fwsc")
 
 
-def latest_github(repo):
+def latest_github(repo, pkg=r"[^/\"]+\.fwsc"):
+    """the newest release with a package (pkg: which one when a release has several)"""
     try:
         rels = json.loads(get(f"https://api.github.com/repos/{repo}/releases?per_page=10"))   # (betas too: "latest" skips them)
     except urllib.error.HTTPError as e:
         if e.code not in (403, 429):
             raise
-        return latest_feed(repo)                      # (the API's limit reached)
-    rel = next(r for r in rels if not r["draft"] and any(a["name"].endswith(".fwsc") for a in r["assets"]))
-    asset = next(a for a in rel["assets"] if a["name"].endswith(".fwsc"))
+        return latest_feed(repo, pkg)                      # (the API's limit reached)
+    rel = next(r for r in rels if not r["draft"] and any(re.fullmatch(pkg, a["name"]) for a in r["assets"]))
+    asset = next(a for a in rel["assets"] if re.fullmatch(pkg, a["name"]))
     return (get(asset["browser_download_url"], "application/octet-stream"), re.sub(r"^\D*", "", rel["tag_name"]),   # (v1.2, drum-v0.14.0: from the first digit)
             rel["published_at"], f"https://github.com/{repo}/releases/tag/{rel['tag_name']}",
             f"https://github.com/{repo}/tree/{rel['tag_name']}")
@@ -176,7 +194,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
     keep, cat = set(), []
     for f in FIRMWARES:
         try:
-            raw, version, date, rel_url, src_url = latest_github(f["repo"]) if f["src"] == "github" else latest_local(f["src"], sloopdx)
+            raw, version, date, rel_url, src_url = latest_github(f["repo"], f.get("pkg", r"[^/\"]+\.fwsc")) if f["src"] == "github" else latest_local(f["src"], sloopdx)
             ident = product_of(raw)
             if not re.fullmatch(f["ident"], ident) or b"FELUCCA-LOADER-1" not in raw:
                 raise ValueError(f"{version}: identity {ident!r} or the update loader not as expected")
@@ -199,7 +217,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
             "release": rel_url or f.get("site"), "source": src_url or f"https://github.com/{f['repo']}",
             "tag": rel_url.rsplit("/", 1)[-1] if rel_url else None,
             "mirror": f"src/{f['id']}-{version}.tar.gz" if rel_url else None,
-            "beta": bool(re.search(r"beta|alpha|rc", version, re.I) or version.startswith("0."))})
+            "beta": bool(re.search(r"beta|alpha|rc|test", version, re.I) or version.startswith("0."))})
         print(f"fm1_sync: {f['name']:8} {version:14} {date[:10]}  {ident:14} {len(raw)} B")
     if list(old.values()) == cat:                     # (the order counts too: it is the page's)
         print("fm1_sync: unchanged")
