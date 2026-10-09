@@ -647,7 +647,7 @@ function render() {
     el.style.setProperty("--c", LOOK[f.id] || "#3b4bf5");
     el.innerHTML = `<div class="shot${WIDE.has(f.id) ? " wide" : ""}"><img src="img/${esc(f.id)}.png" alt="${esc(f.name)} for the M-VAVE FM-1: its screen" loading="lazy"></div>
       <div class="head"><div>
-        <h3>${LOGO[f.id] ? `<img class="logo" src="${LOGO[f.id]}" alt="">` : ""}${esc(f.name)}<small>${esc(f.version)}</small><a class="star" href="https://github.com/${esc(f.repo)}" target="_blank" rel="noopener" title="Star it on GitHub">★ Star${f.stars == null ? "" : ` · ${f.stars}`}</a></h3>
+        <h3>${LOGO[f.id] ? `<img class="logo" src="${LOGO[f.id]}" alt="">` : ""}${esc(f.name)}<small title="${esc(f.version)}">${esc(short(f.version))}</small><a class="star" href="https://github.com/${esc(f.repo)}" target="_blank" rel="noopener" title="Star it on GitHub">★ Star${f.stars == null ? "" : ` · ${f.stars}`}</a></h3>
         <div class="by">by ${esc(f.author)}</div>
         <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${badge(f)}${f.beta ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag kind">${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
       <p class="what">${esc(f.what)}</p>
@@ -671,6 +671,8 @@ const DAY = 864e5, SEEN_KEY = "fm1hub.seen";
 let seen = {};
 try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || "{}") || {}; } catch (e) { seen = {}; }
 const isNew = (f) => f.date && Date.now() - Date.parse(f.date + "T00:00:00Z") < 3 * DAY;
+// the version for show: the number only ("2.5b-b28-test" -> "2.5b", "0.10.3-beta" -> "0.10.3 beta"); the full tag in the tooltip
+const short = (v) => { const m = /^v?(\d+(?:\.\d+)*[a-z]?)(.*)$/i.exec(v || ""); return !m ? v || "" : m[1] + (/beta/i.test(m[2]) ? " beta" : /alpha/i.test(m[2]) ? " alpha" : ""); };
 const isUpd = (f) => seen[f.id] && seen[f.id] !== f.version;
 function badge(f) {
   return isUpd(f) ? `<span class="tag upd" title="A new version since your last visit (was ${esc(seen[f.id])})">update</span>`
@@ -687,7 +689,7 @@ function recent() {
   const day = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
   $("recent").innerHTML = `<div class="wrap"><span class="lbl">Recently updated</span>${l.map((f) =>
     `<a href="${esc(f.release || f.site)}" target="_blank" rel="noopener" style="--c: ${LOOK[f.id] || "#3b4bf5"}" title="${esc(f.name)} ${esc(f.version)}: the release notes">` +
-    `<b>${esc(f.name)}</b> ${esc(f.version)} <span>· ${day(f.date)}</span>${isUpd(f) ? badge(f) : ""}</a>`).join("")}</div>`;
+    `<b>${esc(f.name)}</b> ${esc(short(f.version))} <span>· ${day(f.date)}</span>${isUpd(f) ? badge(f) : ""}</a>`).join("")}</div>`;
   $("recent").hidden = false;
 }
 
