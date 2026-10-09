@@ -29,7 +29,7 @@ BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 # groove, drums, chords), name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
 # latest release's .fwsc) or a path in this machine's checkouts (our own, deployed from there)
 FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their GitHub stars)
-    # (Salt, ChoralRoot, Jangada, Melodee, Hortator, GHOULBOX report numbers the others use too: their check is any FM-1
+    # (Salt, ChoralRoot, Jangada, Melodee, Hortator, GHOULBOX, Bubba report numbers the others use too: their check is any FM-1
     # identity, the update loader is checked as for all; the page names the running one only when it is unambiguous)
     dict(id="zp12", editor="https://zp12.designburgapps.com/editor/",
          kind="drums", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
@@ -62,11 +62,17 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
               "recorded psaltery and harp, an old-RPG screen with wall torches."),
     dict(id="melodee", editor="https://keremimo.github.io/melodee/webapp/editor/",
          kind=["synth", "groove"], name="Melodee", author="keremimo", repo="keremimo/melodee", ident=r"FM-1_\d{3,8}", src="github",
-         what="A multi-engine synthesizer in Felucca 1.0's design, with a complete backup before it installs."),
+         what="Total playing pleasure, far beyond Felucca: recording without quantize, microtonal scales, a Casio CZ-1, "
+              "a bit-by-bit Dexed, scale modes made for an MPC Sample as its companion."),
     dict(id="sloop", editor="https://isod89.github.io/sloop-fm1/webapp/editor/",
          kind="groove", name="SLOOP", author="isod89", repo="isod89/sloop-fm1", ident=r"FM-1_900", src="github",
          what="A live groovebox: tracks, layers, a step sequencer, song mode, punch-in effects and samples, played "
               "on the FM-1 in real time."),
+    dict(id="bubba", editor="https://erbubar23.github.io/sloop-fm1/webapp/editor/",
+         kind=["groove", "synth", "drums"], name="Bubba", author="Erbubar23", repo="Erbubar23/sloop-fm1", ident=r"FM-1_\d{3,8}",
+         src="github", site="https://erbubar23.github.io/sloop-fm1/",
+         what="An eight-track groovebox you play live: seven synths and a drum machine, 38 kits, a sampler that slices "
+              "your loops on the device and a looper on every track. No factory patterns: everything you hear, you play."),
     dict(id="sloopdx", editor="https://dx7.designburgapps.com/webapp/editor/",
          kind=["groove", "synth"], name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_93\d",
          src="sloopdx:docs/firmware", site="https://dx7.designburgapps.com",
