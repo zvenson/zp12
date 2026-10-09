@@ -61,7 +61,7 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   (pulls this repo into the Pi's zp12repo; served as zp12.designburgapps.com and dx7.designburgapps.com/zp12/).
   sloopDX's site copies docs/zp12 too: rebuild it there when /zp12/ should change.
 - Videos: C harness renders the real UI + audio per frame (`../video/zp12av*.c`), compositor `../video/make_video*.py`
-  (panel, knobs, keys, cold open, cuts on bar lines, loudnorm -14 LUFS). Latest: `zp12-1.6-samples.mp4` (`zp12av6.c`, `make_video12.py`, v12/; then loudnorm -14 LUFS with a limiter from
+  (panel, knobs, keys, cold open, cuts on bar lines, loudnorm -14 LUFS). Latest: `zp12-2.0-groove.mp4` (`zp12av7.c`, `make_video13.py`, v13/: boom bap at 90 in one take, sampling in the browser, count-in, mute / solo, punch-in; FX / GLO held driven as zp12.c does, sp_punch after sp_render). Before: `zp12-1.6-samples.mp4` (`zp12av6.c`, `make_video12.py`, v12/; then loudnorm -14 LUFS with a limiter from
   `v12/track.wav`). Its storyboard (the user's): the finished groove, the web editor with two own samples (v12/own/*.wav,
   the editor's `?demo=` states screenshotted with `--allow-file-access-from-files`), the build, the own sample in it, a
   jam, double time, the end cards.
