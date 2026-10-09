@@ -59,8 +59,8 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   otherwise). PDF / screenshots: `flatpak-spawn --host flatpak run --filesystem=$PWD com.google.Chrome --headless=new ...`.
   Bump the version in README, landing, cheat sheet when releasing.
 - Deploy: commit, push `main`, then `ssh -o BatchMode=yes pi-remote '~/docker/sloopdx-site/update.sh'`
-  (pulls this repo into the Pi's zp12repo; served as zp12.designburgapps.com and dx7.designburgapps.com/zp12/).
-  sloopDX's site copies docs/zp12 too: rebuild it there when /zp12/ should change.
+  (pulls this repo into the Pi's zp12repo, purges Cloudflare, syncs the hub; served as zp12.designburgapps.com,
+  dx7.designburgapps.com/zp12 only redirects there).
 - Videos: C harness renders the real UI + audio per frame (`../video/zp12av*.c`), compositor `../video/make_video*.py`
   (panel, knobs, keys, cold open, cuts on bar lines, loudnorm -14 LUFS). Latest: `zp12-2.0-groove.mp4` (`zp12av7.c`, `make_video13.py`, v13/: boom bap at 90 in one take, sampling in the browser, count-in, mute / solo, punch-in; FX / GLO held driven as zp12.c does, sp_punch after sp_render). Before: `zp12-1.6-samples.mp4` (`zp12av6.c`, `make_video12.py`, v12/; then loudnorm -14 LUFS with a limiter from
   `v12/track.wav`). Its storyboard (the user's): the finished groove, the web editor with two own samples (v12/own/*.wav,
