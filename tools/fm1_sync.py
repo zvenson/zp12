@@ -29,7 +29,7 @@ BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 # groove, drums, chords), name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
 # latest release's .fwsc) or a path in this machine's checkouts (our own, deployed from there)
 FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their GitHub stars)
-    # (Salt, ChoralRoot, Jangada, Melodee, Hortator report numbers the others use too: their check is any FM-1
+    # (Salt, ChoralRoot, Jangada, Melodee, Hortator, GHOULBOX report numbers the others use too: their check is any FM-1
     # identity, the update loader is checked as for all; the page names the running one only when it is unambiguous)
     dict(id="zp12", editor="https://zp12.designburgapps.com/editor/",
          kind="drums", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
@@ -55,6 +55,11 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          kind=["synth", "groove"], name="Jangada", author="zednaked", repo="zednaked/jangada", ident=r"FM-1_\d{3,8}", src="github",
          what="Dark, industrial, Brazilian: drones that breathe, ten engines (6-op FM, a superwave analog with a ladder "
               "filter), four tracks, a mod matrix, live effects."),
+    dict(id="ghoulbox", editor="https://jasonpersinger.me/ghoulbox-fm1-dungeon-synth/webapp/editor/",
+         kind=["synth", "groove"], name="GHOULBOX", author="Jason Persinger", repo="jasonpersinger/ghoulbox-fm1-dungeon-synth",
+         ident=r"FM-1_\d{3,8}", src="github", site="https://jasonpersinger.me/ghoulbox-fm1-dungeon-synth/",
+         what="Dungeon synth: a cathedral hall reverb, tape and crush, a hurdy-gurdy engine, choirs, organs and "
+              "recorded psaltery and harp, an old-RPG screen with wall torches."),
     dict(id="melodee", editor="https://keremimo.github.io/melodee/webapp/editor/",
          kind=["synth", "groove"], name="Melodee", author="keremimo", repo="keremimo/melodee", ident=r"FM-1_\d{3,8}", src="github",
          what="A multi-engine synthesizer in Felucca 1.0's design, with a complete backup before it installs."),
