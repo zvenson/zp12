@@ -23,7 +23,8 @@
 - [ ] Video "Sample, Chop, Flip": a soul loop sampled in the browser, 8 chops, a boom bap of them (`?demo=loaded&chop=`).
 - Checked 2026-10-09 (the user's doubt "the filter acts on all tracks"): in sp_core.c CUT / RESO filter only channels
   1-2 (pads 1-2 of every bank), nothing else is dulled (tests/sp_core_test.c "CUT: pads 1-2 ..."). What does act on
-  the whole mix: FX > FILTER (the DJ filter, kept until power-off). Still to listen to on the device.
+  the whole mix: FX > FILTER (the DJ filter, kept until power-off). It was that one: no bug. The user keeps it as
+  the original (no CUT on all pads, no "DJ filter on" sign).
 
 ## Ideas
 - USB audio at 48 kHz for phones (sloopDX 3.4's uac_fir.h / usb.c port): recording the FM-1 INTO a phone.
