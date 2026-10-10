@@ -70,7 +70,14 @@
   .hero { display: grid; grid-template-columns: 1fr minmax(0, 600px); gap: clamp(32px, 5vw, 96px); align-items: center; }
   .lead { font-size: 18.5px; color: var(--text); max-width: 34em; margin: 0 0 28px; }
   .lineup { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin: 0 0 18px; }
-  .lineup img { width: 100%; height: auto; aspect-ratio: 1; border-radius: 12px; object-fit: cover; border: 1px solid var(--line); background: #0e0c0d; image-rendering: pixelated; }
+  .lineup a { display: block; border-radius: 12px; transition: transform .12s; } .lineup a:hover { transform: translateY(-2px); }
+  .lineup a.ext { aspect-ratio: 1; box-sizing: border-box; overflow: hidden; border: 1px solid #ff3fa4; background: #0e0c0d; display: grid; place-content: center; text-align: center;
+                  color: var(--dim); font-size: clamp(7px, .7vw, 11px); letter-spacing: 1.5px; text-transform: uppercase; line-height: 1.3; }
+  .lineup a.ext b { color: #ff3fa4; font-size: clamp(9px, 1.05vw, 16px); letter-spacing: 0; display: block; }
+  .lineup a:hover img { border-color: var(--fg); }
+  .fw.flash { animation: flash 1.6s ease-out; }
+  @keyframes flash { 0%, 30% { border-color: var(--c); box-shadow: 0 0 0 3px var(--c); } 100% { box-shadow: 0 0 0 0 transparent; } }
+  .lineup img { display: block; width: 100%; height: auto; aspect-ratio: 1; border-radius: 12px; object-fit: cover; border: 1px solid var(--line); background: #0e0c0d; image-rendering: pixelated; }
   .bar { display: flex; gap: 12px; justify-content: flex-start; flex-wrap: wrap; align-items: center; }
   button, .btn { font-family: inherit; font-weight: 700; font-size: 15px; line-height: 1; padding: 15px 24px; border-radius: 10px; border: 0;
                  cursor: pointer; background: var(--cyan); color: #121011; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -227,7 +234,7 @@
   <h2 class="sec"><span id="count">Seventeen</span> open-source firmwares, one FM-1</h2>
   <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
   <div class="grid"><div id="grid" class="fws"><p class="meta">Loading the catalogue…</p></div>
-    <section class="fw ext" id="baudgirl" style="--c: #ff3fa4">
+    <section class="fw ext" id="baudgirl" data-id="baudgirl" style="--c: #ff3fa4">
       <div class="shot"><div class="slot ext"><b>FM-1+VA</b>Baud Girl</div></div>
       <div class="head"><div>
         <h3>Baud Girl<small>FM-1+VA</small></h3>
@@ -371,8 +378,19 @@ function chips() {
 }
 const WIDE = new Set(["felucca", "salt", "melodee", "hortator", "ghoulbox", "waveloop"]);                  // (a landscape picture, not a square screen)   // (designburgapps.com's palette)
 const LOGO = { sloop: "img/sloop-icon.png", dinghy: "img/dinghy-icon.png" };
+// Baud Girl: a link card, not in the catalogue (not open source, no stars to sort by): in the second row all the same
+const EXT = $("baudgirl"), EXT_AT = 4;
+const EXT_TILE = `<a href="#baudgirl" data-id="baudgirl" class="ext" title="Baud Girl (FM-1+VA), a link"><b>FM-1+VA</b>Baud Girl</a>`;
 function lineup() {
-  $("lineup").innerHTML = cat.map((f) => `<img src="img/${esc(f.id)}.png" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy">`).join("");
+  $("lineup").innerHTML = cat.map((f, i) => (i === EXT_AT ? EXT_TILE : "") + `<a href="#fw-${esc(f.id)}" data-id="${esc(f.id)}"><img src="img/${esc(f.id)}.png" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy"></a>`).join("");
+  $("lineup").querySelectorAll("a").forEach((a) => a.onclick = (e) => {   // (to its card: all kinds shown if a chip hides it, a flash)
+    e.preventDefault();
+    let el = $("grid").querySelector(`.fw[data-id="${a.dataset.id}"]`);
+    if (!el) return;
+    if (el.hidden) { kind = "all"; history.replaceState(null, "", location.pathname + location.search); chips(); render(); el = $("grid").querySelector(`.fw[data-id="${a.dataset.id}"]`); }
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  });
 }
 
 // the order: ours first (zp12, sloopDX), then the others by their GitHub stars (each night's count)
@@ -382,11 +400,12 @@ const ordered = (l) => [...OURS.map((i) => l.find((f) => f.id === i)).filter(Boo
 function render() {
   const w = whoIs(current);
   $("grid").innerHTML = "";
-  for (const f of cat) {
+  for (const [i, f] of cat.entries()) {
+    if (i === EXT_AT) $("grid").append(EXT);
     const isNow = w && w.fw === f;
     const el = document.createElement("article");
     el.className = "fw" + (isNow ? " now" : "");
-    el.dataset.id = f.id;
+    el.dataset.id = f.id; el.id = "fw-" + f.id;
     el.style.setProperty("--c", LOOK[f.id] || "#3b4bf5");
     el.innerHTML = `<div class="shot${WIDE.has(f.id) ? " wide" : ""}"><img src="img/${esc(f.id)}.png" alt="${esc(f.name)} for the M-VAVE FM-1: its screen" loading="lazy"></div>
       <div class="head"><div>
@@ -407,7 +426,8 @@ function render() {
     el.hidden = kind !== "all" && !kindsOf(f).includes(kind) && !isNow;          // (the one on your FM-1 stays in view)
     $("grid").append(el);
   }
-  $("baudgirl").hidden = kind !== "all" && !["synth", "groove"].includes(kind);   // (a link card, not in the catalogue)
+  if (!EXT.isConnected) $("grid").append(EXT);
+  EXT.hidden = kind !== "all" && !["synth", "groove"].includes(kind);   // (a link card, not in the catalogue)
 }
 
 // UPDATE: another version than on this browser's last visit (kept only here, in
