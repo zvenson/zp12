@@ -241,7 +241,7 @@
   <div class="pads"><span class="d">D1<i>SPIN</i></span><span>D2<i>RIM</i></span><span>D3<i>SHAKR</i></span><span class="d">D4<i>PIANO</i></span><span class="d">D5<i>VIBES</i></span><span class="d">D6<i>HORNS</i></span><span>D7<i>TAMB</i></span><span class="d">D8<i>EP Gm9</i></span></div>
   <p class="caption">All from free sources: VSCO-2 CE, VCSL, Sonic Pi (CC0); the Wurlitzer E-piano by Greg Sullivan (CC BY 3.0). No sound from a commercial record or another company's machine.</p>
   <h3 style="margin-top:36px">Sample your own, right in the browser</h3>
-  <p class="intro">New in 2.1: a pad's channel is its position, in every bank, as on the SP-1200: fader 3, mute 3 and solo 3 are always the pads on position 3, and only they cut each other; pads 1–2 have the filter. Holding GLO, the keys 1–8 light while their channel is heard. A 2.0 save moves with it: loops and pads sound as before.</p>
+  <p class="intro">New in 2.1: a pad's channel is its position, in every bank, as on the SP-1200: fader 3, mute 3 and solo 3 are always the pads on position 3, and only they cut each other; pads 1–2 have the filter. Holding GLO, the keys 1–8 light while their channel is heard. A 2.0 save moves with it: loops and pads sound as before. New in 2.2: a DAW switches the loops by MIDI Program Change (0–15 = loop 1–16, at the loop's end).</p>
   <p class="intro">New in 2.0: the <a href="editor/">sample editor</a> samples from a microphone, an audio interface or the line-in (on a phone its microphone). Set the threshold, make the sound: it starts by itself, as on the old samplers, and stops when you click or the FM-1's room is full. Trim it, hear it as the FM-1 plays it, put it on a pad.</p>
   <a href="editor/"><img src="img/sampling.png" alt="The zp12 sample editor: sampling from the microphone, the level meter, the threshold, the room left, the take trimmed" width="1044" height="930" loading="lazy" style="width:100%;max-width:880px;height:auto;margin:0 auto;border-radius:14px;display:block;box-shadow:0 24px 60px rgba(0,0,0,0.25)"></a>
 </div></section>
@@ -274,7 +274,7 @@
   <div class="csw"><!--cs--><div class="cs"><div class="sheet">
 <header>
   <span class="mark">zp12</span><span class="sub">sampling drums</span><span class="rule"></span>
-  <span class="ver">firmware 2.1 for the M-VAVE FM-1 · zp12.designburgapps.com · 1 / 2</span>
+  <span class="ver">firmware 2.2 for the M-VAVE FM-1 · zp12.designburgapps.com · 1 / 2</span>
 </header>
 
 <div class="grid">
@@ -287,7 +287,7 @@
       <tr><td><span class="k">OCT+</span> <span class="k">OCT−</span></td><td>banks <b>C + D</b> / back to <b>A + B</b> (the LEDs A–D show which)</td></tr>
       <tr><td><span class="k blk">black keys</span></td><td><b>loops 1–11</b> (12–16: SEQ → LOOP): stopped at once; playing: from the end of the loop (its key blinks, the LCD says <b>LOOP 3 NEXT</b>). The loop playing is lit.</td></tr>
       <tr><td><span class="k">ARP</span></td><td><b>MULTI PITCH</b>: the last sound on all 27 keys, F4 (white 8) as tuned. ARP again: pads.</td></tr>
-      <tr><td>USB MIDI</td><td>notes 36–67 play pads A1–D8</td></tr>
+      <tr><td>USB MIDI</td><td>notes 36–67 play pads A1–D8; Program Change 0–15 picks loop 1–16 (at the loop's end)</td></tr>
     </table>
   </div></div>
 
@@ -386,7 +386,7 @@
 <div class="sheet p2">
 <header>
   <span class="mark">zp12</span><span class="sub">in detail</span><span class="rule"></span>
-  <span class="ver">firmware 2.1 · 2 / 2</span>
+  <span class="ver">firmware 2.2 · 2 / 2</span>
 </header>
 
 <div class="grid">
@@ -502,7 +502,7 @@
   </div>
   <div>
     <p class="dim" style="font-size:15px">zp12 is an early test build: try it, and tell what you find on GitHub. Unofficial firmware, free and without warranty: you install it at your own risk.</p>
-    <div class="cta"><a class="btn primary" href="install/">Install zp12 2.1</a><a class="btn ghost" href="https://github.com/zvenson/zp12">Source on GitHub</a><a class="btn ghost" href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a></div>
+    <div class="cta"><a class="btn primary" href="install/">Install zp12 2.2</a><a class="btn ghost" href="https://github.com/zvenson/zp12">Source on GitHub</a><a class="btn ghost" href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a></div>
     <p class="dim" style="font-size:14px;margin-top:14px">zp12 is free and stays free. If it made your day, a coffee is welcome.</p>
   </div>
 </div></section>

@@ -1,7 +1,7 @@
 <p align="center"><a href="https://zp12.designburgapps.com/"><img src="web/img/zp12-logo.svg" width="560" alt="zp12 sampling drums"></a></p>
 
 <p align="center">
-  <a href="https://zp12.designburgapps.com/install/"><img src="https://img.shields.io/badge/firmware-2.1-c82e32" alt="firmware 2.1"></a>
+  <a href="https://zp12.designburgapps.com/install/"><img src="https://img.shields.io/badge/firmware-2.2-c82e32" alt="firmware 2.2"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-263e70" alt="GPL-3.0"></a>
   <img src="https://img.shields.io/badge/device-M--VAVE%20FM--1-1e3060" alt="M-VAVE FM-1">
   <img src="https://img.shields.io/badge/install-Chrome%20%2F%20Edge%2C%20USB-56627e" alt="Chrome / Edge over USB">
@@ -9,7 +9,7 @@
 
 <p align="center">
   <b><a href="https://zp12.designburgapps.com/">Website</a></b> ·
-  <b><a href="https://zp12.designburgapps.com/install/">Install 2.1</a></b> ·
+  <b><a href="https://zp12.designburgapps.com/install/">Install 2.2</a></b> ·
   <a href="https://zp12.designburgapps.com/editor/">Sample editor (sample + drop)</a> ·
   <a href="https://zp12.designburgapps.com/backup/">Backup</a> ·
   <a href="https://zp12.designburgapps.com/#cheatsheet">Cheat sheet</a> (<a href="https://zp12.designburgapps.com/zp12-cheat-sheet.pdf">PDF</a>) ·
@@ -32,7 +32,7 @@ A 12-bit sampling drum machine for the **M-VAVE FM-1**: 32 sounds at 26.04 kHz (
 without interpolation, eight output channels with their filters, a panel-style screen. Inspired by the
 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation.
 
-> **Status: 2.1** (2026-10-09). Install: **https://zp12.designburgapps.com/install/** · Sample editor (now with
+> **Status: 2.2** (2026-10-10). Install: **https://zp12.designburgapps.com/install/** · Sample editor (now with
 > sampling in the browser): **https://zp12.designburgapps.com/editor/** · Backup: **https://zp12.designburgapps.com/backup/** ·
 > Cheat sheet: **https://zp12.designburgapps.com/#cheatsheet** ([PDF](https://zp12.designburgapps.com/zp12-cheat-sheet.pdf)).
 >
@@ -40,6 +40,11 @@ without interpolation, eight output channels with their filters, a panel-style s
 > scratches), eleven loops on the black keys, the sequencer (loops of 1–32 bars or AUTO, song, real-time recording with count-in and AUTO CORRECT, step editing, swing, erase, tap tempo), sloopDX's
 > chorus, delay and reverb, saved in flash (0xC4000.., a room sloopDX leaves free; stock SLOOP keeps its own samples there: back them up first), own samples from the web editor.
 > Plan: [CONCEPT.md](CONCEPT.md), open work: [TODO.md](TODO.md).
+
+## New in 2.2
+
+- **A DAW switches the loops**: MIDI Program Change 0–15 picks loop 1–16 on any channel, as a black key does
+  (stopped: at once; playing: at the end of the loop, "LOOP n NEXT").
 
 ## New in 2.1
 
