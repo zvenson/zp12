@@ -1,0 +1,137 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only  (C) 2026 Sven Trogus
+     The Firmware Hub (thefirmwarehub.com): the start page, one card per device; the FM-1's hub stays at
+     fm1.designburgapps.com. tools/make_fm1.py copies it to firmwarehub/index.html. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Firmware Hub – open-source firmwares for small music machines</title>
+<meta name="description" content="Make Firmware, Not War: open-source custom firmwares for small music machines, collected per device and installed from the browser in one click. Starting with the M-VAVE FM-1.">
+<meta name="author" content="zvenson">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://thefirmwarehub.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Firmware Hub">
+<meta property="og:url" content="https://thefirmwarehub.com/">
+<meta property="og:title" content="The Firmware Hub – Make Firmware, Not War">
+<meta property="og:description" content="Open-source firmwares for small music machines, per device, one click each. Starting with the M-VAVE FM-1.">
+<meta property="og:image" content="https://fm1.designburgapps.com/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fm1.designburgapps.com/og.png">
+<script type="application/ld+json">
+{"@context": "https://schema.org", "@type": "WebSite", "name": "The Firmware Hub", "alternateName": "Make Firmware, Not War",
+ "url": "https://thefirmwarehub.com/", "author": {"@type": "Person", "name": "zvenson", "url": "https://github.com/zvenson"}}
+</script>
+<meta name="theme-color" content="#151213">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23151213'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='15' text-anchor='middle' fill='%2342f5f5'%3EFH%3C/text%3E%3C/svg%3E">
+<style>
+  /* the FM-1 hub's look: warm dark, cyan / blue / pink / beige */
+  :root { --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435; --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9;
+          --cyan: #42f5f5; --blue: #afd9f4; --pink: #f4c0cb; --beige: #e6d1b9; }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16.5px/1.65 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--cyan); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { margin: 0 auto; padding: 0 clamp(16px, 4vw, 72px); max-width: 1400px; }
+  nav { border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+  .mark { font-size: 21px; font-weight: 300; color: var(--fg); } .mark:hover { text-decoration: none; } .mark b { font-weight: 800; color: var(--cyan); }
+  nav .home { font-size: 14px; color: var(--dim); }
+  .strip { display: flex; height: 4px; } .strip i { flex: 1; }
+  .strip i:nth-child(1) { background: var(--cyan); } .strip i:nth-child(2) { background: var(--blue); }
+  .strip i:nth-child(3) { background: var(--pink); } .strip i:nth-child(4) { background: var(--beige); }
+  header { padding: 72px 0 48px; text-align: center;
+           background: radial-gradient(900px 420px at 80% 10%, rgba(66, 245, 245, .10), transparent 70%),
+                       radial-gradient(700px 380px at 10% 100%, rgba(244, 192, 203, .08), transparent 70%); }
+  .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 16px; }
+  h1 { font-size: clamp(42px, 6vw, 92px); line-height: 1.04; font-weight: 300; margin: 0 0 22px; letter-spacing: -.5px; }
+  h1 b { font-weight: 800; background: linear-gradient(90deg, var(--cyan), var(--blue) 45%, var(--pink) 75%, var(--beige));
+         -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 19px; color: var(--text); max-width: 40em; margin: 0 auto; }
+  main { padding: 16px 0 88px; }
+  h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 24px; font-weight: 600; text-align: center; }
+  .devices { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 24px; }
+  .dev { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 28px; display: flex;
+         flex-direction: column; gap: 14px; overflow: hidden; transition: transform .12s, border-color .15s, background .15s; }
+  .dev::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--c); }
+  a.dev { color: inherit; } a.dev:hover { text-decoration: none; transform: translateY(-3px); border-color: var(--c); background: var(--panel2); }
+  .dev h3 { margin: 0; font-size: 34px; font-weight: 800; letter-spacing: -.3px; line-height: 1.1; color: var(--c); }
+  .dev h3 small { font-size: 15px; font-weight: 600; color: var(--dim); margin-left: 10px; }
+  .dev p { margin: 0; color: var(--text); }
+  .shots { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .shots img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: #0e0c0d; image-rendering: pixelated; display: block; }
+  .go { align-self: flex-start; font-weight: 700; font-size: 15px; padding: 14px 22px; border-radius: 10px; background: var(--c); color: #121011; }
+  .dev.next { --c: var(--pink); border-style: dashed; justify-content: center; text-align: center; align-items: center; }
+  .dev.next .plus { font-size: 72px; font-weight: 200; line-height: 1; color: var(--pink); }
+  .dev.next .go { align-self: center; background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); }
+  .dev.next .go:hover { box-shadow: inset 0 0 0 1px var(--pink); text-decoration: none; }
+  .why { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+  .why div { border-top: 1px solid var(--line); padding-top: 18px; }
+  .why b { display: block; font-size: 18px; margin-bottom: 6px; } .why p { margin: 0; color: var(--text); }
+  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
+  footer a { color: var(--text); }
+  @media (max-width: 900px) { .devices, .why { grid-template-columns: 1fr; } .shots { grid-template-columns: repeat(3, 1fr); } header { padding: 48px 0 32px; }
+    .dev { padding: 22px; } .dev h3 { font-size: 28px; } nav .home { display: none; } }
+</style>
+</head>
+<body>
+<nav><div class="wrap"><a class="mark" href="/">The <b>Firmware Hub</b></a>
+  <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
+<div class="strip"><i></i><i></i><i></i><i></i></div>
+
+<header><div class="wrap">
+  <p class="eyebrow">Open source only · one click each</p>
+  <h1>Make <b>Firmware</b>,<br>Not War.</h1>
+  <p class="lead">Small music machines can be many instruments. Here are the open-source firmwares for them, collected per device,
+     always the newest release, installed from the browser. Pick your device.</p>
+</div></header>
+
+<main><div class="wrap">
+  <h2 class="sec">Devices</h2>
+  <div class="devices">
+    <a class="dev" href="https://fm1.designburgapps.com/" style="--c: var(--cyan)">
+      <h3>M-VAVE FM-1<small id="fm1n">18 firmwares</small></h3>
+      <div class="shots" id="shots"></div>
+      <p>The little FM synth with a sequencer, turned into a sampler, a DX7, a groovebox, a dungeon synth, a kalimba and more:
+         synths, grooveboxes, drums and chord instruments by their makers, each installed in a minute, and back to the official firmware any time.</p>
+      <span class="go">Open the FM-1 hub →</span>
+    </a>
+    <section class="dev next">
+      <div class="plus">+</div>
+      <h3 style="color: var(--fg)">Your device</h3>
+      <p>The next one is on its way. Made open-source firmware for another small music machine? It goes here with its own hub.</p>
+      <a class="go" href="mailto:sven@designburg.net?subject=The%20Firmware%20Hub">Mail sven@designburg.net</a>
+    </section>
+  </div>
+
+  <div class="why">
+    <div><b>Open source only</b><p>Every firmware is free software with its source (GPL-3.0), taken unchanged from its makers' releases and kept with its source.</p></div>
+    <div><b>Always the newest</b><p>The hub looks at every project's repository several times a day and offers its newest release, checked before it is listed.</p></div>
+    <div><b>No need to pick a side</b><p>Try them all, keep the one you love, switch back tomorrow. The makers get the credit, the stars and the questions.</p></div>
+  </div>
+</div></main>
+
+<footer><div class="wrap">
+  Every firmware belongs to its authors; device names and trademarks belong to their owners, not affiliated with them. Unofficial firmware, free and without warranty.
+  <br><a href="https://designburg.net/">designburg.net</a> · <a href="https://zp12.designburgapps.com/impressum.html">Impressum · Datenschutz</a>
+  · <a href="https://www.youtube.com/@sonzven?sub_confirmation=1" target="_blank" rel="noopener">▶ YouTube: @sonzven</a>
+  · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a>
+</div></footer>
+
+<script>
+"use strict";
+// the FM-1's firmwares: its catalogue (the FM-1 hub allows this origin), their screens; without it the card stays as written
+const FM1 = "https://fm1.designburgapps.com/";
+fetch(FM1 + "catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.json()).then((c) => {
+  const l = c.firmwares || [];
+  document.getElementById("fm1n").textContent = l.length + " firmwares";
+  const pick = ["zp12", "sloopdx", "felucca", "sloop", "x0x", "fomni", "ghoulbox", "fimba", "choralroot", "jangada", "jiant", "hortator"];
+  const ids = pick.filter((i) => l.some((f) => f.id === i)).slice(0, 12);
+  document.getElementById("shots").innerHTML = ids.map((i) => `<img src="${FM1}img/${i}.png" alt="" loading="lazy">`).join("");
+}).catch(() => {
+  document.getElementById("shots").innerHTML = ["zp12", "sloopdx", "felucca", "sloop", "x0x", "fomni"].map((i) => `<img src="${FM1}img/${i}.png" alt="" loading="lazy">`).join("");
+});
+</script>
+</body>
+</html>

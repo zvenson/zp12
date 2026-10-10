@@ -23,6 +23,13 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
     (HERE / "fm1" / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
                                              f'<url><loc>https://fm1.designburgapps.com/</loc><lastmod>{date.today()}</lastmod>'
                                              '<changefreq>daily</changefreq><priority>1.0</priority></url>\n</urlset>\n')
+    hub = HERE / "firmwarehub"                          # thefirmwarehub.com: the start page, a card per device
+    hub.mkdir(exist_ok=True)
+    (hub / "index.html").write_text((HERE / "web" / "firmwarehub.html").read_text(encoding="utf-8"), encoding="utf-8")
+    (hub / "robots.txt").write_text("User-agent: *\nAllow: /\nSitemap: https://thefirmwarehub.com/sitemap.xml\n")
+    (hub / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                                     f'<url><loc>https://thefirmwarehub.com/</loc><lastmod>{date.today()}</lastmod>'
+                                     '<changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>\n')
     snip = Path(sloopdx) / "tools" / "matomo_snippet.py"
     if snip.exists():
         subprocess.run([sys.executable, str(snip), str(out)], check=True, capture_output=True)
