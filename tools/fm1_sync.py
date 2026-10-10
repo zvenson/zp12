@@ -89,7 +89,7 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          what="SLOOP's live workflow with Dexed's DX7 engine and 128 steps a track: six operators, 32 algorithms, "
               "your own .syx banks, every voice edited on the FM-1, FM drums you program."),
     dict(id="x0x", play="https://charlesvestal.github.io/fm1-x0x/emu/",
-         kind="groove", name="X0X", author="Charles Vestal", repo="charlesvestal/fm1-x0x", ident=r"FM-1_900\d{4}",
+         kind="groove", name="X0X", author="Charles Vestal", repo="charlesvestal/fm1-x0x", ident=r"FM-1_90\d{5}",
          src="github",
          what="A groovebox: 909 and 808 drums, two 303s with TB-3PO, a breakbeat generator and song mode."),
     dict(id="fomni", play="https://charlesvestal.github.io/fm1-fomni/emu/",
