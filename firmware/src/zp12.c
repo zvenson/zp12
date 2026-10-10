@@ -335,11 +335,13 @@ static void zp12_main(void)
             if ((d = fm1_enc_take(6)) != 0)
                 ui_preset(d);
         }
-        while (mi_r != mi_w) {                          /* USB MIDI in: notes 36..67 play the 32 pads */
+        while (mi_r != mi_w) {                          /* USB MIDI in: notes 36..67 play the 32 pads, */
             uint32_t pk = midi_in_q[mi_r % MQ], st = (pk >> 8) & 0xF0u, nt = (pk >> 16) & 0x7Fu, vel = pk >> 24 & 0x7Fu;
-            mi_r++;
+            mi_r++;                                     /* Program Change 0..15 picks loop 1..16 (as a black key) */
             if (st == 0x90u && vel && nt >= 36u && nt < 68u)
                 pad_hit(nt - 36u, vel);
+            else if (st == 0xC0u && nt < SQ_NSEG)
+                ui_loop(nt);
         }
         {
             int32_t a = fm1_adc_read(FM1_ADC_MASTER);   /* the MASTER knob */

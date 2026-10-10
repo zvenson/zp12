@@ -573,6 +573,16 @@ static uint32_t key_pad(uint32_t k)            /* white keys 1-8: bank A (C), 9-
     return w != 0xFFu ? ui.pair * 16u + w : 0xFFu;
 }
 
+/* loop (segment) b: now when stopped, else at the end of the loop playing (a black key, a MIDI Program Change); say it */
+static void ui_loop(uint32_t b)
+{
+    char m[24], *p = cat(m, "LOOP ");
+    sq_post(RQ_LOOP, 0, b);
+    p = num(p, (int32_t)b + 1, b + 1u >= 10u ? 2u : 1u, 0);
+    cat(p, sq.playing && b != sq.seg ? " NEXT" : "");
+    ui_say(m);
+}
+
 /* key k down; erase: LFO held (the pad's hits go: as the playhead passes, or all at once when stopped) */
 static void key_down(uint32_t k, int erase)
 {
@@ -627,13 +637,7 @@ static void key_down(uint32_t k, int erase)
     if (white_of(k) == 0xFFu && !ui.multi && !erase) {   /* a black key: loop (segment) 1-11, at the loop's end */
         uint32_t b = 0, i;
         for (i = 0; i < k; i++) b += white_of(i) == 0xFFu;
-        sq_post(RQ_LOOP, 0, b);
-        {   /* say it: now, or at the end of the loop playing */
-            char m[24], *p = cat(m, "LOOP ");
-            p = num(p, (int32_t)b + 1, b + 1u >= 10u ? 2u : 1u, 0);
-            cat(p, sq.playing && b != sq.seg ? " NEXT" : "");
-            ui_say(m);
-        }
+        ui_loop(b);
         return;
     }
     if (ui.multi && !erase) {                    /* MULTI PITCH: the sound, F4 (key 12) as written */

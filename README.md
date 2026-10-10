@@ -91,7 +91,7 @@ switching it on (USB rescue).
 | ENV · GLO · SAVE | tap tempo · SETUP (TEMPO, BACK: pages back after 6–60 s or never, RESET: turn twice, the factory state), CLICK (CLICK · COUNT · DUB), OUTPUT (SMOOTH) · save now (it saves by itself when stopped and quiet); SAVE held + a black key: the loop into that loop |
 | ARP | MULTI PITCH: the last sound over all 27 keys (F4 as tuned) |
 | SELECT · ALGORITHM · PRESETS | tempo · the sound to edit · the sample of the last pad (one sample on many pads, each tuned its own way) |
-| USB MIDI | notes 36–67 play pads A1–D8 |
+| USB MIDI | notes 36–67 play pads A1–D8; Program Change 0–15 picks loop 1–16 (as a black key: at the loop's end) |
 | Own samples | https://zp12.designburgapps.com/editor/: sample (mic, interface, line-in, threshold start) or drop a WAV, trim, 26 / 27.5 kHz, 45→33, hear it as the FM-1 plays it, onto a pad (2.5 s free, 6.3 s with sloopDX's bank room; 1.4+) |
 | Backup | https://zp12.designburgapps.com/backup/: loops, sounds, songs, samples and sloopDX's DX7 banks in one file, and back (Chrome / Edge, 1.3+) |
 
