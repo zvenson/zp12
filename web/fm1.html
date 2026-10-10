@@ -449,10 +449,25 @@ const HINT = { nosysex: "Click the lock left of the address, set MIDI devices to
                nomidi: "" };
 const hint = (e) => HINT[e && e.code] ?? "Stuck? Hold OCT− while switching on, then Install again.";
 
+// an FM-1 there before anything is asked or counted (most "errors" were a click without one plugged in):
+// null when there is one, else the error, counted as "No device" and not as a failed install
+async function probe(what) {
+  try {
+    const dev = await new Updater(await midi(), log).find(() => true);
+    if (!dev) throw Object.assign(new Error("No FM-1 found."), { code: "notfound" });
+    dev.link.close();
+    return null;
+  } catch (e) { ev("No device", `${what}: ${e.code || e.message}`); return e; }
+}
+
 const TOTAL = 74 + 1179;                        // the reads of a package: step 1, step 2 (as the installers count them)
 async function install(f, el) {
   if (writing) return;
   const msg = (t, cls) => { const m = el.querySelector(".msg"); m.textContent = t; m.style.color = cls === "err" ? "var(--err)" : cls === "ok" ? "var(--ok)" : ""; };
+  msg("Looking for the FM-1…");
+  const none = await probe(`${f.name} ${f.version}`);
+  if (none) { msg((none.code ? `${none.code}: ` : "") + none.message + (hint(none) ? " · " + hint(none) : ""), "err"); return; }
+  msg("");
   const was = whoIs(current);
   if (!confirm(`Install ${f.name} ${f.version}${was && (was.fw || was.name) ? " over " + (was.fw ? was.fw.name : was.name) : ""}?\n\nSaved what you want to keep? The new firmware may not read the old one's projects.`)) return;
   ev("Install", `${f.name} ${f.version}`);
@@ -501,7 +516,10 @@ $("stock-file").onchange = async () => {
 };
 $("stock-saved").onchange = () => { $("stock-go").disabled = !stock || !$("stock-saved").checked; };
 $("stock-go").onclick = async () => {
-  if (writing || !stock || !confirm("Install the official M-VAVE firmware V15?")) return;
+  if (writing || !stock) return;
+  const none = await probe("M-VAVE V15");
+  if (none) { $("stock-msg").textContent = (none.code ? none.code + ": " : "") + none.message + (hint(none) ? " · " + hint(none) : ""); return; }
+  if (!confirm("Install the official M-VAVE firmware V15?")) return;
   ev("Install", "M-VAVE V15");
   writing = true; render();
   try {
