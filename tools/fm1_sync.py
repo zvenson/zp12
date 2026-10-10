@@ -205,6 +205,8 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
                 raise ValueError(f"{version}: identity {ident!r} or the update loader not as expected")
         except Exception as e:                        # (GitHub down, a broken release: the last good one stays)
             print(f"fm1_sync: {f['name']}: {e}", file=sys.stderr)
+            if isinstance(e, urllib.error.HTTPError) and e.code == 404:
+                continue                              # (the repo deleted or private: off the page, back when it is again)
             if f["id"] in old and (out / old[f["id"]]["pkg"]).exists():
                 cat.append(old[f["id"]] | {k: f[k] for k in ("kind", "name", "author", "what")} | {k: f.get(k) for k in ("editor", "play")}
                            | stars_daily(f, old[f["id"]]))   # (the stars on their own: a new count even without the release)
