@@ -382,7 +382,11 @@ const EXT = $("baudgirl"), EXT_AT = 4;
 const EXT_TILE = `<a href="#baudgirl" data-id="baudgirl" class="ext" title="Baud Girl (FM-1+VA), a link"><b>FM-1+VA</b>Baud Girl</a>`;
 function lineup() {
   $("lineup").innerHTML = cat.map((f, i) => (i === EXT_AT ? EXT_TILE : "") + `<a href="#fw-${esc(f.id)}" data-id="${esc(f.id)}"><img src="img/${esc(f.id)}.png" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy"></a>`).join("");
-  $("lineup").querySelectorAll("a").forEach((a) => a.onclick = (e) => {   // (to its card: all kinds shown if a chip hides it, a flash)
+  toCards($("lineup"));
+}
+// a link to a card (the pictures at the top, the recently updated bar): all kinds shown if a chip hides it, a flash
+function toCards(box) {
+  box.querySelectorAll("a[data-id]").forEach((a) => a.onclick = (e) => {
     e.preventDefault();
     let el = $("grid").querySelector(`.fw[data-id="${a.dataset.id}"]`);
     if (!el) return;
@@ -445,15 +449,16 @@ function badge(f) {
 function remember() {
   try { localStorage.setItem(SEEN_KEY, JSON.stringify(Object.fromEntries(cat.map((f) => [f.id, f.version])))); } catch (e) {}
 }
-// the bar at the top: the newest releases (those of the last 3 days, 3 to 8), each a link to its release notes
+// the bar at the top: the newest releases (those of the last 3 days, 3 to 8), each a link to its card (the release notes there)
 function recent() {
   const all = [...cat].filter((f) => f.date).sort((a, b) => (b.published || b.date).localeCompare(a.published || a.date));
   const l = all.slice(0, Math.min(8, Math.max(3, all.filter(isNew).length)));   // (all of the last 3 days: 3 to 8)
   if (!l.length) return;
   const day = (d) => new Date(d + "T00:00:00Z").toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
   $("recent").innerHTML = `<div class="wrap"><span class="lbl">Recently updated</span>${l.map((f) =>
-    `<a href="${esc(f.release || f.site)}" target="_blank" rel="noopener" style="--c: ${LOOK[f.id] || "#3b4bf5"}" title="${esc(f.name)} ${esc(f.version)}: the release notes">` +
+    `<a href="#fw-${esc(f.id)}" data-id="${esc(f.id)}" style="--c: ${LOOK[f.id] || "#3b4bf5"}" title="${esc(f.name)} ${esc(f.version)}: to its card">` +
     `<b>${esc(f.name)}</b> ${esc(short(f.version))} <span>· ${day(f.date)}</span>${isUpd(f) ? badge(f) : ""}</a>`).join("")}</div>`;
+  toCards($("recent"));
   $("recent").hidden = false;
 }
 
