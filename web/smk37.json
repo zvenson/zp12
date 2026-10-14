@@ -47,6 +47,10 @@
    "source": "https://github.com/zvenson/obervave",
    "links": [
     [
+     "▶ Play in the browser",
+     "/play/obervave/"
+    ],
+    [
      "Packages",
      "https://github.com/zvenson/obervave/tree/main/docs/firmware/smk37"
     ],

@@ -109,7 +109,7 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://eli7vh.github.io/Felucca/mod/",
          what="Felucca played from an Arturia MiniLab 3: track faders, a DJ filter, momentary effect pads; 32 patches a "
               "bank, 12 evolving songs, revoiced 808 and CR78 kits."),
-    dict(id="obervave", added="2026-10-13",
+    dict(id="obervave", play="https://thefirmwarehub.com/play/obervave/", added="2026-10-13",
          kind="synth", name="OberVave", author="zvenson", repo="zvenson/obervave", ident=r"FM-1_95\d",
          src="repo:docs/firmware",
          what="An 8-voice analog-style poly in the spirit of the classic American polys of 1979-84: two oscillators a "
