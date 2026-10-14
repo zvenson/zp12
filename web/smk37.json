@@ -1,0 +1,266 @@
+{
+ "_": "The SMK-37 page's firmwares (tools/make_fm1.py renders web/smk37.html's <!--SMK-CARDS--> from it). Versions as on the makers' installers (genkigenki.github.io/smk37: its const FW); update them here when they change.",
+ "own": [
+  {
+   "id": "felucca-smk",
+   "name": "Felucca SMK",
+   "version": "0.9.24 beta",
+   "by": "Chance Roth (ChanceTheMaker)",
+   "img": "img/smk-mix.png",
+   "kind": [
+    "synth",
+    "sequencer"
+   ],
+   "beta": true,
+   "models": "Pro · Elite",
+   "what": "Felucca's synthesis and sequencing on the SMK's 37 keys, pads, knobs, faders, wheels and display: engines from FM6 to phase distortion, chiptune and samples, a step sequencer, a browser Studio and a simulator.",
+   "note": "Its installer builds the package from the keyboard's official firmware 016 and its calibration: 016 first, back up before.",
+   "install": "https://chancethemaker.github.io/felucca-smk/",
+   "source": "https://github.com/ChanceTheMaker/felucca-smk",
+   "links": [
+    [
+     "▶ Simulator",
+     "https://chancethemaker.github.io/felucca-smk/simulator.html"
+    ],
+    [
+     "✎ Studio",
+     "https://chancethemaker.github.io/felucca-smk/editor.html"
+    ]
+   ]
+  },
+  {
+   "id": "makkuro37",
+   "name": "Makkuro37",
+   "version": "0.1",
+   "by": "genkigenki",
+   "img": "img/makkuro37.png",
+   "kind": [
+    "synth"
+   ],
+   "models": "Pro · Elite · MKE-P37",
+   "what": "A microtonal drone synth: eight drones in eight columns, each a little soot creature on the screen, the pads gate them, a CHAOS pad, fader banks, 96 presets in six themes. After the Subharmonicon and the Horn of Abraxas.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/Makkuro37",
+   "links": [
+    [
+     "▶ Simulator",
+     "https://genkigenki.github.io/smk37/makkuro37-sim/"
+    ]
+   ]
+  }
+ ],
+ "ports": [
+  {
+   "id": "snoop37",
+   "name": "Snoop37",
+   "version": "2.6.3",
+   "by": "isod89",
+   "port": "genkigenki",
+   "fm1": "sloop",
+   "orig": "SLOOP",
+   "orig_repo": "isod89/sloop-fm1",
+   "img": "/img/sloop.png",
+   "wide": false,
+   "kind": [
+    "groove"
+   ],
+   "what": "SLOOP, the four-track looper groovebox, with the SMK's pads in track colours, a pad sound picker, fader banks and drums on the outer keys.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/sloop-fm1/tree/snoop37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "x0x37",
+   "name": "X0X",
+   "version": "0.2",
+   "by": "Charles Vestal",
+   "port": "genkigenki",
+   "fm1": "x0x",
+   "orig": "X0X",
+   "orig_repo": "charlesvestal/fm1-x0x",
+   "img": "/img/x0x.png",
+   "wide": false,
+   "kind": [
+    "groove",
+    "drums"
+   ],
+   "what": "A 909, an 808, two 303s with a line generator and a breakbeat player, all at once; the pads as a 16-step grid.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/fm1-x0x/tree/smk37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "fomni37",
+   "name": "FoMni",
+   "version": "0.2",
+   "by": "Charles Vestal",
+   "port": "genkigenki",
+   "fm1": "fomni",
+   "orig": "FoMni",
+   "orig_repo": "charlesvestal/fm1-fomni",
+   "img": "/img/fomni.png",
+   "wide": false,
+   "kind": [
+    "chords"
+   ],
+   "what": "An Omnichord-style chord harp: the 16 pads become the strum plate, the keybed holds the chords.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/fm1-fomni/tree/smk37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "maku37",
+   "name": "MAKU",
+   "version": "0.1",
+   "by": "okumurari",
+   "port": "genkigenki",
+   "fm1": "maku",
+   "orig": "MAKU",
+   "orig_repo": "okumurari2/maku",
+   "img": "/img/maku.png",
+   "wide": false,
+   "kind": [
+    "other"
+   ],
+   "what": "An always-on ambience machine: power it on and a new, random, in-key world is already playing; verbs on the buttons and wheels.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/MAKU37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "rainbow37",
+   "name": "Rainbow Mode",
+   "version": "0.2",
+   "by": "joshbartlettband-web",
+   "port": "genkigenki",
+   "fm1": "rainbow",
+   "orig": "Rainbow Mode",
+   "orig_repo": "joshbartlettband-web/felucca-rainbow",
+   "img": "/img/rainbow.png",
+   "wide": false,
+   "kind": [
+    "other"
+   ],
+   "what": "A music toy for kids: colour-coded notes on the pads, 40 friends who sing along, no menus.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/RAINBOW37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "ghoulbox",
+   "name": "GHOULBOX",
+   "version": "2.1",
+   "by": "Jason Persinger",
+   "port": "genkigenki",
+   "fm1": "ghoulbox",
+   "orig": "GHOULBOX",
+   "orig_repo": "jasonpersinger/ghoulbox-fm1-dungeon-synth",
+   "img": "/img/ghoulbox.png",
+   "wide": true,
+   "kind": [
+    "synth"
+   ],
+   "what": "Dungeon synth: dark ambient, medieval and fantasy sounds, drones, a hurdy-gurdy crank and two sounds at once.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/Felucca/tree/ghoulbox-smk37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "choralroot",
+   "name": "ChoralRoot",
+   "version": "0.21",
+   "by": "Quixotic7",
+   "port": "genkigenki",
+   "fm1": "choralroot",
+   "orig": "ChoralRoot",
+   "orig_repo": "Quixotic7/ChoralRootFM1",
+   "img": "/img/choralroot.png",
+   "wide": false,
+   "kind": [
+    "chords"
+   ],
+   "what": "A chord instrument in the manner of the Orchid: one hand plays roots, the other picks the chord.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/ChoralRootFM1/tree/smk37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "orbit",
+   "name": "ORBIT",
+   "version": "0.7.0",
+   "by": "dspaudio",
+   "port": "genkigenki",
+   "fm1": "orbit",
+   "orig": "ORBIT",
+   "orig_repo": "dspaudio/orbit",
+   "img": "/img/orbit.png",
+   "wide": false,
+   "kind": [
+    "groove"
+   ],
+   "what": "A four-track groovebox with OP-1-inspired screens: three synth parts, a drum machine, an event tape and a mixer.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/orbit/tree/smk37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "amb",
+   "name": "AMB-1",
+   "version": "1.1",
+   "by": "Charles Vestal",
+   "port": "genkigenki",
+   "fm1": "amb",
+   "orig": "AMB-1",
+   "orig_repo": "charlesvestal/fm1-amb",
+   "img": "/img/amb.png",
+   "wide": false,
+   "kind": [
+    "other"
+   ],
+   "what": "A generative ambient machine after Music for Airports: loops of different lengths drift past each other and never repeat.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/fm1-amb/tree/smk37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "polly",
+   "name": "Polly",
+   "version": "0.4.1",
+   "by": "Charles Vestal",
+   "port": "genkigenki",
+   "fm1": "polly",
+   "orig": "Polly",
+   "orig_repo": "charlesvestal/fm1-polly",
+   "img": "/img/polly.png",
+   "wide": false,
+   "kind": [
+    "groove",
+    "chords"
+   ],
+   "what": "A pocket arranger after the Yamaha QY70: a band of eight General MIDI instruments follows the chords you play.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/fm1-polly/tree/smk37",
+   "models": "Pro · Elite · MKE-P37"
+  },
+  {
+   "id": "winamp",
+   "name": "winampFM Synth",
+   "version": "0.1",
+   "by": "Hericdk",
+   "port": "genkigenki",
+   "fm1": "winampfm",
+   "orig": "winampFM Synth",
+   "orig_repo": "hericdk/winampFM",
+   "img": "/img/winampfm.png",
+   "wide": false,
+   "kind": [
+    "groove",
+    "synth"
+   ],
+   "what": "A synth groovebox in the look of Winamp 2.x, built on SLOOP: player, playlist, effect sliders and a visualizer.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/winampFM/tree/smk37",
+   "models": "Pro · Elite · MKE-P37"
+  }
+ ]
+}

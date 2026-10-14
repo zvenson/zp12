@@ -3,19 +3,43 @@
 (web/fm1pkg.js, web/fm1ota.js) inlined, the Matomo count (sloopDX's tools/matomo_snippet.py), into fm1/index.html.
 The catalogue and the packages: tools/fm1_sync.py.
   tools/make_fm1.py [sloopdx repo]"""
-import subprocess, sys
+import html, json, subprocess, sys
 from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parents[1]
 
 
+def smk_cards():
+    """the SMK-37 page's cards from web/smk37.json: (the firmwares made for it, the FM-1 ports), static for the search engines"""
+    d = json.loads((HERE / "web" / "smk37.json").read_text(encoding="utf-8"))
+    e = lambda x: html.escape(str(x), quote=True)
+    out = lambda u, t, c="": f'<a{c} href="{e(u)}" target="_blank" rel="noopener">{t}</a>'
+    def card(f, port):
+        tags = ('<span class="tag beta">beta</span>' if f.get("beta") else "") + (f'<span class="tag port">port</span>' if port else "") + \
+            "".join(f'<span class="tag">{e(k)}</span>' for k in f["kind"]) + f'<span class="tag">{e(f["models"])}</span>'
+        by = (f'{e(f["orig"])} by {out("https://github.com/" + f["orig_repo"], e(f["by"]))}, SMK-37 build by '
+              f'{out("https://github.com/genkigenki", "genkigenki")}' if port else f'by {e(f["by"])}')
+        links = out(f["install"], "Install on its installer ↗", ' class="go"')
+        if port:
+            links += f'<a href="/#fw-{e(f["fm1"])}">On the FM-1 hub</a>'
+        links += "".join(out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
+        return (f'<article class="fw" id="fw-{e(f["id"])}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
+                f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <h3>{e(f["name"])}<small>{e(f["version"])}</small></h3>'
+                f'<div class="by">{by}</div><div class="tags">{tags}</div>\n  <p class="what">{e(f["what"])}</p>'
+                + (f'<div class="note">{e(f["note"])}</div>' if f.get("note") else "")
+                + f'<div class="links">{links}</div><div class="meta">GPL-3.0 · {out(f["source"], "source")}</div></article>\n')
+    return "".join(card(f, False) for f in d["own"]), "".join(card(f, True) for f in d["ports"]), str(len(d["own"]) + len(d["ports"]))
+
+
 def devices(text, dev):
     """the devices menu (web/devices.css, web/devices.html) into a page: /*DEVICES*/ in its style, <!--DEVICES--> in its nav;
     the page's own device marked"""
     menu = (HERE / "web" / "devices.html").read_text(encoding="utf-8").replace(f'data-dev="{dev}"', f'data-dev="{dev}" aria-current="page"')
+    own, ports, n = smk_cards()
     return (text.replace("/*DEVICES*/\n", (HERE / "web" / "devices.css").read_text(encoding="utf-8"))
-                .replace("<!--DEVICES-->\n", menu))
+                .replace("<!--DEVICES-->\n", menu).replace("<!--SMK-OWN-->", own).replace("<!--SMK-PORTS-->", ports)
+                .replace("<!--SMK-N-->", n))
 
 
 def main(sloopdx=str(HERE.parent / "sloopdx")):
@@ -43,7 +67,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
     smk = HERE / "fm1" / "smk37"                        # the SMK-37 Pro's hub: its firmwares (one so far), installed from their own pages
     (smk / "img").mkdir(parents=True, exist_ok=True)
     (smk / "index.html").write_text(devices((HERE / "web" / "smk37.html").read_text(encoding="utf-8"), "smk37"), encoding="utf-8")
-    for p in (HERE / "firmwarehub" / "img").glob("smk-*.png"):
+    for p in (HERE / "firmwarehub" / "img").glob("*.png"):    # (smk-*: Felucca SMK's screens, makkuro37: its home screen)
         (smk / "img" / p.name).write_bytes(p.read_bytes())
     hub = HERE / "firmwarehub"                          # thefirmwarehub.com: the start page, a card per device
     hub.mkdir(exist_ok=True)
