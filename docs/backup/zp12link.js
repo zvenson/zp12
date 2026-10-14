@@ -105,8 +105,9 @@
       for (let i = 32; i < d.length; i++) { if (d[i]) s += String.fromCharCode(d[i]); else { names.push(s); s = ""; } }
       return { waves: d.slice(0, 32), kit: names };
     }
-    async assign(pad, wave, chop) {   // chop: the pad's CHOP group 0-3 (protocol 4; left as it is when not given)
-      const r = await this.request(CMD.ASSIGN, (pad & 31) | (wave & 63) << 8 | (chop != null && this.info?.proto >= 4 ? 4 | (chop & 3) : 0) << 16);
+    async assign(pad, wave, chop) {   // chop: the pad's CHOP group 0-8 (protocol 5; 4 knew 1-3; left as it is when not given)
+      const p = this.info?.proto, g = chop == null || p < 4 ? 0 : p >= 5 ? 16 | (chop & 15) : chop <= 3 ? 4 | chop : 0;
+      const r = await this.request(CMD.ASSIGN, (pad & 31) | (wave & 63) << 8 | g << 16);
       if (r.rc) throw new Error(`that sample is not on the FM-1 (${r.rc})`);
     }
     async read(addr, n) {
@@ -502,7 +503,7 @@
   // several samples onto the FM-1 as one: all their sectors written first, then the directory once, then the
   // pads. Until the directory is written nothing changes for the FM-1 (the sectors were free): a stop
   // (cancelled() true) or an error before it leaves the old samples and pads as they were.
-  // list: [{name, y, rate, slow, oct, pad (-1: none), chop (the pad's CHOP group 0-3, optional)}] -> the slots
+  // list: [{name, y, rate, slow, oct, pad (-1: none), chop (the pad's CHOP group 0-8, optional)}] -> the slots
   async function uploadMany(link, d, list, banks = false, progress = () => {}, cancelled = () => false) {
     const at = plan(d, list.map((s) => s.y.length), banks);
     if (!at) {

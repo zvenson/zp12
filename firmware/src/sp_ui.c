@@ -754,14 +754,14 @@ static void knob(uint32_t n, int32_t d)
         if (n == 3u) s->flags = (uint8_t)(one > 0 ? s->flags | SPF_33 : s->flags & ~SPF_33);
         break;
     case PG_OUT:
-        if (n == 0u) {                          /* CHOP group --, 1-3: its pads cut each other; the pads held take it too */
-            uint32_t g = (uint32_t)sp_clamp((int32_t)SPF_CHOP(s->flags) + one, 0, 3), k, cnt = 1;
+        if (n == 0u) {                          /* CHOP group --, 1-8: its pads cut each other; the pads held take it too */
+            uint32_t g = (uint32_t)sp_clamp((int32_t)SPF_CHOP(s->flags) + one, 0, 8), k, cnt = 1;
             char m[24], *p;
-            s->flags = (uint8_t)((s->flags & ~12u) | g << 2);
+            s->flags = SPF_CHOP_SET(s->flags, g);
             for (k = 0; k < 27u; k++) {
                 uint32_t pd = (ui.keys >> k) & 1u ? key_pad(k) : 0xFFu;
                 if (pd < SP_NSOUND && pd != ui.sel) {
-                    sp_sound[pd].flags = (uint8_t)((sp_sound[pd].flags & ~12u) | g << 2);
+                    sp_sound[pd].flags = SPF_CHOP_SET(sp_sound[pd].flags, g);
                     cnt++;
                 }
             }

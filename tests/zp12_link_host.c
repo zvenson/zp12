@@ -143,7 +143,7 @@ int main(void)
             continue;
         }
         if (!strncmp(line, "CHOPS", 5)) {               /* each pad's CHOP group */
-            for (i = 0; i < 32u; i++) printf("%u ", (sp_sound[i].flags >> 2) & 3u);
+            for (i = 0; i < 32u; i++) printf("%u ", (sp_sound[i].flags >> 2) & 15u);
             printf("\n");
             fflush(stdout);
             continue;

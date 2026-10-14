@@ -166,7 +166,9 @@ int main(int argc, char **argv)
     fm1_ms += 20; ui_draw(); ppm("zp12-chop");
     if (SPF_CHOP(sp_sound[0].flags) != 1u || SPF_CHOP(sp_sound[1].flags) != 1u || SPF_CHOP(sp_sound[3].flags) != 1u ||
         SPF_CHOP(sp_sound[4].flags) || strcmp(ui.msg, "4 PADS CHOP 1")) { printf("zp12 ui: OUT > CHOP on held pads FAIL (%s)\n", ui.msg); return 1; }
-    knob(0, -1);
+    for (i = 0; i < 9u; i++) knob(0, 1);
+    if (SPF_CHOP(sp_sound[0].flags) != 8u || strcmp(ui.msg, "CHOP 8")) { printf("zp12 ui: OUT > CHOP up to 8 FAIL\n"); return 1; }
+    for (i = 0; i < 9u; i++) knob(0, -1);
     if (SPF_CHOP(sp_sound[0].flags) || SPF_CHOP(sp_sound[1].flags) != 1u || strcmp(ui.msg, "NO CHOP")) { printf("zp12 ui: OUT > CHOP off FAIL\n"); return 1; }
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;

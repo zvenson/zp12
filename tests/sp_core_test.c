@@ -247,11 +247,11 @@ int main(int argc, char **argv)
         }
         check(okc, "CUT: pads 1-2 of each bank filtered, the other 24 pads not");
     }
-    {   /* CHOP: A1-A4 in group 1, A5 in group 2, A6 none: a hit stops its group's other pads, nothing else */
+    {   /* CHOP: A1-A4 in group 8, A5 in group 2, A6 none: a hit stops its group's other pads, nothing else */
         uint32_t k, ok1, ok2;
         for (k = 0; k < 6u; k++) {
             sound(k, 0, 0, 127, 100, 0, k);
-            sp_sound[k].flags = (uint8_t)((k < 4u ? 1u : k == 4u ? 2u : 0u) << 2);
+            sp_sound[k].flags = (uint8_t)((k < 4u ? 8u : k == 4u ? 2u : 0u) << 2);
             sp_trigger(k, 127);
         }
         sp_trigger(2, 127);

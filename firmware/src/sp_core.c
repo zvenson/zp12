@@ -27,9 +27,10 @@ typedef struct {                        /* a wave: where its packed samples are 
 } sp_wave_t;
 
 enum { SPF_REVERSE = 1, SPF_33 = 2 };   /* SPF_33: stored at 45 rpm, played at 33 1/3 (rate x 33/45) */
-/* CHOP group 1-3 in flags bits 2-3 (0: none): a hit cuts the pads of its group on the other channels too, so the
+/* CHOP group 1-8 in flags bits 2-5 (0: none): a hit cuts the pads of its group on the other channels too, so the
  * chops of a loop on A1-A8 cut each other as one voice (a channel cuts its own sound anyway) */
-#define SPF_CHOP(f) (((f) >> 2) & 3u)
+#define SPF_CHOP(f) (((f) >> 2) & 15u)
+#define SPF_CHOP_SET(f, g) ((uint8_t)(((f) & ~60u) | ((uint32_t)(g) & 15u) << 2))
 
 typedef struct {                        /* a sound (a pad) */
     uint8_t wave;                       /* index into sp_wave[] (0xFF: none) */
