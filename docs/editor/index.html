@@ -201,7 +201,7 @@
       <div class="chips" id="chips"></div>
       <div class="legend">Each pad plays on its own channel (pad 1–8 = channel 1–8 in every bank):
         <i style="border-color:#e0a84f"></i>1–2 the filter (CUT, RESO) <i style="border-color:#6f8fcf"></i>3–6 a fixed low-pass (9 / 12 kHz)
-        <i style="border-color:#33497c"></i>7–8 open. Two pads on one channel cut each other (A1 and B1).</div>
+        <i style="border-color:#33497c"></i>7–8 open. Two pads on one channel cut each other (A1 and B1); with <b>Cut each other</b> all the chops do (their CHOP group, EDIT → OUT on the FM-1, zp12 2.4).</div>
       <div class="row" id="c-selrow" style="display:none">
         <b id="c-selname" style="font-family:'Courier New',monospace"></b>
         <label class="chk" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="c-keep"> keep</label>
@@ -213,6 +213,7 @@
         <label>Onto the pads from<select id="c-pad"></select></label>
         <label>Rate<select id="c-rate"><option value="26040">26.04 kHz (the SP-1200)</option><option value="27500">27.5 kHz (the SP-12)</option></select></label>
         <label>Stored at<select id="c-speed"><option value="0">1×, as it is</option><option value="1">45 → 33</option><option value="2">×2: an octave down on the pad</option><option value="3">×2.7: both</option></select></label>
+        <label>Cut each other<select id="c-chop"><option value="1">yes: CHOP group 1</option><option value="2">yes: CHOP group 2</option><option value="3">yes: CHOP group 3</option><option value="0">no (only on one channel, A1 and B1)</option></select></label>
         <label>Level<select id="c-norm"><option value="1">all together (the loudest at full)</option><option value="2">each chop at full</option><option value="0">as it is</option></select></label>
       </div>
       <div class="mem" id="c-mem"></div>
@@ -257,7 +258,9 @@
     <p>• <b>Chop to pads</b>: load or sample a loop, then <b>Chop to pads</b>. Tap along (space), find the hits, or cut it in equal
        parts or on a tempo grid; drag the markers, leave chops out, shorten them. Every chop goes onto its own pad, from the
        pad you choose on (16 at most), all in one go. A pad's channel is its position (1–8 in every bank): chops on pads 1–2
-       get the filter (CUT, RESO), 3–6 a fixed low-pass, 7–8 none, and A1 and B1 cut each other as the original's channels do.
+       get the filter (CUT, RESO), 3–6 a fixed low-pass, 7–8 none. <b>Cut each other</b> puts the chops in one CHOP group: a hit
+       stops the chop still sounding, as one voice (zp12 2.4; EDIT → OUT → CHOP on the FM-1). Without it only pads on one
+       channel cut each other (A1 and B1).
        Stopped while writing, the FM-1 stays as it was. Each chop takes one of the 24 places.</p>
     <p>• Your samples are in the <a href="../backup/" style="color:#ffb4ab">backup</a>. Replacing one: delete it, add the new one.</p>
     <p>• Private: the sounds are read and converted in your browser and sent over USB to the FM-1; nothing goes to our server (the page only counts its visits, without cookies).</p>
@@ -869,7 +872,7 @@ $("c-send").onclick = () => {
   run(async () => {
     try {
       say("Getting the chops ready…");
-      const g = gainOf(u.use), list = u.use.map((c, j) => ({ name: base + String(c.i + 1).padStart(2, "0"), y: chopEnc(c, g), rate: o.rate, slow: o.slow, oct: o.oct, pad: pads0[j] }));
+      const g = gainOf(u.use), list = u.use.map((c, j) => ({ name: base + String(c.i + 1).padStart(2, "0"), y: chopEnc(c, g), rate: o.rate, slow: o.slow, oct: o.oct, pad: pads0[j], chop: +$("c-chop").value }));
       say("Writing… (Stop leaves the FM-1 as it was)");
       await Z.uploadMany(link, dir, list, useB(), (d, t) => lcd(`WRITING ${list.length} CHOPS ${Math.round(100 * d / t)} %`), () => CH.stop);
       lcd(`${PADS[pads0[0]]}-${PADS[pads0[pads0.length - 1]]} ${base}`);
@@ -932,7 +935,7 @@ refresh();
      no cookies, IPs anonymised on the server, Do Not Track respected -->
 <script>
   var _paq = window._paq = window._paq || [];
-  var _mtmSite = {"zp12.designburgapps.com": "3", "fm1.designburgapps.com": "4", "designburgapps.com": "5",
+  var _mtmSite = {"zp12.designburgapps.com": "3", "thefirmwarehub.com": "4", "fm1.designburgapps.com": "4", "designburgapps.com": "5",
                   "www.designburgapps.com": "5"}[location.hostname] || "1";
   _paq.push(['setDomains', [location.hostname]]);
   _paq.push(['disableCookies']);

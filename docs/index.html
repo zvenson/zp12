@@ -173,7 +173,7 @@
     <div class="cta"><a class="btn primary" href="install/">Install zp12</a><a class="btn ghost" href="#video">Watch the beat</a><a class="btn ghost" href="#cheatsheet">Cheat sheet</a><a class="btn ghost" href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a></div>
   </div>
   <div>
-    <div class="device"><img id="shot" src="img/rec.png" alt="The zp12 screen on the FM-1: recording loop 1" width="480" height="480"><div class="cap" id="shotcap">Recording: LOOP1 2.3, the knobs' columns below</div></div>
+    <div class="device"><img id="shot" src="img/rec.png" alt="The zp12 screen on the FM-1: recording loop 1" width="480" height="480"><div class="cap" id="shotcap">Recording: LOOP1 2.4, the knobs' columns below</div></div>
     <div class="shots" id="dots"></div>
   </div>
 </div></header>
@@ -241,7 +241,7 @@
   <div class="pads"><span class="d">D1<i>SPIN</i></span><span>D2<i>RIM</i></span><span>D3<i>SHAKR</i></span><span class="d">D4<i>PIANO</i></span><span class="d">D5<i>VIBES</i></span><span class="d">D6<i>HORNS</i></span><span>D7<i>TAMB</i></span><span class="d">D8<i>EP Gm9</i></span></div>
   <p class="caption">All from free sources: VSCO-2 CE, VCSL, Sonic Pi (CC0); the Wurlitzer E-piano by Greg Sullivan (CC BY 3.0). No sound from a commercial record or another company's machine.</p>
   <h3 style="margin-top:36px">Sample your own, right in the browser</h3>
-  <p class="intro">New in 2.1: a pad's channel is its position, in every bank, as on the SP-1200: fader 3, mute 3 and solo 3 are always the pads on position 3, and only they cut each other; pads 1–2 have the filter. Holding GLO, the keys 1–8 light while their channel is heard. A 2.0 save moves with it: loops and pads sound as before. New in 2.2: a DAW switches the loops by MIDI Program Change (0–15 = loop 1–16, at the loop's end). New in 2.3: FX held + OCT− / OCT+ throws every pad into the reverb or the echo while held (after SLOOP 2.6).</p>
+  <p class="intro">New in 2.1: a pad's channel is its position, in every bank, as on the SP-1200: fader 3, mute 3 and solo 3 are always the pads on position 3, and they cut each other; pads 1–2 have the filter. Holding GLO, the keys 1–8 light while their channel is heard. A 2.0 save moves with it: loops and pads sound as before. New in 2.2: a DAW switches the loops by MIDI Program Change (0–15 = loop 1–16, at the loop's end). New in 2.3: FX held + OCT− / OCT+ throws every pad into the reverb or the echo while held (after SLOOP 2.6). New in 2.4: CHOP groups (EDIT → OUT, KNOB 1): the pads of a group cut each other wherever they are, so chops on A1–A8 play as one voice; hold pads while turning and they all join. The editor's Chop to pads sets it for you.</p>
   <p class="intro">New in 2.0: the <a href="editor/">sample editor</a> samples from a microphone, an audio interface or the line-in (on a phone its microphone). Set the threshold, make the sound: it starts by itself, as on the old samplers, and stops when you click or the FM-1's room is full. Trim it, hear it as the FM-1 plays it, put it on a pad.</p>
   <a href="editor/"><img src="img/sampling.png" alt="The zp12 sample editor: sampling from the microphone, the level meter, the threshold, the room left, the take trimmed" width="1044" height="930" loading="lazy" style="width:100%;max-width:880px;height:auto;margin:0 auto;border-radius:14px;display:block;box-shadow:0 24px 60px rgba(0,0,0,0.25)"></a>
 </div></section>
@@ -274,7 +274,7 @@
   <div class="csw"><!--cs--><div class="cs"><div class="sheet">
 <header>
   <span class="mark">zp12</span><span class="sub">sampling drums</span><span class="rule"></span>
-  <span class="ver">firmware 2.3 for the M-VAVE FM-1 · zp12.designburgapps.com · 1 / 2</span>
+  <span class="ver">firmware 2.4 for the M-VAVE FM-1 · zp12.designburgapps.com · 1 / 2</span>
 </header>
 
 <div class="grid">
@@ -301,7 +301,7 @@
 
   <div class="box" style="margin-top:6px"><h2>Sound</h2><div class="in">
     <table>
-      <tr><td>Channels</td><td>a pad plays on the channel of its <b>position</b>: pad 3 of every bank on channel 3 (fader 3, mute 3, solo 3). One sound at a time each: a new hit cuts the last (the hats share 3). Pads 1–2 have the filter</td></tr>
+      <tr><td>Channels</td><td>a pad plays on the channel of its <b>position</b>: pad 3 of every bank on channel 3 (fader 3, mute 3, solo 3). One sound at a time each: a new hit cuts the last (the hats share 3); a CHOP group (EDIT → OUT) cuts across channels. Pads 1–2 have the filter</td></tr>
       <tr><td>1–2</td><td>a 4-pole resonant low-pass: open as CUT at the hit, closing two octaves as the sound decays (RESO)</td></tr>
       <tr><td>3–6 · 7–8</td><td>a fixed low-pass · no filter (OUT: CUT / RESO --)</td></tr>
       <tr><td>45 → 33</td><td>TRUNC, SPEED: played at 33/45 of its rate: lower, grainier. Own samples also at ×2 (the editor): an octave down on the pad</td></tr>
@@ -327,7 +327,7 @@
       <tr><td><span class="k">EDIT</span> WAVE</td><td>the pad's sample · COPY> pad · COPY (turn twice) · –</td></tr>
       <tr><td>SOUND</td><td>TUNE (semitones) · FINE · DECAY · LEVEL</td></tr>
       <tr><td>TRUNC</td><td>START · END · DIR (fwd / rev) · SPEED (45 / 33)</td></tr>
-      <tr><td>OUT</td><td>CHAN (the pad's position) · PAN · CUT · RESO (only pads 1–2 filter: on 3–8 they show --)</td></tr>
+      <tr><td>OUT</td><td>CHOP group (--, 1–3: its pads cut each other, wherever they are; hold pads while turning: they all join; the label shows the channel = the pad's position) · PAN · CUT · RESO (only pads 1–2 filter: on 3–8 they show --)</td></tr>
       <tr><td>SENDS</td><td>DRIVE · CHO · DLY · REV: <b>the effects of this pad</b></td></tr>
       <tr><td><span class="k">FX</span> FILTER</td><td><b>DJ filter</b> on the whole mix: left a low-pass, right a high-pass, centre OFF · RESO</td></tr>
       <tr><td>CHORUS</td><td>RATE · DEPTH · MIX</td></tr>
@@ -386,7 +386,7 @@
 <div class="sheet p2">
 <header>
   <span class="mark">zp12</span><span class="sub">in detail</span><span class="rule"></span>
-  <span class="ver">firmware 2.3 · 2 / 2</span>
+  <span class="ver">firmware 2.4 · 2 / 2</span>
 </header>
 
 <div class="grid">
@@ -456,7 +456,7 @@
       <tr><td>DELAY</td><td>TIME 1/4, 1/8, 1/16, 1/32, 8T, 16T; FDBK 0–120</td></tr>
       <tr><td>REVERB PRE</td><td>0–90 ms</td></tr>
       <tr><td>Filters</td><td>pads 1–2: CUT, RESO (4-pole low-pass) · 3–4: 9 kHz · 5–6: 12 kHz · 7–8: none</td></tr>
-      <tr><td>OUT CHAN</td><td>shows the channel: it is the pad's position and does not change</td></tr>
+      <tr><td>OUT CH1–8</td><td>the label shows the channel: it is the pad's position and does not change. Chops that should cut each other: a CHOP group</td></tr>
     </table>
   </div></div>
 
@@ -502,7 +502,7 @@
   </div>
   <div>
     <p class="dim" style="font-size:15px">zp12 is an early test build: try it, and tell what you find on GitHub. Unofficial firmware, free and without warranty: you install it at your own risk.</p>
-    <div class="cta"><a class="btn primary" href="install/">Install zp12 2.3</a><a class="btn ghost" href="https://github.com/zvenson/zp12">Source on GitHub</a><a class="btn ghost" href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a></div>
+    <div class="cta"><a class="btn primary" href="install/">Install zp12 2.4</a><a class="btn ghost" href="https://github.com/zvenson/zp12">Source on GitHub</a><a class="btn ghost" href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a></div>
     <p class="dim" style="font-size:14px;margin-top:14px">zp12 is free and stays free. If it made your day, a coffee is welcome.</p>
   </div>
 </div></section>
@@ -533,7 +533,7 @@
 <script>
 /* the hero's screens, one after the other */
 (() => {
-  const S = [["rec", "Recording: LOOP1 2.3, the knobs' columns below"], ["steps", "SEQ held: the step grid"], ["chord", "C8: a sampled E-piano chord"],
+  const S = [["rec", "Recording: LOOP1 2.4, the knobs' columns below"], ["steps", "SEQ held: the step grid"], ["chord", "C8: a sampled E-piano chord"],
              ["wave", "EDIT → WAVE: any sample on any pad"], ["home", "HOME: the faders on the knobs"]];
   const img = document.getElementById("shot"), cap = document.getElementById("shotcap"), dots = document.getElementById("dots");
   let i = 0;
@@ -547,7 +547,7 @@
      no cookies, IPs anonymised on the server, Do Not Track respected -->
 <script>
   var _paq = window._paq = window._paq || [];
-  var _mtmSite = {"zp12.designburgapps.com": "3", "fm1.designburgapps.com": "4", "designburgapps.com": "5",
+  var _mtmSite = {"zp12.designburgapps.com": "3", "thefirmwarehub.com": "4", "fm1.designburgapps.com": "4", "designburgapps.com": "5",
                   "www.designburgapps.com": "5"}[location.hostname] || "1";
   _paq.push(['setDomains', [location.hostname]]);
   _paq.push(['disableCookies']);

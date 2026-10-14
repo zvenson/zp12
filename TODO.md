@@ -1,6 +1,6 @@
 # zp12 TODO
 
-## 2.4: CHOP groups (built, not released)
+## 2.4: CHOP groups (released 2026-10-14, not yet tried on the device)
 - A user: "chops on A1-A8 don't cut each other". Pads now have a CHOP group (--, 1-3, EDIT > OUT KNOB 1 where CHAN was shown, the pads held take it too, saved in
   flags bits 2-3, old saves: none); the editor's Chop to pads sets it (link protocol 4, ASSIGN bit 18). Tests:
   sp_core_test "CHOP", zp12_link_test "CHOP group 2".
