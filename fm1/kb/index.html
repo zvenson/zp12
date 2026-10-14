@@ -192,6 +192,7 @@
   <a href="#loader">The update loader</a>
   <a href="#install">What Install does</a>
   <a href="#checks">What the hub checks</a>
+  <a href="#try">Try it before you install</a>
   <a href="#data">Your projects and samples</a>
   <a href="#back">Back to the official firmware</a>
   <a href="#listed">Getting your firmware listed</a>
@@ -275,6 +276,29 @@
   <p>A browser is not allowed to download a release file from GitHub directly. So the hub keeps a copy of each package, and a
     copy of its source code next to it. The firmwares are open source under the GPL-3.0, which allows passing them on
     unchanged with their source.</p>
+</section>
+
+<section id="try">
+  <h2>Try it before you install</h2><p class="who">For everyone, and for authors</p>
+  <h3>In the browser</h3>
+  <p>Many firmwares have their own simulator: the firmware's sources built for the browser, with its screen and its sound.
+    On the hub their cards say <b>▶ Play in the browser</b>. Nothing is installed, and nothing touches your FM-1.</p>
+  <h3>The real package, on your computer</h3>
+  <p><a href="https://github.com/simonjohansson/fm1-emulator" target="_blank" rel="noopener">fm1-emulator</a> by Simon Johansson emulates the FM-1 itself: its chip
+    (pi32v2) and its board, built on QEMU (GPL-2.0). It runs the <b>same .fwsc</b> you would install, with the screen, the
+    keys, the knobs, the LEDs and the sound, and the firmware's console in your terminal. Download it from its
+    <a href="https://github.com/simonjohansson/fm1-emulator/releases/latest" target="_blank" rel="noopener">releases</a> (macOS on Apple Silicon, Linux on x86-64;
+    Windows not yet), then:</p>
+  <p><code>./emulator felucca-1.5.fwsc</code></p>
+  <p>It takes an uncompressed <code>.fwsc</code> or <code>.ufw</code> package or a raw application <code>.bin</code>. Click
+    the keys and buttons, drag or scroll the knobs; on the keyboard <code>Z</code>…<code>C</code> play notes,
+    <code>X</code> / <code>V</code> change the octave, <code>P</code> / <code>O</code> are ENV / LFO, <code>H</code> goes
+    HOME. A firmware's package is linked on its card (release), and the hub keeps a copy of each next to the page.</p>
+  <div class="note"><p>Confirmed by its author: the official V15 and Felucca. Most firmwares on the hub boot in it; a few
+    still stop at an instruction or a chip part the emulator does not have yet (in our tests AMB-1, TRIBE, Bubba Machine,
+    DUELL and FM-106). Its browser build is experimental and still far slower than real time.</p></div>
+  <p><b>For authors:</b> boot your release in it before you publish. It catches a package that does not start before
+    anyone's FM-1 does, and it is how the hub's videos are recorded: unchanged packages, real screens, real sound.</p>
 </section>
 
 <section id="data">
