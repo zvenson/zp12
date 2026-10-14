@@ -27,6 +27,9 @@ typedef struct {                        /* a wave: where its packed samples are 
 } sp_wave_t;
 
 enum { SPF_REVERSE = 1, SPF_33 = 2 };   /* SPF_33: stored at 45 rpm, played at 33 1/3 (rate x 33/45) */
+/* CHOP group 1-3 in flags bits 2-3 (0: none): a hit cuts the pads of its group on the other channels too, so the
+ * chops of a loop on A1-A8 cut each other as one voice (a channel cuts its own sound anyway) */
+#define SPF_CHOP(f) (((f) >> 2) & 3u)
 
 typedef struct {                        /* a sound (a pad) */
     uint8_t wave;                       /* index into sp_wave[] (0xFF: none) */
@@ -55,6 +58,7 @@ typedef struct {
     int32_t drv, snd[3];                /* drive (Q4 gain), sends Q15 */
     int32_t z[4];                       /* filter state */
     uint8_t on;
+    uint8_t pad;                        /* the pad sounding (its CHOP group) */
     uint8_t jump;                       /* the signal jumps next sample (a hit cut, a sample's end): SMOOTH bridges it */
     int32_t dc, last;                   /* SMOOTH: what bridges the jump, dying away; the last output */
     int32_t quiet;                      /* MUTE / SOLO: how far down, Q12 (0 heard, 4096 silent), ramped */
@@ -172,6 +176,14 @@ static void sp_trigger_lk(uint32_t k, uint32_t vel, int32_t semis, uint32_t lk)
         return;
     w = &sp_wave[s->wave];
     c = &sp_ch[SP_CH_OF(k)];
+    if (SPF_CHOP(s->flags)) {                       /* CHOP: the group's pads on the other channels stop */
+        uint32_t ch;
+        for (ch = 0; ch < SP_NCH; ch++)
+            if (sp_ch[ch].on && &sp_ch[ch] != c && SPF_CHOP(sp_sound[sp_ch[ch].pad].flags) == SPF_CHOP(s->flags)) {
+                sp_ch[ch].on = 0;
+                sp_ch[ch].jump = 1;                  /* (SMOOTH bridges the cut, the filter rings out) */
+            }
+    }
     a = w->n / 1000u * s->start + w->n % 1000u * s->start / 1000u;   /* (32 bits, no 64-bit division) */
     b = s->end ? w->n / 1000u * s->end + w->n % 1000u * s->end / 1000u : w->n;
     if (b > w->n) b = w->n;
@@ -205,6 +217,7 @@ static void sp_trigger_lk(uint32_t k, uint32_t vel, int32_t semis, uint32_t lk)
     c->jump = (uint8_t)(c->on || ((s->flags & SPF_REVERSE) ? s->end < 1000u && s->end : s->start > 0u));
     if (!c->jump) c->dc = 0;
     c->on = 1;
+    c->pad = (uint8_t)(k % SP_NSOUND);
 }
 
 static void sp_trigger_at(uint32_t k, uint32_t vel, int32_t semis) { sp_trigger_lk(k, vel, semis, 0); }

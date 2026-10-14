@@ -30,7 +30,7 @@ const check = (ok, what) => { console.log(`link: ${what.padEnd(72)} ${ok ? "ok" 
 const same = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
 
 const info = await link.hello();
-check(info.proto === 3 && info.version === "zp12 1.5" && info.kit === 27, `HELLO: protocol 3, "${info.version}", ${info.kit} kit waves`);
+check(info.proto === 4 && info.version === "zp12 1.5" && info.kit === 27, `HELLO: protocol 4, "${info.version}", ${info.kit} kit waves`);
 const store0 = await dump(0xC4000, 0x8000), banks0 = await dump(0xA0000, 0x3000), smp0 = await dump(0xEA000, 0x1800);
 const presets0 = await dump(0xDC000, 0x1000);
 
@@ -152,7 +152,7 @@ check(e && /damaged/.test(e.message), "restore: a damaged file refused (CRC)");
   const pads0 = (await raw("PADS")).trim(), waves0 = (await raw("WAVES")).trim(), gen0 = d.gen;
   const x = Float32Array.from({ length: 16 * 4000 }, (_, i) => Math.sin(i * 0.02) * Math.exp(-(i % 4000) / 800));
   const list = Array.from({ length: 16 }, (_, j) => ({ name: "BRK" + String(j + 1).padStart(2, "0"),
-    y: Z.encode(x, 44100, { start: j * 4000, end: (j + 1) * 4000 }), rate: 26040, pad: 8 + j }));
+    y: Z.encode(x, 44100, { start: j * 4000, end: (j + 1) * 4000 }), rate: 26040, pad: 8 + j, chop: 2 }));
   let steps = 0, e = null;
   try { await Z.uploadMany(link, d, list, false, (k) => { steps = k; }, () => steps > 40); } catch (x) { e = x; }
   check(e && /stopped/.test(e.message) && (await raw("PADS")).trim() === pads0 && (await raw("WAVES")).trim() === waves0 &&
@@ -164,6 +164,8 @@ check(e && /damaged/.test(e.message), "restore: a damaged file refused (CRC)");
         "chops: 16 samples on the FM-1, the directory written once");
   check(list.every((s, j) => p[8 + j] === info.kit + slots[j]), "chops: B1..D8 each play their chop (channels 1-8 twice)");
   check(p.slice(0, 8).join() === pads0.split(" ").slice(0, 8).join(), "chops: the other pads untouched");
+  const g = (await raw("CHOPS")).trim().split(" ").map(Number);
+  check(g.slice(8, 24).every((v) => v === 2) && g.slice(0, 8).every((v) => v === 0), "chops: their pads in CHOP group 2, the others not");
   const back = await Z.fetchSample(link, d.slots[slots[7]]);
   check(back.length === list[7].y.length && back.every((v, i) => v === list[7].y[i]), "chops: the 8th read back as sent");
   e = null;

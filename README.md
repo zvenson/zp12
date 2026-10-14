@@ -41,6 +41,13 @@ without interpolation, eight output channels with their filters, a panel-style s
 > chorus, delay and reverb, saved in flash (0xC4000.., a room sloopDX leaves free; stock SLOOP keeps its own samples there: back them up first), own samples from the web editor.
 > Plan: [CONCEPT.md](CONCEPT.md), open work: [TODO.md](TODO.md).
 
+## New in 2.4 (built, not released yet)
+
+- **CHOP groups**: EDIT → WAVE, KNOB 4 = CHOP (--, 1, 2, 3). Pads in one group cut each other wherever they are,
+  so chops on A1–A8 play as one voice; each still plays through its own position's channel (fader, filter, mute).
+  Pads on one position (A1, B1, C1, D1) cut each other as before. The editor's **Chop to pads** sets the group for
+  you (Cut each other: group 1 unless you pick another). Why: chops on A1–A8 rang out over each other.
+
 ## New in 2.3
 
 - **REV THROW / ECHO THROW** (after SLOOP 2.6 and Felucca 1.5.1): hold FX and OCT− (reverb) or OCT+ (echo): every

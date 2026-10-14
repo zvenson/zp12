@@ -1,5 +1,11 @@
 # zp12 TODO
 
+## 2.4: CHOP groups (built, not released)
+- A user: "chops on A1-A8 don't cut each other". Pads now have a CHOP group (--, 1-3, EDIT > WAVE KNOB 4, saved in
+  flags bits 2-3, old saves: none); the editor's Chop to pads sets it (link protocol 4, ASSIGN bit 18). Tests:
+  sp_core_test "CHOP", zp12_link_test "CHOP group 2".
+- To do: on the device (A1-A8 chops in group 1 cut each other, SMOOTH: no click), then release 2.4 + site, cheat sheet PDF.
+
 ## 2.1 (built, not released: build/zp12-2.1-test.fwsc, identity FM-1_971)
 - A pad's channel = its position (pad % 8, every bank), as on the SP-1200: fader, mute / solo, the filter (pads 1-2)
   and the choke follow the pad. The kit laid out by role (tools/gen_kit.py LAYOUT_A-D); a 2.0 save's pads and loop

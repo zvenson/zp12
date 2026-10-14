@@ -10,10 +10,11 @@
  *   5 HOLD         -> the sequencer stops; no autosave while the link is busy (10 s from the last message)
  *   6 REBOOT       -> after the reply (a restored store is read at the start)
  *   7 RELOAD       -> the samples' directory read again (sp_samples.c); data: how many there are
- *   8 ASSIGN a     -> pad a & 31 plays wave (a >> 8) & 63, heard at once (the web editor's "on a pad")
+ *   8 ASSIGN a     -> pad a & 31 plays wave (a >> 8) & 63, heard at once (the web editor's "on a pad");
+ *                     bit 18 set: its CHOP group becomes (a >> 16) & 3 (4: the chops cut each other)
  *   9 PADS         -> data: the wave of each of the 32 pads (0xFF none), then the kit's names, each ended by 0 */
 #define ZL_MAX 512u
-#define ZL_PROTO 3u                              /* 2: RELOAD, ASSIGN (the sample editor); 3: PADS */
+#define ZL_PROTO 4u                              /* 2: RELOAD, ASSIGN (the sample editor); 3: PADS; 4: ASSIGN's CHOP */
 static uint8_t zl_dec[16 + ZL_MAX], zl_wire[32 + (16 + ZL_MAX) * 8u / 7u];
 static uint8_t zl_back[ZL_MAX];
 static uint32_t zl_last;                         /* fm1_ms of the last message (0: never) */
@@ -118,8 +119,11 @@ static void zl_service(void)
     case 8:
         if (((a >> 8) & 63u) >= KIT_NWAVE + SP_NUSER || !sp_wave[(a >> 8) & 63u].n)
             rc = 2;
-        else
+        else {
             wave_set(a & 31u, (a >> 8) & 63u);
+            if (a & (1u << 18))
+                sp_sound[a & 31u].flags = (uint8_t)((sp_sound[a & 31u].flags & ~12u) | ((a >> 16) & 3u) << 2);
+        }
         break;
     case 9: {
         uint32_t k;

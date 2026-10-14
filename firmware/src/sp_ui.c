@@ -152,6 +152,7 @@ static void page_cols(char lab[4][8], char val[4][8])
         COL(0, "WAVE", cat(val[0], wave_name(s->wave)));
         COL(1, "COPY>", pad_label(val[1], ui.copy_pad));
         COL(2, "COPY", cat(val[2], ui.arm == PG_WAVE + 1u ? "AGAIN" : "-->"));
+        COL(3, "CHOP", SPF_CHOP(s->flags) ? (void)num(val[3], (int32_t)SPF_CHOP(s->flags), 1, 0) : (void)cat(val[3], "--"));
         break;
     case PG_SOUND:
         COL(0, "TUNE", num(val[0], s->tune, 2, 1)); COL(1, "FINE", num(val[1], s->fine, 2, 1));
@@ -737,6 +738,8 @@ static void knob(uint32_t n, int32_t d)
             sp_sound[ui.copy_pad] = *s;
             ui_say("SOUND COPIED");
         }
+        if (n == 3u)                                /* CHOP group: --, 1-3 (pads of one group cut each other) */
+            s->flags = (uint8_t)((s->flags & ~12u) | (uint32_t)sp_clamp((int32_t)SPF_CHOP(s->flags) + one, 0, 3) << 2);
         break;
     case PG_SOUND:
         if (n < 3u) { ui.turn_pad = ui.sel; ui.turn_ms = fm1_ms; }   /* (recording: the hits take TUNE / FINE / DECAY) */

@@ -41,7 +41,7 @@ static char ui_uname[SP_NUSER][9];
 static uint8_t ui_uflags[SP_NUSER];
 static uint32_t pad_wave[32] = {0};
 #define SP_NSOUND 32u
-static struct { uint8_t wave; } sp_sound[SP_NSOUND];
+static struct { uint8_t wave, flags; } sp_sound[SP_NSOUND];
 static const struct { uint32_t off, n; const char *name; } KIT_WAVE[KIT_NWAVE] = {
     {0, 0, "KICK"}, {0, 0, "SNARE"}, {0, 0, "RIM"}, {0, 0, "CLAP"}, {0, 0, "HAT"}, {0, 0, "OHAT"}, {0, 0, "TOM L"}, {0, 0, "TOM H"},
     {0, 0, "CRASH"}, {0, 0, "RIDE"}, {0, 0, "COWBL"}, {0, 0, "TAMB"}, {0, 0, "SHAKR"}, {0, 0, "CONGA"}, {0, 0, "CLAVE"}, {0, 0, "WOOD"},
@@ -138,6 +138,12 @@ int main(void)
                 if (sp_wave[KIT_NWAVE + i].n)
                     printf("%u %u %u %u %s %u ", i, (unsigned)(sp_wave[KIT_NWAVE + i].d - flash), sp_wave[KIT_NWAVE + i].n,
                            sp_wave[KIT_NWAVE + i].rate, ui_uname[i], ui_uflags[i]);
+            printf("\n");
+            fflush(stdout);
+            continue;
+        }
+        if (!strncmp(line, "CHOPS", 5)) {               /* each pad's CHOP group */
+            for (i = 0; i < 32u; i++) printf("%u ", (sp_sound[i].flags >> 2) & 3u);
             printf("\n");
             fflush(stdout);
             continue;
