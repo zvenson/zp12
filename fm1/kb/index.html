@@ -110,8 +110,9 @@
   .tag.shared { background: rgba(242, 196, 109, .14); color: var(--warn); }
   .tag.mv { background: rgba(175, 217, 244, .14); color: var(--blue); }
   .tabmsg { color: var(--dim); font-size: 14px; }
-  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
-  footer a { color: var(--text); }
+  /* the footer (web/footer.html, the same on every page: tools/make_fm1.py puts it in, the credits from the catalogues) */
+  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; line-height: 1.7; padding: 34px 0 54px; text-align: center; }
+  footer .wrap { max-width: 900px; } footer a { color: var(--text); }
   @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .toc { position: static; display: none; } }
   @media (max-width: 640px) { .flow { grid-template-columns: 1fr; } h2 { font-size: 24px; } .lead { font-size: 17.5px; } nav .home { display: none; }
     .eyebrow { letter-spacing: 1.5px; font-size: 12px; } th, td { padding: 8px 10px; } }
@@ -318,10 +319,22 @@
 </div>
 
 <footer><div class="wrap">
-  The FM-1 Firmware Hub by <a href="https://github.com/zvenson" rel="noopener">zvenson</a>. The update path is Felucca's
-  (Leo Kuroshita, Hügelton Instruments). M-VAVE and FM-1 are trademarks of their owners; not affiliated with M-VAVE.
-  <br><a href="https://thefirmwarehub.com/">The hub</a> · <a href="https://designburg.net/">designburg.net</a>
-  · <a href="https://zp12.designburgapps.com/impressum.html">Impressum · Datenschutz</a>
+  <b>Disclaimer.</b> Every firmware here belongs to its authors, each under its own license (GPL-3.0:
+  <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">the license</a>); only zp12, sloopDX, OberVave and Dinghy are ours
+  (<a href="https://github.com/zvenson" rel="noopener">zvenson</a>). We do not develop, test or support the others and take no
+  responsibility for them, for what they do on your device or for lost data: questions and bug reports go to each project, linked on
+  its card. The FM-1 firmwares are taken automatically and unchanged from their releases; the FM-1 page only checks that a package is
+  an FM-1 firmware with the update loader before it writes it, and keeps a copy of its source next to it. The SMK-37 firmwares install
+  from their makers' own installers. The pictures on the cards are from each project's repository.
+  FM-1: Hortator by DEADACTIVE; Felucca by Leo Kuroshita (Hügelton Instruments); Felucca [Salt] by Chance Roth (ChanceTheMaker); Jangada by zednaked; GHOULBOX by Jason Persinger; Melodee by keremimo; SLOOP by isod89; Bubba Machine by Erbubar23; SLOOP Floyd FM by René Bohne; SLOOP DX7 Banks by majnikool; X0X, FoMni, AMB-1, CTL-1 and Polly by Charles Vestal; ChoralRoot by Quixotic7; WaveLoop FM-1 by ELI7VH; FiMba-1 by jadamsowers; JIANT FM by juanjiant-bit; fm1-chord by math0ne; FuMi-1 by cartesive; MAKU by okumurari; Rainbow Mode by joshbartlettband-web; winampFM Synth by Hericdk; MYCELIUM by Mandalars; ETCH by SikkenWorks; FM-106 by PatttF; TRIBE by apiel; DUELL by OSCILL/R; Skiff by illuminus5; Fart Machine One by adamcharleswilsonmusic-code; ORBIT by dspaudio; Felucca 8 Patterns by echoe. SMK-37: Felucca SMK by Chance Roth (ChanceTheMaker); Makkuro37 and the SMK-37 builds of the FM-1 firmwares by genkigenki. Baud Girl (FM-1+VA) by Madeline is only linked: not open source, not hosted or mirrored
+  here, it installs from baudgirl.com. The update path is Felucca's, as sloopDX carries it. M-VAVE, FM-1 and SMK-37 are trademarks of
+  their owners; not affiliated with M-VAVE. E-mu and SP-1200 are trademarks of their owners. Unofficial firmware, free and without
+  warranty: you install it at your own risk.
+  <br><a href="https://designburg.net/">designburg.net</a> · <a href="/impressum/">Impressum</a> · <a href="/impressum/#datenschutz">Datenschutz</a>
+  · <a href="https://www.youtube.com/@sonzven?sub_confirmation=1" target="_blank" rel="noopener">▶ YouTube: @sonzven</a>
+  · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a>
+  · <a href="https://link.amazon/B0axzqKZf" target="_blank" rel="sponsored noopener">🎹 Buy the FM-1 on Amazon*</a> (* affiliate link, an ad: as an Amazon Associate we earn from
+  qualifying purchases; Als Amazon-Partner verdienen wir an qualifizierten Verkäufen)<span id="updated"></span>
 </div></footer>
 
 <script>

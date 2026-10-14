@@ -241,8 +241,7 @@
   details { margin-top: 40px; text-align: center; } summary { cursor: pointer; color: var(--dim); }
   details p { max-width: 760px; margin: 12px auto; text-align: left; }
   pre#log { white-space: pre-wrap; font-size: 12px; color: var(--dim); max-height: 180px; overflow: auto; text-align: left; }
-  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
-  footer .wrap { max-width: 900px; } footer a { color: var(--text); }
+/*FOOTER*/
   @media (max-width: 1000px) { .hero { grid-template-columns: 1fr; } }
   @media (prefers-reduced-motion: reduce) { .lineup .lt { animation: none; } .lineup .row { overflow-x: auto; scrollbar-width: none; } }
   @media (max-width: 760px) { header { padding: 40px 0 32px; } .two { grid-template-columns: 1fr; } .grid { grid-template-columns: 1fr; gap: 18px; }
@@ -397,23 +396,7 @@ sudo python3 fm1_rescue.py sloop</pre>
   </details>
 </div></main>
 
-<footer><div class="wrap">
-  <b>Disclaimer.</b> Every firmware here belongs to its authors and is taken automatically and unchanged from their GitHub
-  releases (each under its own license, GPL-3.0; <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">the license</a>);
-  only zp12, sloopDX and Dinghy are ours (<a href="https://github.com/zvenson" rel="noopener">zvenson</a>). We do not develop, test or support the
-  others and take no responsibility for them, for what they do on your FM-1 or for lost data: questions and bug reports go to each project,
-  linked on its card. The page only checks that a package is an FM-1 firmware with the update loader before it writes it.
-  The source of each is at its repository and tag, and a copy of it is kept here next to the package; the pictures on the cards are
-  from each project's repository. Felucca by Leo Kuroshita (Hügelton Instruments); Felucca [Salt] by Chance Roth; SLOOP by isod89;
-  X0X and FoMni by Charles Vestal; ChoralRoot by Quixotic7; Jangada by zednaked; Melodee by keremimo; Hortator by DEADACTIVE; FiMba-1 by jadamsowers; GHOULBOX by Jason Persinger; SLOOP Floyd FM by René Bohne; SLOOP DX7 Banks by majnikool; WaveLoop FM-1 by ELI7VH; JIANT FM by juanjiant-bit; fm1-chord by math0ne; FuMi-1 by cartesive; MAKU by okumurari; Rainbow Mode by joshbartlettband-web; AMB-1 and CTL-1 by Charles Vestal; Bubba Machine by Erbubar23; ETCH by SikkenWorks; FM-106 by PatttF; TRIBE by apiel; DUELL by OSCILL/R; Skiff by illuminus5; Fart Machine One by adamcharleswilsonmusic-code; ORBIT by dspaudio; Felucca 8 Patterns by echoe. Baud Girl (FM-1+VA) by Madeline is only linked: not open source, not hosted or mirrored here, it installs from baudgirl.com. The update path is Felucca's, as
-  sloopDX carries it. M-VAVE and FM-1 are trademarks of their owners; not affiliated with M-VAVE. E-mu and SP-1200 are trademarks of their owners. Unofficial firmware, free and without
-  warranty: you install it at your own risk.
-  <br><a href="https://designburg.net/">designburg.net</a> · <a href="https://zp12.designburgapps.com/impressum.html">Impressum · Datenschutz</a>
-  · <a href="https://www.youtube.com/@sonzven?sub_confirmation=1" target="_blank" rel="noopener">▶ YouTube: @sonzven</a>
-  · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a>
-  · <a href="https://link.amazon/B0axzqKZf" target="_blank" rel="sponsored noopener">🎹 Buy the FM-1 on Amazon*</a> (* affiliate link, an ad: as an Amazon Associate we earn from
-  qualifying purchases; Als Amazon-Partner verdienen wir an qualifizierten Verkäufen) · <span id="updated"></span>
-</div></footer>
+<!--FOOTER-->
 
 <script>
 "use strict";
@@ -753,7 +736,7 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   cat = ordered(c.firmwares);
   rescueFill();
   $("count").textContent = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty", "Twenty-one", "Twenty-two", "Twenty-three", "Twenty-four", "Twenty-five"][cat.length] || cat.length;
-  $("updated").textContent = "catalogue of " + c.updated; lineup(); chips(); sorts(); render(); recent(); remember();
+  $("updated").textContent = " · catalogue of " + c.updated; lineup(); chips(); sorts(); render(); recent(); remember();
   // ?demo=connected|install|done&now=<id>&fw=<id>&pct=N: the page in a state, for a video (no FM-1 needed)
   const q = new URLSearchParams(location.search), st = q.get("demo");
   if (!st) return;

@@ -10,6 +10,26 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parents[1]
 
 
+def smk_stars(repos):
+    """the repos' GitHub stars, fetched once a day (web/smk37-stars.json keeps them: a build without the network or over
+    the API's limit takes the last counts)"""
+    import urllib.request
+    from datetime import date as _d
+    f = HERE / "web" / "smk37-stars.json"
+    was = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    if was.get("day") == str(_d.today()) and all(r in was.get("stars", {}) for r in repos):
+        return was["stars"]
+    stars = dict(was.get("stars", {}))
+    for r in repos:
+        try:
+            req = urllib.request.Request(f"https://api.github.com/repos/{r}", headers={"User-Agent": "fm1-switcher (thefirmwarehub.com)"})
+            stars[r] = json.loads(urllib.request.urlopen(req, timeout=20).read()).get("stargazers_count")
+        except Exception:
+            pass
+    f.write_text(json.dumps({"day": str(_d.today()), "stars": stars}, indent=1) + "\n", encoding="utf-8")
+    return stars
+
+
 def smk_cards():
     """the SMK-37 page's cards from web/smk37.json: (the firmwares made for it, the FM-1 ports), static for the search engines"""
     d = json.loads((HERE / "web" / "smk37.json").read_text(encoding="utf-8"))
@@ -19,6 +39,8 @@ def smk_cards():
     label = {"synth": "synth", "groove": "groovebox", "drums": "drums · sampler", "chords": "chords", "dev": "for developers", "other": "other"}
     e = lambda x: html.escape(str(x), quote=True)
     out = lambda u, t, c="": f'<a{c} href="{e(u)}" target="_blank" rel="noopener">{t}</a>'
+    home = lambda f: f["orig_repo"] if "orig_repo" in f else f["source"].split("github.com/")[1].split("/tree/")[0].split("/blob/")[0]
+    stars = smk_stars(sorted({home(f) for f in d["own"] + d["ports"]}))
     def card(f, port):
         kind = kinds[f["fm1"]] if port else f["kind"]
         tags = ('<span class="tag beta">beta</span>' if f.get("beta") else "") + ('<span class="tag port">FM-1 port</span>' if port else "") + \
@@ -30,11 +52,34 @@ def smk_cards():
             links += f'<a href="/#fw-{e(f["fm1"])}">On the FM-1 hub</a>'
         links += "".join(f'<a href="{e(u)}">{e(t)}</a>' if u.startswith("/") else out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
         return (f'<article class="fw" id="fw-{e(f["id"])}" data-kind="{" ".join(kind)}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
-                f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <h3>{e(f["name"])}<small>{e(f["version"])}</small></h3>'
+                f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <h3>{e(f["name"])}<small>{e(f["version"])}</small>'
+                f'<a class="star" href="https://github.com/{e(home(f))}" target="_blank" rel="noopener" title="Star it on GitHub">'
+                f'★ Star{"" if stars.get(home(f)) is None else " · " + str(stars[home(f)])}</a></h3>'
                 f'<div class="by">{by}</div><div class="tags">{tags}</div>\n  <p class="what">{e(f["what"])}</p>'
                 + (f'<div class="note">{e(f["note"])}</div>' if f.get("note") else "")
                 + f'<div class="links">{links}</div><div class="meta">GPL-3.0 · {out(f["source"], "source")}</div></article>\n')
     return "".join(card(f, False) for f in d["own"]), "".join(card(f, True) for f in d["ports"]), str(len(d["own"]) + len(d["ports"]))
+
+
+def credits():
+    """the footer's credits, from the catalogues: ours (zvenson's), the FM-1's others by author, the SMK-37's"""
+    sys.path.insert(0, str(HERE / "tools"))
+    import fm1_sync
+    d = json.loads((HERE / "web" / "smk37.json").read_text(encoding="utf-8"))
+    names = lambda l: l[0] if len(l) == 1 else ", ".join(l[:-1]) + " and " + l[-1]
+    ours = [f["name"] for f in fm1_sync.FIRMWARES if f["author"] == "zvenson"]
+    by = {}
+    for f in fm1_sync.FIRMWARES:
+        if f["author"] != "zvenson":
+            by.setdefault(f["author"], []).append(f["name"])
+    smk = {}
+    for f in d["own"]:
+        if f["by"] != "zvenson":
+            smk.setdefault(f["by"], []).append(f["name"])
+    smk.setdefault("genkigenki", []).append("the SMK-37 builds of the FM-1 firmwares")
+    e = lambda x: html.escape(x, quote=False)
+    return (e(names(ours)), "; ".join(f"{e(names(n))} by {e(a)}" for a, n in by.items()),
+            "; ".join(f"{e(names(n))} by {e(a)}" for a, n in smk.items()))
 
 
 def devices(text, dev):
@@ -42,6 +87,10 @@ def devices(text, dev):
     the page's own device marked"""
     menu = (HERE / "web" / "devices.html").read_text(encoding="utf-8").replace(f'data-dev="{dev}"', f'data-dev="{dev}" aria-current="page"')
     own, ports, n = smk_cards()
+    ours, fm1, smk = credits()
+    foot = ((HERE / "web" / "footer.html").read_text(encoding="utf-8").replace("<!--F-OURS-->", ours)
+            .replace("<!--F-FM1-->", fm1).replace("<!--F-SMK-->", smk))
+    text = text.replace("/*FOOTER*/\n", (HERE / "web" / "footer.css").read_text(encoding="utf-8")).replace("<!--FOOTER-->\n", foot)
     return (text.replace("/*DEVICES*/\n", (HERE / "web" / "devices.css").read_text(encoding="utf-8"))
                 .replace("<!--DEVICES-->\n", menu).replace("<!--SMK-OWN-->", own).replace("<!--SMK-PORTS-->", ports)
                 .replace("<!--SMK-N-->", n))
@@ -72,6 +121,9 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
     smk = HERE / "fm1" / "smk37"                        # the SMK-37 Pro's hub: its firmwares (one so far), installed from their own pages
     (smk / "img").mkdir(parents=True, exist_ok=True)
     (smk / "index.html").write_text(devices((HERE / "web" / "smk37.html").read_text(encoding="utf-8"), "smk37"), encoding="utf-8")
+    imp = HERE / "fm1" / "impressum"                    # the legal notice and privacy policy, the hub's own
+    imp.mkdir(exist_ok=True)
+    (imp / "index.html").write_text(devices((HERE / "web" / "hub-impressum.html").read_text(encoding="utf-8"), ""), encoding="utf-8")
     for p in (HERE / "firmwarehub" / "img").glob("*.png"):    # (smk-*: Felucca SMK's screens, makkuro37: its home screen)
         (smk / "img" / p.name).write_bytes(p.read_bytes())
     hub = HERE / "firmwarehub"                          # thefirmwarehub.com: the start page, a card per device
@@ -83,7 +135,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
                                      '<changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>\n')
     snip = Path(sloopdx) / "tools" / "matomo_snippet.py"
     if snip.exists():
-        for page in (out, kb / "index.html", smk / "index.html"):
+        for page in (out, kb / "index.html", smk / "index.html", imp / "index.html"):
             subprocess.run([sys.executable, str(snip), str(page)], check=True, capture_output=True)
     (HERE / "fm1" / "rescue").mkdir(exist_ok=True)       # the rescue script, served next to the page (#rescue)
     (HERE / "fm1" / "rescue" / "fm1_rescue.py").write_text((HERE / "tools" / "fm1_rescue.py").read_text(encoding="utf-8"), encoding="utf-8")

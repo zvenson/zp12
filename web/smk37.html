@@ -67,6 +67,9 @@
   .fw .shot.wide img { width: 100%; height: var(--h); object-fit: contain; border-radius: 0; box-shadow: none; image-rendering: auto; }
   .fw h3 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -.3px; line-height: 1.1; color: var(--c); }
   .fw h3 small { font-size: 14px; font-weight: 600; color: var(--dim); margin-left: 8px; }
+  .fw h3 a.star { font-size: 12px; font-weight: 500; letter-spacing: 0; color: var(--dim); margin-left: 10px; padding: 3px 8px; border-radius: 7px;
+                  box-shadow: inset 0 0 0 1px var(--line); vertical-align: 4px; white-space: nowrap; }
+  .fw h3 a.star:hover { text-decoration: none; color: var(--fg); box-shadow: inset 0 0 0 1px var(--c); }
   .by { color: var(--dim); font-size: 14px; line-height: 1.5; }
   .by a { color: var(--text); }
   .tags { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -90,8 +93,7 @@
   .card p { color: var(--text); margin: 0 0 16px; font-size: 15px; }
   .card a { display: inline-block; padding: 9px 16px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); font-weight: 600; font-size: 14.5px; }
   .card a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--pink); }
-  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
-  footer a { color: var(--text); }
+/*FOOTER*/
   @media (max-width: 1300px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
   @media (max-width: 760px) { header { padding: 40px 0 28px; } .fw { padding: 0 22px 22px; } .fw .shot { margin: 0 -22px 8px; --h: 220px; }
@@ -151,11 +153,6 @@ function chips() {
 chips();
 </script>
 
-<footer><div class="wrap">
-  The Firmware Hub by <a href="https://github.com/zvenson" rel="noopener">zvenson</a>. Each firmware is its maker's, installed from
-  their own page. M-VAVE, FM-1 and SMK-37 are trademarks of their owners; not affiliated with M-VAVE.
-  <br><a href="https://thefirmwarehub.com/">The FM-1 hub</a> · <a href="https://designburg.net/">designburg.net</a>
-  · <a href="https://zp12.designburgapps.com/impressum.html">Impressum · Datenschutz</a>
-</div></footer>
+<!--FOOTER-->
 </body>
 </html>
