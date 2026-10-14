@@ -15,7 +15,14 @@
 
   const S = { node: null, ctx: null, on: false, starting: false, master: 900, midi: null, midiSel: '' };
   try { const m = parseInt(localStorage.getItem(MASTER_KEY), 10); if (m >= 0 && m <= 1023) S.master = m; } catch (e) {}
-  const send = (m) => { if (S.node) S.node.port.postMessage(m); };
+  // Matomo on thefirmwarehub.com (no cookies, if the page has it): who starts the sound, plays a note, brings a MIDI
+  // keyboard, keeps playing a minute / five; nothing else, no notes or settings
+  const ev = (a) => { try { if (window._paq) window._paq.push(['trackEvent', 'Play', 'OberVave: ' + a]); } catch (e) {} };
+  let played = false;
+  const send = (m) => {
+    if (S.node) S.node.port.postMessage(m);
+    if (!played && ((m.t === 'key' && m.down) || (m.t === 'midi' && (m.d[0] & 0xF0) === 0x90 && m.d[2] > 0))) { played = true; ev('first note'); }
+  };
 
   // ---- the screen
   const cv = $('#screen'), cx = cv.getContext('2d'), img = cx.createImageData(240, 240);
@@ -61,7 +68,7 @@
         const m = ev.data;
         if (m.t === 'frame') { if (m.fb) draw(m.fb); leds(m.leds, m.keys, m.glow); }
         else if (m.t === 'store') saveStore(m.data);
-        else if (m.t === 'ready') { S.on = true; power.hidden = true; }
+        else if (m.t === 'ready') { S.on = true; power.hidden = true; ev('start'); setTimeout(() => ev('1 min'), 60e3); setTimeout(() => ev('5 min'), 300e3); }
         else if (m.t === 'error') { say('Error', m.message); S.starting = false; }
       };
       S.node.connect(S.ctx.destination);
@@ -262,6 +269,7 @@
     if (!navigator.requestMIDIAccess) { midiMsg.textContent = 'This browser has no Web MIDI (Safari): try Chrome, Edge or Firefox.'; return; }
     try {
       S.midi = await navigator.requestMIDIAccess({ sysex: false });
+      ev('midi');
       S.midi.onstatechange = listMidi;
       listMidi();
       midiBtn.textContent = 'MIDI connected';

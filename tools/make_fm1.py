@@ -146,7 +146,8 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
                                      '<changefreq>weekly</changefreq><priority>1.0</priority></url>\n</urlset>\n')
     snip = Path(sloopdx) / "tools" / "matomo_snippet.py"
     if snip.exists():
-        for page in (out, kb / "index.html", smk / "index.html", imp / "index.html"):
+        plays = sorted((HERE / "fm1" / "play").glob("*/index.html"))     # (the simulators: counted as the hub's pages)
+        for page in (out, kb / "index.html", smk / "index.html", imp / "index.html", *plays):
             subprocess.run([sys.executable, str(snip), str(page)], check=True, capture_output=True)
     (HERE / "fm1" / "rescue").mkdir(exist_ok=True)       # the rescue script, served next to the page (#rescue)
     (HERE / "fm1" / "rescue" / "fm1_rescue.py").write_text((HERE / "tools" / "fm1_rescue.py").read_text(encoding="utf-8"), encoding="utf-8")
