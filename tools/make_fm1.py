@@ -82,7 +82,7 @@ def credits():
             "; ".join(f"{e(names(n))} by {e(a)}" for a, n in smk.items()))
 
 
-def devices(text, dev):
+def devices(text, dev, ref="hub"):
     """the devices menu (web/devices.css, web/devices.html) into a page: /*DEVICES*/ in its style, <!--DEVICES--> in its nav;
     the page's own device marked"""
     menu = (HERE / "web" / "devices.html").read_text(encoding="utf-8").replace(f'data-dev="{dev}"', f'data-dev="{dev}" aria-current="page"')
@@ -90,6 +90,8 @@ def devices(text, dev):
     ours, fm1, smk = credits()
     foot = ((HERE / "web" / "footer.html").read_text(encoding="utf-8").replace("<!--F-OURS-->", ours)
             .replace("<!--F-FM1-->", fm1).replace("<!--F-SMK-->", smk))
+    text = (text.replace("/*VIBEBAR*/\n", (HERE / "web" / "vibe-banner.css").read_text(encoding="utf-8"))   # (the VIBE line on top, ?ref= per page)
+                .replace("<!--VIBEBAR-->\n", (HERE / "web" / "vibe-banner.html").read_text(encoding="utf-8").replace("<!--REF-->", ref)))
     text = text.replace("/*FOOTER*/\n", (HERE / "web" / "footer.css").read_text(encoding="utf-8")).replace("<!--FOOTER-->\n", foot)
     # (Cloudflare's email obfuscation off for our pages: the addresses stay plain text and links, also without JavaScript;
     #  the legal notice needs its address readable)
@@ -120,13 +122,13 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
                                              '<changefreq>weekly</changefreq><priority>0.7</priority></url>\n</urlset>\n')
     kb = HERE / "fm1" / "kb"                            # the knowledge base: no menu link yet (the user's wish, 2026-10-13)
     kb.mkdir(exist_ok=True)
-    (kb / "index.html").write_text(devices((HERE / "web" / "fm1kb.html").read_text(encoding="utf-8"), "fm1"), encoding="utf-8")
+    (kb / "index.html").write_text(devices((HERE / "web" / "fm1kb.html").read_text(encoding="utf-8"), "fm1", "kb"), encoding="utf-8")
     smk = HERE / "fm1" / "smk37"                        # the SMK-37 Pro's hub: its firmwares (one so far), installed from their own pages
     (smk / "img").mkdir(parents=True, exist_ok=True)
-    (smk / "index.html").write_text(devices((HERE / "web" / "smk37.html").read_text(encoding="utf-8"), "smk37"), encoding="utf-8")
+    (smk / "index.html").write_text(devices((HERE / "web" / "smk37.html").read_text(encoding="utf-8"), "smk37", "smk37"), encoding="utf-8")
     imp = HERE / "fm1" / "impressum"                    # the legal notice and privacy policy, the hub's own
     imp.mkdir(exist_ok=True)
-    (imp / "index.html").write_text(devices((HERE / "web" / "hub-impressum.html").read_text(encoding="utf-8"), ""), encoding="utf-8")
+    (imp / "index.html").write_text(devices((HERE / "web" / "hub-impressum.html").read_text(encoding="utf-8"), "", "impressum"), encoding="utf-8")
     for p in (HERE / "firmwarehub" / "img").glob("*.png"):    # (smk-*: Felucca SMK's screens, makkuro37: its home screen)
         (smk / "img" / p.name).write_bytes(p.read_bytes())
     hub = HERE / "firmwarehub"                          # thefirmwarehub.com: the start page, a card per device

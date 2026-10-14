@@ -1,0 +1,15 @@
+  /* VIBE FM teaser (thefirmwarehub.com/vibe/, own PHP page): one slim line above the nav on every page (web/vibe-banner.html; tools/make_fm1.py puts it in), the device and its orange */
+  .vibe { display: block; position: relative; background: #0c0a0a; color: var(--text); font-size: 14px; }
+  .vibe::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+                 background: linear-gradient(90deg, #8FD0FF, #9EF0C4, #FFE27A, #FFAA6E, #D7B6FF); opacity: .7; }
+  .vibe .wrap { display: flex; align-items: center; gap: 12px; height: 42px; }
+  .vibe img { width: 84px; height: 30px; object-fit: cover; object-position: 70% 50%; border-radius: 5px; flex: none; display: block; }
+  .vibe b { color: var(--fg); font-weight: 800; white-space: nowrap; } .vibe b em { font-style: normal; color: #ff6a1a; }
+  .vibe .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .vibe .t i { font-style: normal; font-weight: 800; background: linear-gradient(90deg, #8FD0FF, #9EF0C4 30%, #FFE27A 55%, #FFAA6E 80%, #D7B6FF);
+               -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .vibe .offer { margin-left: auto; white-space: nowrap; color: var(--dim); } .vibe .offer strong { color: #ff6a1a; }
+  .vibe .go { background: #ff6a1a; color: #0e0f11; font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 7px; white-space: nowrap; }
+  .vibe:hover { text-decoration: none; } .vibe:hover .go { background: #ff8a4a; }
+  @media (max-width: 1100px) { .vibe .offer { display: none; } .vibe .go { margin-left: auto; } }
+  @media (max-width: 640px) { .vibe .wrap { gap: 9px; height: 40px; } .vibe img { width: 52px; height: 26px; } .vibe .t { display: none; } }

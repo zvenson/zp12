@@ -88,10 +88,11 @@
   .mega .pic.quad { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1px; background: var(--line); }
   .mega .tile b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; line-height: 1.3; }
   .mega .tile small { display: block; color: var(--dim); font-size: 13.5px; margin-top: 2px; }
+  .mega .tile.vibe-t .pic img { object-position: 70% 50%; image-rendering: auto; } .mega .tile.vibe-t b { color: #ff6a1a; }
   .mega .tile.add .pic { border-style: dashed; background: transparent; color: var(--pink); font-size: 34px; font-weight: 200; }
   @media (max-width: 760px) { .mega .in { grid-template-columns: 1fr; padding-top: 14px; padding-bottom: 18px; } .mega .side { display: none; }
                               .mega .pic { width: 56px; height: 56px; } }
-  /* VIBE FM teaser (thefirmwarehub.com/vibe/, own PHP page): one slim line above the nav, the device and its orange */
+  /* VIBE FM teaser (thefirmwarehub.com/vibe/, own PHP page): one slim line above the nav on every page (web/vibe-banner.html; tools/make_fm1.py puts it in), the device and its orange */
   .vibe { display: block; position: relative; background: #0c0a0a; color: var(--text); font-size: 14px; }
   .vibe::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
                  background: linear-gradient(90deg, #8FD0FF, #9EF0C4, #FFE27A, #FFAA6E, #D7B6FF); opacity: .7; }
@@ -309,6 +310,8 @@
           <span><b>M-VAVE FM-1</b><small><span id="dd-fm1">All</span> firmwares</small></span></a>
         <a class="tile" href="/smk37/" data-dev="smk37"><span class="pic"><img src="/smk37/img/smk-mix.png" alt=""></span>
           <span><b>M-VAVE SMK-37 Pro</b><small>14 firmwares · Pro, Elite, MKE-P37</small></span></a>
+        <a class="tile vibe-t" href="/vibe/?ref=menu" data-dev="vibe"><span class="pic"><img src="/vibe/assets/img/banner-device.jpg" alt=""></span>
+          <span><b>VIBE FM Mk1</b><small>Hardware with open firmware · join the list</small></span></a>
         <a class="tile add" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device"><span class="pic">+</span>
           <span><b>Your device</b><small>Firmware for another machine? Tell us.</small></span></a>
       </div>

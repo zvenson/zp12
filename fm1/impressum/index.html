@@ -25,6 +25,21 @@
   .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; } .mark:hover { text-decoration: none; }
   .mark b { font-weight: 800; color: var(--cyan); }
   nav .home { font-size: 14px; color: var(--dim); }
+  /* VIBE FM teaser (thefirmwarehub.com/vibe/, own PHP page): one slim line above the nav on every page (web/vibe-banner.html; tools/make_fm1.py puts it in), the device and its orange */
+  .vibe { display: block; position: relative; background: #0c0a0a; color: var(--text); font-size: 14px; }
+  .vibe::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+                 background: linear-gradient(90deg, #8FD0FF, #9EF0C4, #FFE27A, #FFAA6E, #D7B6FF); opacity: .7; }
+  .vibe .wrap { display: flex; align-items: center; gap: 12px; height: 42px; }
+  .vibe img { width: 84px; height: 30px; object-fit: cover; object-position: 70% 50%; border-radius: 5px; flex: none; display: block; }
+  .vibe b { color: var(--fg); font-weight: 800; white-space: nowrap; } .vibe b em { font-style: normal; color: #ff6a1a; }
+  .vibe .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .vibe .t i { font-style: normal; font-weight: 800; background: linear-gradient(90deg, #8FD0FF, #9EF0C4 30%, #FFE27A 55%, #FFAA6E 80%, #D7B6FF);
+               -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .vibe .offer { margin-left: auto; white-space: nowrap; color: var(--dim); } .vibe .offer strong { color: #ff6a1a; }
+  .vibe .go { background: #ff6a1a; color: #0e0f11; font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 7px; white-space: nowrap; }
+  .vibe:hover { text-decoration: none; } .vibe:hover .go { background: #ff8a4a; }
+  @media (max-width: 1100px) { .vibe .offer { display: none; } .vibe .go { margin-left: auto; } }
+  @media (max-width: 640px) { .vibe .wrap { gap: 9px; height: 40px; } .vibe img { width: 52px; height: 26px; } .vibe .t { display: none; } }
   /* the devices menu (web/devices.html, put into every page by tools/make_fm1.py): a mega menu under "Devices", open on
      hover (a mouse) or on a tap / Enter (touch, keyboard) */
   nav { position: relative; z-index: 40; }
@@ -56,6 +71,7 @@
   .mega .pic.quad { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1px; background: var(--line); }
   .mega .tile b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; line-height: 1.3; }
   .mega .tile small { display: block; color: var(--dim); font-size: 13.5px; margin-top: 2px; }
+  .mega .tile.vibe-t .pic img { object-position: 70% 50%; image-rendering: auto; } .mega .tile.vibe-t b { color: #ff6a1a; }
   .mega .tile.add .pic { border-style: dashed; background: transparent; color: var(--pink); font-size: 34px; font-weight: 200; }
   @media (max-width: 760px) { .mega .in { grid-template-columns: 1fr; padding-top: 14px; padding-bottom: 18px; } .mega .side { display: none; }
                               .mega .pic { width: 56px; height: 56px; } }
@@ -81,6 +97,11 @@
 </head>
 <body>
 <!--email_off-->
+<a class="vibe" href="/vibe/?ref=impressum"><div class="wrap">
+  <picture><source type="image/webp" srcset="/vibe/assets/img/banner-device.webp"><img src="/vibe/assets/img/banner-device.jpg" alt="" width="84" height="30"></picture>
+  <b>VIBE <em>FM</em> Mk1</b> <span class="t">Open firmware, <i>officially supported.</i></span>
+  <span class="offer"><strong>The first 100</strong> get 10% off</span> <span class="go">Join the list &rarr;</span>
+</div></a>
 <nav><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
   <div class="dd" id="dd">
     <button class="ddb" type="button" aria-expanded="false" aria-controls="mega">Devices<span class="ar" aria-hidden="true">▼</span></button>
@@ -97,6 +118,8 @@
           <span><b>M-VAVE FM-1</b><small><span id="dd-fm1">All</span> firmwares</small></span></a>
         <a class="tile" href="/smk37/" data-dev="smk37"><span class="pic"><img src="/smk37/img/smk-mix.png" alt=""></span>
           <span><b>M-VAVE SMK-37 Pro</b><small>14 firmwares · Pro, Elite, MKE-P37</small></span></a>
+        <a class="tile vibe-t" href="/vibe/?ref=menu" data-dev="vibe"><span class="pic"><img src="/vibe/assets/img/banner-device.jpg" alt=""></span>
+          <span><b>VIBE FM Mk1</b><small>Hardware with open firmware · join the list</small></span></a>
         <a class="tile add" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device"><span class="pic">+</span>
           <span><b>Your device</b><small>Firmware for another machine? Tell us.</small></span></a>
       </div>
