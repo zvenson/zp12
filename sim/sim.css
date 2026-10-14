@@ -184,5 +184,7 @@ footer { max-width: 1100px; margin: 0 auto; padding: 12px 16px 32px; color: var(
   .btn .kb { display: none; }
   .keys { height: 120px; }
   .key .kl { display: none; }
+  .key.w .pad { top: auto; bottom: 8px; font-size: 9px; }
+  .key.b .pad { display: none; }
   .info { grid-template-columns: 1fr; }
 }

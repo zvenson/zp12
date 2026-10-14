@@ -65,8 +65,8 @@
       const [wasm] = await Promise.all([fetch('zp12.wasm').then((r) => { if (!r.ok) throw new Error('zp12.wasm: ' + r.status); return r.arrayBuffer(); }),
         S.ctx.audioWorklet.addModule('worklet.js')]);
       S.node = new AudioWorkletNode(S.ctx, 'zp12', { numberOfInputs: 0, outputChannelCount: [2], processorOptions: { wasm, store: loadStore(), master: S.master } });
-      S.node.port.onmessage = (ev) => {
-        const m = ev.data;
+      S.node.port.onmessage = (e) => {         // (not "ev": that is the Matomo helper above)
+        const m = e.data;
         if (m.t === 'frame') { if (m.fb) draw(m.fb); leds(m.leds, m.keys, m.glow); bank(m.bank); if (m.halted && !S.halted) { S.halted = 1; say('Restart', 'the firmware asked for a reboot: reload the page'); power.hidden = false; } }
         else if (m.t === 'store') saveStore(m.data);
         else if (m.t === 'ready') { S.on = true; power.hidden = true; ev('start'); setTimeout(() => ev('1 min'), 60e3); setTimeout(() => ev('5 min'), 300e3); }
