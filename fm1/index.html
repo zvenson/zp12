@@ -57,6 +57,16 @@
   .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; } .mark:hover { text-decoration: none; }
   .mark b { font-weight: 800; color: var(--cyan); }
   nav .home { font-size: 14px; color: var(--dim); }
+  /* the devices: the FM-1 is this hub; the others link out until they have their own */
+  nav .devs { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+  nav .devs .lbl { color: var(--dim); font-size: 11px; letter-spacing: 1.8px; text-transform: uppercase; font-weight: 700; margin-right: 6px; }
+  nav .devs a { color: var(--fg); padding: 6px 13px; border-radius: 999px; box-shadow: inset 0 0 0 1px var(--line); white-space: nowrap; }
+  nav .devs a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--beige); }
+  nav .devs a[aria-current] { background: var(--fg); color: #121011; box-shadow: none; font-weight: 700; }
+  nav .devs a.add { color: var(--dim); box-shadow: none; border: 1px dashed var(--line); padding: 5px 12px; }
+  @media (max-width: 760px) { nav .wrap { flex-wrap: wrap; height: auto; min-height: 60px; padding-top: 10px; padding-bottom: 10px; row-gap: 8px; }
+    .mark { font-size: 18px; } nav .devs { font-size: 13px; gap: 5px; } nav .devs a { padding: 5px 10px; }
+    nav .devs .lbl, nav .devs .long, nav .devs a.add { display: none; } }
   /* VIBE FM teaser (thefirmwarehub.com/vibe/, own PHP page): one slim line above the nav, the device and its orange */
   .vibe { display: block; position: relative; background: #0c0a0a; color: var(--text); font-size: 14px; }
   .vibe::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
@@ -258,6 +268,7 @@
   <span class="offer"><strong>The first 100</strong> get 10% off</span> <span class="go">Join the list &rarr;</span>
 </div></a>
 <nav><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
+  <div class="devs" role="navigation" aria-label="Devices"><span class="lbl">Devices</span><a href="https://thefirmwarehub.com/" aria-current="page"><span class="long">M-VAVE </span>FM-1</a><a href="https://chancethemaker.github.io/felucca-smk/" target="_blank" rel="noopener" title="M-VAVE SMK-37 Pro: Felucca SMK by Chance Roth, with its own installer">SMK-37<span class="long"> Pro</span> ↗</a><a class="add" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device" title="Made open-source firmware for another small music machine? It gets its own hub here.">+ Your device</a></div>
   <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
 <div class="strip"><i></i><i></i><i></i><i></i></div>
 <div class="recent" id="recent" hidden></div>
