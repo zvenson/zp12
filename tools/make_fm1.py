@@ -13,18 +13,23 @@ HERE = Path(__file__).resolve().parents[1]
 def smk_cards():
     """the SMK-37 page's cards from web/smk37.json: (the firmwares made for it, the FM-1 ports), static for the search engines"""
     d = json.loads((HERE / "web" / "smk37.json").read_text(encoding="utf-8"))
+    sys.path.insert(0, str(HERE / "tools"))
+    import fm1_sync                                     # (a port's kinds: its FM-1 entry's, as the FM-1 page shows them)
+    kinds = {f["id"]: [f["kind"]] if isinstance(f["kind"], str) else f["kind"] for f in fm1_sync.FIRMWARES}
+    label = {"synth": "synth", "groove": "groovebox", "drums": "drums · sampler", "chords": "chords", "dev": "for developers", "other": "other"}
     e = lambda x: html.escape(str(x), quote=True)
     out = lambda u, t, c="": f'<a{c} href="{e(u)}" target="_blank" rel="noopener">{t}</a>'
     def card(f, port):
-        tags = ('<span class="tag beta">beta</span>' if f.get("beta") else "") + (f'<span class="tag port">port</span>' if port else "") + \
-            "".join(f'<span class="tag">{e(k)}</span>' for k in f["kind"]) + f'<span class="tag">{e(f["models"])}</span>'
+        kind = kinds[f["fm1"]] if port else f["kind"]
+        tags = ('<span class="tag beta">beta</span>' if f.get("beta") else "") + ('<span class="tag port">FM-1 port</span>' if port else "") + \
+            "".join(f'<span class="tag kind">{label[k]}</span>' for k in kind) + f'<span class="tag model">{e(f["models"])}</span>'
         by = (f'{e(f["orig"])} by {out("https://github.com/" + f["orig_repo"], e(f["by"]))}, SMK-37 build by '
               f'{out("https://github.com/genkigenki", "genkigenki")}' if port else f'by {e(f["by"])}')
         links = out(f["install"], "Install on its installer ↗", ' class="go"')
         if port:
             links += f'<a href="/#fw-{e(f["fm1"])}">On the FM-1 hub</a>'
         links += "".join(out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
-        return (f'<article class="fw" id="fw-{e(f["id"])}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
+        return (f'<article class="fw" id="fw-{e(f["id"])}" data-kind="{" ".join(kind)}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
                 f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <h3>{e(f["name"])}<small>{e(f["version"])}</small></h3>'
                 f'<div class="by">{by}</div><div class="tags">{tags}</div>\n  <p class="what">{e(f["what"])}</p>'
                 + (f'<div class="note">{e(f["note"])}</div>' if f.get("note") else "")

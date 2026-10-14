@@ -1,5 +1,5 @@
 {
- "_": "The SMK-37 page's firmwares (tools/make_fm1.py renders web/smk37.html's <!--SMK-CARDS--> from it). Versions as on the makers' installers (genkigenki.github.io/smk37: its const FW); update them here when they change.",
+ "_": "The SMK-37 page's firmwares (tools/make_fm1.py renders web/smk37.html's <!--SMK-CARDS--> from it). Versions as on the makers' installers (genkigenki.github.io/smk37: its const FW); update them here when they change. The ports' kinds come from tools/fm1_sync.py (their FM-1 entries).",
  "own": [
   {
    "id": "felucca-smk",
@@ -9,7 +9,7 @@
    "img": "img/smk-mix.png",
    "kind": [
     "synth",
-    "sequencer"
+    "groove"
    ],
    "beta": true,
    "models": "Pro · Elite",
@@ -61,9 +61,6 @@
    "orig_repo": "isod89/sloop-fm1",
    "img": "/img/sloop.png",
    "wide": false,
-   "kind": [
-    "groove"
-   ],
    "what": "SLOOP, the four-track looper groovebox, with the SMK's pads in track colours, a pad sound picker, fader banks and drums on the outer keys.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/sloop-fm1/tree/snoop37",
@@ -80,10 +77,6 @@
    "orig_repo": "charlesvestal/fm1-x0x",
    "img": "/img/x0x.png",
    "wide": false,
-   "kind": [
-    "groove",
-    "drums"
-   ],
    "what": "A 909, an 808, two 303s with a line generator and a breakbeat player, all at once; the pads as a 16-step grid.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/fm1-x0x/tree/smk37",
@@ -100,9 +93,6 @@
    "orig_repo": "charlesvestal/fm1-fomni",
    "img": "/img/fomni.png",
    "wide": false,
-   "kind": [
-    "chords"
-   ],
    "what": "An Omnichord-style chord harp: the 16 pads become the strum plate, the keybed holds the chords.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/fm1-fomni/tree/smk37",
@@ -119,9 +109,6 @@
    "orig_repo": "okumurari2/maku",
    "img": "/img/maku.png",
    "wide": false,
-   "kind": [
-    "other"
-   ],
    "what": "An always-on ambience machine: power it on and a new, random, in-key world is already playing; verbs on the buttons and wheels.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/MAKU37",
@@ -138,9 +125,6 @@
    "orig_repo": "joshbartlettband-web/felucca-rainbow",
    "img": "/img/rainbow.png",
    "wide": false,
-   "kind": [
-    "other"
-   ],
    "what": "A music toy for kids: colour-coded notes on the pads, 40 friends who sing along, no menus.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/RAINBOW37",
@@ -157,9 +141,6 @@
    "orig_repo": "jasonpersinger/ghoulbox-fm1-dungeon-synth",
    "img": "/img/ghoulbox.png",
    "wide": true,
-   "kind": [
-    "synth"
-   ],
    "what": "Dungeon synth: dark ambient, medieval and fantasy sounds, drones, a hurdy-gurdy crank and two sounds at once.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/Felucca/tree/ghoulbox-smk37",
@@ -176,9 +157,6 @@
    "orig_repo": "Quixotic7/ChoralRootFM1",
    "img": "/img/choralroot.png",
    "wide": false,
-   "kind": [
-    "chords"
-   ],
    "what": "A chord instrument in the manner of the Orchid: one hand plays roots, the other picks the chord.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/ChoralRootFM1/tree/smk37",
@@ -195,9 +173,6 @@
    "orig_repo": "dspaudio/orbit",
    "img": "/img/orbit.png",
    "wide": false,
-   "kind": [
-    "groove"
-   ],
    "what": "A four-track groovebox with OP-1-inspired screens: three synth parts, a drum machine, an event tape and a mixer.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/orbit/tree/smk37",
@@ -214,9 +189,6 @@
    "orig_repo": "charlesvestal/fm1-amb",
    "img": "/img/amb.png",
    "wide": false,
-   "kind": [
-    "other"
-   ],
    "what": "A generative ambient machine after Music for Airports: loops of different lengths drift past each other and never repeat.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/fm1-amb/tree/smk37",
@@ -233,10 +205,6 @@
    "orig_repo": "charlesvestal/fm1-polly",
    "img": "/img/polly.png",
    "wide": false,
-   "kind": [
-    "groove",
-    "chords"
-   ],
    "what": "A pocket arranger after the Yamaha QY70: a band of eight General MIDI instruments follows the chords you play.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/fm1-polly/tree/smk37",
@@ -253,10 +221,6 @@
    "orig_repo": "hericdk/winampFM",
    "img": "/img/winampfm.png",
    "wide": false,
-   "kind": [
-    "groove",
-    "synth"
-   ],
    "what": "A synth groovebox in the look of Winamp 2.x, built on SLOOP: player, playlist, effect sliders and a visualizer.",
    "install": "https://genkigenki.github.io/smk37/",
    "source": "https://github.com/genkigenki/winampFM/tree/smk37",

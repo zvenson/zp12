@@ -81,10 +81,17 @@
   .lead { font-size: 18.5px; color: var(--text); max-width: 42em; margin: 0; }
   main { padding: 20px 0 80px; }
   h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 22px; font-weight: 600; }
-  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-bottom: 52px; }
-  .sub { color: var(--text); margin: -10px 0 24px; max-width: 52em; }
+  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }   /* 4 a row, as on the FM-1 page */
+  h2.sec { text-align: center; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: -6px 0 28px; }
+  .chips button { font: inherit; font-weight: 700; line-height: 1; border: 0; border-radius: 10px; cursor: pointer; background: transparent;
+                  color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 11px 18px; font-size: 14.5px; }
+  .chips button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
+  .chips button[aria-selected="true"] { background: var(--fg); color: #121011; box-shadow: none; }
+  .chips button span { opacity: .55; font-weight: 600; margin-left: 4px; }
+  .fw[hidden] { display: none; }
   .models { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--smk); border-radius: 12px; padding: 16px 22px;
-            color: var(--text); font-size: 15px; margin: 0 0 44px; }
+            color: var(--text); font-size: 15px; margin: 0 0 40px; }
   .fw { --c: var(--smk); position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 0 26px 24px;
         display: flex; flex-direction: column; gap: 12px; overflow: hidden; transition: transform .12s, border-color .15s, background .15s; }
   .fw:hover { transform: translateY(-3px); border-color: var(--c); background: var(--panel2); }
@@ -96,8 +103,9 @@
   .by { color: var(--dim); font-size: 14px; line-height: 1.5; }
   .by a { color: var(--text); }
   .tags { display: flex; gap: 6px; flex-wrap: wrap; }
-  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 6px;
-         background: rgba(239, 232, 225, .08); color: var(--dim); }
+  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 6px; }
+  .tag.kind { background: rgba(239, 232, 225, .08); color: var(--dim); }
+  .tag.model { background: rgba(255, 107, 94, .10); color: var(--smk); }
   .tag.beta { background: rgba(242, 196, 109, .14); color: var(--warn); }
   .tag.port { background: rgba(66, 245, 245, .10); color: var(--cyan); }
   .what { margin: 0; color: var(--text); font-size: 15.5px; }
@@ -168,53 +176,51 @@
 
 <main><div class="wrap">
   <div class="models"><b>Pick your keyboard's own model in the installer.</b> Most firmwares here come as three packages: SMK-37 Pro,
-    SMK-37 Elite and MKE-P37 (a Starrykey 37 Play takes the Pro's). They install in Chrome or Edge over USB from their makers'
-    installers. Back up your sounds first; M-Vave's updater takes the keyboard back to its factory firmware, and holding
-    <b>OCT−</b> while switching on is the rescue.</div>
-  <h2 class="sec">Made for the SMK-37</h2>
-  <div class="grid"><article class="fw" id="fw-felucca-smk"><div class="shot"><img src="img/smk-mix.png" alt="Felucca SMK on the SMK-37" loading="lazy"></div>
-  <h3>Felucca SMK<small>0.9.24 beta</small></h3><div class="by">by Chance Roth (ChanceTheMaker)</div><div class="tags"><span class="tag beta">beta</span><span class="tag">synth</span><span class="tag">sequencer</span><span class="tag">Pro · Elite</span></div>
+    SMK-37 Elite and MKE-P37 (a Starrykey 37 Play takes the Pro's). The <b>FM-1 ports</b> are the firmwares of
+    <a href="/">the FM-1 hub</a>, built for the SMK-37 by genkigenki with
+    <a href="https://github.com/genkigenki/fm1-to-smk37" target="_blank" rel="noopener">fm1-to-smk37</a>. Everything installs in
+    Chrome or Edge over USB from its maker's installer. Back up your sounds first; M-Vave's updater takes the keyboard back to its
+    factory firmware, and holding <b>OCT−</b> while switching it on is the rescue.</div>
+  <h2 class="sec">13 open-source firmwares, one SMK-37</h2>
+  <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
+  <div class="grid" id="grid"><article class="fw" id="fw-felucca-smk" data-kind="synth groove"><div class="shot"><img src="img/smk-mix.png" alt="Felucca SMK on the SMK-37" loading="lazy"></div>
+  <h3>Felucca SMK<small>0.9.24 beta</small></h3><div class="by">by Chance Roth (ChanceTheMaker)</div><div class="tags"><span class="tag beta">beta</span><span class="tag kind">synth</span><span class="tag kind">groovebox</span><span class="tag model">Pro · Elite</span></div>
   <p class="what">Felucca&#x27;s synthesis and sequencing on the SMK&#x27;s 37 keys, pads, knobs, faders, wheels and display: engines from FM6 to phase distortion, chiptune and samples, a step sequencer, a browser Studio and a simulator.</p><div class="note">Its installer builds the package from the keyboard&#x27;s official firmware 016 and its calibration: 016 first, back up before.</div><div class="links"><a class="go" href="https://chancethemaker.github.io/felucca-smk/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="https://chancethemaker.github.io/felucca-smk/simulator.html" target="_blank" rel="noopener">▶ Simulator ↗</a><a href="https://chancethemaker.github.io/felucca-smk/editor.html" target="_blank" rel="noopener">✎ Studio ↗</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/ChanceTheMaker/felucca-smk" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-makkuro37"><div class="shot"><img src="img/makkuro37.png" alt="Makkuro37 on the SMK-37" loading="lazy"></div>
-  <h3>Makkuro37<small>0.1</small></h3><div class="by">by genkigenki</div><div class="tags"><span class="tag">synth</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-makkuro37" data-kind="synth"><div class="shot"><img src="img/makkuro37.png" alt="Makkuro37 on the SMK-37" loading="lazy"></div>
+  <h3>Makkuro37<small>0.1</small></h3><div class="by">by genkigenki</div><div class="tags"><span class="tag kind">synth</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">A microtonal drone synth: eight drones in eight columns, each a little soot creature on the screen, the pads gate them, a CHAOS pad, fader banks, 96 presets in six themes. After the Subharmonicon and the Horn of Abraxas.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="https://genkigenki.github.io/smk37/makkuro37-sim/" target="_blank" rel="noopener">▶ Simulator ↗</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/Makkuro37" target="_blank" rel="noopener">source</a></div></article>
-</div>
-  <h2 class="sec">From the FM-1, ported by genkigenki</h2>
-  <p class="sub">The FM-1 firmwares from <a href="/">the FM-1 hub</a>, built for the SMK-37 with
-    <a href="https://github.com/genkigenki/fm1-to-smk37" target="_blank" rel="noopener">fm1-to-smk37</a>: the pads, faders,
-    wheels and outer keys mapped to each firmware, sent back to its maker as a pull request.</p>
-  <div class="grid"><article class="fw" id="fw-snoop37"><div class="shot"><img src="/img/sloop.png" alt="Snoop37 on the SMK-37" loading="lazy"></div>
-  <h3>Snoop37<small>2.6.3</small></h3><div class="by">SLOOP by <a href="https://github.com/isod89/sloop-fm1" target="_blank" rel="noopener">isod89</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">groove</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-snoop37" data-kind="groove"><div class="shot"><img src="/img/sloop.png" alt="Snoop37 on the SMK-37" loading="lazy"></div>
+  <h3>Snoop37<small>2.6.3</small></h3><div class="by">SLOOP by <a href="https://github.com/isod89/sloop-fm1" target="_blank" rel="noopener">isod89</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">groovebox</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">SLOOP, the four-track looper groovebox, with the SMK&#x27;s pads in track colours, a pad sound picker, fader banks and drums on the outer keys.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-sloop">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/sloop-fm1/tree/snoop37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-x0x37"><div class="shot"><img src="/img/x0x.png" alt="X0X on the SMK-37" loading="lazy"></div>
-  <h3>X0X<small>0.2</small></h3><div class="by">X0X by <a href="https://github.com/charlesvestal/fm1-x0x" target="_blank" rel="noopener">Charles Vestal</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">groove</span><span class="tag">drums</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-x0x37" data-kind="groove"><div class="shot"><img src="/img/x0x.png" alt="X0X on the SMK-37" loading="lazy"></div>
+  <h3>X0X<small>0.2</small></h3><div class="by">X0X by <a href="https://github.com/charlesvestal/fm1-x0x" target="_blank" rel="noopener">Charles Vestal</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">groovebox</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">A 909, an 808, two 303s with a line generator and a breakbeat player, all at once; the pads as a 16-step grid.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-x0x">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/fm1-x0x/tree/smk37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-fomni37"><div class="shot"><img src="/img/fomni.png" alt="FoMni on the SMK-37" loading="lazy"></div>
-  <h3>FoMni<small>0.2</small></h3><div class="by">FoMni by <a href="https://github.com/charlesvestal/fm1-fomni" target="_blank" rel="noopener">Charles Vestal</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">chords</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-fomni37" data-kind="chords"><div class="shot"><img src="/img/fomni.png" alt="FoMni on the SMK-37" loading="lazy"></div>
+  <h3>FoMni<small>0.2</small></h3><div class="by">FoMni by <a href="https://github.com/charlesvestal/fm1-fomni" target="_blank" rel="noopener">Charles Vestal</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">chords</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">An Omnichord-style chord harp: the 16 pads become the strum plate, the keybed holds the chords.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-fomni">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/fm1-fomni/tree/smk37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-maku37"><div class="shot"><img src="/img/maku.png" alt="MAKU on the SMK-37" loading="lazy"></div>
-  <h3>MAKU<small>0.1</small></h3><div class="by">MAKU by <a href="https://github.com/okumurari2/maku" target="_blank" rel="noopener">okumurari</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">other</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-maku37" data-kind="groove synth"><div class="shot"><img src="/img/maku.png" alt="MAKU on the SMK-37" loading="lazy"></div>
+  <h3>MAKU<small>0.1</small></h3><div class="by">MAKU by <a href="https://github.com/okumurari2/maku" target="_blank" rel="noopener">okumurari</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">groovebox</span><span class="tag kind">synth</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">An always-on ambience machine: power it on and a new, random, in-key world is already playing; verbs on the buttons and wheels.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-maku">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/MAKU37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-rainbow37"><div class="shot"><img src="/img/rainbow.png" alt="Rainbow Mode on the SMK-37" loading="lazy"></div>
-  <h3>Rainbow Mode<small>0.2</small></h3><div class="by">Rainbow Mode by <a href="https://github.com/joshbartlettband-web/felucca-rainbow" target="_blank" rel="noopener">joshbartlettband-web</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">other</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-rainbow37" data-kind="other"><div class="shot"><img src="/img/rainbow.png" alt="Rainbow Mode on the SMK-37" loading="lazy"></div>
+  <h3>Rainbow Mode<small>0.2</small></h3><div class="by">Rainbow Mode by <a href="https://github.com/joshbartlettband-web/felucca-rainbow" target="_blank" rel="noopener">joshbartlettband-web</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">other</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">A music toy for kids: colour-coded notes on the pads, 40 friends who sing along, no menus.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-rainbow">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/RAINBOW37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-ghoulbox"><div class="shot wide"><img src="/img/ghoulbox.png" alt="GHOULBOX on the SMK-37" loading="lazy"></div>
-  <h3>GHOULBOX<small>2.1</small></h3><div class="by">GHOULBOX by <a href="https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth" target="_blank" rel="noopener">Jason Persinger</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">synth</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-ghoulbox" data-kind="synth groove"><div class="shot wide"><img src="/img/ghoulbox.png" alt="GHOULBOX on the SMK-37" loading="lazy"></div>
+  <h3>GHOULBOX<small>2.1</small></h3><div class="by">GHOULBOX by <a href="https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth" target="_blank" rel="noopener">Jason Persinger</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">synth</span><span class="tag kind">groovebox</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">Dungeon synth: dark ambient, medieval and fantasy sounds, drones, a hurdy-gurdy crank and two sounds at once.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-ghoulbox">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/Felucca/tree/ghoulbox-smk37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-choralroot"><div class="shot"><img src="/img/choralroot.png" alt="ChoralRoot on the SMK-37" loading="lazy"></div>
-  <h3>ChoralRoot<small>0.21</small></h3><div class="by">ChoralRoot by <a href="https://github.com/Quixotic7/ChoralRootFM1" target="_blank" rel="noopener">Quixotic7</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">chords</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-choralroot" data-kind="chords"><div class="shot"><img src="/img/choralroot.png" alt="ChoralRoot on the SMK-37" loading="lazy"></div>
+  <h3>ChoralRoot<small>0.21</small></h3><div class="by">ChoralRoot by <a href="https://github.com/Quixotic7/ChoralRootFM1" target="_blank" rel="noopener">Quixotic7</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">chords</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">A chord instrument in the manner of the Orchid: one hand plays roots, the other picks the chord.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-choralroot">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/ChoralRootFM1/tree/smk37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-orbit"><div class="shot"><img src="/img/orbit.png" alt="ORBIT on the SMK-37" loading="lazy"></div>
-  <h3>ORBIT<small>0.7.0</small></h3><div class="by">ORBIT by <a href="https://github.com/dspaudio/orbit" target="_blank" rel="noopener">dspaudio</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">groove</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-orbit" data-kind="groove synth"><div class="shot"><img src="/img/orbit.png" alt="ORBIT on the SMK-37" loading="lazy"></div>
+  <h3>ORBIT<small>0.7.0</small></h3><div class="by">ORBIT by <a href="https://github.com/dspaudio/orbit" target="_blank" rel="noopener">dspaudio</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">groovebox</span><span class="tag kind">synth</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">A four-track groovebox with OP-1-inspired screens: three synth parts, a drum machine, an event tape and a mixer.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-orbit">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/orbit/tree/smk37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-amb"><div class="shot"><img src="/img/amb.png" alt="AMB-1 on the SMK-37" loading="lazy"></div>
-  <h3>AMB-1<small>1.1</small></h3><div class="by">AMB-1 by <a href="https://github.com/charlesvestal/fm1-amb" target="_blank" rel="noopener">Charles Vestal</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">other</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-amb" data-kind="synth"><div class="shot"><img src="/img/amb.png" alt="AMB-1 on the SMK-37" loading="lazy"></div>
+  <h3>AMB-1<small>1.1</small></h3><div class="by">AMB-1 by <a href="https://github.com/charlesvestal/fm1-amb" target="_blank" rel="noopener">Charles Vestal</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">synth</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">A generative ambient machine after Music for Airports: loops of different lengths drift past each other and never repeat.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-amb">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/fm1-amb/tree/smk37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-polly"><div class="shot"><img src="/img/polly.png" alt="Polly on the SMK-37" loading="lazy"></div>
-  <h3>Polly<small>0.4.1</small></h3><div class="by">Polly by <a href="https://github.com/charlesvestal/fm1-polly" target="_blank" rel="noopener">Charles Vestal</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">groove</span><span class="tag">chords</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-polly" data-kind="groove chords"><div class="shot"><img src="/img/polly.png" alt="Polly on the SMK-37" loading="lazy"></div>
+  <h3>Polly<small>0.4.1</small></h3><div class="by">Polly by <a href="https://github.com/charlesvestal/fm1-polly" target="_blank" rel="noopener">Charles Vestal</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">groovebox</span><span class="tag kind">chords</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">A pocket arranger after the Yamaha QY70: a band of eight General MIDI instruments follows the chords you play.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-polly">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/fm1-polly/tree/smk37" target="_blank" rel="noopener">source</a></div></article>
-<article class="fw" id="fw-winamp"><div class="shot"><img src="/img/winampfm.png" alt="winampFM Synth on the SMK-37" loading="lazy"></div>
-  <h3>winampFM Synth<small>0.1</small></h3><div class="by">winampFM Synth by <a href="https://github.com/hericdk/winampFM" target="_blank" rel="noopener">Hericdk</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">port</span><span class="tag">groove</span><span class="tag">synth</span><span class="tag">Pro · Elite · MKE-P37</span></div>
+<article class="fw" id="fw-winamp" data-kind="groove synth"><div class="shot"><img src="/img/winampfm.png" alt="winampFM Synth on the SMK-37" loading="lazy"></div>
+  <h3>winampFM Synth<small>0.1</small></h3><div class="by">winampFM Synth by <a href="https://github.com/hericdk/winampFM" target="_blank" rel="noopener">Hericdk</a>, SMK-37 build by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag port">FM-1 port</span><span class="tag kind">groovebox</span><span class="tag kind">synth</span><span class="tag model">Pro · Elite · MKE-P37</span></div>
   <p class="what">A synth groovebox in the look of Winamp 2.x, built on SLOOP: player, playlist, effect sliders and a visualizer.</p><div class="links"><a class="go" href="https://genkigenki.github.io/smk37/" target="_blank" rel="noopener">Install on its installer ↗</a><a href="/#fw-winampfm">On the FM-1 hub</a></div><div class="meta">GPL-3.0 · <a href="https://github.com/genkigenki/winampFM/tree/smk37" target="_blank" rel="noopener">source</a></div></article>
 
     <div class="card">
@@ -225,6 +231,27 @@
     </div>
   </div>
 </div></main>
+<script>
+"use strict";
+// the chips as on the FM-1 page: a kind with its count; #groove links straight to one kind
+const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"], ["other", "Other"]];
+const cards = [...document.querySelectorAll("#grid .fw")], kindsOf = (el) => el.dataset.kind.split(" ");
+let kind = (location.hash || "").slice(1);
+function chips() {
+  if (!KINDS.some(([k]) => k === kind)) kind = "all";
+  const box = document.getElementById("chips");
+  box.innerHTML = KINDS.map(([k, label]) => {
+    const n = k === "all" ? cards.length : cards.filter((el) => kindsOf(el).includes(k)).length;
+    return n ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${n}</span></button>` : "";
+  }).join("");
+  box.querySelectorAll("button").forEach((b) => b.onclick = () => {
+    kind = b.dataset.k; history.replaceState(null, "", kind === "all" ? location.pathname + location.search : "#" + kind);
+    chips();
+  });
+  cards.forEach((el) => el.hidden = kind !== "all" && !kindsOf(el).includes(kind));
+}
+chips();
+</script>
 
 <footer><div class="wrap">
   The Firmware Hub by <a href="https://github.com/zvenson" rel="noopener">zvenson</a>. Each firmware is its maker's, installed from

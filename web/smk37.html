@@ -48,10 +48,17 @@
   .lead { font-size: 18.5px; color: var(--text); max-width: 42em; margin: 0; }
   main { padding: 20px 0 80px; }
   h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 22px; font-weight: 600; }
-  .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-bottom: 52px; }
-  .sub { color: var(--text); margin: -10px 0 24px; max-width: 52em; }
+  .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; }   /* 4 a row, as on the FM-1 page */
+  h2.sec { text-align: center; }
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: -6px 0 28px; }
+  .chips button { font: inherit; font-weight: 700; line-height: 1; border: 0; border-radius: 10px; cursor: pointer; background: transparent;
+                  color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 11px 18px; font-size: 14.5px; }
+  .chips button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
+  .chips button[aria-selected="true"] { background: var(--fg); color: #121011; box-shadow: none; }
+  .chips button span { opacity: .55; font-weight: 600; margin-left: 4px; }
+  .fw[hidden] { display: none; }
   .models { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--smk); border-radius: 12px; padding: 16px 22px;
-            color: var(--text); font-size: 15px; margin: 0 0 44px; }
+            color: var(--text); font-size: 15px; margin: 0 0 40px; }
   .fw { --c: var(--smk); position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 0 26px 24px;
         display: flex; flex-direction: column; gap: 12px; overflow: hidden; transition: transform .12s, border-color .15s, background .15s; }
   .fw:hover { transform: translateY(-3px); border-color: var(--c); background: var(--panel2); }
@@ -63,8 +70,9 @@
   .by { color: var(--dim); font-size: 14px; line-height: 1.5; }
   .by a { color: var(--text); }
   .tags { display: flex; gap: 6px; flex-wrap: wrap; }
-  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 6px;
-         background: rgba(239, 232, 225, .08); color: var(--dim); }
+  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 6px; }
+  .tag.kind { background: rgba(239, 232, 225, .08); color: var(--dim); }
+  .tag.model { background: rgba(255, 107, 94, .10); color: var(--smk); }
   .tag.beta { background: rgba(242, 196, 109, .14); color: var(--warn); }
   .tag.port { background: rgba(66, 245, 245, .10); color: var(--cyan); }
   .what { margin: 0; color: var(--text); font-size: 15.5px; }
@@ -105,16 +113,14 @@
 
 <main><div class="wrap">
   <div class="models"><b>Pick your keyboard's own model in the installer.</b> Most firmwares here come as three packages: SMK-37 Pro,
-    SMK-37 Elite and MKE-P37 (a Starrykey 37 Play takes the Pro's). They install in Chrome or Edge over USB from their makers'
-    installers. Back up your sounds first; M-Vave's updater takes the keyboard back to its factory firmware, and holding
-    <b>OCT−</b> while switching on is the rescue.</div>
-  <h2 class="sec">Made for the SMK-37</h2>
-  <div class="grid"><!--SMK-OWN--></div>
-  <h2 class="sec">From the FM-1, ported by genkigenki</h2>
-  <p class="sub">The FM-1 firmwares from <a href="/">the FM-1 hub</a>, built for the SMK-37 with
-    <a href="https://github.com/genkigenki/fm1-to-smk37" target="_blank" rel="noopener">fm1-to-smk37</a>: the pads, faders,
-    wheels and outer keys mapped to each firmware, sent back to its maker as a pull request.</p>
-  <div class="grid"><!--SMK-PORTS-->
+    SMK-37 Elite and MKE-P37 (a Starrykey 37 Play takes the Pro's). The <b>FM-1 ports</b> are the firmwares of
+    <a href="/">the FM-1 hub</a>, built for the SMK-37 by genkigenki with
+    <a href="https://github.com/genkigenki/fm1-to-smk37" target="_blank" rel="noopener">fm1-to-smk37</a>. Everything installs in
+    Chrome or Edge over USB from its maker's installer. Back up your sounds first; M-Vave's updater takes the keyboard back to its
+    factory firmware, and holding <b>OCT−</b> while switching it on is the rescue.</div>
+  <h2 class="sec"><!--SMK-N--> open-source firmwares, one SMK-37</h2>
+  <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
+  <div class="grid" id="grid"><!--SMK-OWN--><!--SMK-PORTS-->
     <div class="card">
       <div class="plus">+</div>
       <h3>Made firmware for the SMK-37?</h3>
@@ -123,6 +129,27 @@
     </div>
   </div>
 </div></main>
+<script>
+"use strict";
+// the chips as on the FM-1 page: a kind with its count; #groove links straight to one kind
+const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"], ["other", "Other"]];
+const cards = [...document.querySelectorAll("#grid .fw")], kindsOf = (el) => el.dataset.kind.split(" ");
+let kind = (location.hash || "").slice(1);
+function chips() {
+  if (!KINDS.some(([k]) => k === kind)) kind = "all";
+  const box = document.getElementById("chips");
+  box.innerHTML = KINDS.map(([k, label]) => {
+    const n = k === "all" ? cards.length : cards.filter((el) => kindsOf(el).includes(k)).length;
+    return n ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${n}</span></button>` : "";
+  }).join("");
+  box.querySelectorAll("button").forEach((b) => b.onclick = () => {
+    kind = b.dataset.k; history.replaceState(null, "", kind === "all" ? location.pathname + location.search : "#" + kind);
+    chips();
+  });
+  cards.forEach((el) => el.hidden = kind !== "all" && !kindsOf(el).includes(kind));
+}
+chips();
+</script>
 
 <footer><div class="wrap">
   The Firmware Hub by <a href="https://github.com/zvenson" rel="noopener">zvenson</a>. Each firmware is its maker's, installed from
