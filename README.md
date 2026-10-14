@@ -43,8 +43,9 @@ without interpolation, eight output channels with their filters, a panel-style s
 
 ## New in 2.4 (built, not released yet)
 
-- **CHOP groups**: EDIT → WAVE, KNOB 4 = CHOP (--, 1, 2, 3). Pads in one group cut each other wherever they are,
-  so chops on A1–A8 play as one voice; each still plays through its own position's channel (fader, filter, mute).
+- **CHOP groups**: EDIT → OUT, KNOB 1 = CHOP (--, 1, 2, 3; its label shows the channel, CH1–8). Pads in one group
+  cut each other wherever they are, so chops on A1–A8 play as one voice; each still plays through its own position's
+  channel (fader, filter, mute). Hold pads while turning: they all take the group ("4 PADS CHOP 1").
   Pads on one position (A1, B1, C1, D1) cut each other as before. The editor's **Chop to pads** sets the group for
   you (Cut each other: group 1 unless you pick another). Why: chops on A1–A8 rang out over each other.
 

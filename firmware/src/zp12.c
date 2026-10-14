@@ -256,6 +256,7 @@ static void zp12_main(void)
         {   /* SEL held: the faders 5-8; LFO held: ERASE (the pads held lose their hits as the playhead passes) */
             uint32_t bt = fm1_in.buttons, er = 0, k;
             ui.held = bt;                               /* (SAVE held + a black key: key_down) */
+            ui.keys = n;                                /* (EDIT > OUT: CHOP turned sets the pads held) */
             if ((bt >> B_LFO) & 1u)
                 for (k = 0; k < 27u; k++)
                     if ((n >> k) & 1u) {

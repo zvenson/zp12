@@ -1,7 +1,7 @@
 # zp12 TODO
 
 ## 2.4: CHOP groups (built, not released)
-- A user: "chops on A1-A8 don't cut each other". Pads now have a CHOP group (--, 1-3, EDIT > WAVE KNOB 4, saved in
+- A user: "chops on A1-A8 don't cut each other". Pads now have a CHOP group (--, 1-3, EDIT > OUT KNOB 1 where CHAN was shown, the pads held take it too, saved in
   flags bits 2-3, old saves: none); the editor's Chop to pads sets it (link protocol 4, ASSIGN bit 18). Tests:
   sp_core_test "CHOP", zp12_link_test "CHOP group 2".
 - To do: on the device (A1-A8 chops in group 1 cut each other, SMOOTH: no click), then release 2.4 + site, cheat sheet PDF.

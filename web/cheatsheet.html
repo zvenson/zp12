@@ -87,7 +87,7 @@
 
   <div class="box" style="margin-top:6px"><h2>Sound</h2><div class="in">
     <table>
-      <tr><td>Channels</td><td>a pad plays on the channel of its <b>position</b>: pad 3 of every bank on channel 3 (fader 3, mute 3, solo 3). One sound at a time each: a new hit cuts the last (the hats share 3); a CHOP group (EDIT → WAVE) cuts across channels. Pads 1–2 have the filter</td></tr>
+      <tr><td>Channels</td><td>a pad plays on the channel of its <b>position</b>: pad 3 of every bank on channel 3 (fader 3, mute 3, solo 3). One sound at a time each: a new hit cuts the last (the hats share 3); a CHOP group (EDIT → OUT) cuts across channels. Pads 1–2 have the filter</td></tr>
       <tr><td>1–2</td><td>a 4-pole resonant low-pass: open as CUT at the hit, closing two octaves as the sound decays (RESO)</td></tr>
       <tr><td>3–6 · 7–8</td><td>a fixed low-pass · no filter (OUT: CUT / RESO --)</td></tr>
       <tr><td>45 → 33</td><td>TRUNC, SPEED: played at 33/45 of its rate: lower, grainier. Own samples also at ×2 (the editor): an octave down on the pad</td></tr>
@@ -110,10 +110,10 @@
 
   <div class="box" style="margin-top:6px"><h2>Pages · KNOB 1 · 2 · 3 · 4</h2><div class="in">
     <table>
-      <tr><td><span class="k">EDIT</span> WAVE</td><td>the pad's sample · COPY> pad · COPY (turn twice) · CHOP group (--, 1–3: the group's pads cut each other, wherever they are)</td></tr>
+      <tr><td><span class="k">EDIT</span> WAVE</td><td>the pad's sample · COPY> pad · COPY (turn twice) · –</td></tr>
       <tr><td>SOUND</td><td>TUNE (semitones) · FINE · DECAY · LEVEL</td></tr>
       <tr><td>TRUNC</td><td>START · END · DIR (fwd / rev) · SPEED (45 / 33)</td></tr>
-      <tr><td>OUT</td><td>CHAN (the pad's position) · PAN · CUT · RESO (only pads 1–2 filter: on 3–8 they show --)</td></tr>
+      <tr><td>OUT</td><td>CHOP group (--, 1–3: its pads cut each other, wherever they are; hold pads while turning: they all join; the label shows the channel = the pad's position) · PAN · CUT · RESO (only pads 1–2 filter: on 3–8 they show --)</td></tr>
       <tr><td>SENDS</td><td>DRIVE · CHO · DLY · REV: <b>the effects of this pad</b></td></tr>
       <tr><td><span class="k">FX</span> FILTER</td><td><b>DJ filter</b> on the whole mix: left a low-pass, right a high-pass, centre OFF · RESO</td></tr>
       <tr><td>CHORUS</td><td>RATE · DEPTH · MIX</td></tr>
@@ -242,7 +242,7 @@
       <tr><td>DELAY</td><td>TIME 1/4, 1/8, 1/16, 1/32, 8T, 16T; FDBK 0–120</td></tr>
       <tr><td>REVERB PRE</td><td>0–90 ms</td></tr>
       <tr><td>Filters</td><td>pads 1–2: CUT, RESO (4-pole low-pass) · 3–4: 9 kHz · 5–6: 12 kHz · 7–8: none</td></tr>
-      <tr><td>OUT CHAN</td><td>shows the channel: it is the pad's position and does not change</td></tr>
+      <tr><td>OUT CH1–8</td><td>the label shows the channel: it is the pad's position and does not change. Chops that should cut each other: a CHOP group</td></tr>
     </table>
   </div></div>
 

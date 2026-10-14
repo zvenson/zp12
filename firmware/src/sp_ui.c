@@ -66,6 +66,7 @@ static struct {
     uint8_t turn_pad;                           /* the pad whose TUNE / DECAY / CUT was turned last ... */
     uint32_t turn_ms;                           /* ... and when (recording: its hits take them) */
     uint32_t held;                              /* the buttons held (bit = matrix id) */
+    uint32_t keys;                              /* the keys held (bit = key 0..26; zp12.c): OUT's CHOP sets them all */
     uint8_t rec_on, rec_prev, holding;          /* REC: pressed, the state before, held into a CLEAR */
     uint8_t save_used, prev_page, fx_used;     /* SAVE held: a loop saved; the page before EDIT; FX held: a key pressed (a punch, not the pages) */
     uint8_t glo_used;                           /* GLO held: a key pressed (mute / solo, not the pages) */
@@ -152,7 +153,6 @@ static void page_cols(char lab[4][8], char val[4][8])
         COL(0, "WAVE", cat(val[0], wave_name(s->wave)));
         COL(1, "COPY>", pad_label(val[1], ui.copy_pad));
         COL(2, "COPY", cat(val[2], ui.arm == PG_WAVE + 1u ? "AGAIN" : "-->"));
-        COL(3, "CHOP", SPF_CHOP(s->flags) ? (void)num(val[3], (int32_t)SPF_CHOP(s->flags), 1, 0) : (void)cat(val[3], "--"));
         break;
     case PG_SOUND:
         COL(0, "TUNE", num(val[0], s->tune, 2, 1)); COL(1, "FINE", num(val[1], s->fine, 2, 1));
@@ -164,7 +164,8 @@ static void page_cols(char lab[4][8], char val[4][8])
         COL(3, "SPEED", cat(val[3], (s->flags & SPF_33) ? "33" : "45"));
         break;
     case PG_OUT:
-        COL(0, "CHAN", num(val[0], (int32_t)SP_CH_OF(ui.sel) + 1, 1, 0)); COL(1, "PAN", num(val[1], s->pan, 2, 1));
+        lab[0][0] = 'C'; lab[0][1] = 'H'; lab[0][2] = (char)('1' + SP_CH_OF(ui.sel)); lab[0][3] = 0;   /* the channel (its position) */
+        SPF_CHOP(s->flags) ? (void)num(cat(val[0], "CHOP"), (int32_t)SPF_CHOP(s->flags), 1, 0) : (void)cat(val[0], "--"); COL(1, "PAN", num(val[1], s->pan, 2, 1));
         if (SP_CH_OF(ui.sel) < 2u) { COL(2, "CUT", num(val[2], s->cut, 3, 0)); COL(3, "RESO", num(val[3], s->reso, 3, 0)); }
         else { COL(2, "CUT", cat(val[2], "--")); COL(3, "RESO", cat(val[3], "--")); }   /* (only channels 1-2 filter) */
         break;
@@ -738,8 +739,6 @@ static void knob(uint32_t n, int32_t d)
             sp_sound[ui.copy_pad] = *s;
             ui_say("SOUND COPIED");
         }
-        if (n == 3u)                                /* CHOP group: --, 1-3 (pads of one group cut each other) */
-            s->flags = (uint8_t)((s->flags & ~12u) | (uint32_t)sp_clamp((int32_t)SPF_CHOP(s->flags) + one, 0, 3) << 2);
         break;
     case PG_SOUND:
         if (n < 3u) { ui.turn_pad = ui.sel; ui.turn_ms = fm1_ms; }   /* (recording: the hits take TUNE / FINE / DECAY) */
@@ -755,7 +754,23 @@ static void knob(uint32_t n, int32_t d)
         if (n == 3u) s->flags = (uint8_t)(one > 0 ? s->flags | SPF_33 : s->flags & ~SPF_33);
         break;
     case PG_OUT:
-        if (n == 0u) { ui_say(SP_CH_OF(ui.sel) < 2u ? "CH = PAD: FILTER" : "CH = PAD 1-8"); break; }   /* (2.1: the position) */
+        if (n == 0u) {                          /* CHOP group --, 1-3: its pads cut each other; the pads held take it too */
+            uint32_t g = (uint32_t)sp_clamp((int32_t)SPF_CHOP(s->flags) + one, 0, 3), k, cnt = 1;
+            char m[24], *p;
+            s->flags = (uint8_t)((s->flags & ~12u) | g << 2);
+            for (k = 0; k < 27u; k++) {
+                uint32_t pd = (ui.keys >> k) & 1u ? key_pad(k) : 0xFFu;
+                if (pd < SP_NSOUND && pd != ui.sel) {
+                    sp_sound[pd].flags = (uint8_t)((sp_sound[pd].flags & ~12u) | g << 2);
+                    cnt++;
+                }
+            }
+            p = cnt > 1u ? cat(num(m, (int32_t)cnt, cnt >= 10u ? 2u : 1u, 0), " PADS ") : m;   /* (13 fit the big line) */
+            if (g) num(cat(p, "CHOP "), (int32_t)g, 1, 0);
+            else cat(p, "NO CHOP");
+            ui_say(m);
+            break;
+        }
         if (n == 1u) s->pan = (int8_t)sp_clamp(s->pan + dd, -64, 63);
         if (n >= 2u && SP_CH_OF(ui.sel) >= 2u) { ui_say("FILTER: PADS 1-2"); break; }   /* (3-8 have none to turn) */
         if (n == 2u) { s->cut = (uint8_t)sp_clamp(s->cut + dd, 0, 127); ui.turn_pad = ui.sel; ui.turn_ms = fm1_ms; }

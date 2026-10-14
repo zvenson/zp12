@@ -161,6 +161,13 @@ int main(int argc, char **argv)
     sp_mute = sp_solo = 0;
     ui.sel = 4; page(PG_OUT); i = sp_sound[4].cut; knob(2, 3); fm1_ms += 20; ui_draw(); ppm("zp12-out");   /* (pad 5: channel 5, 2.1) */
     if (sp_sound[4].cut != i || strcmp(ui.msg, "FILTER: PADS 1-2")) { printf("zp12 ui: CUT on CH5 not refused FAIL\n"); return 1; }
+    /* OUT > CHOP: KNOB 1 sets A1's group, the pads held (white 2-4: A2-A4) take it too; A5 stays out */
+    ui.pair = 0; ui.sel = 0; page(PG_OUT); ui.keys = 1u << 2 | 1u << 4 | 1u << 6; knob(0, 1); ui.keys = 0;
+    fm1_ms += 20; ui_draw(); ppm("zp12-chop");
+    if (SPF_CHOP(sp_sound[0].flags) != 1u || SPF_CHOP(sp_sound[1].flags) != 1u || SPF_CHOP(sp_sound[3].flags) != 1u ||
+        SPF_CHOP(sp_sound[4].flags) || strcmp(ui.msg, "4 PADS CHOP 1")) { printf("zp12 ui: OUT > CHOP on held pads FAIL (%s)\n", ui.msg); return 1; }
+    knob(0, -1);
+    if (SPF_CHOP(sp_sound[0].flags) || SPF_CHOP(sp_sound[1].flags) != 1u || strcmp(ui.msg, "NO CHOP")) { printf("zp12 ui: OUT > CHOP off FAIL\n"); return 1; }
     printf("zp12 ui: screens written to %s\n", dir);
     return 0;
 }
