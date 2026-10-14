@@ -135,7 +135,7 @@ static const char *sound_name(uint32_t k)
 static void pad_label(char *b, uint32_t k) { b[0] = (char)('A' + k / 8u); b[1] = (char)('1' + k % 8u); b[2] = 0; }
 
 /* the four columns of the page: label and value of KNOB 1-4 ("" = nothing on that knob) */
-static void page_cols(char lab[4][8], char val[4][8])
+static void page_cols(char lab[4][8], char val[4][12])   /* (val: an own sample's name is 8 letters + 0) */
 {
     const sp_sound_t *s = &sp_sound[ui.sel];
     uint32_t i;
@@ -293,7 +293,7 @@ static void draw_frame(void)                    /* once: the light frame */
 
 static void draw_lcd(void)                      /* the LCD: big the state, below it the knobs' four columns */
 {
-    char big[24], small[24], lab[4][8], val[4][8], *p = big;
+    char big[24], small[24], lab[4][8], val[4][12], *p = big;
     uint32_t i, bpm = sq.bpm10;
     cv_begin(232, 78, P_FRAME);
     cv_rect(0, 0, 232, 78, RGB(70, 76, 66));    /* the bezel */
@@ -1048,7 +1048,7 @@ static int32_t splash_kick(uint32_t i)            /* the sampled kick at x = i: 
 static void ui_splash(uint32_t t)
 {
     uint32_t i, lit = 0, n = t < 1300u ? t * 232u / 1300u : 232u, flash = t >= 1850u && t < 1990u;
-    char b[24];
+    char b[32];                                  /* the longest: "12-bit sampling drums  " + the version */
     cv_begin(240, 20, P_NAVY);                   /* the top: SAMPLING and its LED, the rate */
     if (t < 1300u) {
         cv_text_on(8, 2, &FONT_S, "SAMPLING", P_FRAME, P_NAVY);
@@ -1091,6 +1091,7 @@ static void ui_splash(uint32_t t)
         cv_rect(cx - 8, 5, 17, 2, (lit >> i) & 1u ? RGB(255, 140, 120) : RGB(48, 48, 52));
     }
     if (t >= 1900u) {
+        (void)sizeof(char[sizeof "12-bit sampling drums  " + sizeof ZP12_VER - 1u <= sizeof b ? 1 : -1]);   /* (fits, or no build) */
         cat(cat(b, "12-bit sampling drums  "), ZP12_VERSION);
         cv_text_on(116 - text_w(&FONT_S, b) / 2, 28, &FONT_S, b, P_FRAME, P_NAVY);
     }

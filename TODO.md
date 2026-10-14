@@ -1,5 +1,10 @@
 # zp12 TODO
 
+## 2.4.2: a fix (2026-10-14)
+- The start screen's text ("12-bit sampling drums  " + the version, 29 bytes at 2.4.1) no longer runs past its
+  buffer (ui_splash b[24] -> b[32], a compile-time check that it fits); found by the browser simulator. Also EDIT > WAVE:
+  an own sample's 8-letter name took 9 bytes of val[4][8] (now [4][12]).
+
 ## 2.4: CHOP groups (released 2026-10-14, not yet tried on the device)
 - A user: "chops on A1-A8 don't cut each other". Pads now have a CHOP group (--, 1-8 since 2.4.1, EDIT > OUT KNOB 1 where CHAN was shown, the pads held take it too, saved in
   flags bits 2-5, old saves: none); the editor's Chop to pads sets it (link protocol 5: ASSIGN bit 20 + group in 16-19; 4: bit 18 + 1-3). Tests:

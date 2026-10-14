@@ -138,5 +138,26 @@
     <a href="https://github.com/hericdk/winampFM">winampFM</a>.</p>
 </footer>
 <script src="sim.js"></script>
+<!-- Matomo (self-hosted, matomo.designburgapps.com): one site per host (dx7 1, zp12 3, fm1 4, designburgapps.com 5);
+     no cookies, IPs anonymised on the server, Do Not Track respected -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  var _mtmSite = {"zp12.designburgapps.com": "3", "thefirmwarehub.com": "4", "fm1.designburgapps.com": "4", "designburgapps.com": "5",
+                  "www.designburgapps.com": "5"}[location.hostname] || "1";
+  _paq.push(['setDomains', [location.hostname]]);
+  _paq.push(['disableCookies']);
+  _paq.push(['setDoNotTrack', true]);
+  _paq.push(['enableHeartBeatTimer']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://matomo.designburgapps.com/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', _mtmSite]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
 </body>
 </html>
