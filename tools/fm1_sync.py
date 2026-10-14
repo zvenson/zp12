@@ -159,6 +159,15 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://charlesvestal.github.io/fm1-ctl/",
          what="A MIDI controller: notes in any scale with its chords on the black keys, four banks of knobs, an "
               "arpeggiator and Euclidean drums, with General MIDI sounds of its own when nothing is connected."),
+    dict(id="winampfm", added="2026-10-14", play="https://hericdk.github.io/winampFM/sim/",
+         kind=["groove", "synth"], name="winampFM Synth", author="Hericdk", repo="hericdk/winampFM", ident=r"FM-1_900",
+         src="repo:release", site="https://hericdk.github.io/winampFM/",   # (no releases: the package committed in release/, its tag v<version>)
+         what="Winamp 2.x on the FM-1, built on SLOOP: your sounds as a playlist, four tracks you record as loops, "
+              "effects on sliders and a visualizer made of lines. The real firmware plays in a 3D simulator first."),
+    dict(id="mycelium", added="2026-10-14", kind="groove", name="MYCELIUM", author="Mandalars", repo="megagott/mycelium-fm1",
+         ident=r"FM-1_900", src="github", site="https://www.mandalars.org/mandalars/fm1/",
+         what="Forest, Psytrance, Goa and Hitech grooves, built on Felucca and SLOOP: original drums and icons and four "
+              "factory songs. A test release: not yet fully tested on the device."),
     dict(id="polly", added="2026-10-13", play="https://charlesvestal.github.io/fm1-polly/emu/",
          kind=["groove", "chords"], name="Polly", author="Charles Vestal", repo="charlesvestal/fm1-polly", ident=r"FM-1_3\d{6}",
          src="github", site="https://charlesvestal.github.io/fm1-polly/",
