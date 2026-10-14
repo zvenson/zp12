@@ -1,0 +1,142 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only  (C) 2026 Sven Trogus
+     The Firmware Hub for the M-VAVE SMK-37 Pro & Elite (thefirmwarehub.com/smk37/): its open-source firmwares, one so far.
+     They install from their makers' own installers (Felucca SMK builds its package in the browser from the keyboard's
+     official 016 and its calibration: not mirrored here). tools/make_fm1.py writes it as fm1/smk37/index.html. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M-VAVE SMK-37 Pro firmware – The Firmware Hub</title>
+<meta name="description" content="Open-source custom firmware for the M-VAVE SMK-37 Pro and Elite: Felucca SMK by Chance Roth turns the 37-key controller into a synth with a sequencer, a browser Studio and a simulator.">
+<meta name="author" content="zvenson">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://thefirmwarehub.com/smk37/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Firmware Hub">
+<meta property="og:url" content="https://thefirmwarehub.com/smk37/">
+<meta property="og:title" content="M-VAVE SMK-37 Pro firmware – The Firmware Hub">
+<meta property="og:description" content="Open-source custom firmware for the M-VAVE SMK-37 Pro and Elite.">
+<meta property="og:image" content="https://thefirmwarehub.com/og.png">
+<meta name="theme-color" content="#151213">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23151213'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='15' text-anchor='middle' fill='%2342f5f5'%3EFH%3C/text%3E%3C/svg%3E">
+<style>
+  /* the hub's look (web/fm1.html): warm dark, cyan / blue / pink / beige; the SMK's colour: a warm red */
+  :root { --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435; --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9;
+          --cyan: #42f5f5; --blue: #afd9f4; --pink: #f4c0cb; --beige: #e6d1b9; --ok: #5fe3a1; --warn: #f2c46d; --smk: #ff6b5e; }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16.5px/1.7 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--cyan); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { margin: 0 auto; padding: 0 clamp(16px, 4vw, 72px); width: 100%; }
+  nav { border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+  .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; } .mark:hover { text-decoration: none; }
+  .mark b { font-weight: 800; color: var(--cyan); }
+  nav .home { font-size: 14px; color: var(--dim); }
+/*DEVICES*/
+  .strip { display: flex; height: 4px; } .strip i { flex: 1; }
+  .strip i:nth-child(1) { background: var(--cyan); } .strip i:nth-child(2) { background: var(--blue); }
+  .strip i:nth-child(3) { background: var(--pink); } .strip i:nth-child(4) { background: var(--beige); }
+  header { padding: 56px 0 40px;
+           background: radial-gradient(900px 420px at 80% 20%, rgba(255, 107, 94, .10), transparent 70%),
+                       radial-gradient(700px 380px at 5% 100%, rgba(244, 192, 203, .08), transparent 70%); }
+  .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 14px; }
+  h1 { font-size: clamp(40px, 5vw, 80px); line-height: 1.05; font-weight: 300; margin: 0 0 18px; letter-spacing: -.5px; }
+  h1 b { font-weight: 800; background: linear-gradient(90deg, var(--smk), var(--pink) 60%, var(--beige));
+         -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 18.5px; color: var(--text); max-width: 42em; margin: 0; }
+  main { padding: 20px 0 80px; }
+  h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 22px; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  .fw { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+  .fw .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 26px; background: #0e0c0d; border-bottom: 4px solid var(--smk); }
+  .fw .shots img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 8px; image-rendering: pixelated; box-shadow: 0 8px 30px rgba(0, 0, 0, .6); }
+  .fw .body { padding: 22px 28px 28px; display: flex; flex-direction: column; gap: 12px; }
+  .fw h3 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -.3px; line-height: 1.1; color: var(--smk); }
+  .fw h3 a.star { font-size: 12px; font-weight: 500; letter-spacing: 0; color: var(--dim); margin-left: 10px; padding: 3px 8px; border-radius: 7px;
+                  box-shadow: inset 0 0 0 1px var(--line); vertical-align: 6px; white-space: nowrap; }
+  .fw h3 a.star:hover { text-decoration: none; color: var(--fg); box-shadow: inset 0 0 0 1px var(--smk); }
+  .by { color: var(--dim); font-size: 14.5px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 6px;
+         background: rgba(239, 232, 225, .08); color: var(--dim); }
+  .tag.beta { background: rgba(242, 196, 109, .14); color: var(--warn); }
+  .what { margin: 0; color: var(--text); }
+  .note { background: rgba(242, 196, 109, .07); border: 1px solid var(--line); border-left: 4px solid var(--warn); border-radius: 10px;
+          padding: 12px 16px; font-size: 14.5px; color: var(--text); }
+  .note b { color: var(--warn); }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .links a { padding: 9px 16px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); font-weight: 600; font-size: 14.5px; }
+  .links a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--smk); }
+  .links a.go { background: var(--smk); color: #121011; box-shadow: none; }
+  .links a.go:hover { filter: brightness(1.08); }
+  .meta { font-size: 13.5px; color: var(--dim); }
+  .card { background: var(--panel); border: 1px dashed var(--line); border-radius: 14px; padding: 28px; text-align: center; }
+  .card .plus { font-size: 64px; font-weight: 200; line-height: 1; color: var(--pink); }
+  .card h3 { margin: 6px 0 8px; font-size: 22px; }
+  .card p { color: var(--text); margin: 0 0 16px; font-size: 15px; }
+  .card a { display: inline-block; padding: 9px 16px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); font-weight: 600; font-size: 14.5px; }
+  .card a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--pink); }
+  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
+  footer a { color: var(--text); }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { header { padding: 40px 0 28px; } .fw .shots { padding: 16px; gap: 8px; } .fw .body { padding: 18px 20px 22px; }
+    .lead { font-size: 17.5px; } nav .home { display: none; } }
+</style>
+</head>
+<body>
+<nav><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
+<!--DEVICES-->
+  <a class="home" href="https://thefirmwarehub.com/">← All FM-1 firmwares</a></div></nav>
+<div class="strip"><i></i><i></i><i></i><i></i></div>
+
+<header><div class="wrap">
+  <p class="eyebrow">The Firmware Hub · M-VAVE SMK-37 Pro &amp; Elite</p>
+  <h1>Open firmware for the <b>SMK-37</b></h1>
+  <p class="lead">The 37-key controller with pads, eight knobs, four faders and wheels, turned into a synth with a sequencer.
+    One firmware so far, and a beta: open source, by its maker, tried in the browser before it goes on the keyboard.</p>
+</div></header>
+
+<main><div class="wrap">
+  <h2 class="sec">1 firmware</h2>
+  <div class="grid">
+    <article class="fw" id="fw-felucca-smk">
+      <div class="shots"><img src="img/smk-mix.png" alt="Felucca SMK on the SMK-37 Pro: the mix page" loading="lazy"><img src="img/smk-steps.png" alt="Felucca SMK: the step editor" loading="lazy"><img src="img/smk-envelope.png" alt="Felucca SMK: the envelope" loading="lazy"></div>
+      <div class="body">
+        <h3>Felucca SMK<a class="star" href="https://github.com/ChanceTheMaker/felucca-smk" target="_blank" rel="noopener" title="Star it on GitHub">★ Star</a></h3>
+        <div class="by">by Chance Roth (ChanceTheMaker), built on Felucca by Leo Kuroshita (Hügelton Instruments)</div>
+        <div class="tags"><span class="tag beta">beta</span><span class="tag">synth</span><span class="tag">sequencer</span><span class="tag">Pro &amp; Elite</span></div>
+        <p class="what">Felucca's synthesis and sequencing on the SMK's 37 keys, pads, eight knobs, four faders, pitch and mod wheels
+          and display: engines from FM6 (six operators, 32 algorithms) and phase distortion to chiptune and samples, a step
+          sequencer, a browser Studio, and a simulator that plays without the keyboard.</p>
+        <div class="note"><b>Installs from its own page.</b> Its installer builds the package in your browser from the keyboard's
+          official firmware <b>016</b> and its calibration, so the keyboard needs 016 first. It is a beta: back up your sounds
+          and settings before, and read its notes on the page.</div>
+        <div class="links">
+          <a class="go" href="https://chancethemaker.github.io/felucca-smk/" target="_blank" rel="noopener">Install on its page ↗</a>
+          <a href="https://chancethemaker.github.io/felucca-smk/simulator.html" target="_blank" rel="noopener">▶ Simulator ↗</a>
+          <a href="https://chancethemaker.github.io/felucca-smk/editor.html" target="_blank" rel="noopener">✎ Studio ↗</a>
+        </div>
+        <div class="meta">GPL-3.0 · <a href="https://github.com/ChanceTheMaker/felucca-smk" target="_blank" rel="noopener">source</a> ·
+          <a href="https://github.com/ChanceTheMaker/felucca-smk#known-issues-and-remaining-work" target="_blank" rel="noopener">known issues</a> ·
+          Chrome or Edge (Web MIDI)</div>
+      </div>
+    </article>
+    <div class="card">
+      <div class="plus">+</div>
+      <h3>Made firmware for the SMK-37?</h3>
+      <p>Open source and ready to install? It gets its card here, next to Felucca SMK.</p>
+      <a href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20SMK-37%20firmware">Mail zven@thefirmwarehub.com</a>
+    </div>
+  </div>
+</div></main>
+
+<footer><div class="wrap">
+  The Firmware Hub by <a href="https://github.com/zvenson" rel="noopener">zvenson</a>. Each firmware is its maker's, installed from
+  their own page. M-VAVE, FM-1 and SMK-37 are trademarks of their owners; not affiliated with M-VAVE.
+  <br><a href="https://thefirmwarehub.com/">The FM-1 hub</a> · <a href="https://designburg.net/">designburg.net</a>
+  · <a href="https://zp12.designburgapps.com/impressum.html">Impressum · Datenschutz</a>
+</div></footer>
+</body>
+</html>

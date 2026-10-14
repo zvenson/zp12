@@ -1,0 +1,226 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only  (C) 2026 Sven Trogus
+     The Firmware Hub for the M-VAVE SMK-37 Pro & Elite (thefirmwarehub.com/smk37/): its open-source firmwares, one so far.
+     They install from their makers' own installers (Felucca SMK builds its package in the browser from the keyboard's
+     official 016 and its calibration: not mirrored here). tools/make_fm1.py writes it as fm1/smk37/index.html. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>M-VAVE SMK-37 Pro firmware – The Firmware Hub</title>
+<meta name="description" content="Open-source custom firmware for the M-VAVE SMK-37 Pro and Elite: Felucca SMK by Chance Roth turns the 37-key controller into a synth with a sequencer, a browser Studio and a simulator.">
+<meta name="author" content="zvenson">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://thefirmwarehub.com/smk37/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Firmware Hub">
+<meta property="og:url" content="https://thefirmwarehub.com/smk37/">
+<meta property="og:title" content="M-VAVE SMK-37 Pro firmware – The Firmware Hub">
+<meta property="og:description" content="Open-source custom firmware for the M-VAVE SMK-37 Pro and Elite.">
+<meta property="og:image" content="https://thefirmwarehub.com/og.png">
+<meta name="theme-color" content="#151213">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23151213'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='15' text-anchor='middle' fill='%2342f5f5'%3EFH%3C/text%3E%3C/svg%3E">
+<style>
+  /* the hub's look (web/fm1.html): warm dark, cyan / blue / pink / beige; the SMK's colour: a warm red */
+  :root { --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435; --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9;
+          --cyan: #42f5f5; --blue: #afd9f4; --pink: #f4c0cb; --beige: #e6d1b9; --ok: #5fe3a1; --warn: #f2c46d; --smk: #ff6b5e; }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16.5px/1.7 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--cyan); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { margin: 0 auto; padding: 0 clamp(16px, 4vw, 72px); width: 100%; }
+  nav { border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+  .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; } .mark:hover { text-decoration: none; }
+  .mark b { font-weight: 800; color: var(--cyan); }
+  nav .home { font-size: 14px; color: var(--dim); }
+  /* the devices menu (web/devices.html, put into every page by tools/make_fm1.py): a mega menu under "Devices", open on
+     hover (a mouse) or on a tap / Enter (touch, keyboard) */
+  nav { position: relative; z-index: 40; }
+  nav .dd { align-self: stretch; display: flex; align-items: center; margin: 0 auto 0 clamp(14px, 3vw, 44px); }
+  nav .ddb { background: transparent; color: var(--fg); font: inherit; font-size: 15px; font-weight: 600; padding: 8px 2px; border: 0;
+             border-radius: 0; cursor: pointer; box-shadow: inset 0 -2px 0 transparent; }
+  nav .ddb:hover { filter: none; transform: none; }
+  nav .ddb .ar { display: inline-block; color: var(--dim); font-size: 11px; margin-left: 6px; transition: transform .15s; }
+  nav .dd.open .ddb { box-shadow: inset 0 -2px 0 var(--pink); } nav .dd.open .ddb .ar { transform: rotate(180deg); }
+  .mega { display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--bg); border-bottom: 1px solid var(--line);
+          box-shadow: 0 30px 60px rgba(0, 0, 0, .55); }
+  nav .dd.open .mega { display: block; }
+  @media (hover: hover) { nav .dd:hover .mega { display: block; } nav .dd:hover .ddb { box-shadow: inset 0 -2px 0 var(--pink); }
+                          nav .dd:hover .ddb .ar { transform: rotate(180deg); } }
+  .mega .in { display: grid; height: auto; grid-template-columns: 250px minmax(0, 1fr); gap: clamp(20px, 3vw, 44px); padding-top: 26px; padding-bottom: 30px; }
+  .mega .side { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; font-size: 14.5px; line-height: 1.55; }
+  .mega .side .k { font-size: 11.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); font-weight: 700; margin: 0 0 10px; }
+  .mega .side a { display: block; color: var(--fg); padding: 4px 0; }
+  .mega .side hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+  .mega .side p { margin: 0 0 8px; color: var(--text); }
+  .mega .side a.mail { color: var(--pink); }
+  .mega .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px 18px; align-content: start; }
+  .mega .tile { display: flex; align-items: center; gap: 16px; padding: 10px 12px; border-radius: 14px; color: var(--fg); }
+  .mega .tile:hover { text-decoration: none; background: var(--panel2); }
+  .mega .tile[aria-current] { box-shadow: inset 0 0 0 1px var(--cyan); }
+  .mega .pic { flex: none; width: 72px; height: 72px; border-radius: 12px; background: #0e0c0d; border: 1px solid var(--line); overflow: hidden;
+               display: grid; place-items: center; }
+  .mega .pic img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
+  .mega .pic.quad { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1px; background: var(--line); }
+  .mega .tile b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; line-height: 1.3; }
+  .mega .tile small { display: block; color: var(--dim); font-size: 13.5px; margin-top: 2px; }
+  .mega .tile.add .pic { border-style: dashed; background: transparent; color: var(--pink); font-size: 34px; font-weight: 200; }
+  @media (max-width: 760px) { .mega .in { grid-template-columns: 1fr; padding-top: 14px; padding-bottom: 18px; } .mega .side { display: none; }
+                              .mega .pic { width: 56px; height: 56px; } }
+  .strip { display: flex; height: 4px; } .strip i { flex: 1; }
+  .strip i:nth-child(1) { background: var(--cyan); } .strip i:nth-child(2) { background: var(--blue); }
+  .strip i:nth-child(3) { background: var(--pink); } .strip i:nth-child(4) { background: var(--beige); }
+  header { padding: 56px 0 40px;
+           background: radial-gradient(900px 420px at 80% 20%, rgba(255, 107, 94, .10), transparent 70%),
+                       radial-gradient(700px 380px at 5% 100%, rgba(244, 192, 203, .08), transparent 70%); }
+  .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 14px; }
+  h1 { font-size: clamp(40px, 5vw, 80px); line-height: 1.05; font-weight: 300; margin: 0 0 18px; letter-spacing: -.5px; }
+  h1 b { font-weight: 800; background: linear-gradient(90deg, var(--smk), var(--pink) 60%, var(--beige));
+         -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 18.5px; color: var(--text); max-width: 42em; margin: 0; }
+  main { padding: 20px 0 80px; }
+  h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 22px; font-weight: 600; }
+  .grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+  .fw { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
+  .fw .shots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 26px; background: #0e0c0d; border-bottom: 4px solid var(--smk); }
+  .fw .shots img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: 8px; image-rendering: pixelated; box-shadow: 0 8px 30px rgba(0, 0, 0, .6); }
+  .fw .body { padding: 22px 28px 28px; display: flex; flex-direction: column; gap: 12px; }
+  .fw h3 { margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -.3px; line-height: 1.1; color: var(--smk); }
+  .fw h3 a.star { font-size: 12px; font-weight: 500; letter-spacing: 0; color: var(--dim); margin-left: 10px; padding: 3px 8px; border-radius: 7px;
+                  box-shadow: inset 0 0 0 1px var(--line); vertical-align: 6px; white-space: nowrap; }
+  .fw h3 a.star:hover { text-decoration: none; color: var(--fg); box-shadow: inset 0 0 0 1px var(--smk); }
+  .by { color: var(--dim); font-size: 14.5px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 4px 9px; border-radius: 6px;
+         background: rgba(239, 232, 225, .08); color: var(--dim); }
+  .tag.beta { background: rgba(242, 196, 109, .14); color: var(--warn); }
+  .what { margin: 0; color: var(--text); }
+  .note { background: rgba(242, 196, 109, .07); border: 1px solid var(--line); border-left: 4px solid var(--warn); border-radius: 10px;
+          padding: 12px 16px; font-size: 14.5px; color: var(--text); }
+  .note b { color: var(--warn); }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; }
+  .links a { padding: 9px 16px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); font-weight: 600; font-size: 14.5px; }
+  .links a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--smk); }
+  .links a.go { background: var(--smk); color: #121011; box-shadow: none; }
+  .links a.go:hover { filter: brightness(1.08); }
+  .meta { font-size: 13.5px; color: var(--dim); }
+  .card { background: var(--panel); border: 1px dashed var(--line); border-radius: 14px; padding: 28px; text-align: center; }
+  .card .plus { font-size: 64px; font-weight: 200; line-height: 1; color: var(--pink); }
+  .card h3 { margin: 6px 0 8px; font-size: 22px; }
+  .card p { color: var(--text); margin: 0 0 16px; font-size: 15px; }
+  .card a { display: inline-block; padding: 9px 16px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); font-weight: 600; font-size: 14.5px; }
+  .card a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--pink); }
+  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; padding: 34px 0 54px; text-align: center; }
+  footer a { color: var(--text); }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { header { padding: 40px 0 28px; } .fw .shots { padding: 16px; gap: 8px; } .fw .body { padding: 18px 20px 22px; }
+    .lead { font-size: 17.5px; } nav .home { display: none; } }
+</style>
+</head>
+<body>
+<nav><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
+  <div class="dd" id="dd">
+    <button class="ddb" type="button" aria-expanded="false" aria-controls="mega">Devices<span class="ar" aria-hidden="true">▼</span></button>
+    <div class="mega" id="mega"><div class="wrap in">
+      <div class="side">
+        <p class="k">The Firmware Hub</p>
+        <p>Open-source firmware for small music machines, from their makers, installed in the browser.</p>
+        <a href="/">All FM-1 firmwares</a><a href="/kb/">Knowledge Base</a><a href="/vibe/?ref=menu">VIBE FM Mk1</a>
+        <hr><p>Made firmware for another device?</p>
+        <a class="mail" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device">zven@thefirmwarehub.com</a>
+      </div>
+      <div class="tiles">
+        <a class="tile" href="/" data-dev="fm1"><span class="pic quad"><img src="/img/zp12.png" alt=""><img src="/img/sloop.png" alt=""><img src="/img/x0x.png" alt=""><img src="/img/winampfm.png" alt=""></span>
+          <span><b>M-VAVE FM-1</b><small><span id="dd-fm1">All</span> firmwares</small></span></a>
+        <a class="tile" href="/smk37/" data-dev="smk37" aria-current="page"><span class="pic"><img src="/smk37/img/smk-mix.png" alt=""></span>
+          <span><b>M-VAVE SMK-37 Pro</b><small>1 firmware · beta · Pro &amp; Elite</small></span></a>
+        <a class="tile add" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device"><span class="pic">+</span>
+          <span><b>Your device</b><small>Firmware for another machine? Tell us.</small></span></a>
+      </div>
+    </div></div>
+  </div>
+  <script>
+  (() => {                                                 // a tap / Enter opens it, a tap outside or Esc closes it
+    const dd = document.getElementById("dd"), b = dd.querySelector(".ddb");
+    const set = (o) => { dd.classList.toggle("open", o); b.setAttribute("aria-expanded", String(o)); };
+    b.addEventListener("click", (e) => { e.stopPropagation(); set(!dd.classList.contains("open")); });
+    document.addEventListener("click", (e) => { if (!dd.contains(e.target)) set(false); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") { set(false); } });
+    fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.json())     // (the hub's daily key: one cache)
+      .then((c) => { document.getElementById("dd-fm1").textContent = c.firmwares.length; }).catch(() => {});
+  })();
+  </script>
+  <a class="home" href="https://thefirmwarehub.com/">← All FM-1 firmwares</a></div></nav>
+<div class="strip"><i></i><i></i><i></i><i></i></div>
+
+<header><div class="wrap">
+  <p class="eyebrow">The Firmware Hub · M-VAVE SMK-37 Pro &amp; Elite</p>
+  <h1>Open firmware for the <b>SMK-37</b></h1>
+  <p class="lead">The 37-key controller with pads, eight knobs, four faders and wheels, turned into a synth with a sequencer.
+    One firmware so far, and a beta: open source, by its maker, tried in the browser before it goes on the keyboard.</p>
+</div></header>
+
+<main><div class="wrap">
+  <h2 class="sec">1 firmware</h2>
+  <div class="grid">
+    <article class="fw" id="fw-felucca-smk">
+      <div class="shots"><img src="img/smk-mix.png" alt="Felucca SMK on the SMK-37 Pro: the mix page" loading="lazy"><img src="img/smk-steps.png" alt="Felucca SMK: the step editor" loading="lazy"><img src="img/smk-envelope.png" alt="Felucca SMK: the envelope" loading="lazy"></div>
+      <div class="body">
+        <h3>Felucca SMK<a class="star" href="https://github.com/ChanceTheMaker/felucca-smk" target="_blank" rel="noopener" title="Star it on GitHub">★ Star</a></h3>
+        <div class="by">by Chance Roth (ChanceTheMaker), built on Felucca by Leo Kuroshita (Hügelton Instruments)</div>
+        <div class="tags"><span class="tag beta">beta</span><span class="tag">synth</span><span class="tag">sequencer</span><span class="tag">Pro &amp; Elite</span></div>
+        <p class="what">Felucca's synthesis and sequencing on the SMK's 37 keys, pads, eight knobs, four faders, pitch and mod wheels
+          and display: engines from FM6 (six operators, 32 algorithms) and phase distortion to chiptune and samples, a step
+          sequencer, a browser Studio, and a simulator that plays without the keyboard.</p>
+        <div class="note"><b>Installs from its own page.</b> Its installer builds the package in your browser from the keyboard's
+          official firmware <b>016</b> and its calibration, so the keyboard needs 016 first. It is a beta: back up your sounds
+          and settings before, and read its notes on the page.</div>
+        <div class="links">
+          <a class="go" href="https://chancethemaker.github.io/felucca-smk/" target="_blank" rel="noopener">Install on its page ↗</a>
+          <a href="https://chancethemaker.github.io/felucca-smk/simulator.html" target="_blank" rel="noopener">▶ Simulator ↗</a>
+          <a href="https://chancethemaker.github.io/felucca-smk/editor.html" target="_blank" rel="noopener">✎ Studio ↗</a>
+        </div>
+        <div class="meta">GPL-3.0 · <a href="https://github.com/ChanceTheMaker/felucca-smk" target="_blank" rel="noopener">source</a> ·
+          <a href="https://github.com/ChanceTheMaker/felucca-smk#known-issues-and-remaining-work" target="_blank" rel="noopener">known issues</a> ·
+          Chrome or Edge (Web MIDI)</div>
+      </div>
+    </article>
+    <div class="card">
+      <div class="plus">+</div>
+      <h3>Made firmware for the SMK-37?</h3>
+      <p>Open source and ready to install? It gets its card here, next to Felucca SMK.</p>
+      <a href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20SMK-37%20firmware">Mail zven@thefirmwarehub.com</a>
+    </div>
+  </div>
+</div></main>
+
+<footer><div class="wrap">
+  The Firmware Hub by <a href="https://github.com/zvenson" rel="noopener">zvenson</a>. Each firmware is its maker's, installed from
+  their own page. M-VAVE, FM-1 and SMK-37 are trademarks of their owners; not affiliated with M-VAVE.
+  <br><a href="https://thefirmwarehub.com/">The FM-1 hub</a> · <a href="https://designburg.net/">designburg.net</a>
+  · <a href="https://zp12.designburgapps.com/impressum.html">Impressum · Datenschutz</a>
+</div></footer>
+<!-- Matomo (self-hosted, matomo.designburgapps.com): one site per host (dx7 1, zp12 3, fm1 4, designburgapps.com 5);
+     no cookies, IPs anonymised on the server, Do Not Track respected -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  var _mtmSite = {"zp12.designburgapps.com": "3", "thefirmwarehub.com": "4", "fm1.designburgapps.com": "4", "designburgapps.com": "5",
+                  "www.designburgapps.com": "5"}[location.hostname] || "1";
+  _paq.push(['setDomains', [location.hostname]]);
+  _paq.push(['disableCookies']);
+  _paq.push(['setDoNotTrack', true]);
+  _paq.push(['enableHeartBeatTimer']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://matomo.designburgapps.com/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', _mtmSite]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+</body>
+</html>
