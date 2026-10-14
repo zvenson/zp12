@@ -133,12 +133,13 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
     smk = HERE / "fm1" / "smk37"                        # the SMK-37 Pro's hub: its firmwares (one so far), installed from their own pages
     (smk / "img").mkdir(parents=True, exist_ok=True)
     (smk / "index.html").write_text(devices((HERE / "web" / "smk37.html").read_text(encoding="utf-8"), "smk37", "smk37"), encoding="utf-8")
-    sim = HERE.parent / "obervave" / "docs" / "sim"     # OberVave's browser simulator (its repo builds it: web/sim/build.sh)
-    if sim.exists():
-        play = HERE / "fm1" / "play" / "obervave"
-        play.mkdir(parents=True, exist_ok=True)
-        for p in sim.iterdir():
-            (play / p.name).write_bytes(p.read_bytes())
+    # the browser simulators, as their repos build them: OberVave's (web/sim/build.sh), zp12's (this repo: sim/build.sh)
+    for name, sim in (("obervave", HERE.parent / "obervave" / "docs" / "sim"), ("zp12", HERE / "docs" / "sim")):
+        if sim.exists():
+            play = HERE / "fm1" / "play" / name
+            play.mkdir(parents=True, exist_ok=True)
+            for p in sim.iterdir():
+                (play / p.name).write_bytes(p.read_bytes())
     imp = HERE / "fm1" / "impressum"                    # the legal notice and privacy policy, the hub's own
     imp.mkdir(exist_ok=True)
     (imp / "index.html").write_text(devices((HERE / "web" / "hub-impressum.html").read_text(encoding="utf-8"), "", "impressum"), encoding="utf-8")

@@ -33,7 +33,7 @@ BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their GitHub stars)
     # (Salt, ChoralRoot, Jangada, Melodee, Hortator, GHOULBOX, Bubba, Floyd, DX7 Banks, WaveLoop report numbers the others use too: their check is any FM-1
     # identity, the update loader is checked as for all; the page names the running one only when it is unambiguous)
-    dict(id="zp12", added="2026-10-08", editor="https://zp12.designburgapps.com/editor/",
+    dict(id="zp12", added="2026-10-08", play="https://thefirmwarehub.com/play/zp12/", editor="https://zp12.designburgapps.com/editor/",
          kind="drums", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
          src="zp12:docs/install/firmware", site="https://zp12.designburgapps.com",
          what="A standalone 12-bit sampler inspired by the E-mu SP-1200: sample in the browser (mic, line-in or a "

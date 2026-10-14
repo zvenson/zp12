@@ -64,8 +64,8 @@
       const [wasm] = await Promise.all([fetch('obervave.wasm').then((r) => { if (!r.ok) throw new Error('obervave.wasm: ' + r.status); return r.arrayBuffer(); }),
         S.ctx.audioWorklet.addModule('worklet.js')]);
       S.node = new AudioWorkletNode(S.ctx, 'obervave', { numberOfInputs: 0, outputChannelCount: [2], processorOptions: { wasm, store: loadStore(), master: S.master } });
-      S.node.port.onmessage = (ev) => {
-        const m = ev.data;
+      S.node.port.onmessage = (msg) => {
+        const m = msg.data;
         if (m.t === 'frame') { if (m.fb) draw(m.fb); leds(m.leds, m.keys, m.glow); }
         else if (m.t === 'store') saveStore(m.data);
         else if (m.t === 'ready') { S.on = true; power.hidden = true; ev('start'); setTimeout(() => ev('1 min'), 60e3); setTimeout(() => ev('5 min'), 300e3); }
