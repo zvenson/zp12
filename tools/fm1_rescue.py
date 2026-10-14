@@ -24,7 +24,7 @@ layouts and the WL82's UBOOT1.00 behaviour."""
 import argparse, ctypes, fcntl, glob, hashlib, json, os, struct, sys, time, urllib.request
 from pathlib import Path
 
-HUB = "https://fm1.designburgapps.com"
+HUB = "https://thefirmwarehub.com"
 JL_COMMIT = "adb3f18889e88ac512ce0a3c4d8cc3d3cb30696a"
 JL_URL = f"https://raw.githubusercontent.com/kagaimiq/jl-uboot-tool/{JL_COMMIT}/data/loaderblobs/usb/wl82loader.bin"
 JL_SHA256 = "d41da6126760c9d66660bcc0cac8d27d221806c5e369a8036921efe68dca5376"
