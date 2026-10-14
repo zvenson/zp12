@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 # zp12 in the browser: the firmware's sources (firmware/src, unchanged) on a fake FM-1 (sim/hal, sim/sim.c)
 # -> WebAssembly, plus the page.
-#   sh sim/build.sh        ->  docs/sim/{index.html, sim.js, sim.css, worklet.js, zp12.wasm}
+#   sh sim/build.sh        ->  docs/sim/{index.html, sim.js, sim.css, worklet.js, zp12.wasm, favicon.svg}
 #   then: python3 -m http.server -d docs/sim 8737   and open http://localhost:8737
 # Tools (once, nothing system-wide; override with ZIG= / WASM_OPT=), the same as OberVave's web/sim/build.sh:
 #   zig cc (wasm32-freestanding, as winampFM's firmware/build-wasm.sh):
@@ -36,4 +36,5 @@ nice -n 15 $ZIG cc --target=wasm32-freestanding -mcpu=generic+bulk_memory -O2 -f
 nice -n 15 "$WASM_OPT" build/sim/raw.wasm --enable-bulk-memory --asyncify -O2 --strip-debug --strip-producers \
     -o docs/sim/zp12.wasm
 cp sim/index.html sim/sim.js sim/sim.css sim/worklet.js docs/sim/
+cp docs/favicon.svg docs/sim/favicon.svg                # (its own copy: the page also works elsewhere, e.g. on the hub)
 echo "sim: docs/sim, zp12 $VER ($(wc -c < docs/sim/zp12.wasm | tr -d ' ') B wasm)"

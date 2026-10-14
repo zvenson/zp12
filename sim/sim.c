@@ -262,3 +262,4 @@ EXPORT uint32_t sim_playing(void) { return sq.playing; }
 EXPORT uint32_t sim_recording(void) { return sq.recording | (uint32_t)sq.rec_arm << 1; }
 EXPORT uint32_t sim_loop_events(void) { return sq_seg[sq.seg].n; }   /* hits in the current loop */
 EXPORT uint32_t sim_bpm10(void) { return sq.bpm10; }
+EXPORT uint32_t sim_bank(void) { return ui.pair; }   /* 0: the white keys are banks A / B, 1: C / D */
