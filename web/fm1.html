@@ -457,7 +457,7 @@ function chips() {
     chips(); render();
   });
 }
-// the order of the cards: by stars (zp12 first, Baud Girl in the second row), the newest release, the newest on the hub
+// the order of the cards: by stars (as the page loads: zp12 first; the chip: all by stars), the newest release, the newest on the hub
 // or by name; from ?sort= (a link with it), else the last choice (localStorage: only this), else by stars
 const SORTS = [["stars", "Most stars"], ["updated", "Recently updated"], ["added", "New on the hub"], ["name", "A–Z"]];
 const SORT_KEY = "fm1hub.sort", isSort = (k) => SORTS.some(([s]) => s === k);
@@ -471,7 +471,7 @@ const released = (f) => f.published || f.date || "";
 const sorted = () => sort === "updated" ? [...cat].sort((a, b) => released(b).localeCompare(released(a)))
   : sort === "added" ? [...cat].sort((a, b) => (b.added || "").localeCompare(a.added || "") || released(b).localeCompare(released(a)))
   : sort === "name" ? [...cat].sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }))
-  : cat;
+  : [...cat].sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1));
 function sorts() {
   $("sorts").innerHTML = "<span>Sort</span>" + SORTS.map(([k, label]) => `<button type="button" data-s="${k}" aria-pressed="${k === sort}">${label}</button>`).join("");
   $("sorts").querySelectorAll("button").forEach((b) => b.onclick = () => {

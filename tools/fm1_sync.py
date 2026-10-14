@@ -314,7 +314,10 @@ def latest_local(spec, sloopdx):
         raise SystemExit(f"fm1_sync: no package in {root}")
     p = pkgs[-1]
     version = re.sub(r"^[a-z0-9]+-|\.fwsc$", "", p.name)
-    date = datetime.fromtimestamp(p.stat().st_mtime, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # (the release date: the commit that brought the package; a fresh clone's mtimes are the day of the clone)
+    log = subprocess.run(["git", "-C", str(root), "log", "-1", "--format=%cI", "--", p.name], capture_output=True, text=True).stdout.strip()
+    date = (datetime.fromisoformat(log).astimezone(timezone.utc) if log else
+            datetime.fromtimestamp(p.stat().st_mtime, timezone.utc)).strftime("%Y-%m-%dT%H:%M:%SZ")
     return p.read_bytes(), version, date, None, None
 
 
