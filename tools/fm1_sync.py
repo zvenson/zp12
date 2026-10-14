@@ -191,11 +191,11 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          what="A multimorphing bitimbral synthesizer: two complete parts, three ways to play them together, and a "
               "morph that glides between two versions of every sound."),
     dict(id="skiff", added="2026-10-13", editor="https://illuminus5.github.io/skiff/",
-         kind=["groove", "synth"], name="Skiff", author="illuminus5", repo="illuminus5/skiff", ident=r"FM-1_710",
+         kind=["groove", "synth"], name="Skiff", author="illuminus5", repo="illuminus5/skiff", ident=r"FM-1_71\d",
          src="github", pkg=r"skiff-[^/\"]+\.fwsc", site="https://illuminus5.github.io/skiff/",
          what="Six tracks of synths and drums with a groovebox's workflow: fourteen engines, a 64-step sequencer with "
-              "chords, ratchets, trig conditions and locks, songs, PERFORM with scenes, six themes and a browser editor. "
-              "Built on Felucca 1.1.5; its sounds and projects load."),
+              "chords, ratchets, trig conditions and locks, songs, PERFORM with scenes, six themes and a browser editor; "
+              "FM6 sounds built from scratch on the unit. Built on Felucca 1.1.5; its sounds and projects load."),
     dict(id="fart", added="2026-10-13", kind="other", name="Fart Machine One", author="adamcharleswilsonmusic-code",
          repo="adamcharleswilsonmusic-code/Fart-Machine-One", ident=r"FM-1_701", src="github",
          what="A questionable musical instrument: eleven artisanal farts, reverb, delay and a sixteen-step sequencer."),
