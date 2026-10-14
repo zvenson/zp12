@@ -209,6 +209,12 @@
   <h3>The USB rescue</h3>
   <p>If the FM-1 does not start any more, hold <b>OCT−</b> while you switch it on. It then waits for an update over USB.
     Connect it and install any firmware, or V15, from the hub.</p>
+  <p>If no installer finds it and the computer only sees a USB disk <b>"WL82 UBOOT1.00"</b>, the chip's bootloader in ROM still
+    answers, and no update can erase it. The hub's <a href="https://thefirmwarehub.com/#rescue">Rescue</a> (Linux) and
+    <a href="https://github.com/Quixotic7/MvaveFM1Unbricker" target="_blank" rel="noopener">MvaveFM1Unbricker</a> by Quixotic7 (Windows and Linux, MIT) put a firmware
+    back through it; the Unbricker keeps a full backup of the flash first. An FM-1 that never shows that disk can come back
+    with the <a href="https://github.com/kurogedelic/FM-1-transporter" target="_blank" rel="noopener">FM-1 Transporter</a>,
+    a small RP2040 board on the USB lines (<a href="https://github.com/Quixotic7/MvaveFM1Unbricker/blob/main/TRANSPORTER-GUIDE.md" target="_blank" rel="noopener">step by step</a>).</p>
 </section>
 
 <section id="listed">

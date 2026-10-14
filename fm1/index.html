@@ -391,6 +391,7 @@
     <section class="fw stock" id="rescue" style="--c: var(--dim)">
       <div class="shot"><div class="slot v15">USB<br><b>RESCUE</b></div></div>
       <h3>Rescue a stuck FM-1</h3>
+      <div class="tags"><span class="tag kind">for developers</span></div>
       <p class="what">No installer finds the FM-1 any more, or an update stopped and it will not come back? Its chip has a
          bootloader in ROM that no firmware can overwrite. Two steps put any firmware from this hub back on through it.
          <b>Linux</b> for now.</p>
@@ -406,6 +407,11 @@ sudo python3 fm1_rescue.py sloop</pre>
          <a href="rescue/fm1_rescue.py">fm1_rescue.py</a> (GPL-3.0), the bootloader protocol after
          <a href="https://github.com/kagaimiq/jl-uboot-tool" target="_blank" rel="noopener">jl-uboot-tool</a> (MIT), whose
          flash helper for the chip it downloads.</p>
+      <p class="what"><b>On Windows, or with a full backup first:</b> <a href="https://github.com/Quixotic7/MvaveFM1Unbricker" target="_blank" rel="noopener">MvaveFM1Unbricker</a>
+         by Quixotic7 (MIT) takes the same way in. It reads the whole flash twice and keeps it, writes only the firmware area
+         and checks every byte. An FM-1 that never shows "UBOOT1.00" at all comes back with its
+         <a href="https://github.com/Quixotic7/MvaveFM1Unbricker/blob/main/TRANSPORTER-GUIDE.md" target="_blank" rel="noopener">Transporter guide</a> and a small RP2040 board.</p>
+      <a class="btn ghost" href="https://github.com/Quixotic7/MvaveFM1Unbricker" target="_blank" rel="noopener">MvaveFM1Unbricker ↗</a>
     </section>
   </div>
 
