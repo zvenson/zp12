@@ -22,7 +22,11 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
                                             "Sitemap: https://thefirmwarehub.com/sitemap.xml\n")
     (HERE / "fm1" / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
                                              f'<url><loc>https://thefirmwarehub.com/</loc><lastmod>{date.today()}</lastmod>'
-                                             '<changefreq>daily</changefreq><priority>1.0</priority></url>\n</urlset>\n')
+                                             '<changefreq>daily</changefreq><priority>1.0</priority></url>\n'
+                                             f'<url><loc>https://thefirmwarehub.com/kb/</loc><lastmod>{date.today()}</lastmod>'
+                                             '<changefreq>weekly</changefreq><priority>0.7</priority></url>\n'
+                                             f'<url><loc>https://thefirmwarehub.com/vibe/</loc><lastmod>{date.today()}</lastmod>'
+                                             '<changefreq>weekly</changefreq><priority>0.7</priority></url>\n</urlset>\n')
     kb = HERE / "fm1" / "kb"                            # the knowledge base: no menu link yet (the user's wish, 2026-10-13)
     kb.mkdir(exist_ok=True)
     (kb / "index.html").write_text((HERE / "web" / "fm1kb.html").read_text(encoding="utf-8"), encoding="utf-8")
