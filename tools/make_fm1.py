@@ -3,7 +3,7 @@
 (web/fm1pkg.js, web/fm1ota.js) inlined, the Matomo count (sloopDX's tools/matomo_snippet.py), into fm1/index.html.
 The catalogue and the packages: tools/fm1_sync.py.
   tools/make_fm1.py [sloopdx repo]"""
-import html, json, subprocess, sys
+import hashlib, html, json, re, subprocess, sys
 from datetime import date
 from pathlib import Path
 
@@ -96,7 +96,12 @@ def devices(text, dev, ref="hub"):
     # (Cloudflare's email obfuscation off for our pages: the addresses stay plain text and links, also without JavaScript;
     #  the legal notice needs its address readable)
     text = text.replace("<body>\n", "<body>\n<!--email_off-->\n", 1).replace("</body>", "<!--/email_off-->\n</body>", 1)
-    return (text.replace("/*DEVICES*/\n", (HERE / "web" / "devices.css").read_text(encoding="utf-8"))
+    def fp(t):                                          # (/img/x.png and /smk37/img/x.png: ?v=<its fingerprint>)
+        def one(mo):
+            f = HERE / "fm1" / mo.group(1).lstrip("/")
+            return mo.group(0) if not f.exists() else f'{mo.group(1)}?v={hashlib.sha256(f.read_bytes()).hexdigest()[:8]}"'
+        return re.sub(r'(/(?:smk37/)?img/[\w.-]+\.png)"', one, t)
+    return fp(text.replace("/*DEVICES*/\n", (HERE / "web" / "devices.css").read_text(encoding="utf-8"))
                 .replace("<!--DEVICES-->\n", menu).replace("<!--SMK-OWN-->", own).replace("<!--SMK-PORTS-->", ports)
                 .replace("<!--SMK-N-->", n))
 
@@ -108,7 +113,9 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
     lib = make_site.strip_module((web / "fm1pkg.js").read_text(encoding="utf-8")) + "\n" + \
         make_site.strip_module((web / "fm1ota.js").read_text(encoding="utf-8"))
     out = HERE / "fm1" / "index.html"
-    out.write_text(devices((HERE / "web" / "fm1.html").read_text(encoding="utf-8").replace("/*LIB*/", lib), "fm1"), encoding="utf-8")
+    imgv = {p.stem: hashlib.sha256(p.read_bytes()).hexdigest()[:8] for p in sorted((HERE / "fm1" / "img").glob("*.png"))}
+    out.write_text(devices((HERE / "web" / "fm1.html").read_text(encoding="utf-8").replace("/*LIB*/", lib)
+                           .replace("/*IMGV*/{}", json.dumps(imgv, separators=(",", ":"))), "fm1"), encoding="utf-8")
     (HERE / "fm1" / "robots.txt").write_text("User-agent: *\nAllow: /\nDisallow: /fw/\nDisallow: /src/\n"
                                             "Sitemap: https://thefirmwarehub.com/sitemap.xml\n")
     (HERE / "fm1" / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

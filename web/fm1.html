@@ -456,13 +456,15 @@ function sorts() {
     sorts(); render();
   });
 }
+// each card picture's fingerprint (tools/make_fm1.py): a new picture gets a new address, so no cache shows the old one
+const IMGV = /*IMGV*/{}, iv = (id) => IMGV[id] ? "?v=" + IMGV[id] : "";
 const WIDE = new Set(["felucca", "salt", "melodee", "hortator", "ghoulbox", "waveloop", "skiff", "duell", "felucca8", "obervave"]);                  // (a landscape picture, not a square screen)   // (designburgapps.com's palette)
 const LOGO = { sloop: "img/sloop-icon.png", dinghy: "img/dinghy-icon.png" };
 // Baud Girl: a link card, not in the catalogue (not open source, no stars to sort by): in the second row all the same
 const EXT = $("baudgirl"), EXT_AT = 4;
 const EXT_TILE = `<a href="#baudgirl" data-id="baudgirl" class="ext" title="Baud Girl (FM-1+VA), a link"><b>FM-1+VA</b>Baud Girl</a>`;
 function lineup() {                                      // two rows, each twice (the loop of the drift); the copy is for the eye only
-  const tiles = cat.map((f, i) => (i === EXT_AT ? EXT_TILE : "") + `<a href="#fw-${esc(f.id)}" data-id="${esc(f.id)}"><img src="img/${esc(f.id)}.png" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy"></a>`);
+  const tiles = cat.map((f, i) => (i === EXT_AT ? EXT_TILE : "") + `<a href="#fw-${esc(f.id)}" data-id="${esc(f.id)}"><img src="img/${esc(f.id)}.png${iv(f.id)}" alt="${esc(f.name)} on the FM-1" title="${esc(f.name)}" loading="lazy"></a>`);
   const half = Math.ceil(tiles.length / 2);
   $("lineup").innerHTML = [tiles.slice(0, half), tiles.slice(half)].map((r) => {
     const once = r.join("");
@@ -496,7 +498,7 @@ function render() {
     el.className = "fw" + (isNow ? " now" : "");
     el.dataset.id = f.id; el.id = "fw-" + f.id;
     el.style.setProperty("--c", LOOK[f.id] || "#3b4bf5");
-    el.innerHTML = `<div class="shot${WIDE.has(f.id) ? " wide" : ""}"><img src="img/${esc(f.id)}.png" alt="${esc(f.name)} for the M-VAVE FM-1: its screen" loading="lazy"></div>
+    el.innerHTML = `<div class="shot${WIDE.has(f.id) ? " wide" : ""}"><img src="img/${esc(f.id)}.png${iv(f.id)}" alt="${esc(f.name)} for the M-VAVE FM-1: its screen" loading="lazy"></div>
       <div class="head"><div>
         <h3>${LOGO[f.id] ? `<img class="logo" src="${LOGO[f.id]}" alt="">` : ""}${esc(f.name)}<small title="${esc(f.version)}">${esc(short(f.version))}</small><a class="star" href="https://github.com/${esc(f.repo)}" target="_blank" rel="noopener" title="Star it on GitHub">★ Star${f.stars == null ? "" : ` · ${f.stars}`}</a></h3>
         <div class="by">by ${esc(f.author)}</div>
