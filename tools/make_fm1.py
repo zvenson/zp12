@@ -25,10 +25,10 @@ def smk_cards():
             "".join(f'<span class="tag kind">{label[k]}</span>' for k in kind) + f'<span class="tag model">{e(f["models"])}</span>'
         by = (f'{e(f["orig"])} by {out("https://github.com/" + f["orig_repo"], e(f["by"]))}, SMK-37 build by '
               f'{out("https://github.com/genkigenki", "genkigenki")}' if port else f'by {e(f["by"])}')
-        links = out(f["install"], "Install on its installer ↗", ' class="go"')
+        links = out(f["install"], f.get("install_label", "Install on its installer ↗"), ' class="go"')
         if port:
             links += f'<a href="/#fw-{e(f["fm1"])}">On the FM-1 hub</a>'
-        links += "".join(out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
+        links += "".join(f'<a href="{e(u)}">{e(t)}</a>' if u.startswith("/") else out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
         return (f'<article class="fw" id="fw-{e(f["id"])}" data-kind="{" ".join(kind)}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
                 f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <h3>{e(f["name"])}<small>{e(f["version"])}</small></h3>'
                 f'<div class="by">{by}</div><div class="tags">{tags}</div>\n  <p class="what">{e(f["what"])}</p>'
