@@ -287,6 +287,7 @@
 </style>
 </head>
 <body>
+<!--email_off-->
 <a class="vibe" href="/vibe/?ref=hub"><div class="wrap">
   <picture><source type="image/webp" srcset="/vibe/assets/img/banner-device.webp"><img src="/vibe/assets/img/banner-device.jpg" alt="" width="84" height="30"></picture>
   <b>VIBE <em>FM</em> Mk1</b> <span class="t">Open firmware, <i>officially supported.</i></span>
@@ -1131,6 +1132,7 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   }
 }).catch((e) => { $("grid").innerHTML = `<p class="meta">The catalogue could not be loaded: ${esc(e.message)}</p>`; });
 </script>
+<!--/email_off-->
 <!-- Matomo (self-hosted, matomo.designburgapps.com): one site per host (dx7 1, zp12 3, fm1 4, designburgapps.com 5);
      no cookies, IPs anonymised on the server, Do Not Track respected -->
 <script>

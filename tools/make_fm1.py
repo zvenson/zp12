@@ -91,6 +91,9 @@ def devices(text, dev):
     foot = ((HERE / "web" / "footer.html").read_text(encoding="utf-8").replace("<!--F-OURS-->", ours)
             .replace("<!--F-FM1-->", fm1).replace("<!--F-SMK-->", smk))
     text = text.replace("/*FOOTER*/\n", (HERE / "web" / "footer.css").read_text(encoding="utf-8")).replace("<!--FOOTER-->\n", foot)
+    # (Cloudflare's email obfuscation off for our pages: the addresses stay plain text and links, also without JavaScript;
+    #  the legal notice needs its address readable)
+    text = text.replace("<body>\n", "<body>\n<!--email_off-->\n", 1).replace("</body>", "<!--/email_off-->\n</body>", 1)
     return (text.replace("/*DEVICES*/\n", (HERE / "web" / "devices.css").read_text(encoding="utf-8"))
                 .replace("<!--DEVICES-->\n", menu).replace("<!--SMK-OWN-->", own).replace("<!--SMK-PORTS-->", ports)
                 .replace("<!--SMK-N-->", n))
