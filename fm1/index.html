@@ -131,6 +131,11 @@
   .chips button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
   .chips button[aria-selected="true"] { background: var(--fg); color: #121011; box-shadow: none; }
   .chips button span { opacity: .55; font-weight: 600; margin-left: 4px; }
+  /* the order of the cards: one quiet line under the chips */
+  .sorts { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 16px; margin: -14px 0 30px; font-size: 13.5px; color: var(--dim); }
+  .sorts button { background: transparent; color: var(--dim); box-shadow: none; border-radius: 0; padding: 4px 1px; font-size: 13.5px; font-weight: 600; }
+  .sorts button:hover { color: var(--fg); }
+  .sorts button[aria-pressed="true"] { color: var(--fg); box-shadow: inset 0 -2px 0 var(--beige); }
   .fw[hidden] { display: none; }
   .tag.kind { background: rgba(239, 232, 225, .08); color: var(--dim); }
   @media (max-width: 1300px) { .grid { grid-template-columns: repeat(2, 1fr); } }
@@ -283,6 +288,7 @@
 <main><div class="wrap">
   <h2 class="sec"><span id="count">Twenty-two</span> open-source firmwares, one FM-1</h2>
   <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
+  <div class="sorts" id="sorts" role="group" aria-label="Sort"></div>
   <div class="grid"><div id="grid" class="fws"><p class="meta">Loading the catalogue…</p></div>
     <section class="fw ext" id="baudgirl" data-id="baudgirl" style="--c: #ff3fa4">
       <div class="shot"><div class="slot ext"><b>FM-1+VA</b>Baud Girl</div></div>
@@ -743,6 +749,32 @@ function chips() {
     chips(); render();
   });
 }
+// the order of the cards: by stars (zp12 first, Baud Girl in the second row), the newest release, the newest on the hub
+// or by name; from ?sort= (a link with it), else the last choice (localStorage: only this), else by stars
+const SORTS = [["stars", "Most stars"], ["updated", "Recently updated"], ["added", "New on the hub"], ["name", "A–Z"]];
+const SORT_KEY = "fm1hub.sort", isSort = (k) => SORTS.some(([s]) => s === k);
+let sort = (() => {
+  const q = new URLSearchParams(location.search).get("sort");
+  if (isSort(q)) return q;
+  try { const s = localStorage.getItem(SORT_KEY); if (isSort(s)) return s; } catch (e) {}
+  return "stars";
+})();
+const released = (f) => f.published || f.date || "";
+const sorted = () => sort === "updated" ? [...cat].sort((a, b) => released(b).localeCompare(released(a)))
+  : sort === "added" ? [...cat].sort((a, b) => (b.added || "").localeCompare(a.added || "") || released(b).localeCompare(released(a)))
+  : sort === "name" ? [...cat].sort((a, b) => a.name.localeCompare(b.name, "en", { sensitivity: "base" }))
+  : cat;
+function sorts() {
+  $("sorts").innerHTML = "<span>Sort</span>" + SORTS.map(([k, label]) => `<button type="button" data-s="${k}" aria-pressed="${k === sort}">${label}</button>`).join("");
+  $("sorts").querySelectorAll("button").forEach((b) => b.onclick = () => {
+    sort = b.dataset.s;
+    try { localStorage.setItem(SORT_KEY, sort); } catch (e) {}
+    const q = new URLSearchParams(location.search);
+    if (sort === "stars") q.delete("sort"); else q.set("sort", sort);
+    history.replaceState(null, "", location.pathname + (q.size ? "?" + q : "") + location.hash);
+    sorts(); render();
+  });
+}
 const WIDE = new Set(["felucca", "salt", "melodee", "hortator", "ghoulbox", "waveloop", "skiff", "duell", "felucca8", "obervave"]);                  // (a landscape picture, not a square screen)   // (designburgapps.com's palette)
 const LOGO = { sloop: "img/sloop-icon.png", dinghy: "img/dinghy-icon.png" };
 // Baud Girl: a link card, not in the catalogue (not open source, no stars to sort by): in the second row all the same
@@ -776,8 +808,8 @@ const ordered = (l) => [...OURS.map((i) => l.find((f) => f.id === i)).filter(Boo
 function render() {
   const w = whoIs(current);
   $("grid").innerHTML = "";
-  for (const [i, f] of cat.entries()) {
-    if (i === EXT_AT) $("grid").append(EXT);
+  for (const [i, f] of sorted().entries()) {
+    if (i === EXT_AT && sort === "stars") $("grid").append(EXT);
     const isNow = w && w.fw === f;
     const el = document.createElement("article");
     el.className = "fw" + (isNow ? " now" : "");
@@ -1005,7 +1037,7 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   cat = ordered(c.firmwares);
   rescueFill();
   $("count").textContent = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty", "Twenty-one", "Twenty-two", "Twenty-three", "Twenty-four", "Twenty-five"][cat.length] || cat.length;
-  $("updated").textContent = "catalogue of " + c.updated; lineup(); chips(); render(); recent(); remember();
+  $("updated").textContent = "catalogue of " + c.updated; lineup(); chips(); sorts(); render(); recent(); remember();
   // ?demo=connected|install|done&now=<id>&fw=<id>&pct=N: the page in a state, for a video (no FM-1 needed)
   const q = new URLSearchParams(location.search), st = q.get("demo");
   if (!st) return;
