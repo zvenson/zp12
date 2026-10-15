@@ -114,10 +114,17 @@
   .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }   /* the firmwares + yours + the official one, 4 a row */
   .fws { display: contents; }
   /* the search above the chips: every word somewhere in a card, with the chip's kind; "/" jumps into it */
-  .find { position: relative; max-width: 560px; margin: -6px auto 18px; }
+  /* the nav stays on top here, the search in its middle (a phone: a line of its own) */
+  nav { position: sticky; top: 0; background: var(--bg); }
+  nav .find { flex: 0 1 440px; margin: 0 auto; }
+  @media (max-width: 900px) { nav .wrap { flex-wrap: wrap; height: auto; min-height: 60px; row-gap: 0; }
+                              nav .find { order: 10; flex-basis: 100%; margin: 0 0 10px; } }
+  .subline { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--fg); opacity: .72; margin: -8px 0 18px; font-weight: 600; }
+  .find { position: relative; }
   .find input { width: 100%; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 999px;
                 padding: 12px 46px 12px 20px; font: inherit; font-size: 15.5px; }
   .find input:focus { outline: none; border-color: var(--beige); }
+  nav .find input { padding-top: 8px; padding-bottom: 8px; font-size: 14.5px; }
   .find input::placeholder { color: var(--dim); }
   .find .key { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; line-height: 1.5; color: var(--dim);
                border: 1px solid var(--line); border-radius: 5px; padding: 0 7px; pointer-events: none; }
@@ -125,17 +132,22 @@
   @media (hover: none) { .find .key { display: none; } }
   .nomatch { text-align: center; color: var(--dim); margin: 0 0 34px; }
   .nomatch button { background: transparent; color: var(--cyan); box-shadow: none; padding: 0; font-size: inherit; font-weight: 600; }
-  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: -6px 0 28px; }
-  .chips button { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 11px 18px; font-size: 14.5px; }
+  /* one toolbar over the cards: the kinds on the left, sort, show and view on the right (wraps when narrow) */
+  .tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin: 0 0 28px; }
+  .tools, .fw { scroll-margin-top: 84px; }            /* (under the nav, which stays on top) */
+  @media (max-width: 900px) { .tools, .fw { scroll-margin-top: 130px; } }
+  .tools-r { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; margin-left: auto; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chips button { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 9px 14px; font-size: 14px; }
   .chips button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
   .chips button[aria-selected="true"] { background: var(--fg); color: #121011; box-shadow: none; }
   .chips button span { opacity: .55; font-weight: 600; margin-left: 4px; }
   /* the order of the cards: one quiet line under the chips */
-  .sorts { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px 16px; margin: -14px 0 30px; font-size: 13.5px; color: var(--dim); }
+  .sorts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-size: 13.5px; color: var(--dim); }
+  .sorts select { background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font: inherit; font-size: 13.5px; font-weight: 600; }
   .sorts button { background: transparent; color: var(--dim); box-shadow: none; border-radius: 0; padding: 4px 1px; font-size: 13.5px; font-weight: 600; }
   .sorts button:hover { color: var(--fg); }
   .sorts button[aria-pressed="true"] { color: var(--fg); box-shadow: inset 0 -2px 0 var(--beige); }
-  .sorts .sep { width: 1px; height: 16px; background: var(--line); margin: 0 6px; }
   /* the list view (View: List): a row per firmware, every one in sight; the cards' parts in a grid of their own */
   .fws.list { display: flex; flex-direction: column; gap: 8px; grid-column: 1 / -1; margin-bottom: 8px; }
   .fws.list > .fw { display: grid; grid-template-columns: 76px 300px minmax(0, 1fr) 250px 190px;   /* (fixed: the columns line up from row to row) */
@@ -160,7 +172,7 @@
                                .fws.list > .fw .what, .fws.list > .fw .meta { display: none; } .fws.list > .fw .links { justify-content: flex-start; } }
   @media (max-width: 1100px) and (min-width: 561px) { .fws.list > .fw { grid-template-columns: 64px minmax(0, 1fr) 250px 170px; grid-template-areas: "shot head links go" "shot head links prog"; } }
   @media (max-width: 560px) { .fws.list > .fw { grid-template-columns: 56px minmax(0, 1fr); grid-template-areas: "shot head" "shot go"; gap: 8px 14px; }
-                              .fws.list > .fw .tags, .fws.list > .fw .links { display: none; } .sorts .sep { display: none; } }   /* (a phone's list: name and Install; the rest in Cards) */
+                              .fws.list > .fw .tags, .fws.list > .fw .links { display: none; } }   /* (a phone's list: name and Install; the rest in Cards) */
   .mailcta .addr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
   .mailcta .addr code { color: var(--fg); font-size: 14.5px; }
   .mailcta .addr button { background: transparent; color: var(--dim); box-shadow: inset 0 0 0 1px var(--line); padding: 5px 10px; font-size: 12.5px; }
@@ -286,11 +298,14 @@
 <!--VIBEBAR-->
 <nav><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
 <!--DEVICES-->
+  <div class="find" role="search"><input type="search" id="q" placeholder="Search firmwares: a name, a maker, acid, drums…"
+    aria-label="Search the firmwares" autocomplete="off" spellcheck="false"><span class="key" aria-hidden="true">/</span></div>
   <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
 <div class="strip"><i></i><i></i><i></i><i></i></div>
 <div class="recent" id="recent" hidden></div>
 <header><div class="wrap hero"><div>
   <p class="eyebrow">The FM-1 Firmware Hub · open source only</p>
+  <p class="subline"><span id="count">Forty</span> open-source firmwares, one FM-1</p>
   <h1>Make <b>Firmware</b>,<br>Not War.</h1>
   <p class="lead">A collection of open-source firmwares for the M-VAVE FM-1 in one place: Felucca, SLOOP, X0X, FoMni, Jangada, ChoralRoot, Melodee, Hortator, FiMba-1, GHOULBOX, JIANT FM, WaveLoop, MAKU, FuMi-1, Rainbow Mode, fm1-chord, zp12, sloopDX and more. No need to pick a side. Connect your FM-1 by USB, choose one,
      press Install: about a minute, and it is a different instrument. Try them all, keep the one you love, switch back tomorrow.
@@ -314,12 +329,11 @@
 </div></header>
 
 <main><div class="wrap">
-  <h2 class="sec"><span id="count">Twenty-two</span> open-source firmwares, one FM-1</h2>
-  <div class="find" role="search"><input type="search" id="q" placeholder="Search by name, maker or sound: acid, drums, chords…"
-    aria-label="Search the firmwares" autocomplete="off" spellcheck="false"><span class="key" aria-hidden="true">/</span></div>
-  <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
-  <div class="sorts" id="sorts" role="group" aria-label="Sort"></div>
-  <div class="sorts" id="opts" role="group" aria-label="Show and view"></div>
+  <div class="tools" id="tools">
+    <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
+    <div class="tools-r"><div class="sorts" id="sorts" role="group" aria-label="Sort"></div>
+      <div class="sorts" id="opts" role="group" aria-label="View"></div></div>
+  </div>
   <p class="nomatch" id="nomatch" hidden></p>
   <div class="grid"><div id="grid" class="fws"><p class="meta">Loading the catalogue…</p></div>
     <section class="fw ext" id="baudgirl" data-id="baudgirl" style="--c: #ff3fa4">
@@ -501,7 +515,7 @@ function chips() {
   if (!KINDS.some(([k]) => k === kind)) kind = "all";
   $("chips").innerHTML = KINDS.map(([k, label]) => {
     const of = (l) => k === "all" ? l : l.filter((f) => kindsOf(f).includes(k));
-    return of(cat).length ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${of(cat.filter(passes)).length}</span></button>` : "";
+    return of(cat).length ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${of(cat.filter(found)).length}</span></button>` : "";
   }).join("");
   $("chips").querySelectorAll("button").forEach((b) => b.onclick = () => {
     kind = b.dataset.k; history.replaceState(null, "", kind === "all" ? location.pathname + location.search : "#" + kind);
@@ -526,23 +540,19 @@ const sorted = () => sort === "updated" ? [...cat].sort((a, b) => released(b).lo
   : [...cat].sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1));
 function sorts() {
   const have = (k) => k !== "installs" || cat.some((f) => f.installs);   // (installs: once the catalogue counts them)
-  $("sorts").innerHTML = "<span>Sort</span>" + SORTS.filter(([k]) => have(k)).map(([k, label]) => `<button type="button" data-s="${k}" aria-pressed="${k === sort}">${label}</button>`).join("");
-  $("sorts").querySelectorAll("button").forEach((b) => b.onclick = () => {
-    sort = b.dataset.s;
+  $("sorts").innerHTML = '<label>Sort <select id="sortsel">' + SORTS.filter(([k]) => have(k)).map(([k, label]) => `<option value="${k}"${k === sort ? " selected" : ""}>${label}</option>`).join("") + "</select></label>";
+  $("sortsel").onchange = (e) => {
+    sort = e.target.value;
     try { localStorage.setItem(SORT_KEY, sort); } catch (e) {}
     const q = new URLSearchParams(location.search);
     if (sort === "stars") q.delete("sort"); else q.set("sort", sort);
     history.replaceState(null, "", location.pathname + (q.size ? "?" + q : "") + location.hash);
     sorts(); render();
-  });
+  };
 }
-// what shows besides the kind and the search: only those playable in the browser, only the stable ones (?play=1, ?stable=1);
-// and the view: the cards or a list, a row each (?view=list, else the last choice, localStorage)
+// the view: the cards or a list, a row each (?view=list, else the last choice, localStorage)
 const P0 = new URLSearchParams(location.search), VIEW_KEY = "fm1hub.view";
-let onlyPlay = P0.get("play") === "1", onlyStable = P0.get("stable") === "1";
 let view = P0.get("view") === "list" || P0.get("view") === "cards" ? P0.get("view") : (() => { try { return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "cards"; } catch (e) { return "cards"; } })();
-const isBeta = (f) => f.beta && !devOnly(f);
-const passes = (f) => found(f) && (!onlyPlay || f.play) && (!onlyStable || !isBeta(f));
 function setParam(k, v) {
   const u = new URLSearchParams(location.search);
   if (v) u.set(k, v); else u.delete(k);
@@ -550,13 +560,7 @@ function setParam(k, v) {
 }
 function opts() {
   const b = (attr, val, on, label) => `<button type="button" ${attr}="${val}" aria-pressed="${on}">${label}</button>`;
-  $("opts").innerHTML = "<span>Show</span>" + b("data-o", "play", onlyPlay, "▶ Playable in browser") + b("data-o", "stable", onlyStable, "Stable only")
-    + '<span class="sep"></span><span>View</span>' + b("data-v", "cards", view === "cards", "Cards") + b("data-v", "list", view === "list", "List");
-  $("opts").querySelectorAll("[data-o]").forEach((x) => x.onclick = () => {
-    if (x.dataset.o === "play") { onlyPlay = !onlyPlay; setParam("play", onlyPlay ? "1" : ""); }
-    else { onlyStable = !onlyStable; setParam("stable", onlyStable ? "1" : ""); }
-    opts(); chips(); filter();
-  });
+  $("opts").innerHTML = "<span>View</span>" + b("data-v", "cards", view === "cards", "Cards") + b("data-v", "list", view === "list", "List");
   $("opts").querySelectorAll("[data-v]").forEach((x) => x.onclick = () => {
     view = x.dataset.v;
     try { localStorage.setItem(VIEW_KEY, view); } catch (e) {}
@@ -633,17 +637,16 @@ function filter() {
   shown = 0;
   for (const el of $("grid").querySelectorAll("article.fw")) {
     const f = cat.find((x) => x.id === el.dataset.id);
-    el.hidden = (kind !== "all" && !kindsOf(f).includes(kind) && !el.classList.contains("now")) || !passes(f);
+    el.hidden = (kind !== "all" && !kindsOf(f).includes(kind) && !el.classList.contains("now")) || !found(f);
     shown += !el.hidden;
   }
-  EXT.hidden = (kind !== "all" && !["synth", "groove"].includes(kind)) || !hits(EXT.textContent) || onlyPlay;   // (a link card, not in the catalogue)
+  EXT.hidden = (kind !== "all" && !["synth", "groove"].includes(kind)) || !hits(EXT.textContent);   // (a link card, not in the catalogue)
   shown += !EXT.hidden;
   const nm = $("nomatch");
   nm.hidden = shown > 0;
   if (!shown) {
-    nm.innerHTML = `No firmware matches${q.trim() ? ` “${esc(q.trim())}”` : ""}${kind !== "all" || onlyPlay || onlyStable ? " with these filters" : ""}. <button type="button">Show all</button>`;
-    nm.querySelector("button").onclick = () => { kind = "all"; onlyPlay = onlyStable = false; setParam("play", ""); setParam("stable", ""); setQ("");
-                                                  history.replaceState(null, "", location.pathname + location.search); opts(); chips(); filter(); };
+    nm.innerHTML = `No firmware matches “${esc(q.trim())}”${kind !== "all" ? " in this group" : ""}. <button type="button">Show all</button>`;
+    nm.querySelector("button").onclick = () => { kind = "all"; setQ(""); history.replaceState(null, "", location.pathname + location.search); chips(); filter(); };
   }
 }
 function setQ(v) {                                      // (the box, the address: ?q=, beside ?sort= and the #kind)
@@ -658,6 +661,8 @@ function find() {
   box.value = q;
   box.oninput = () => {
     setQ(box.value); chips(); filter();
+    const t = $("tools").getBoundingClientRect().top;  // (the search sits at the top: the cards into view while typing)
+    if (q.trim() && (t > innerHeight * .5 || t < 0)) $("tools").scrollIntoView({ block: "start", behavior: "smooth" });
     clearTimeout(searchT);                              // (Matomo's site search: what people look for, once they stop typing)
     searchT = setTimeout(() => { if (q.trim().length > 1) try { (window._paq = window._paq || []).push(["trackSiteSearch", q.trim(), kind === "all" ? false : kind, shown]); } catch (e) {} }, 1500);
   };
