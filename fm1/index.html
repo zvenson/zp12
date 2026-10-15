@@ -1179,7 +1179,7 @@ $("connect").onclick = async () => {
   try {
     const up = new Updater(await midi(), log);
     const dev = await up.find(() => true);
-    if (!dev) { $("now").textContent = "No FM-1 found: plug it in, close other MIDI apps, try again"; return; }
+    if (!dev) { $("now").textContent = "No FM-1 found: plug it in, close other MIDI apps, try again" + up.seen(); return; }
     dev.link.close();
     current = dev.id.text;
     log(`identity ${current}`);
