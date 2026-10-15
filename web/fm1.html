@@ -718,7 +718,7 @@ $("rescue-uboot").onclick = async () => {
   try {
     const acc = await midi();
     let n = 0;
-    for (const o of acc.outputs.values()) if (FM1_PORT.test(o.name)) { o.send(UBOOT_KEY); n++; }
+    for (const o of ports(acc.outputs)) if (FM1_PORT.test(o.name)) { o.send(UBOOT_KEY); n++; }
     $("rescue-msg").textContent = n ? 'Sent. The screen stops and a USB disk "UBOOT1.00" appears: on to step 2.'
                                     : "No FM-1 among the MIDI devices: plug it in by USB, close other MIDI apps, try again.";
     ev("Rescue", n ? "bootloader" : "no device");

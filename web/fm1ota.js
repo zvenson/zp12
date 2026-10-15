@@ -18,6 +18,9 @@ export const OUR_LOADER = (id) => /^ota-FM-1_9\d\d$/i.test(id.text);
 // CLIPPER ("Clipper"), under a firmware named after itself ("SLOOP"), the update loaders, and the names
 // Windows / macOS give the stock firmware (as SLOOP 2.6's fm1ota.js)
 export const FM1_PORT = /fm-1|felucca|sloop|clipper|ota|composite|sinco|usb-midi/i;
+// the ports of a MIDIInputMap / MIDIOutputMap as an array: by forEach, as iOS Web MIDI apps (Web MIDI Browser)
+// hand out maps whose values() is no iterable, so [...map.values()] and for..of throw there
+export const ports = (map) => { const a = []; map.forEach((p) => a.push(p)); return a; };
 
 // errors carry a code the pages translate: notfound, model, stopped, noloader, lost, noreturn,
 // mismatch (detail: the identity the device reports), badreq, foreign (detail: the loader's identity)
@@ -122,8 +125,8 @@ export class Updater {
 
   // every in/out pair with the same port name that answers the handshake
   async find(filter) {
-    const outs = [...this.access.outputs.values()];
-    for (const input of this.access.inputs.values()) {
+    const outs = ports(this.access.outputs);
+    for (const input of ports(this.access.inputs)) {
       if (input.state === "disconnected") continue;
       if (!FM1_PORT.test(input.name || "")) continue;   // never probe other gear
       const output = outs.find((o) => o.name === input.name) || (outs.length === 1 ? outs[0] : null);
@@ -139,7 +142,7 @@ export class Updater {
 
   // the MIDI inputs there are, for the "not found" message: " (MIDI: a, b)" (a port the installer skipped shows)
   seen() {
-    const names = [...this.access.inputs.values()].filter((p) => p.state !== "disconnected").map((p) => p.name || "?");
+    const names = ports(this.access.inputs).filter((p) => p.state !== "disconnected").map((p) => p.name || "?");
     return names.length ? ` (MIDI: ${names.join(", ")})` : " (MIDI: none)";
   }
 
