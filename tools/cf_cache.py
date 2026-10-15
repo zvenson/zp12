@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Cloudflare in front of the two static sites (zp12.designburgapps.com, dx7.designburgapps.com): the Pi's home
-line is the bottleneck, so Cloudflare keeps the files at its edge.
+"""Cloudflare in front of the static sites: zp12/dx7.designburgapps.com (the Pi's home line is the bottleneck) and
+thefirmwarehub.com (the Hetzner server in Helsinki), so Cloudflare keeps the files at its edge.
 
   tools/cf_cache.py rule     the cache rule: the hosts eligible for cache, 2 h at the edge for pages, 30 days for
                              files (pictures, videos, packages: a deploy purges what changed; the browser asks
@@ -10,25 +10,41 @@ line is the bottleneck, so Cloudflare keeps the files at its edge.
   tools/cf_cache.py purge-url URL...   just these (fm1_sync.py: a changed catalogue)
   tools/cf_cache.py check    what the edge says for a few of their files (HIT, MISS, ...)
 
-The API token (Zone: Cache Rules Edit, Cache Purge, Zone Read; designburgapps.com only) is read from
+The zone: $CF_ZONE_NAME (designburgapps.com when unset, the Pi; thefirmwarehub.com on the Hetzner server).
+The API token (Zone: Cache Rules Edit, Cache Purge, Zone Read; that zone only) is read from
 $CF_TOKEN_FILE or ~/.config/designburg/cf-token and never printed. Without Zone Read: the zone's id (not a secret)
 in ~/.config/designburg/cf-zone."""
-import hashlib, json, os, sys, urllib.error, urllib.request
+import hashlib, json, os, sys, urllib.error, urllib.parse, urllib.request
 from pathlib import Path
 
-ZONE = "designburgapps.com"
-HOSTS = ["zp12.designburgapps.com", "dx7.designburgapps.com", "fm1.designburgapps.com", "designburgapps.com"]   # (our static sites; the apps and the WordPress sites on the zone keep Cloudflare's default: files yes, pages no)
-RULE_REF = "zp12-dx7-static"
 EDGE_TTL, BROWSER_TTL = 7200, 600
 FILE_TTL = 30 * 86400                                 # (not a page: a picture, a video, a package; purged when it changes)
 PAGES = ("html", "json", "txt", "xml", "webmanifest")
-SEEN = Path.home() / ".cache/designburg/cf-purged.json"
 API = "https://api.cloudflare.com/client/v4"
 HERE = Path(__file__).resolve().parents[1]
-DOCS = {"zp12.designburgapps.com": HERE / "docs", "fm1.designburgapps.com": HERE / "fm1",           # (dx7: sloopDX's docs/, beside this repo: "repo" on the Pi)
-        "dx7.designburgapps.com": next((p for p in (HERE.parent / "repo" / "docs", HERE.parent / "sloopdx" / "docs") if p.is_dir()), None),
-        "designburgapps.com": next((p for p in (HERE.parent / "repo" / "deploy" / "designburgapps",       # (sloopDX's deploy/: the entry page)
-                                                HERE.parent / "sloopdx" / "deploy" / "designburgapps") if p.is_dir()), None)}
+SITES = {
+    "designburgapps.com": dict(   # (our static sites; the apps and the WordPress sites on the zone keep Cloudflare's default: files yes, pages no)
+        hosts=["zp12.designburgapps.com", "dx7.designburgapps.com", "fm1.designburgapps.com", "designburgapps.com"],
+        ref="zp12-dx7-static", label="zp12 + dx7", nocache=("/vibe",), file_browser=BROWSER_TTL,
+        docs={"zp12.designburgapps.com": HERE / "docs", "fm1.designburgapps.com": HERE / "fm1",           # (dx7: sloopDX's docs/, beside this repo: "repo" on the Pi)
+              "dx7.designburgapps.com": next((p for p in (HERE.parent / "repo" / "docs", HERE.parent / "sloopdx" / "docs") if p.is_dir()), None),
+              "designburgapps.com": next((p for p in (HERE.parent / "repo" / "deploy" / "designburgapps",       # (sloopDX's deploy/: the entry page)
+                                                      HERE.parent / "sloopdx" / "deploy" / "designburgapps") if p.is_dir()), None)},
+        check=["https://zp12.designburgapps.com/", "https://zp12.designburgapps.com/zp12-beat.mp4",
+               "https://zp12.designburgapps.com/editor/", "https://dx7.designburgapps.com/"]),
+    "thefirmwarehub.com": dict(   # (www and the old fm1 host only redirect; /src/ is a live listing of the sync's copies)
+        hosts=["thefirmwarehub.com"], ref="firmwarehub-static", label="thefirmwarehub", nocache=("/vibe", "/src/"),
+        file_browser=None,        # (the browser keeps nginx's own times: /fw/ immutable, pictures 6 h, /play/ 1 h)
+        docs={"thefirmwarehub.com": HERE / "fm1"},
+        check=["https://thefirmwarehub.com/", "https://thefirmwarehub.com/kb/", "https://thefirmwarehub.com/catalog.json",
+               "https://thefirmwarehub.com/og.png"]),
+}
+ZONE = os.environ.get("CF_ZONE_NAME", "designburgapps.com")
+if ZONE not in SITES:
+    sys.exit(f"cf_cache: no sites for zone {ZONE} ({', '.join(SITES)})")
+SITE = SITES[ZONE]
+HOSTS, DOCS, RULE_REF = SITE["hosts"], SITE["docs"], SITE["ref"]
+SEEN = Path.home() / (".cache/designburg/cf-purged.json" if ZONE == "designburgapps.com" else f".cache/designburg/cf-purged-{ZONE}.json")
 
 
 def token():
@@ -64,17 +80,19 @@ def zone_id():
 def rule():
     z = zone_id()
     # /vibe (fm1: the VIBE FM teaser, PHP with sign-ups and a password preview) is never cached: Cloudflare's default
-    expr = "(http.host in {" + " ".join(f'"{h}"' for h in HOSTS) + "} and not starts_with(http.request.uri.path, \"/vibe\"))"
-    mine = {"ref": RULE_REF, "description": "zp12 + dx7: static, cached at the edge (tools/cf_cache.py)",
+    expr = ("(http.host in {" + " ".join(f'"{h}"' for h in HOSTS) + "}"
+            + "".join(f' and not starts_with(http.request.uri.path, "{p}")' for p in SITE["nocache"]) + ")")
+    mine = {"ref": RULE_REF, "description": f"{SITE['label']}: static, cached at the edge (tools/cf_cache.py)",
             "expression": expr, "action": "set_cache_settings",
             "action_parameters": {"cache": True, "edge_ttl": {"mode": "override_origin", "default": EDGE_TTL},
                                   "browser_ttl": {"mode": "override_origin", "default": BROWSER_TTL}}}
-    files = {"ref": RULE_REF + "-files", "description": "zp12 + dx7 + fm1: pictures, videos, packages, 30 days at the edge",
+    files = {"ref": RULE_REF + "-files", "description": f"{SITE['label']}: pictures, videos, packages, 30 days at the edge",
              "expression": expr[:-1] + " and http.request.uri.path.extension ne \"\" and not http.request.uri.path.extension in {"
                            + " ".join(f'"{e}"' for e in PAGES) + "})",
              "action": "set_cache_settings",
              "action_parameters": {"cache": True, "edge_ttl": {"mode": "override_origin", "default": FILE_TTL},
-                                   "browser_ttl": {"mode": "override_origin", "default": BROWSER_TTL}}}
+                                   "browser_ttl": {"mode": "override_origin", "default": SITE["file_browser"]}
+                                   if SITE["file_browser"] else {"mode": "respect_origin"}}}
     r = call("GET", f"/zones/{z}/rulesets/phases/http_request_cache_settings/entrypoint", missing_ok=True)   # (none yet: 404)
     rules = [x for x in r.get("result", {}).get("rules", []) if x.get("ref") not in (RULE_REF, files["ref"])] if r.get("success") else []
     keep = [{k: x[k] for k in ("ref", "description", "expression", "action", "action_parameters", "enabled") if k in x} for x in rules]
@@ -95,7 +113,7 @@ def urls():
                 out[f"https://{host}/{rel}"] = h
                 if p.name == "index.html":
                     out[f"https://{host}/{rel[:-len('index.html')]}"] = h
-    if DOCS["dx7.designburgapps.com"] is None:            # (no sloopDX checkout here: its pages that change)
+    if "dx7.designburgapps.com" in DOCS and DOCS["dx7.designburgapps.com"] is None:            # (no sloopDX checkout here: its pages that change)
         out |= {f"https://dx7.designburgapps.com/{p}": None for p in ("", "index.html", "webapp/installer/", "webapp/editor/",
                                                                       "cheatsheet.html", "impressum.html")}
     return out
@@ -117,13 +135,15 @@ def purge():
 
 
 def purge_url():
-    call("POST", f"/zones/{zone_id()}/purge_cache", {"files": sys.argv[2:32]})
-    print(f"cf_cache: {len(sys.argv[2:32])} URL(s) purged")
+    """just these; URLs of another zone are left out (fm1_sync.py names both hosts of the catalogue)"""
+    u = [x for x in sys.argv[2:] if (urllib.parse.urlsplit(x).hostname or "").endswith(ZONE)][:30]
+    if u:
+        call("POST", f"/zones/{zone_id()}/purge_cache", {"files": u})
+    print(f"cf_cache: {len(u)} URL(s) purged")
 
 
 def check():
-    for u in ("https://zp12.designburgapps.com/", "https://zp12.designburgapps.com/zp12-beat.mp4",
-              "https://zp12.designburgapps.com/editor/", "https://dx7.designburgapps.com/"):
+    for u in SITE["check"]:
         for _ in range(2):                            # (the first may be the MISS that fills the edge)
             with urllib.request.urlopen(urllib.request.Request(u, method="HEAD"), timeout=30) as r:
                 st = r.headers.get("cf-cache-status")

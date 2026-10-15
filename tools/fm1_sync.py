@@ -379,8 +379,9 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
     print("fm1_sync: catalogue written")
     if purge:
         day = datetime.now(timezone.utc).strftime("%Y-%m-%d")    # (the page asks for catalog.json?<UTC day>)
-        subprocess.run([sys.executable, str(HERE / "tools" / "cf_cache.py"), "purge-url",
-                        "https://fm1.designburgapps.com/catalog.json", f"https://fm1.designburgapps.com/catalog.json?{day}"], check=False)
+        subprocess.run([sys.executable, str(HERE / "tools" / "cf_cache.py"), "purge-url",   # (cf_cache keeps its own zone's)
+                        *(f"https://{h}/catalog.json{q}" for h in ("thefirmwarehub.com", "fm1.designburgapps.com") for q in ("", f"?{day}"))],
+                       check=False)
 
 
 def sources(dest, out=OUT):
