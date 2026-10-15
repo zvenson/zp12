@@ -21,6 +21,9 @@
     </div></div>
   </div>
   <a class="kbl" href="/kb/" title="Knowledge Base: how a firmware gets onto the FM-1"><span class="lg">Knowledge Base</span><span class="sm">KB</span></a>
+  <form class="find" role="search" action="/" method="get"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><input
+    type="search" name="q" id="q" placeholder="Search firmwares: a name, a maker, acid, drums…" aria-label="Search the firmwares" autocomplete="off"
+    spellcheck="false"><span class="key" aria-hidden="true">/</span></form>
   <script>
   (() => {                                                 // a tap / Enter opens it, a tap outside or Esc closes it
     const dd = document.getElementById("dd"), b = dd.querySelector(".ddb");
@@ -28,6 +31,11 @@
     b.addEventListener("click", (e) => { e.stopPropagation(); set(!dd.classList.contains("open")); });
     document.addEventListener("click", (e) => { if (!dd.contains(e.target)) set(false); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") { set(false); } });
+    document.addEventListener("keydown", (e) => {          // "/": into the search, on every page
+      const a = document.activeElement;
+      if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(a?.tagName || "") || a?.isContentEditable) return;
+      e.preventDefault(); const q = document.getElementById("q"); q.focus(); q.select();
+    });
     fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.json())     // (the hub's daily key: one cache)
       .then((c) => { document.getElementById("dd-fm1").textContent = c.firmwares.length; }).catch(() => {});
   })();

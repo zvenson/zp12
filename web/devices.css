@@ -43,3 +43,24 @@
   .mega .tile.add .pic { border-style: dashed; background: transparent; color: var(--pink); font-size: 34px; font-weight: 200; }
   @media (max-width: 760px) { .mega .in { grid-template-columns: 1fr; padding-top: 14px; padding-bottom: 18px; } .mega .side { display: none; }
                               .mega .pic { width: 56px; height: 56px; } }
+  /* the nav stays on top, the search in its middle (from 1700 px the true middle; a phone: a line of its own). The colours
+     on the nav itself: the same on VIBE's page, which has its own (hubnav/vibe.html) */
+  nav.top { position: sticky; top: 0; background: var(--bg); --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435;
+            --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9; --cyan: #42f5f5; --pink: #f4c0cb; --beige: #e6d1b9; }
+  nav.top .find { position: relative; flex: 0 1 460px; margin: 0 auto; }
+  nav.top .kbl { margin-right: 0; }                    /* (the search takes the free space on both sides: between the links) */
+  @media (min-width: 1700px) { nav.top .wrap { position: relative; } nav.top .kbl { margin-right: auto; }
+                               nav.top .find { position: absolute; left: 50%; width: 460px; transform: translateX(-50%); } }
+  @media (max-width: 900px) { nav.top .wrap { flex-wrap: wrap; height: auto; min-height: 60px; row-gap: 0; }
+                              nav.top .find { order: 10; flex-basis: 100%; margin: 0 0 10px; } }
+  nav.top .find input { width: 100%; box-sizing: border-box; color: var(--fg); border: 1px solid rgba(239, 232, 225, .3); border-radius: 999px;
+                        padding: 9px 46px 9px 42px; font: inherit; font-size: 15px; background: var(--panel2); margin: 0; }
+  nav.top .find input:hover { border-color: rgba(239, 232, 225, .5); }
+  nav.top .find input:focus { outline: none; border-color: var(--beige); }
+  nav.top .find input::placeholder { color: var(--text); opacity: .8; }
+  nav.top .find .ico { position: absolute; left: 15px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%); fill: none; stroke: var(--text);
+                       stroke-width: 2.2; stroke-linecap: round; pointer-events: none; }
+  nav.top .find .key { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; line-height: 1.5; color: var(--dim);
+                       border: 1px solid var(--line); border-radius: 5px; padding: 0 7px; pointer-events: none; }
+  nav.top .find input:focus + .key, nav.top .find input:not(:placeholder-shown) + .key { display: none; }
+  @media (hover: none) { nav.top .find .key { display: none; } }

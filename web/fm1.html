@@ -113,28 +113,6 @@
   h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 24px; font-weight: 600; text-align: center; }
   .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }   /* the firmwares + yours + the official one, 4 a row */
   .fws { display: contents; }
-  /* the search above the chips: every word somewhere in a card, with the chip's kind; "/" jumps into it */
-  /* the nav stays on top here, the search in its middle (a phone: a line of its own) */
-  nav { position: sticky; top: 0; background: var(--bg); }
-  nav .find { flex: 0 1 460px; margin: 0 auto; }
-  nav .kbl { margin-right: 0; }                        /* (the search takes the free space on both sides: between the links) */
-  @media (min-width: 1700px) { nav .wrap { position: relative; } nav .kbl { margin-right: auto; } nav .find { position: absolute; left: 50%; width: 460px; transform: translateX(-50%); } }   /* (the true middle) */
-  @media (max-width: 900px) { nav .wrap { flex-wrap: wrap; height: auto; min-height: 60px; row-gap: 0; }
-                              nav .find { order: 10; flex-basis: 100%; margin: 0 0 10px; } }
-  .find { position: relative; }
-  .find input { width: 100%; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 999px;
-                padding: 12px 46px 12px 20px; font: inherit; font-size: 15.5px; }
-  .find input:focus { outline: none; border-color: var(--beige); }
-  nav .find input { padding: 9px 46px 9px 42px; font-size: 15px; background: var(--panel2); border-color: rgba(239, 232, 225, .3); }
-  nav .find input:hover { border-color: rgba(239, 232, 225, .5); }
-  nav .find input::placeholder { color: var(--text); opacity: .8; }
-  .find .ico { position: absolute; left: 15px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%); fill: none; stroke: var(--text);
-               stroke-width: 2.2; stroke-linecap: round; pointer-events: none; }
-  .find input::placeholder { color: var(--dim); }
-  .find .key { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; line-height: 1.5; color: var(--dim);
-               border: 1px solid var(--line); border-radius: 5px; padding: 0 7px; pointer-events: none; }
-  .find input:focus + .key, .find input:not(:placeholder-shown) + .key { display: none; }
-  @media (hover: none) { .find .key { display: none; } }
   .nomatch { text-align: center; color: var(--dim); margin: 0 0 34px; }
   .nomatch button { background: transparent; color: var(--cyan); box-shadow: none; padding: 0; font-size: inherit; font-weight: 600; }
   /* one toolbar over the cards: the kinds on the left, sort, show and view on the right (wraps when narrow) */
@@ -308,8 +286,6 @@
 <!--VIBEBAR-->
 <nav><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
 <!--DEVICES-->
-  <div class="find" role="search"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><input type="search" id="q" placeholder="Search firmwares: a name, a maker, acid, drums…"
-    aria-label="Search the firmwares" autocomplete="off" spellcheck="false"><span class="key" aria-hidden="true">/</span></div>
   <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
 <div class="strip"><i></i><i></i><i></i><i></i></div>
 <div class="recent" id="recent" hidden></div>
@@ -676,10 +652,8 @@ function find() {
     searchT = setTimeout(() => { if (q.trim().length > 1) try { (window._paq = window._paq || []).push(["trackSiteSearch", q.trim(), kind === "all" ? false : kind, shown]); } catch (e) {} }, 1500);
   };
   box.onkeydown = (e) => { if (e.key === "Escape" && box.value) { e.preventDefault(); box.value = ""; box.oninput(); } };
-  document.addEventListener("keydown", (e) => {
-    if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "") || document.activeElement?.isContentEditable) return;
-    e.preventDefault(); box.focus(); box.select();
-  });
+  box.form.onsubmit = (e) => e.preventDefault();       // (on the hub the search filters as you type; elsewhere it comes here with ?q=)
+  if (q.trim() && !location.hash) setTimeout(() => $("tools").scrollIntoView({ block: "start" }), 300);
 }
 
 // UPDATE: another version than on this browser's last visit (kept only here, in

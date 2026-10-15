@@ -1,0 +1,125 @@
+<style>
+  /* the devices menu (web/devices.html, put into every page by tools/make_fm1.py): a mega menu under "Devices", open on
+     hover (a mouse) or on a tap / Enter (touch, keyboard) */
+  nav { position: relative; z-index: 40; }
+  nav .dd { align-self: stretch; display: flex; align-items: center; margin: 0 0 0 clamp(14px, 3vw, 44px); }
+  /* the Knowledge Base beside it, a plain link in the same type (on the KB itself: marked) */
+  nav .kbl { align-self: stretch; display: flex; align-items: center; margin: 0 auto 0 clamp(4px, 1.6vw, 22px); padding: 8px 2px;
+             color: var(--fg); font-size: 15px; font-weight: 600; white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
+  nav .kbl:hover { text-decoration: none; box-shadow: inset 0 -2px 0 var(--pink); }
+  nav .kbl[aria-current] { box-shadow: inset 0 -2px 0 var(--cyan); }
+  nav .kbl .sm { display: none; }
+  @media (max-width: 560px) { nav .kbl .lg { display: none; } nav .kbl .sm { display: inline; }     /* (a phone: the name on one line) */
+                              nav .wrap { gap: 10px; } nav .dd { margin-left: 4px; } nav .kbl { margin-left: 0; } nav .ddb .ar { margin-left: 4px; } }
+  @media (max-width: 400px) { nav .mark { font-size: 18px; } }
+  @media (max-width: 350px) { nav .mark { font-size: 16px; } nav .dd { margin-left: 2px; } }   /* (an iPhone SE: Devices and KB beside it) */
+  nav .ddb { background: transparent; color: var(--fg); font: inherit; font-size: 15px; font-weight: 600; padding: 8px 2px; border: 0;
+             border-radius: 0; cursor: pointer; box-shadow: inset 0 -2px 0 transparent; }
+  nav .ddb:hover { filter: none; transform: none; }
+  nav .ddb .ar { display: inline-block; color: var(--dim); font-size: 11px; margin-left: 6px; transition: transform .15s; }
+  nav .dd.open .ddb { box-shadow: inset 0 -2px 0 var(--pink); } nav .dd.open .ddb .ar { transform: rotate(180deg); }
+  .mega { display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--bg); border-bottom: 1px solid var(--line);
+          box-shadow: 0 30px 60px rgba(0, 0, 0, .55); }
+  nav .dd.open .mega { display: block; }
+  @media (hover: hover) { nav .dd:hover .mega { display: block; } nav .dd:hover .ddb { box-shadow: inset 0 -2px 0 var(--pink); }
+                          nav .dd:hover .ddb .ar { transform: rotate(180deg); } }
+  .mega .in { display: grid; height: auto; grid-template-columns: 250px minmax(0, 1fr); gap: clamp(20px, 3vw, 44px); padding-top: 26px; padding-bottom: 30px; }
+  .mega .side { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; font-size: 14.5px; line-height: 1.55; }
+  .mega .side .k { font-size: 11.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); font-weight: 700; margin: 0 0 10px; }
+  .mega .side a { display: block; color: var(--fg); padding: 4px 0; }
+  .mega .side hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+  .mega .side p { margin: 0 0 8px; color: var(--text); }
+  .mega .side a.mail { color: var(--pink); }
+  .mega .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px 18px; align-content: start; }
+  .mega .tile { display: flex; align-items: center; gap: 16px; padding: 10px 12px; border-radius: 14px; color: var(--fg); }
+  .mega .tile:hover { text-decoration: none; background: var(--panel2); }
+  .mega .tile[aria-current] { box-shadow: inset 0 0 0 1px var(--cyan); }
+  .mega .pic { flex: none; width: 72px; height: 72px; border-radius: 12px; background: #0e0c0d; border: 1px solid var(--line); overflow: hidden;
+               display: grid; place-items: center; }
+  .mega .pic img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
+  .mega .pic.quad { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1px; background: var(--line); }
+  .mega .tile b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; line-height: 1.3; }
+  .mega .tile small { display: block; color: var(--dim); font-size: 13.5px; margin-top: 2px; }
+  .mega .tile.vibe-t .pic img { object-position: 70% 50%; image-rendering: auto; } .mega .tile.vibe-t b { color: #ff6a1a; }
+  .mega .tile.add .pic { border-style: dashed; background: transparent; color: var(--pink); font-size: 34px; font-weight: 200; }
+  @media (max-width: 760px) { .mega .in { grid-template-columns: 1fr; padding-top: 14px; padding-bottom: 18px; } .mega .side { display: none; }
+                              .mega .pic { width: 56px; height: 56px; } }
+  /* the nav stays on top, the search in its middle (from 1700 px the true middle; a phone: a line of its own). The colours
+     on the nav itself: the same on VIBE's page, which has its own (hubnav/vibe.html) */
+  nav.top { position: sticky; top: 0; background: var(--bg); --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435;
+            --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9; --cyan: #42f5f5; --pink: #f4c0cb; --beige: #e6d1b9; }
+  nav.top .find { position: relative; flex: 0 1 460px; margin: 0 auto; }
+  nav.top .kbl { margin-right: 0; }                    /* (the search takes the free space on both sides: between the links) */
+  @media (min-width: 1700px) { nav.top .wrap { position: relative; } nav.top .kbl { margin-right: auto; }
+                               nav.top .find { position: absolute; left: 50%; width: 460px; transform: translateX(-50%); } }
+  @media (max-width: 900px) { nav.top .wrap { flex-wrap: wrap; height: auto; min-height: 60px; row-gap: 0; }
+                              nav.top .find { order: 10; flex-basis: 100%; margin: 0 0 10px; } }
+  nav.top .find input { width: 100%; box-sizing: border-box; color: var(--fg); border: 1px solid rgba(239, 232, 225, .3); border-radius: 999px;
+                        padding: 9px 46px 9px 42px; font: inherit; font-size: 15px; background: var(--panel2); margin: 0; }
+  nav.top .find input:hover { border-color: rgba(239, 232, 225, .5); }
+  nav.top .find input:focus { outline: none; border-color: var(--beige); }
+  nav.top .find input::placeholder { color: var(--text); opacity: .8; }
+  nav.top .find .ico { position: absolute; left: 15px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%); fill: none; stroke: var(--text);
+                       stroke-width: 2.2; stroke-linecap: round; pointer-events: none; }
+  nav.top .find .key { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; line-height: 1.5; color: var(--dim);
+                       border: 1px solid var(--line); border-radius: 5px; padding: 0 7px; pointer-events: none; }
+  nav.top .find input:focus + .key, nav.top .find input:not(:placeholder-shown) + .key { display: none; }
+  @media (hover: none) { nav.top .find .key { display: none; } }
+  /* (VIBE's page: the hub's nav on its own, its base too; VIBE's links, fonts and .wrap kept out) */
+  nav.top { z-index: 40; border-bottom: 1px solid var(--line); color: var(--fg);
+            font: 16px/1.65 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  nav.top *, nav.top *::before, nav.top *::after { box-sizing: border-box; }
+  nav.top a { text-decoration: none; }                  /* (each link has its colour in devices.css) */
+  nav.top .wrap { margin: 0 auto; padding: 0 clamp(16px, 4vw, 72px); width: 100%; }
+  nav.top > .wrap { display: flex; align-items: center; justify-content: space-between; min-height: 60px; column-gap: 16px; }
+  @media (max-width: 760px) { nav.top .wrap { padding: 0 16px; } nav.top .home { display: none; } }   /* (as on the hub's pages) */
+  nav.top .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; }
+  nav.top .mark b { font-weight: 800; color: var(--cyan); }
+  nav.top .home { font-size: 14px; color: var(--dim); }
+  @media (max-width: 400px) { nav.top .mark { font-size: 18px; } } @media (max-width: 350px) { nav.top .mark { font-size: 16px; } }
+  .lang { top: 76px; } @media (max-width: 900px) { .lang { top: 112px; } }   /* (EN / DE under the nav) */
+</style>
+<nav class="top"><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
+  <div class="dd" id="dd">
+    <button class="ddb" type="button" aria-expanded="false" aria-controls="mega">Devices<span class="ar" aria-hidden="true">▼</span></button>
+    <div class="mega" id="mega"><div class="wrap in">
+      <div class="side">
+        <p class="k">The Firmware Hub</p>
+        <p>Open-source firmware for small music machines, from their makers, installed in the browser.</p>
+        <a href="/">All FM-1 firmwares</a><a href="/kb/">Knowledge Base</a><a href="/#submit">Submit a firmware</a><a href="/vibe/?ref=menu">VIBE FM Mk1</a>
+        <hr><p>Made firmware for another device?</p>
+        <a class="mail" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device">zven@thefirmwarehub.com</a>
+      </div>
+      <div class="tiles">
+        <a class="tile" href="/" data-dev="fm1"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
+          <span><b>M-VAVE FM-1</b><small><span id="dd-fm1">All</span> firmwares</small></span></a>
+        <a class="tile" href="/smk37/" data-dev="smk37"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
+          <span><b>M-VAVE SMK-37 Pro</b><small>14 firmwares · Pro, Elite, MKE-P37</small></span></a>
+        <a class="tile vibe-t" href="/vibe/?ref=menu" data-dev="vibe" aria-current="page"><span class="pic"><img src="/vibe/assets/img/banner-device.jpg" alt=""></span>
+          <span><b>VIBE FM Mk1</b><small>Hardware with open firmware · join the list</small></span></a>
+        <a class="tile add" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device"><span class="pic">+</span>
+          <span><b>Your device</b><small>Firmware for another machine? Tell us.</small></span></a>
+      </div>
+    </div></div>
+  </div>
+  <a class="kbl" href="/kb/" title="Knowledge Base: how a firmware gets onto the FM-1"><span class="lg">Knowledge Base</span><span class="sm">KB</span></a>
+  <form class="find" role="search" action="/" method="get"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><input
+    type="search" name="q" id="q" placeholder="Search firmwares: a name, a maker, acid, drums…" aria-label="Search the firmwares" autocomplete="off"
+    spellcheck="false"><span class="key" aria-hidden="true">/</span></form>
+  <script>
+  (() => {                                                 // a tap / Enter opens it, a tap outside or Esc closes it
+    const dd = document.getElementById("dd"), b = dd.querySelector(".ddb");
+    const set = (o) => { dd.classList.toggle("open", o); b.setAttribute("aria-expanded", String(o)); };
+    b.addEventListener("click", (e) => { e.stopPropagation(); set(!dd.classList.contains("open")); });
+    document.addEventListener("click", (e) => { if (!dd.contains(e.target)) set(false); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") { set(false); } });
+    document.addEventListener("keydown", (e) => {          // "/": into the search, on every page
+      const a = document.activeElement;
+      if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(a?.tagName || "") || a?.isContentEditable) return;
+      e.preventDefault(); const q = document.getElementById("q"); q.focus(); q.select();
+    });
+    fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.json())     // (the hub's daily key: one cache)
+      .then((c) => { document.getElementById("dd-fm1").textContent = c.firmwares.length; }).catch(() => {});
+  })();
+  </script>
+  <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>

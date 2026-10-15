@@ -103,9 +103,32 @@ def devices(text, dev, ref="hub"):
             f = HERE / "fm1" / mo.group(1).lstrip("/")
             return mo.group(0) if not f.exists() else f'{mo.group(1)}?v={hashlib.sha256(f.read_bytes()).hexdigest()[:8]}"'
         return re.sub(r'(/(?:smk37/)?img/[\w.-]+\.png)"', one, t)
+    text = text.replace('<nav><div class="wrap"><a class="mark"', '<nav class="top"><div class="wrap"><a class="mark"', 1)   # (the nav of the page: devices.css)
     return fp(text.replace("/*DEVICES*/\n", (HERE / "web" / "devices.css").read_text(encoding="utf-8"))
                 .replace("<!--DEVICES-->\n", menu).replace("<!--SMK-OWN-->", own).replace("<!--SMK-PORTS-->", ports)
                 .replace("<!--SMK-N-->", n))
+
+
+VIBE_NAV = """<style>
+/*DEVICES*/
+  /* (VIBE's page: the hub's nav on its own, its base too; VIBE's links, fonts and .wrap kept out) */
+  nav.top { z-index: 40; border-bottom: 1px solid var(--line); color: var(--fg);
+            font: 16px/1.65 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  nav.top *, nav.top *::before, nav.top *::after { box-sizing: border-box; }
+  nav.top a { text-decoration: none; }                  /* (each link has its colour in devices.css) */
+  nav.top .wrap { margin: 0 auto; padding: 0 clamp(16px, 4vw, 72px); width: 100%; }
+  nav.top > .wrap { display: flex; align-items: center; justify-content: space-between; min-height: 60px; column-gap: 16px; }
+  @media (max-width: 760px) { nav.top .wrap { padding: 0 16px; } nav.top .home { display: none; } }   /* (as on the hub's pages) */
+  nav.top .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; }
+  nav.top .mark b { font-weight: 800; color: var(--cyan); }
+  nav.top .home { font-size: 14px; color: var(--dim); }
+  @media (max-width: 400px) { nav.top .mark { font-size: 18px; } } @media (max-width: 350px) { nav.top .mark { font-size: 16px; } }
+  .lang { top: 76px; } @media (max-width: 900px) { .lang { top: 112px; } }   /* (EN / DE under the nav) */
+</style>
+<nav><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
+<!--DEVICES-->
+  <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
+"""
 
 
 def main(sloopdx=str(HERE.parent / "sloopdx")):
@@ -147,6 +170,8 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
     (imp / "index.html").write_text(devices((HERE / "web" / "hub-impressum.html").read_text(encoding="utf-8"), "", "impressum"), encoding="utf-8")
     for p in (HERE / "firmwarehub" / "img").glob("*.png"):    # (smk-*: Felucca SMK's screens, makkuro37: its home screen)
         (smk / "img" / p.name).write_bytes(p.read_bytes())
+    (HERE / "hubnav").mkdir(exist_ok=True)              # VIBE's page: the nav (its layout.php includes hubnav.html; copied there on deploy)
+    (HERE / "hubnav" / "vibe.html").write_text(devices(VIBE_NAV, "vibe", "vibe"), encoding="utf-8")
     hub = HERE / "firmwarehub"                          # thefirmwarehub.com: the start page, a card per device
     hub.mkdir(exist_ok=True)
     (hub / "index.html").write_text((HERE / "web" / "firmwarehub.html").read_text(encoding="utf-8"), encoding="utf-8")
