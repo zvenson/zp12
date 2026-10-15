@@ -62,13 +62,11 @@
   nav { position: relative; z-index: 40; }
   nav .dd { align-self: stretch; display: flex; align-items: center; margin: 0 0 0 clamp(14px, 3vw, 44px); }
   /* the Knowledge Base beside it, a plain link in the same type (on the KB itself: marked) */
-  nav .kbl { align-self: stretch; display: flex; align-items: center; margin: 0 0 0 clamp(4px, 1.6vw, 22px); padding: 8px 2px;
+  nav .kbl { align-self: stretch; display: flex; align-items: center; margin: 0 auto 0 clamp(4px, 1.6vw, 22px); padding: 8px 2px;
              color: var(--fg); font-size: 15px; font-weight: 600; white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
   nav .kbl:hover { text-decoration: none; box-shadow: inset 0 -2px 0 var(--pink); }
   nav .kbl[aria-current] { box-shadow: inset 0 -2px 0 var(--cyan); }
   nav .kbl .sm { display: none; }
-  nav .kbl.sub { margin-right: auto; }                 /* (the last link: the rest of the nav to the right) */
-  @media (max-width: 900px) { nav .kbl.sub { display: none; } nav .kbl:not(.sub) { margin-right: auto; } }   /* (then in the Devices menu) */
   @media (max-width: 560px) { nav .kbl .lg { display: none; } nav .kbl .sm { display: inline; }     /* (a phone: the name on one line) */
                               nav .wrap { gap: 10px; } nav .dd { margin-left: 4px; } nav .kbl { margin-left: 0; } nav .ddb .ar { margin-left: 4px; } }
   @media (max-width: 400px) { nav .mark { font-size: 18px; } }
@@ -175,14 +173,20 @@
   /* the search above the chips: every word somewhere in a card, with the chip's kind; "/" jumps into it */
   /* the nav stays on top here, the search in its middle (a phone: a line of its own) */
   nav { position: sticky; top: 0; background: var(--bg); }
-  nav .find { flex: 0 1 440px; margin: 0 auto; }
+  nav .find { flex: 0 1 460px; margin: 0 auto; }
+  nav .kbl { margin-right: 0; }                        /* (the search takes the free space on both sides: between the links) */
+  @media (min-width: 1700px) { nav .wrap { position: relative; } nav .kbl { margin-right: auto; } nav .find { position: absolute; left: 50%; width: 460px; transform: translateX(-50%); } }   /* (the true middle) */
   @media (max-width: 900px) { nav .wrap { flex-wrap: wrap; height: auto; min-height: 60px; row-gap: 0; }
                               nav .find { order: 10; flex-basis: 100%; margin: 0 0 10px; } }
   .find { position: relative; }
   .find input { width: 100%; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 999px;
                 padding: 12px 46px 12px 20px; font: inherit; font-size: 15.5px; }
   .find input:focus { outline: none; border-color: var(--beige); }
-  nav .find input { padding-top: 8px; padding-bottom: 8px; font-size: 14.5px; }
+  nav .find input { padding: 9px 46px 9px 42px; font-size: 15px; background: var(--panel2); border-color: rgba(239, 232, 225, .3); }
+  nav .find input:hover { border-color: rgba(239, 232, 225, .5); }
+  nav .find input::placeholder { color: var(--text); opacity: .8; }
+  .find .ico { position: absolute; left: 15px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%); fill: none; stroke: var(--text);
+               stroke-width: 2.2; stroke-linecap: round; pointer-events: none; }
   .find input::placeholder { color: var(--dim); }
   .find .key { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; line-height: 1.5; color: var(--dim);
                border: 1px solid var(--line); border-radius: 5px; padding: 0 7px; pointer-events: none; }
@@ -385,7 +389,6 @@
     </div></div>
   </div>
   <a class="kbl" href="/kb/" title="Knowledge Base: how a firmware gets onto the FM-1"><span class="lg">Knowledge Base</span><span class="sm">KB</span></a>
-  <a class="kbl sub" href="/#submit" title="Made a firmware? Get it listed">Submit a firmware</a>
   <script>
   (() => {                                                 // a tap / Enter opens it, a tap outside or Esc closes it
     const dd = document.getElementById("dd"), b = dd.querySelector(".ddb");
@@ -397,7 +400,7 @@
       .then((c) => { document.getElementById("dd-fm1").textContent = c.firmwares.length; }).catch(() => {});
   })();
   </script>
-  <div class="find" role="search"><input type="search" id="q" placeholder="Search firmwares: a name, a maker, acid, drums…"
+  <div class="find" role="search"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><input type="search" id="q" placeholder="Search firmwares: a name, a maker, acid, drums…"
     aria-label="Search the firmwares" autocomplete="off" spellcheck="false"><span class="key" aria-hidden="true">/</span></div>
   <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
 <div class="strip"><i></i><i></i><i></i><i></i></div>

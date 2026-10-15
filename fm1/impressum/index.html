@@ -45,13 +45,11 @@
   nav { position: relative; z-index: 40; }
   nav .dd { align-self: stretch; display: flex; align-items: center; margin: 0 0 0 clamp(14px, 3vw, 44px); }
   /* the Knowledge Base beside it, a plain link in the same type (on the KB itself: marked) */
-  nav .kbl { align-self: stretch; display: flex; align-items: center; margin: 0 0 0 clamp(4px, 1.6vw, 22px); padding: 8px 2px;
+  nav .kbl { align-self: stretch; display: flex; align-items: center; margin: 0 auto 0 clamp(4px, 1.6vw, 22px); padding: 8px 2px;
              color: var(--fg); font-size: 15px; font-weight: 600; white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
   nav .kbl:hover { text-decoration: none; box-shadow: inset 0 -2px 0 var(--pink); }
   nav .kbl[aria-current] { box-shadow: inset 0 -2px 0 var(--cyan); }
   nav .kbl .sm { display: none; }
-  nav .kbl.sub { margin-right: auto; }                 /* (the last link: the rest of the nav to the right) */
-  @media (max-width: 900px) { nav .kbl.sub { display: none; } nav .kbl:not(.sub) { margin-right: auto; } }   /* (then in the Devices menu) */
   @media (max-width: 560px) { nav .kbl .lg { display: none; } nav .kbl .sm { display: inline; }     /* (a phone: the name on one line) */
                               nav .wrap { gap: 10px; } nav .dd { margin-left: 4px; } nav .kbl { margin-left: 0; } nav .ddb .ar { margin-left: 4px; } }
   @media (max-width: 400px) { nav .mark { font-size: 18px; } }
@@ -137,7 +135,6 @@
     </div></div>
   </div>
   <a class="kbl" href="/kb/" title="Knowledge Base: how a firmware gets onto the FM-1"><span class="lg">Knowledge Base</span><span class="sm">KB</span></a>
-  <a class="kbl sub" href="/#submit" title="Made a firmware? Get it listed">Submit a firmware</a>
   <script>
   (() => {                                                 // a tap / Enter opens it, a tap outside or Esc closes it
     const dd = document.getElementById("dd"), b = dd.querySelector(".ddb");
