@@ -195,9 +195,13 @@
   .nomatch { text-align: center; color: var(--dim); margin: 0 0 34px; }
   .nomatch button { background: transparent; color: var(--cyan); box-shadow: none; padding: 0; font-size: inherit; font-weight: 600; }
   /* one toolbar over the cards: the kinds on the left, sort, show and view on the right (wraps when narrow) */
-  .tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin: 0 0 28px; }
-  .tools, .fw { scroll-margin-top: 84px; }            /* (under the nav, which stays on top) */
-  @media (max-width: 900px) { .tools, .fw { scroll-margin-top: 130px; } }
+  .tools { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin: 0 0 16px; padding: 12px 0; }
+  /* the toolbar stays under the nav while the cards scroll (--navh, --toolsh from JS); its background the page's width */
+  @media (min-width: 561px) { .tools { position: sticky; top: var(--navh, 60px); z-index: 30; background: var(--bg);
+                                       box-shadow: 0 0 0 100vmax var(--bg), 0 1px 0 100vmax var(--line); clip-path: inset(0 -100vmax -1px); } }
+  .tools { scroll-margin-top: var(--navh, 60px); }
+  .fw { scroll-margin-top: calc(var(--navh, 60px) + 16px); }   /* (under the nav, which stays on top) */
+  @media (min-width: 561px) { .fw { scroll-margin-top: calc(var(--navh, 60px) + var(--toolsh, 70px) + 16px); } }
   .tools-r { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; margin-left: auto; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
   .chips button { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 9px 14px; font-size: 14px; }
@@ -243,7 +247,7 @@
   .mailcta .addr { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
   .mailcta .addr code { color: var(--fg); font-size: 14.5px; }
   .mailcta .addr button { background: transparent; color: var(--dim); box-shadow: inset 0 0 0 1px var(--line); padding: 5px 10px; font-size: 12.5px; }
-  .fw[hidden] { display: none; }
+  .fw[hidden], .fws.list > .fw[hidden] { display: none; }   /* (the list's rows are a grid: hidden must win there too) */
   .tag.kind { background: rgba(239, 232, 225, .08); color: var(--dim); }
   @media (max-width: 1300px) { .grid { grid-template-columns: repeat(2, 1fr); } }
   .fw { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 0 26px 24px; display: flex;
@@ -641,6 +645,10 @@ const OUR_LOADER = (id) => /^ota-FM-1_9\d\d$/i.test(id.text);
 // CLIPPER ("Clipper"), under a firmware named after itself ("SLOOP"), the update loaders, and the names
 // Windows / macOS give the stock firmware (as SLOOP 2.6's fm1ota.js)
 const FM1_PORT = /fm-1|felucca|sloop|clipper|ota|composite|sinco|usb-midi/i;
+// the ports of a MIDIInputMap / MIDIOutputMap as an array: by forEach, as iOS Web MIDI apps (Web MIDI Browser)
+// hand out maps whose values() is no iterable, so [...map.values()] and for..of throw there
+// (some hand the arguments over as (key, port): the port is whichever is an object)
+const ports = (map) => { const a = []; map.forEach((x, y) => a.push(x && typeof x === "object" ? x : y)); return a; };
 
 // errors carry a code the pages translate: notfound, model, stopped, noloader, lost, noreturn,
 // mismatch (detail: the identity the device reports), badreq, foreign (detail: the loader's identity)
@@ -745,8 +753,8 @@ class Updater {
 
   // every in/out pair with the same port name that answers the handshake
   async find(filter) {
-    const outs = [...this.access.outputs.values()];
-    for (const input of this.access.inputs.values()) {
+    const outs = ports(this.access.outputs);
+    for (const input of ports(this.access.inputs)) {
       if (input.state === "disconnected") continue;
       if (!FM1_PORT.test(input.name || "")) continue;   // never probe other gear
       const output = outs.find((o) => o.name === input.name) || (outs.length === 1 ? outs[0] : null);
@@ -762,7 +770,7 @@ class Updater {
 
   // the MIDI inputs there are, for the "not found" message: " (MIDI: a, b)" (a port the installer skipped shows)
   seen() {
-    const names = [...this.access.inputs.values()].filter((p) => p.state !== "disconnected").map((p) => p.name || "?");
+    const names = ports(this.access.inputs).filter((p) => p.state !== "disconnected").map((p) => p.name || "?");
     return names.length ? ` (MIDI: ${names.join(", ")})` : " (MIDI: none)";
   }
 
@@ -875,12 +883,18 @@ const $ = (id) => document.getElementById(id);
 const tryIt = (f) => f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Play in browser</a>` : "";
 const build = (f) => kindsOf(f).includes("dev") ? `https://github.com/${esc(f.repo)}${BUILD_AT[f.id] || "#readme"}` : "";
 const buildInMeta = (f) => build(f) && f.play && f.editor;   // (two buttons already: the line stays one line)
+// the nav and the toolbar stay on top (the toolbar not on a phone): their heights for the CSS and for scrolling
+const navH = () => document.querySelector("nav").offsetHeight;
+const stuck = () => navH() + (innerWidth > 560 ? $("tools").offsetHeight : 0);
+const toTools = (behavior) => scrollTo({ top: $("tools").parentElement.getBoundingClientRect().top + scrollY - navH(), behavior });   // (the sticky bar's own place)
+const heights = new ResizeObserver(() => { const r = document.documentElement.style; r.setProperty("--navh", navH() + "px"); r.setProperty("--toolsh", $("tools").offsetHeight + "px"); });
+heights.observe(document.querySelector("nav")); heights.observe($("tools"));
 // a link to one card (thefirmwarehub.com/#fw-zp12, e.g. from another page): there, with a flash
 function jump() {                                       // (after the first renders have settled: the card as it stays)
   setTimeout(() => {
     const m = /^#fw-([\w-]+)$/.exec(location.hash), el = location.hash === "#submit" ? $("submit") : m && $("grid").querySelector(`.fw[data-id="${m[1]}"]`);
     if (!el || el.hidden) return;
-    if (el.id === "submit") scrollTo(0, el.getBoundingClientRect().top + scrollY - document.querySelector("nav").offsetHeight - 16);   // (under the nav, which stays on top)
+    if (el.id === "submit") scrollTo(0, el.getBoundingClientRect().top + scrollY - stuck() - 16);   // (under the nav, which stays on top)
     else el.scrollIntoView({ block: "center" });
     el.classList.add("flash");
   }, 300);
@@ -1082,14 +1096,14 @@ function find() {
   box.value = q;
   box.oninput = () => {
     setQ(box.value); chips(); filter();
-    const t = $("tools").getBoundingClientRect().top;  // (the search sits at the top: the cards into view while typing)
-    if (q.trim() && (t > innerHeight * .5 || t < 0)) $("tools").scrollIntoView({ block: "start", behavior: "smooth" });
+    const t = $("tools").parentElement.getBoundingClientRect().top - navH();   // (the search sits at the top: the cards into view while typing)
+    if (q.trim() && (t > innerHeight * .5 || t < 0)) toTools("smooth");
     clearTimeout(searchT);                              // (Matomo's site search: what people look for, once they stop typing)
     searchT = setTimeout(() => { if (q.trim().length > 1) try { (window._paq = window._paq || []).push(["trackSiteSearch", q.trim(), kind === "all" ? false : kind, shown]); } catch (e) {} }, 1500);
   };
   box.onkeydown = (e) => { if (e.key === "Escape" && box.value) { e.preventDefault(); box.value = ""; box.oninput(); } };
   box.form.onsubmit = (e) => e.preventDefault();       // (on the hub the search filters as you type; elsewhere it comes here with ?q=)
-  if (q.trim() && !location.hash) setTimeout(() => $("tools").scrollIntoView({ block: "start" }), 300);
+  if (q.trim() && !location.hash) setTimeout(() => toTools("auto"), 300);
 }
 
 // UPDATE: another version than on this browser's last visit (kept only here, in
