@@ -431,7 +431,15 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
                            | stars_daily(f, old[f["id"]]))   # (the stars on their own: a new count even without the release)
                 keep.add(Path(old[f["id"]]["pkg"]).name)
             continue
-        name = f"{f['id']}-{version}.fwsc"
+        # the package's name: never two contents under one name (/fw/ is cached for good, at Cloudflare's edge too): the same
+        # bytes keep their name; a new build under the same version (Rainbow Mode: 1.1.5-rb again and again) a name of its own
+        digest, o = hashlib.sha256(raw).hexdigest(), old.get(f["id"], {})
+        if o.get("sha256") == digest and (out / o.get("pkg", "-")).is_file():
+            name = Path(o["pkg"]).name
+        elif o.get("version") == version:
+            name = f"{f['id']}-{version}+{digest[:8]}.fwsc"
+        else:
+            name = f"{f['id']}-{version}.fwsc"
         if not (out / "fw" / name).exists() or (out / "fw" / name).read_bytes() != raw:
             (out / "fw" / name).write_bytes(raw)
         keep.add(name)
