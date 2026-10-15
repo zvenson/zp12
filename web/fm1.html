@@ -166,6 +166,7 @@
   .mailcta .addr button { background: transparent; color: var(--dim); box-shadow: inset 0 0 0 1px var(--line); padding: 5px 10px; font-size: 12.5px; }
   .fw[hidden] { display: none; }
   .tag.kind { background: rgba(239, 232, 225, .08); color: var(--dim); }
+  .tag.vintage { background: rgba(230, 209, 185, .16); color: var(--beige); }
   @media (max-width: 1300px) { .grid { grid-template-columns: repeat(2, 1fr); } }
   .fw { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 0 26px 24px; display: flex;
         flex-direction: column; gap: 12px; overflow: hidden; transition: transform .12s, border-color .15s, background .15s; }
@@ -484,9 +485,9 @@ const LOOK = { dinghy: "#8f62f0", felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx:
                salt: "#ff8f7a", choralroot: "#ffc46b", jangada: "#ff5fc8", melodee: "#8fe3b0", hortator: "#d8dde6", fimba: "#f0a35e", ghoulbox: "#ffb000", jiant: "#ff7a00", bubba: "#ffc83d", floyd: "#ffb347", sloopbanks: "#7fd4ff", waveloop: "#b58cff",
                chord: "#f2564e", fumi: "#b08a5a", maku: "#f0806a", rainbow: "#ffd23f", obervave: "#3c82eb",
                pigeon: "#b49cff", cs1: "#f2a93b", hyp1: "#a35cff", tonitor: "#00d6ff", noizdemons: "#7dff3c", coralflower: "#ff7aa8" };
-const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"], ["other", "Other"]];
-const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords", dev: "for developers", other: "other" };
-const kindsOf = (f) => [].concat(f.kind || []);
+const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"], ["other", "Other"], ["vintage", "Vintage"]];
+const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords", dev: "for developers", other: "other", vintage: "vintage" };
+const kindsOf = (f) => [].concat(f.kind || [], f.vintage ? ["vintage"] : []);   // (vintage: a classic instrument rebuilt, a group of its own)
 const BUILD_AT = { dinghy: "#build-your-own" };                       // (the step-by-step manual in its README)
 const devOnly = (f) => kindsOf(f).length === 1 && kindsOf(f)[0] === "dev";   // (a base to build on: no beta tag; installable all the same)
 let kind = (location.hash || "").slice(1);                             // (#drums: a link straight to one kind)
@@ -600,7 +601,7 @@ function render() {
       <div class="head"><div>
         <h3>${LOGO[f.id] ? `<img class="logo" src="${LOGO[f.id]}" alt="">` : ""}${esc(f.name)}<small title="${esc(f.version)}">${esc(short(f.version))}</small><a class="star" href="https://github.com/${esc(f.repo)}" target="_blank" rel="noopener" title="Star it on GitHub">★ Star${f.stars == null ? "" : ` · ${f.stars}`}</a></h3>
         <div class="by">by ${esc(f.author)}</div>
-        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${badge(f)}${f.beta && !devOnly(f) ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag kind">${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
+        <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${badge(f)}${f.beta && !devOnly(f) ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag ${k === "vintage" ? "vintage" : "kind"}" ${k === "vintage" ? 'title="Built after a classic instrument (the description says which)"' : ""}>${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
       <p class="what">${esc(f.what)}</p>
       <div class="meta">${f.installs ? `<span class="inst" title="Installed from this page only: installs from the author's own installer or from GitHub are not counted, nor visitors who opt out of statistics">↓ ${f.installs.toLocaleString("en")} installs via the hub</span> · ` : ""}${f.added ? `<span class="added" title="On the hub since ${esc(f.added)}">added ${day(f.added)}</span> · ` : ""}<span title="Released ${esc(f.date)}">released ${day(f.date)}</span> · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·

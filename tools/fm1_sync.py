@@ -35,10 +35,12 @@ BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 # (and only with FM1_INSTALLS=1: /srv/fm1/staging/sync.sh sets it, the live sync not yet)
 MATOMO, MATOMO_SITE, MATOMO_TOKEN = "https://matomo.designburgapps.com/", 4, Path.home() / ".config/designburg/matomo-token"
 
+# vintage=True: the firmware is, at its core, one classic instrument rebuilt (not only some of its sounds); the page
+# names no maker in a tag, the description says what it is after
 FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their GitHub stars)
     # (Salt, ChoralRoot, Jangada, Melodee, Hortator, GHOULBOX, Bubba, Floyd, DX7 Banks, WaveLoop report numbers the others use too: their check is any FM-1
     # identity, the update loader is checked as for all; the page names the running one only when it is unambiguous)
-    dict(id="zp12", added="2026-10-08", play="https://thefirmwarehub.com/play/zp12/", editor="https://zp12.designburgapps.com/editor/",
+    dict(id="zp12", vintage=True, added="2026-10-08", play="https://thefirmwarehub.com/play/zp12/", editor="https://zp12.designburgapps.com/editor/",
          kind="drums", name="zp12", author="zvenson", repo="zvenson/zp12", ident=r"FM-1_97\d",
          src="zp12:docs/install/firmware", site="https://zp12.designburgapps.com",
          what="A standalone 12-bit sampler inspired by the E-mu SP-1200: sample in the browser (mic, line-in or a "
@@ -86,21 +88,21 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", pkg=r"sloop-[^/\"]+\.fwsc",              # (its release carries a felucca-*.fwsc too: the sloop one)
          what="SLOOP with a visual four-operator FM engine after Floyd Steinberg's 4-OP idea: an ADSR per operator, "
               "seven pages, a live oscilloscope that draws the envelopes as you play."),
-    dict(id="sloopbanks", added="2026-10-09", editor="https://isod89.github.io/sloop-fm1/webapp/editor/",
+    dict(id="sloopbanks", vintage=True, added="2026-10-09", editor="https://isod89.github.io/sloop-fm1/webapp/editor/",
          kind=["groove", "synth"], name="SLOOP DX7 Banks", author="majnikool", repo="majnikool/sloop-fm1", ident=r"FM-1_\d{3,8}",
          src="github",
          what="SLOOP 2.4 with up to twelve DX7 voice banks, kept and named in the editor, presets by kind. Test builds: "
               "back up first."),
-    dict(id="sloopdx", added="2026-10-08", editor="https://dx7.designburgapps.com/webapp/editor/",
+    dict(id="sloopdx", vintage=True, added="2026-10-08", editor="https://dx7.designburgapps.com/webapp/editor/",
          kind=["groove", "synth"], name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_93\d",
          src="sloopdx:docs/firmware", site="https://dx7.designburgapps.com",
          what="SLOOP's live workflow with Dexed's DX7 engine and 128 steps a track: six operators, 32 algorithms, "
               "your own .syx banks, every voice edited on the FM-1, FM drums you program."),
-    dict(id="x0x", added="2026-10-08", play="https://charlesvestal.github.io/fm1-x0x/emu/",
+    dict(id="x0x", vintage=True, added="2026-10-08", play="https://charlesvestal.github.io/fm1-x0x/emu/",
          kind="groove", name="X0X", author="Charles Vestal", repo="charlesvestal/fm1-x0x", ident=r"FM-1_90\d{5}",
          src="github",
          what="A groovebox: 909 and 808 drums, two 303s with TB-3PO, a breakbeat generator and song mode."),
-    dict(id="fomni", added="2026-10-08", play="https://charlesvestal.github.io/fm1-fomni/emu/",
+    dict(id="fomni", vintage=True, added="2026-10-08", play="https://charlesvestal.github.io/fm1-fomni/emu/",
          kind="chords", name="FoMni", author="Charles Vestal", repo="charlesvestal/fm1-fomni", ident=r"FM-1_800\d{4}",
          src="github",
          what="A chord harp inspired by the Omnichord: strum the white keys, pick chords on the black ones."),
@@ -114,7 +116,7 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://eli7vh.github.io/Felucca/mod/",
          what="Felucca played from an Arturia MiniLab 3: track faders, a DJ filter, momentary effect pads; 32 patches a "
               "bank, 12 evolving songs, revoiced 808 and CR78 kits."),
-    dict(id="obervave", play="https://thefirmwarehub.com/play/obervave/", added="2026-10-13",
+    dict(id="obervave", vintage=True, play="https://thefirmwarehub.com/play/obervave/", added="2026-10-13",
          kind="synth", name="OberVave", author="zvenson", repo="zvenson/obervave", ident=r"FM-1_95\d",
          src="repo:docs/firmware",
          what="An 8-voice analog-style poly in the spirit of the classic American polys of 1979-84: two oscillators a "
@@ -139,7 +141,7 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github",
          what="A chord machine after the HiChord, with extras: chords in a key under the white keys, slash chords and "
               "inversions, sounds, envelopes, effects and a looper."),
-    dict(id="fumi", added="2026-10-12", kind=["synth", "chords"], name="FuMi-1", author="cartesive", repo="cartesive/fumi-1",
+    dict(id="fumi", vintage=True, added="2026-10-12", kind=["synth", "chords"], name="FuMi-1", author="cartesive", repo="cartesive/fumi-1",
          ident=r"FM-1_70\d{5}", src="github",
          what="A shigin conductor after the Suiko ST-50: its two rows of keys, the key set in honsū, equal or its own "
               "just tuning, a koto and twelve more sounds on a 6-op FM engine, ring time, vibrato, trill and a looper."),
@@ -173,7 +175,7 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          ident=r"FM-1_900", src="github", site="https://www.mandalars.org/mandalars/fm1/",
          what="Forest, Psytrance, Goa and Hitech grooves, built on Felucca and SLOOP: original drums and icons and four "
               "factory songs. A test release: not yet fully tested on the device."),
-    dict(id="polly", added="2026-10-13", play="https://charlesvestal.github.io/fm1-polly/emu/",
+    dict(id="polly", vintage=True, added="2026-10-13", play="https://charlesvestal.github.io/fm1-polly/emu/",
          kind=["groove", "chords"], name="Polly", author="Charles Vestal", repo="charlesvestal/fm1-polly", ident=r"FM-1_3\d{6}",
          src="github", site="https://charlesvestal.github.io/fm1-polly/",
          what="A pocket arranger after the QY70: pick a style, play three keys for a chord and a band of eight follows, "
@@ -182,7 +184,7 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          ident=r"FM-1_\d{3,8}", src="github", ver="pkg", site="https://etch.sikkenworks.com",   # (one fixed tag: the version from the package's name)
          what="Draw the sound: a waveform drawn and changed with the knobs, saved, morphed into another one, and a "
               "third waveform modulating the result."),
-    dict(id="fm106", added="2026-10-13", kind="synth", name="FM-106", author="PatttF", repo="PatttF/fm-106",
+    dict(id="fm106", vintage=True, added="2026-10-13", kind="synth", name="FM-106", author="PatttF", repo="PatttF/fm-106",
          ident=r"FM-1_\d{3,8}", src="github", ver="tag",            # (tags Beta2, release: the tag as it is)
          what="The Juno-106 emulation of KR-106 ported to the FM-1: six voices on both cores, the BBD stereo chorus, "
               "128 factory presets and a 1980s Roland look."),
@@ -217,7 +219,7 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="pages:https://theshrimpblimp.com/pigeon/webapp/installer/", site="https://theshrimpblimp.com/pigeon/",
          what="An old-school hip-hop and house sampler after the SP-404 and the PO-33: two song samples and a 16-pad kit, "
               "up to 32 chops a song, a 64-step sequencer, patterns and a song arrangement. Built on Felucca."),
-    dict(id="cs1", added="2026-10-15", play="https://twochannels.github.io/CS-1/emu/",
+    dict(id="cs1", vintage=True, added="2026-10-15", play="https://twochannels.github.io/CS-1/emu/",
          kind="synth", name="CS-1", author="twochannels", repo="twochannels/CS-1", ident=r"FM-1_950",
          src="pages:https://twochannels.github.io/CS-1/install.html", site="https://twochannels.github.io/CS-1/",
          what="A Yamaha CS-80 in spirit: eight voices of two channels, high- and low-pass filters in series, ring "
@@ -431,7 +433,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
                 continue                              # (the repo deleted or private: off the page, back when it is again)
             if f["id"] in old and (out / old[f["id"]]["pkg"]).exists():
                 cat.append(old[f["id"]] | {k: f[k] for k in ("kind", "name", "author", "what")} | {k: f.get(k) for k in ("editor", "play", "added", "loader")}
-                           | stars_daily(f, old[f["id"]]))   # (the stars on their own: a new count even without the release)
+                           | {"vintage": bool(f.get("vintage"))} | stars_daily(f, old[f["id"]]))   # (the stars on their own: a new count even without the release)
                 keep.add(Path(old[f["id"]]["pkg"]).name)
             continue
         # the package's name: never two contents under one name (/fw/ is cached for good, at Cloudflare's edge too): the same
@@ -447,7 +449,8 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
             (out / "fw" / name).write_bytes(raw)
         keep.add(name)
         cat.append({k: f[k] for k in ("id", "kind", "name", "author", "repo", "ident", "what")} | {
-            "editor": f.get("editor"), "play": f.get("play"), "added": f.get("added"), "loader": f.get("loader"), **stars_daily(f, old.get(f["id"], {})),
+            "editor": f.get("editor"), "play": f.get("play"), "added": f.get("added"), "loader": f.get("loader"),
+            "vintage": bool(f.get("vintage")),       # (built after one classic instrument: the page's tag and chip "Vintage") **stars_daily(f, old.get(f["id"], {})),
             "site": f.get("site") or f"https://github.com/{f['repo']}", "version": version, "date": date[:10],
             "published": date,                        # (the time too: the page's "Recently updated" order)
             "pkg": "fw/" + name, "product": ident, "size": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
