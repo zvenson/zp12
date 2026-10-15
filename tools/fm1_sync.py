@@ -450,7 +450,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
         keep.add(name)
         cat.append({k: f[k] for k in ("id", "kind", "name", "author", "repo", "ident", "what")} | {
             "editor": f.get("editor"), "play": f.get("play"), "added": f.get("added"), "loader": f.get("loader"),
-            "vintage": bool(f.get("vintage")),       # (built after one classic instrument: the page's tag and chip "Vintage") **stars_daily(f, old.get(f["id"], {})),
+            "vintage": bool(f.get("vintage")), **stars_daily(f, old.get(f["id"], {})),   # (vintage: one classic instrument rebuilt)
             "site": f.get("site") or f"https://github.com/{f['repo']}", "version": version, "date": date[:10],
             "published": date,                        # (the time too: the page's "Recently updated" order)
             "pkg": "fw/" + name, "product": ident, "size": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
