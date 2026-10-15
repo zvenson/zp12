@@ -249,7 +249,10 @@
   .meta .added { font-weight: 600; }
   .fw button.go { background: var(--c); color: #121011; width: 100%; margin-top: 6px; }
   progress { width: 100%; height: 8px; display: none; accent-color: var(--c); }
-  .fw .links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .fw .links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 36px; }   /* (on every card, empty too, one line: the buttons in a row line up) */
+  .fw .links a { line-height: 22px; }
+  .fw .go { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-left: 12px; padding-right: 12px; }   /* (one line: in line with the row's) */
+  #rescue .go { white-space: normal; }               /* (its steps are sentences) */
   .fw .links a { font-size: 13.5px; font-weight: 600; color: var(--fg); padding: 7px 12px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); }
   .fw .links a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--c); }
   /* the FM-1 emulator (Joakim Eriksson's fm1-emu) over the page: a card's "Try in the emulator", the hub stays underneath */
@@ -409,6 +412,7 @@
       <div class="meta">Not open source, so not mirrored here: it installs on Madeline's own page, in the browser, the same way.
          Questions and thanks go to her.</div>
       <a class="btn go" href="https://baudgirl.com/work/FM-1+VA/install" target="_blank" rel="noopener" data-ev="Baud Girl">Install on baudgirl.com ↗</a>
+      <div class="msg"></div>
     </section>
     <section class="fw mailcta" style="--c: var(--pink)">
       <div class="shot"><div class="slot">+</div></div>
@@ -418,7 +422,8 @@
          Want to make one? Start from <a href="https://github.com/zvenson/dinghy#readme" target="_blank" rel="noopener">Dinghy</a>:
          the plumbing done and documented, a sine wave on top, yours to replace.</p>
       <p class="meta">The hub is free and stays free. If it saved you an evening: <a href="https://paypal.me/zvenson" rel="noopener">☕ buy me a coffee</a>.</p>
-      <a class="btn go" href="mailto:zven@thefirmwarehub.com?subject=FM-1%20Firmware%20Hub%3A%20my%20firmware&amp;body=Name%3A%0ARepository%3A%0AWhat%20it%20does%3A%0A">Mail zven@thefirmwarehub.com</a>
+      <a class="btn go" href="mailto:zven@thefirmwarehub.com?subject=FM-1%20Firmware%20Hub%3A%20my%20firmware&amp;body=Name%3A%0ARepository%3A%0AWhat%20it%20does%3A%0A">✉ Mail me your firmware</a>
+      <div class="msg"></div>
     </section>
     <section class="fw stock" id="official" style="--c: var(--dim)">
       <div class="shot"><div class="slot v15">M-VAVE<br><b>V15</b></div></div>
@@ -428,7 +433,7 @@
       <input type="file" id="stock-file" accept=".fwsc">
       <label class="chk"><input type="checkbox" id="stock-saved"> I have saved what I want to keep</label>
       <button id="stock-go" class="go" disabled>Install the official firmware</button>
-      <p class="meta" id="stock-msg"></p>
+      <div class="msg" id="stock-msg"></div>
     </section>
     <section class="fw stock" id="rescue" style="--c: var(--dim)">
       <div class="shot"><div class="slot v15">USB<br><b>RESCUE</b></div></div>
@@ -828,6 +833,13 @@ const $ = (id) => document.getElementById(id);
 // the FM-1 emulator (Joakim Eriksson's fm1-emu) in a window over the hub, loaded only on the click (privacy policy:
 // GitHub Pages); closing it unloads it, its sound stops with it
 const EMU = "https://joakimeriksson.github.io/fm1-emu/";
+// a card's "try it": the emulator in the window where it plays the firmware, else the author's own page (a new tab);
+// the author's own (or our simulator) beside the emulator as a plain link
+const tryIt = (f) => f.emu ? `<a class="emu" href="${EMU}?fw=${encodeURIComponent(f.emu)}" target="_blank" rel="noopener">▶ Try in browser</a>`
+  : f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Try in browser ↗</a>` : "";
+const demo = (f) => f.emu && f.play ? ` · <a href="${esc(f.play)}" target="_blank" rel="noopener">${f.play.startsWith("https://thefirmwarehub.com/") ? "our simulator" : "author's demo"} ↗</a>` : "";
+const build = (f) => kindsOf(f).includes("dev") ? `https://github.com/${esc(f.repo)}${BUILD_AT[f.id] || "#readme"}` : "";
+const buildInMeta = (f) => build(f) && (f.emu || f.play) && f.editor;   // (two buttons already: the line stays one line)
 function tryEmu(f) {
   const u = EMU + "?fw=" + encodeURIComponent(f.emu);
   $("emu-t").textContent = f.name + " · FM-1 emulator";
@@ -973,8 +985,8 @@ function render() {
       <p class="what">${esc(f.what)}</p>
       <div class="meta">${f.added ? `<span class="added" title="On the hub since ${esc(f.added)}">added ${day(f.added)}</span> · ` : ""}<span title="Released ${esc(f.date)}">released ${day(f.date)}</span> · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
-        <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}</div>
-      ${f.editor || f.play || f.emu || kindsOf(f).includes("dev") ? `<div class="links">${kindsOf(f).includes("dev") ? `<a href="https://github.com/${esc(f.repo)}${BUILD_AT[f.id] || "#readme"}" target="_blank" rel="noopener">⚓ Build your own on it</a>` : ""}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Play in the browser</a>` : ""}${f.emu ? `<a class="emu" href="${EMU}?fw=${encodeURIComponent(f.emu)}" target="_blank" rel="noopener">▷ Try in the emulator</a>` : ""}</div>` : ""}
+        <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}${demo(f)}${buildInMeta(f) ? ` · <a href="${build(f)}" target="_blank" rel="noopener">build on it ↗</a>` : ""}</div>
+      <div class="links">${tryIt(f)}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${build(f) && !buildInMeta(f) ? `<a href="${build(f)}" target="_blank" rel="noopener">⚓ Build on it</a>` : ""}</div>
       <progress max="100" value="0"></progress>
       <button class="go">${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button>
       <div class="msg"></div>`;
