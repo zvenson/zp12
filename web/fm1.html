@@ -509,7 +509,7 @@ function chips() {
 }
 // the order of the cards: by stars (as the page loads: zp12 first; the chip: all by stars), the newest release, the newest on the hub
 // or by name; from ?sort= (a link with it), else the last choice (localStorage: only this), else by stars
-const SORTS = [["stars", "Most stars"], ["installs", "Most installed"], ["updated", "Recently updated"], ["added", "New on the hub"], ["name", "A–Z"]];
+const SORTS = [["stars", "Most stars"], ["installs", "Most installed via the hub"], ["updated", "Recently updated"], ["added", "New on the hub"], ["name", "A–Z"]];
 const SORT_KEY = "fm1hub.sort", isSort = (k) => SORTS.some(([s]) => s === k);
 let sort = (() => {
   const q = new URLSearchParams(location.search).get("sort");
@@ -602,7 +602,7 @@ function render() {
         <div class="by">by ${esc(f.author)}</div>
         <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${badge(f)}${f.beta && !devOnly(f) ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag kind">${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
       <p class="what">${esc(f.what)}</p>
-      <div class="meta">${f.installs ? `<span class="inst" title="Installed from this page (counted without visitors who opt out of statistics)">↓ ${f.installs.toLocaleString("en")} installs</span> · ` : ""}${f.added ? `<span class="added" title="On the hub since ${esc(f.added)}">added ${day(f.added)}</span> · ` : ""}<span title="Released ${esc(f.date)}">released ${day(f.date)}</span> · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
+      <div class="meta">${f.installs ? `<span class="inst" title="Installed from this page only: installs from the author's own installer or from GitHub are not counted, nor visitors who opt out of statistics">↓ ${f.installs.toLocaleString("en")} installs via the hub</span> · ` : ""}${f.added ? `<span class="added" title="On the hub since ${esc(f.added)}">added ${day(f.added)}</span> · ` : ""}<span title="Released ${esc(f.date)}">released ${day(f.date)}</span> · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
         <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}${buildInMeta(f) ? ` · <a href="${build(f)}" target="_blank" rel="noopener">build on it ↗</a>` : ""}</div>
       <div class="links">${tryIt(f)}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${build(f) && !buildInMeta(f) ? `<a href="${build(f)}" target="_blank" rel="noopener">⚓ Build on it</a>` : ""}</div>
