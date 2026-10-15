@@ -17,7 +17,7 @@ CORS), checked (the FM-1 package identity, the Felucca update loader), with its 
 
 GPL-3.0 projects only (each package's source is at the project's repository and tag, linked on the page).
 A firmware is added to FIRMWARES below; its author asked first."""
-import hashlib, json, re, subprocess, sys, urllib.error, urllib.parse, urllib.request
+import hashlib, json, os, re, subprocess, sys, urllib.error, urllib.parse, urllib.request
 from email.utils import parsedate_to_datetime
 from datetime import datetime, timezone
 from pathlib import Path
@@ -32,6 +32,7 @@ BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 # package committed in that directory of the repository, its tag v<version>) or a path in this machine's checkouts (our own, deployed from there)
 # installs on the cards: Matomo's "Install OK" events of site 4 (the page sends "<name> <version>"), all versions
 # together; the token (view access is enough) in ~/.config/designburg/matomo-token, none there: no counts
+# (and only with FM1_INSTALLS=1: /srv/fm1/staging/sync.sh sets it, the live sync not yet)
 MATOMO, MATOMO_SITE, MATOMO_TOKEN = "https://matomo.designburgapps.com/", 4, Path.home() / ".config/designburg/matomo-token"
 
 FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their GitHub stars)
@@ -378,6 +379,8 @@ def latest_local(spec, sloopdx):
 
 def installs(old):
     """our id -> its successful installs so far (Matomo: visitors who opt out are not in it); unreachable: the last run's"""
+    if os.environ.get("FM1_INSTALLS") != "1":          # (only where the sync is told to: the test site for now)
+        return {}
     last = {i: f["installs"] for i, f in old.items() if f.get("installs")}
     if not MATOMO_TOKEN.exists():
         return last
