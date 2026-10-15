@@ -24,10 +24,6 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parents[1]
 OUT = HERE / "fm1"
-# the FM-1 emulator in the browser (Joakim Eriksson's fm1-emu, MIT): the hub opens it on a card (?fw=<its id>); it fetches
-# the packages from our /fw/ (CORS open in nginx). Its list says which it plays; where its names differ from ours:
-EMU = "https://joakimeriksson.github.io/fm1-emu/"
-EMU_ID = {"salt": "felucca-salt", "floyd": "sloop-floyd", "sloopbanks": "sloop-banks"}
 BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 
 # id, editor / play (its web editor, its version in the browser), kind (the page's filter, one or a list: synth,
@@ -325,17 +321,6 @@ def latest_local(spec, sloopdx):
     return p.read_bytes(), version, date, None, None
 
 
-def emu_ids(old):
-    """our id -> the FM-1 emulator's, for each firmware it plays (its firmwares.json); unreachable: the last run's"""
-    try:
-        req = urllib.request.Request(EMU + "firmwares.json", headers={"User-Agent": "fm1-switcher (thefirmwarehub.com)"})
-        have = {f["id"] for f in json.loads(urllib.request.urlopen(req, timeout=20).read())["firmwares"]}
-    except Exception as e:
-        print(f"fm1_sync: the emulator's list: {e}", file=sys.stderr)
-        return {i: f.get("emu") for i, f in old.items()}
-    return {f["id"]: EMU_ID.get(f["id"], f["id"]) for f in FIRMWARES if EMU_ID.get(f["id"], f["id"]) in have}
-
-
 def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
     (out / "fw").mkdir(parents=True, exist_ok=True)
     try:
@@ -381,9 +366,6 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
     # task page shows it, mounted read-only into vibe-php)
     (out / "problems.json").write_text(json.dumps({"at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
                                                    "problems": problems}, indent=1, ensure_ascii=False) + "\n")
-    emu = emu_ids(old)
-    for c in cat:
-        c["emu"] = emu.get(c["id"])
     if list(old.values()) == cat:                     # (the order counts too: it is the page's)
         print("fm1_sync: unchanged")
         return

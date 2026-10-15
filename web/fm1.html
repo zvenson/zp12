@@ -198,18 +198,6 @@
   #rescue .go { white-space: normal; }               /* (its steps are sentences) */
   .fw .links a { font-size: 13.5px; font-weight: 600; color: var(--fg); padding: 7px 12px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); }
   .fw .links a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--c); }
-  /* the FM-1 emulator (Joakim Eriksson's fm1-emu) over the page: a card's "Try in the emulator", the hub stays underneath */
-  dialog.emu { width: min(1280px, 96vw); height: min(900px, 92vh); max-width: none; max-height: none; padding: 0; border: 1px solid var(--line);
-               border-radius: 16px; background: var(--bg); color: var(--fg); overflow: hidden; }
-  dialog.emu[open] { display: flex; flex-direction: column; }
-  dialog.emu::backdrop { background: rgba(8, 7, 8, .78); backdrop-filter: blur(3px); }
-  html:has(dialog.emu[open]) { overflow: hidden; }
-  .emu-bar { display: flex; align-items: center; gap: 8px 16px; flex-wrap: wrap; padding: 10px 12px 10px 20px; border-bottom: 1px solid var(--line); font-size: 14px; }
-  .emu-bar b { font-size: 15.5px; } .emu-bar .by { color: var(--dim); margin-right: auto; } .emu-bar .by a { color: var(--dim); text-decoration: underline; }
-  .emu-bar .tab { color: var(--fg); font-weight: 600; }
-  .emu-bar button { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); padding: 4px 13px; font-size: 20px; line-height: 1.3; }
-  dialog.emu iframe { flex: 1; width: 100%; border: 0; background: #000; }
-  @media (max-width: 760px) { dialog.emu { width: 100vw; height: 100dvh; border: 0; border-radius: 0; } .emu-bar .by { display: none; } .emu-bar b { margin-right: auto; } }
   .fw .msg { font-size: 14px; color: var(--dim); min-height: 1.2em; }
   /* after a successful install: the moment to mention VIBE FM (thefirmwarehub.com/vibe/, ref hub-install) */
   .fw .vibe-after { display: flex; gap: 12px; align-items: center; margin-top: 10px; padding: 10px 12px; border-radius: 10px;
@@ -409,13 +397,6 @@ sudo python3 fm1_rescue.py sloop</pre>
     <pre id="log"></pre>
   </details>
 </div></main>
-<dialog class="emu" id="emu" aria-labelledby="emu-t">
-  <div class="emu-bar"><b id="emu-t">FM-1 emulator</b>
-    <span class="by">by <a href="https://github.com/joakimeriksson/fm1-emu" target="_blank" rel="noopener">Joakim Eriksson</a> · the firmware runs unchanged, nothing is installed</span>
-    <a class="tab" id="emu-tab" href="https://joakimeriksson.github.io/fm1-emu/" target="_blank" rel="noopener">New tab ↗</a>
-    <button type="button" id="emu-x" aria-label="Close">×</button></div>
-  <iframe id="emu-f" title="FM-1 emulator" allow="autoplay; fullscreen"></iframe>
-</dialog>
 
 <!--FOOTER-->
 
@@ -424,27 +405,11 @@ sudo python3 fm1_rescue.py sloop</pre>
 /*LIB*/
 
 const $ = (id) => document.getElementById(id);
-// the FM-1 emulator (Joakim Eriksson's fm1-emu) in a window over the hub, loaded only on the click (privacy policy:
-// GitHub Pages); closing it unloads it, its sound stops with it
-const EMU = "https://joakimeriksson.github.io/fm1-emu/";
-// a card's "try it": the emulator in the window where it plays the firmware, else the author's own page (a new tab);
-// the author's own (or our simulator) beside the emulator as a plain link
-const tryIt = (f) => f.emu ? `<a class="emu" href="${EMU}?fw=${encodeURIComponent(f.emu)}" target="_blank" rel="noopener">▶ Try in browser</a>`
-  : f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Try in browser ↗</a>` : "";
-const demo = (f) => f.emu && f.play ? ` · <a href="${esc(f.play)}" target="_blank" rel="noopener">${f.play.startsWith("https://thefirmwarehub.com/") ? "our simulator" : "author's demo"} ↗</a>` : "";
+// a card's "play": the author's own page in the browser (or our simulator), a new tab
+const tryIt = (f) => f.play ? `<a href="${esc(f.play)}" target="_blank" rel="noopener">▶ Play in browser</a>` : "";
 const build = (f) => kindsOf(f).includes("dev") ? `https://github.com/${esc(f.repo)}${BUILD_AT[f.id] || "#readme"}` : "";
-const buildInMeta = (f) => build(f) && (f.emu || f.play) && f.editor;   // (two buttons already: the line stays one line)
-function tryEmu(f) {
-  const u = EMU + "?fw=" + encodeURIComponent(f.emu);
-  $("emu-t").textContent = f.name + " · FM-1 emulator";
-  $("emu-tab").href = u; $("emu-f").src = u;
-  $("emu").showModal();
-  ev("Try in emulator", f.name);
-}
-$("emu").addEventListener("close", () => { $("emu-f").src = "about:blank"; });
-$("emu-x").onclick = () => $("emu").close();
-$("emu").addEventListener("click", (e) => { if (e.target === $("emu")) $("emu").close(); });   // (a click beside it)
-// a link to one card (thefirmwarehub.com/#fw-zp12, e.g. back from the emulator): there, with a flash
+const buildInMeta = (f) => build(f) && f.play && f.editor;   // (two buttons already: the line stays one line)
+// a link to one card (thefirmwarehub.com/#fw-zp12, e.g. from another page): there, with a flash
 function jump() {                                       // (after the first renders have settled: the card as it stays)
   setTimeout(() => {
     const m = /^#fw-([\w-]+)$/.exec(location.hash), el = m && $("grid").querySelector(`.fw[data-id="${m[1]}"]`);
@@ -579,15 +544,13 @@ function render() {
       <p class="what">${esc(f.what)}</p>
       <div class="meta">${f.added ? `<span class="added" title="On the hub since ${esc(f.added)}">added ${day(f.added)}</span> · ` : ""}<span title="Released ${esc(f.date)}">released ${day(f.date)}</span> · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
-        <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}${demo(f)}${buildInMeta(f) ? ` · <a href="${build(f)}" target="_blank" rel="noopener">build on it ↗</a>` : ""}</div>
+        <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}${buildInMeta(f) ? ` · <a href="${build(f)}" target="_blank" rel="noopener">build on it ↗</a>` : ""}</div>
       <div class="links">${tryIt(f)}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${build(f) && !buildInMeta(f) ? `<a href="${build(f)}" target="_blank" rel="noopener">⚓ Build on it</a>` : ""}</div>
       <progress max="100" value="0"></progress>
       <button class="go">${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button>
       <div class="msg"></div>`;
     const go = el.querySelector("button");
     if (go) { go.onclick = () => install(f, el); go.disabled = writing; }
-    const em = el.querySelector("a.emu");                 // (Ctrl/middle click: its own tab, as a link)
-    if (em) em.onclick = (e) => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.button) return; e.preventDefault(); tryEmu(f); };
     $("grid").append(el);
   }
   if (!EXT.isConnected) $("grid").append(EXT);
