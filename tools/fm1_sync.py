@@ -248,8 +248,14 @@ def product_of(raw):
     return "".join(chr((m - i - 1) & 0xFF) for i in range(BLOCKS) if (m := raw[i * BLK + KEEP]) != 0x7D)
 
 
+GITHUB_TOKEN = Path.home() / ".config/designburg/github-token"   # (read-only, public repos: 5000 API calls an hour, not 60)
+
+
 def get(url, accept="application/vnd.github+json"):
-    req = urllib.request.Request(url, headers={"Accept": accept, "User-Agent": "fm1-switcher (designburgapps.com)"})
+    h = {"Accept": accept, "User-Agent": "fm1-switcher (designburgapps.com)"}
+    if url.startswith("https://api.github.com/") and GITHUB_TOKEN.exists():
+        h["Authorization"] = "Bearer " + GITHUB_TOKEN.read_text().strip()
+    req = urllib.request.Request(url, headers=h)
     with urllib.request.urlopen(req, timeout=60) as r:
         return r.read()
 
@@ -333,7 +339,7 @@ def latest_pages(spec, repo):
         raw = r.read()
         date = parsedate_to_datetime(r.headers["Last-Modified"]).strftime("%Y-%m-%dT%H:%M:%SZ")
     named = re.fullmatch(r"[A-Za-z0-9]+[-_]v?(\d[\w.+-]*)\.fwsc", pkg.rsplit("/", 1)[-1])
-    version = (meta.get("version") or (named.group(1) if named else date[:10])).lstrip("v")
+    version = (meta.get("version") or (named.group(1) if named else date[:10].replace("-", "."))).lstrip("v")   # (2026.10.14: the page shows it whole)
     commit = version.rsplit("-", 1)[-1]                # (v0.6.2-be3719e: the build's commit; 1.1.5-rb: none, then main)
     return raw, version, date, None, f"https://github.com/{repo}/tree/{commit if re.fullmatch(r'[0-9a-f]{7,40}', commit) else 'main'}"
 
