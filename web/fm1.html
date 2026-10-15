@@ -190,6 +190,7 @@
   .meta { color: var(--dim); font-size: 13px; }
   .meta a { color: var(--dim); text-decoration: underline; text-decoration-color: var(--line); }
   .meta .added { font-weight: 600; }
+  .meta .inst { color: var(--text); font-weight: 600; }
   .fw button.go { background: var(--c); color: #121011; width: 100%; margin-top: 6px; }
   progress { width: 100%; height: 8px; display: none; accent-color: var(--c); }
   .fw .links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 36px; }   /* (on every card, empty too, one line: the buttons in a row line up) */
@@ -444,7 +445,8 @@ function showNow() {
 // each firmware's colour and picture: its own screen, from its repository (SLOOP: its logo too)
 const LOOK = { dinghy: "#8f62f0", felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx: "#42f5f5", zp12: "#ff6a3d", x0x: "#f4c0cb", fomni: "#c9b6ff",
                salt: "#ff8f7a", choralroot: "#ffc46b", jangada: "#ff5fc8", melodee: "#8fe3b0", hortator: "#d8dde6", fimba: "#f0a35e", ghoulbox: "#ffb000", jiant: "#ff7a00", bubba: "#ffc83d", floyd: "#ffb347", sloopbanks: "#7fd4ff", waveloop: "#b58cff",
-               chord: "#f2564e", fumi: "#b08a5a", maku: "#f0806a", rainbow: "#ffd23f", obervave: "#3c82eb" };
+               chord: "#f2564e", fumi: "#b08a5a", maku: "#f0806a", rainbow: "#ffd23f", obervave: "#3c82eb",
+               pigeon: "#b49cff", cs1: "#f2a93b", hyp1: "#a35cff", tonitor: "#00d6ff", noizdemons: "#7dff3c", coralflower: "#ff7aa8" };
 const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"], ["other", "Other"]];
 const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords", dev: "for developers", other: "other" };
 const kindsOf = (f) => [].concat(f.kind || []);
@@ -542,7 +544,7 @@ function render() {
         <div class="by">by ${esc(f.author)}</div>
         <div class="tags">${isNow ? '<span class="tag now">on your FM-1</span>' : ""}${badge(f)}${f.beta && !devOnly(f) ? '<span class="tag beta">beta</span>' : ""}${kindsOf(f).map((k) => `<span class="tag kind">${KIND_TAG[k] || k}</span>`).join("")}</div></div></div>
       <p class="what">${esc(f.what)}</p>
-      <div class="meta">${f.added ? `<span class="added" title="On the hub since ${esc(f.added)}">added ${day(f.added)}</span> · ` : ""}<span title="Released ${esc(f.date)}">released ${day(f.date)}</span> · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
+      <div class="meta">${f.installs ? `<span class="inst" title="Installed from this page (counted without visitors who opt out of statistics)">↓ ${f.installs.toLocaleString("en")} installs</span> · ` : ""}${f.added ? `<span class="added" title="On the hub since ${esc(f.added)}">added ${day(f.added)}</span> · ` : ""}<span title="Released ${esc(f.date)}">released ${day(f.date)}</span> · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
         <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}${buildInMeta(f) ? ` · <a href="${build(f)}" target="_blank" rel="noopener">build on it ↗</a>` : ""}</div>
       <div class="links">${tryIt(f)}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${build(f) && !buildInMeta(f) ? `<a href="${build(f)}" target="_blank" rel="noopener">⚓ Build on it</a>` : ""}</div>
