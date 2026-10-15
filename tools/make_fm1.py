@@ -86,6 +86,8 @@ def devices(text, dev, ref="hub"):
     """the devices menu (web/devices.css, web/devices.html) into a page: /*DEVICES*/ in its style, <!--DEVICES--> in its nav;
     the page's own device marked"""
     menu = (HERE / "web" / "devices.html").read_text(encoding="utf-8").replace(f'data-dev="{dev}"', f'data-dev="{dev}" aria-current="page"')
+    if ref == "kb":                                     # (the Knowledge Base link beside Devices: marked on the KB itself)
+        menu = menu.replace('<a class="kbl"', '<a class="kbl" aria-current="page"')
     own, ports, n = smk_cards()
     ours, fm1, smk = credits()
     foot = ((HERE / "web" / "footer.html").read_text(encoding="utf-8").replace("<!--F-OURS-->", ours)

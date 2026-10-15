@@ -113,6 +113,18 @@
   h2.sec { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 24px; font-weight: 600; text-align: center; }
   .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }   /* the firmwares + yours + the official one, 4 a row */
   .fws { display: contents; }
+  /* the search above the chips: every word somewhere in a card, with the chip's kind; "/" jumps into it */
+  .find { position: relative; max-width: 560px; margin: -6px auto 18px; }
+  .find input { width: 100%; background: var(--panel); color: var(--fg); border: 1px solid var(--line); border-radius: 999px;
+                padding: 12px 46px 12px 20px; font: inherit; font-size: 15.5px; }
+  .find input:focus { outline: none; border-color: var(--beige); }
+  .find input::placeholder { color: var(--dim); }
+  .find .key { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; line-height: 1.5; color: var(--dim);
+               border: 1px solid var(--line); border-radius: 5px; padding: 0 7px; pointer-events: none; }
+  .find input:focus + .key, .find input:not(:placeholder-shown) + .key { display: none; }
+  @media (hover: none) { .find .key { display: none; } }
+  .nomatch { text-align: center; color: var(--dim); margin: 0 0 34px; }
+  .nomatch button { background: transparent; color: var(--cyan); box-shadow: none; padding: 0; font-size: inherit; font-weight: 600; }
   .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: -6px 0 28px; }
   .chips button { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 11px 18px; font-size: 14.5px; }
   .chips button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
@@ -270,8 +282,11 @@
 
 <main><div class="wrap">
   <h2 class="sec"><span id="count">Twenty-two</span> open-source firmwares, one FM-1</h2>
+  <div class="find" role="search"><input type="search" id="q" placeholder="Search by name, maker or sound: acid, drums, chords…"
+    aria-label="Search the firmwares" autocomplete="off" spellcheck="false"><span class="key" aria-hidden="true">/</span></div>
   <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
   <div class="sorts" id="sorts" role="group" aria-label="Sort"></div>
+  <p class="nomatch" id="nomatch" hidden></p>
   <div class="grid"><div id="grid" class="fws"><p class="meta">Loading the catalogue…</p></div>
     <section class="fw ext" id="baudgirl" data-id="baudgirl" style="--c: #ff3fa4">
       <div class="shot"><div class="slot ext"><b>FM-1+VA</b>Baud Girl</div></div>
@@ -419,11 +434,17 @@ const kindsOf = (f) => [].concat(f.kind || []);
 const BUILD_AT = { dinghy: "#build-your-own" };                       // (the step-by-step manual in its README)
 const devOnly = (f) => kindsOf(f).length === 1 && kindsOf(f)[0] === "dev";   // (a base to build on: no beta tag; installable all the same)
 let kind = (location.hash || "").slice(1);                             // (#drums: a link straight to one kind)
+// the search: every word somewhere in a card (name, maker, what it does, its kinds), accents and case ignored; ?q= in the address
+const fold = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+let q = new URLSearchParams(location.search).get("q") || "";
+const words = () => fold(q).split(/\s+/).filter(Boolean);
+const hits = (text) => { const t = fold(text); return words().every((w) => t.includes(w)); };
+const found = (f) => hits([f.name, f.id, f.author, f.what, f.product, ...kindsOf(f).map((k) => KIND_TAG[k] || k)].join(" "));
 function chips() {
   if (!KINDS.some(([k]) => k === kind)) kind = "all";
   $("chips").innerHTML = KINDS.map(([k, label]) => {
-    const n = k === "all" ? cat.length : cat.filter((f) => kindsOf(f).includes(k)).length;
-    return n ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${n}</span></button>` : "";
+    const of = (l) => k === "all" ? l : l.filter((f) => kindsOf(f).includes(k));
+    return of(cat).length ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${of(cat.filter(found)).length}</span></button>` : "";
   }).join("");
   $("chips").querySelectorAll("button").forEach((b) => b.onclick = () => {
     kind = b.dataset.k; history.replaceState(null, "", kind === "all" ? location.pathname + location.search : "#" + kind);
@@ -478,7 +499,7 @@ function toCards(box) {
     e.preventDefault();
     let el = $("grid").querySelector(`.fw[data-id="${a.dataset.id}"]`);
     if (!el) return;
-    if (el.hidden) { kind = "all"; history.replaceState(null, "", location.pathname + location.search); chips(); render(); el = $("grid").querySelector(`.fw[data-id="${a.dataset.id}"]`); }
+    if (el.hidden) { kind = "all"; setQ(""); history.replaceState(null, "", location.pathname + location.search); chips(); render(); el = $("grid").querySelector(`.fw[data-id="${a.dataset.id}"]`); }
     el.scrollIntoView({ behavior: "smooth", block: "center" });
     el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
   });
@@ -513,11 +534,49 @@ function render() {
       <div class="msg"></div>`;
     const go = el.querySelector("button");
     if (go) { go.onclick = () => install(f, el); go.disabled = writing; }
-    el.hidden = kind !== "all" && !kindsOf(f).includes(kind) && !isNow;          // (the one on your FM-1 stays in view)
     $("grid").append(el);
   }
   if (!EXT.isConnected) $("grid").append(EXT);
-  EXT.hidden = kind !== "all" && !["synth", "groove"].includes(kind);   // (a link card, not in the catalogue)
+  filter();
+}
+// which cards show: the chip's kind (the one on your FM-1 stays in view) and the search; typing only hides and shows, no rebuild
+let shown = 0;
+function filter() {
+  shown = 0;
+  for (const el of $("grid").querySelectorAll("article.fw")) {
+    const f = cat.find((x) => x.id === el.dataset.id);
+    el.hidden = (kind !== "all" && !kindsOf(f).includes(kind) && !el.classList.contains("now")) || !found(f);
+    shown += !el.hidden;
+  }
+  EXT.hidden = (kind !== "all" && !["synth", "groove"].includes(kind)) || !hits(EXT.textContent);   // (a link card, not in the catalogue)
+  shown += !EXT.hidden;
+  const nm = $("nomatch");
+  nm.hidden = shown > 0;
+  if (!shown) {
+    nm.innerHTML = `No firmware matches “${esc(q.trim())}”${kind !== "all" ? " in this group" : ""}. <button type="button">Show all</button>`;
+    nm.querySelector("button").onclick = () => { kind = "all"; setQ(""); history.replaceState(null, "", location.pathname + location.search); chips(); filter(); };
+  }
+}
+function setQ(v) {                                      // (the box, the address: ?q=, beside ?sort= and the #kind)
+  q = v; $("q").value = v;
+  const u = new URLSearchParams(location.search);
+  if (v.trim()) u.set("q", v.trim()); else u.delete("q");
+  history.replaceState(null, "", location.pathname + (u.size ? "?" + u : "") + location.hash);
+}
+let searchT;
+function find() {
+  const box = $("q");
+  box.value = q;
+  box.oninput = () => {
+    setQ(box.value); chips(); filter();
+    clearTimeout(searchT);                              // (Matomo's site search: what people look for, once they stop typing)
+    searchT = setTimeout(() => { if (q.trim().length > 1) try { (window._paq = window._paq || []).push(["trackSiteSearch", q.trim(), kind === "all" ? false : kind, shown]); } catch (e) {} }, 1500);
+  };
+  box.onkeydown = (e) => { if (e.key === "Escape" && box.value) { e.preventDefault(); box.value = ""; box.oninput(); } };
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "") || document.activeElement?.isContentEditable) return;
+    e.preventDefault(); box.focus(); box.select();
+  });
 }
 
 // UPDATE: another version than on this browser's last visit (kept only here, in
@@ -720,7 +779,7 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   cat = ordered(c.firmwares);
   rescueFill();
   $("count").textContent = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty", "Twenty-one", "Twenty-two", "Twenty-three", "Twenty-four", "Twenty-five"][cat.length] || cat.length;
-  $("updated").textContent = " · catalogue of " + c.updated; lineup(); chips(); sorts(); render(); recent(); remember();
+  $("updated").textContent = " · catalogue of " + c.updated; lineup(); find(); chips(); sorts(); render(); recent(); remember();
   // ?demo=connected|install|done&now=<id>&fw=<id>&pct=N: the page in a state, for a video (no FM-1 needed)
   const q = new URLSearchParams(location.search), st = q.get("demo");
   if (!st) return;
