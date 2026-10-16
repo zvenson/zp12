@@ -31,7 +31,7 @@
   {
    "id": "obervave",
    "name": "OberVave",
-   "version": "1.2.1 beta",
+   "version": "1.3.1 beta",
    "by": "zvenson",
    "img": "/img/obervave.png",
    "wide": true,
@@ -41,7 +41,6 @@
    "beta": true,
    "models": "Pro · Elite · MKE-P37",
    "what": "One polyphonic analog-style synth after the classic 8-voice American polys of 1979-84: 32 programs, chorus, delay and plate reverb, an arpeggiator, a two-track step sequencer on the 16 pads, filter and effects on the fader banks.",
-   "note": "Not yet tested on a real SMK-37: make a full flash backup first, and please report what works.",
    "install": "https://github.com/zvenson/obervave/blob/main/SMK37.md#install",
    "install_label": "How to install ↗",
    "source": "https://github.com/zvenson/obervave",
