@@ -542,7 +542,9 @@ function showNow() {
 const LOOK = { dinghy: "#8f62f0", felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx: "#42f5f5", zp12: "#ff6a3d", x0x: "#f4c0cb", fomni: "#c9b6ff",
                salt: "#ff8f7a", choralroot: "#ffc46b", jangada: "#ff5fc8", melodee: "#8fe3b0", hortator: "#d8dde6", fimba: "#f0a35e", ghoulbox: "#ffb000", jiant: "#ff7a00", bubba: "#ffc83d", floyd: "#ffb347", sloopbanks: "#7fd4ff", waveloop: "#b58cff",
                chord: "#f2564e", fumi: "#b08a5a", maku: "#f0806a", rainbow: "#ffd23f", obervave: "#3c82eb",
-               pigeon: "#b49cff", cs1: "#f2a93b", hyp1: "#a35cff", tonitor: "#00d6ff", noizdemons: "#7dff3c", coralflower: "#ff7aa8" };
+               pigeon: "#b49cff", cs1: "#f2a93b", hyp1: "#a35cff", tonitor: "#00d6ff", noizdemons: "#7dff3c", coralflower: "#ff7aa8",
+               mc1: "#ff8a1e", beetle: "#ff3ad0", min1: "#3f7be0", purplemonkey: "#9b5cff", gammawave: "#ffb800", tuna: "#3db7e4",
+               frodhes: "#e8a33d", fomajam: "#a3e635" };
 const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"], ["other", "Other"], ["vintage", "Vintage"]];
 const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords", dev: "for developers", other: "other", vintage: "vintage" };
 const kindsOf = (f) => [].concat(f.kind || [], f.vintage ? ["vintage"] : []);   // (vintage: a classic instrument rebuilt, a group of its own)

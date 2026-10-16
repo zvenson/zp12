@@ -249,6 +249,47 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          what="An orbiting overtone synth: four corners of two overtone generators each, a sun on a path and a moon "
               "around it decide how much of each you hear; the knobs shape the selected planet. Made for the SMK-37, "
               "here its FM-1 build. After the Beetlecrab Vector."),
+    dict(id="mc1", added="2026-10-16", play="https://dspaudio.github.io/mc-1/",
+         kind="groove", name="MC-1", author="dspaudio", repo="dspaudio/mc-1", ident=r"FM-1_900", src="github",
+         site="https://dspaudio.github.io/mc-1/",
+         what="An original four-part groovebox with a 1990s workflow: three melodic parts and a 16-lane drum part, "
+              "128 melodic presets, eight drum kits, song arrangement, an arpeggiator and recorded knob moves."),
+    dict(id="beetle", added="2026-10-16", play="https://sikkenworks.github.io/BEETLE/",
+         kind="groove", name="BEETLE", author="Joppe Sikken (SikkenWorks)", repo="SikkenWorks/BEETLE", ident=r"FM-1_2101",
+         src="github", site="https://sikkenworks.github.io/BEETLE/",
+         what="A tracker for the FM-1: patterns written top to bottom, step by step, with note, instrument, chord and "
+              "effect columns, the way trackers have always worked."),
+    dict(id="min1", added="2026-10-16", play="https://reytian.github.io/fm1-min1/emu/",
+         kind=["chords", "other"], name="MIN-1", author="Reytian", repo="Reytian/fm1-min1", ident=r"FM-1_5000201",
+         src="github", site="https://reytian.github.io/fm1-min1/",
+         what="A tiny minimalist ensemble after Philip Glass: it starts playing when you switch on, you join whenever "
+              "you like. In EASY mode every white key is a chord that fits. Four models, twenty pieces."),
+    dict(id="purplemonkey", added="2026-10-16", play="https://quixotic7.github.io/PurpleMonkeyFM1/",
+         kind="other", name="PurpleMonkey", author="Quixotic7", repo="Quixotic7/PurpleMonkeyFM1", ident=r"FM-1_927",
+         src="github", site="https://quixotic7.github.io/PurpleMonkeyFM1/",
+         what="A first instrument for toddlers: random key bashing and knob turning are rewarded with dancing animated "
+              "pets and little musical sequences. Press a key, any key."),
+    dict(id="gammawave", added="2026-10-16", play="https://fvalente.github.io/GammaWave-FM1/",
+         editor="https://fvalente.github.io/GammaWave-FM1/webapp/editor/?mock=1",
+         kind=["synth", "groove"], name="Pocket GammaWave", author="ShadowTune (GammaWave Audio)", repo="fvalente/GammaWave-FM1",
+         ident=r"FM-1_981", src="github", site="https://gammawaveaudio.com/",
+         what="The companion to the GammaWave desktop synth: four industrial distortions, vowel and scream filters, an "
+              "FFT spectrogram, a four-track tape deck screen and a song generator with 49 genres, trap and drill too."),
+    dict(id="tuna", added="2026-10-16", play="https://delirioux.github.io/tuna/try/",
+         kind="other", name="Tuna", author="delirioux", repo="delirioux/tuna", ident=r"FM-1_900",
+         src="pages:https://delirioux.github.io/tuna/install/", site="https://delirioux.github.io/tuna/",
+         what="Generative music built on Felucca: composer profiles write the music as it plays, you steer them. A work "
+              "in progress."),
+    dict(id="frodhes", vintage=True, added="2026-10-16", play="https://leonardomirabal.github.io/frodhes/",
+         kind="synth", name="Frodhes", author="Leonardo Mirabal", repo="leonardoMirabal/frodhes", ident=r"FM-1_958",
+         src="github",
+         what="A Rhodes electric piano, physically modelled, no samples: four piano types, compressor, drive, tremolo or "
+              "wah, phaser, chorus, delay and reverb, tap tempo, MIDI clock, scales and presets. Built on Dinghy."),
+    dict(id="fomajam", added="2026-10-16", play="https://konsumer.js.org/fomajam/",
+         kind=["drums", "groove"], name="FOMAJAM", author="konsumer", repo="konsumer/fomajam", ident=r"FM-1_961",
+         src="github", site="https://konsumer.js.org/fomajam/",
+         what="A drum machine in the classic step-grid style: voices after the 909, 808, 707, 606, DMX and more, a "
+              "machine per voice, accents and patterns. Play it in the browser first."),
 ]
 
 
@@ -401,6 +442,7 @@ def latest_pages(spec, repo):
         date = parsedate_to_datetime(r.headers["Last-Modified"]).strftime("%Y-%m-%dT%H:%M:%SZ")
     named = re.fullmatch(r"[A-Za-z0-9]+[-_]v?(\d[\w.+-]*)\.fwsc", pkg.rsplit("/", 1)[-1])
     version = (meta.get("version") or (named.group(1) if named else date[:10].replace("-", "."))).lstrip("v")   # (2026.10.14: the page shows it whole)
+    version = re.sub(r"\s*\((\w+)\)$", r"-\1", version).replace(" ", "-")   # ("1.0 (b77b159)", Tuna: 1.0-b77b159)
     commit = version.rsplit("-", 1)[-1]                # (v0.6.2-be3719e: the build's commit; 1.1.5-rb: none, then main)
     return raw, version, date, None, f"https://github.com/{repo}/tree/{commit if re.fullmatch(r'[0-9a-f]{7,40}', commit) else 'main'}"
 
