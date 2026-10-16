@@ -311,6 +311,9 @@
                border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 16px; }
   dialog.dlg input.code { font: 700 26px/1.2 ui-monospace, Menlo, monospace; letter-spacing: 8px; text-align: center; }
   dialog.dlg input:focus { outline: none; border-color: var(--cyan); }
+  dialog.dlg label.vb { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.45; color: var(--text); margin: 2px 0 6px; cursor: pointer; }
+  dialog.dlg label.vb input { margin-top: 3px; accent-color: #ff6a1a; flex: none; width: 16px; height: 16px; }
+  dialog.dlg label.vb a { color: #ff8a4a; font-weight: 700; }
   dialog.dlg .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
   dialog.dlg .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
   dialog.dlg .row .go { background: var(--cyan); color: #121011; }
@@ -790,13 +793,14 @@ function acct() {
 let mailTo = "";
 function dialog(step, why = "") {
   const d = $("acctdlg"), b = $("acctbody");
-  const privacy = '<p class="small">Your address is only used to sign you in: no newsletter, no sharing. You can delete the account any time. <a href="/impressum/#datenschutz">Privacy</a></p>';
+  const privacy = '<p class="small">Your address is only used to sign you in (and for the VIBE FM list, if you tick it): no sharing. You can delete the account any time. <a href="/impressum/#datenschutz">Privacy</a></p>';
   if (step === "email") {
     b.innerHTML = `<h3>Sign in to the <b>hub</b></h3>
       <p>${esc(why || "Rate firmwares and keep your favourites on every device.")}</p>
       <p class="small">No password: we mail you a sign-in link and a 6-digit code. Either one signs you in.</p>
       <form id="f-mail" novalidate><input type="email" id="in-mail" autocomplete="email" placeholder="you@example.com" required value="${esc(mailTo)}">
       <label class="hp" aria-hidden="true">Website <input type="text" id="in-web" tabindex="-1" autocomplete="off"></label>
+      <label class="vb"><input type="checkbox" id="in-vibe"> <span>Also put me on the <a href="/vibe/?ref=hub-account" target="_blank" rel="noopener">VIBE FM</a> list: news about VIBE FM, the synth made for open firmware. Unsubscribe any time.</span></label>
       <p class="err" id="d-err"></p><div class="row"><button class="go" id="b-send">Send me the mail</button>
       ${mailTo ? '<button type="button" class="lnk" id="b-have">I have a code</button>' : ""}</div></form>${privacy}`;
     $("f-mail").onsubmit = async (e) => {
@@ -804,7 +808,7 @@ function dialog(step, why = "") {
       const email = $("in-mail").value.trim(), btn = $("b-send");
       if (!/^\S+@\S+\.\S+$/.test(email)) { $("d-err").textContent = "Please check the address."; return; }
       btn.disabled = true; btn.textContent = "Sending…";
-      try { await api("login", { email, website: $("in-web").value }); mailTo = email; evA("Login mail"); dialog("code"); }
+      try { await api("login", { email, website: $("in-web").value, vibe: $("in-vibe").checked }); mailTo = email; evA("Login mail", $("in-vibe").checked ? "vibe" : ""); dialog("code"); }
       catch (err) { $("d-err").textContent = err.message; btn.disabled = false; btn.textContent = "Send me the mail"; }
     };
     if ($("b-have")) $("b-have").onclick = () => dialog("code");
@@ -825,6 +829,7 @@ function dialog(step, why = "") {
   } else {
     b.innerHTML = `<h3>Your <b>account</b></h3>
       <p>Signed in as <b>${esc(me.email)}</b>.</p>
+      ${me.vibe ? '<p class="small">On the <a href="/vibe/" target="_blank" rel="noopener">VIBE FM</a> list: each of its mails has an unsubscribe link.</p>' : ""}
       <p class="small">${me.favs.length} favourite${me.favs.length === 1 ? "" : "s"}, ${Object.keys(me.ratings).length} rating${Object.keys(me.ratings).length === 1 ? "" : "s"}. On another device, sign in with the same address.</p>
       <p class="err" id="d-err"></p><div class="row"><button type="button" class="quiet" id="b-out">Sign out</button><button type="button" class="danger" id="b-del">Delete my account</button></div>${privacy}`;
     $("b-out").onclick = async () => { try { await api("logout", {}); } catch (e) {} me = null; d.close(); paintAll(); chips(); filter(); toast("Signed out on this device."); };

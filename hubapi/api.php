@@ -14,6 +14,8 @@ const SESSION_DAYS = 365;               // signed in for a year on a device, a v
 const LOGIN_MINUTES = 15;               // a link / code lasts this long, once
 const CODE_TRIES = 5;                   // wrong codes per mail before it is spent
 const COOKIE = 'hub_s';
+// the box in the sign-in dialog (unticked): its words are kept with the consent, as VIBE's own form does
+const VIBE_CONSENT = 'Also put me on the VIBE FM list: news about VIBE FM, the synth made for open firmware. Unsubscribe any time.';
 
 $ENV = [
     'data' => getenv('HUB_DATA') ?: ($_SERVER['HUB_DATA'] ?? ''),
@@ -128,6 +130,16 @@ function db(): PDO
         CREATE TABLE IF NOT EXISTS throttle (k TEXT NOT NULL, t INTEGER NOT NULL);
         CREATE INDEX IF NOT EXISTS throttle_k ON throttle(k, t);
     ");
+    // later columns: the VIBE list box (logins.vibe: ticked for this mail; users.vibe_*: confirmed by signing in with it)
+    $has = fn(string $tb) => array_column($pdo->query("PRAGMA table_info($tb)")->fetchAll(), 'name');
+    if (!in_array('vibe', $has('logins'), true)) {
+        $pdo->exec('ALTER TABLE logins ADD COLUMN vibe INTEGER NOT NULL DEFAULT 0');
+    }
+    if (!in_array('vibe_at', $has('users'), true)) {
+        $pdo->exec("ALTER TABLE users ADD COLUMN vibe_at TEXT");                  // (UTC: when the sign-in confirmed it)
+        $pdo->exec("ALTER TABLE users ADD COLUMN vibe_text TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE users ADD COLUMN vibe_sent TEXT");                // (when it went to VIBE's list: live only)
+    }
     return $pdo;
 }
 
@@ -233,7 +245,9 @@ function mine(array $u): array
     $f->execute([$u['id']]);
     $r = db()->prepare('SELECT fw, stars FROM ratings WHERE user_id = ?');
     $r->execute([$u['id']]);
-    return ['email' => $u['email'], 'favs' => $f->fetchAll(PDO::FETCH_COLUMN), 'ratings' => (object)$r->fetchAll(PDO::FETCH_KEY_PAIR)];
+    $v = db()->prepare('SELECT vibe_at IS NOT NULL FROM users WHERE id = ?');
+    $v->execute([$u['id']]);
+    return ['email' => $u['email'], 'vibe' => (bool)$v->fetchColumn(), 'favs' => $f->fetchAll(PDO::FETCH_COLUMN), 'ratings' => (object)$r->fetchAll(PDO::FETCH_KEY_PAIR)];
 }
 
 // every firmware's ratings: [average, count]
@@ -247,7 +261,7 @@ function all_ratings(): array
     return $o;
 }
 
-function login_mail(string $to, string $link, string $code): bool
+function login_mail(string $to, string $link, string $code, bool $vibe = false): bool
 {
     global $ENV;
     $vibe = is_file($ENV['mailcfg']) ? require $ENV['mailcfg'] : [];
@@ -257,10 +271,13 @@ function login_mail(string $to, string $link, string $code): bool
         return false;
     }
     $host = parse_url($ENV['base'], PHP_URL_HOST) ?: 'thefirmwarehub.com';
+    $vibeLine = 'You also ticked the box for the VIBE FM list: signing in confirms it (news about VIBE FM, the synth made for open '
+        . 'firmware; one click in each mail unsubscribes). Without signing in, nothing is added.';
     $text = "Your sign-in code for the FM-1 Firmware Hub:\n\n    $code\n\nType it on the page, or open this link on the device "
         . "you want to sign in on:\n$link\n\nBoth work once, for " . LOGIN_MINUTES . " minutes. No password needed: your favourites "
-        . "and ratings follow your address to every device.\n\nYou did not ask for this? Then ignore it: without the code or the link "
-        . "nobody signs in.\n-- \nThe FM-1 Firmware Hub · $host (this address does not read replies)\n";
+        . "and ratings follow your address to every device.\n\n" . ($vibe ? $vibeLine . "\n\n" : '')
+        . "You did not ask for this? Then ignore it: without the code or the link nobody signs in.\n-- \n"
+        . "The FM-1 Firmware Hub · $host (this address does not read replies)\n";
     $e = fn(string $s) => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
     $html = '<!doctype html><html><body style="margin:0;background:#121011;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;'
         . 'color:#efe8e1;font-size:16px;line-height:1.5"><div style="max-width:520px;margin:0 auto">'
@@ -272,6 +289,7 @@ function login_mail(string $to, string $link, string $code): bool
         . 'padding:13px 22px;border-radius:8px;display:inline-block">Sign in</a></p>'
         . '<p style="margin:0 0 14px;color:#a39c96;font-size:14px">Both work once, for ' . LOGIN_MINUTES . ' minutes. No password: your '
         . 'favourites and ratings follow your address to every device. You did not ask for this? Ignore it, nobody signs in without the code or the link.</p>'
+        . ($vibe ? '<p style="margin:0 0 14px;color:#ffb27a;font-size:14px">' . $e($vibeLine) . '</p>' : '')
         . '<p style="font-size:12px;color:#6f6863;margin-top:32px;border-top:1px solid #2a2627;padding-top:16px">The FM-1 Firmware Hub · '
         . $e($host) . '</p></div></body></html>';
     return send_mail(['from' => $ENV['from']] + $m, $to, "Your sign-in code: $code", $text, $html, $host);
@@ -379,6 +397,10 @@ function use_login(array $l): void
 {
     db()->prepare('UPDATE logins SET used = ? WHERE id = ?')->execute([now(), $l['id']]);
     start_session($l['email']);
+    if ((int)($l['vibe'] ?? 0)) {                       // (the mail said so: signing in with it is the double opt-in)
+        db()->prepare('UPDATE users SET vibe_at = ?, vibe_text = ? WHERE email = ? AND vibe_at IS NULL')
+            ->execute([now(), VIBE_CONSENT, $l['email']]);
+    }
 }
 
 $route = preg_replace('~^.*/api/~', '', (string)parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH));
@@ -407,11 +429,12 @@ switch ($route) {
         }
         $token = bin2hex(random_bytes(24));
         $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        db()->prepare('INSERT INTO logins (email, token, code, created, expires) VALUES (?, ?, ?, ?, ?)')
-            ->execute([$email, hsh($token), '', now(), gmdate('Y-m-d H:i:s', time() + LOGIN_MINUTES * 60)]);
+        $vibe = !empty($b['vibe']);                     // (the VIBE list box: unticked unless the visitor ticks it)
+        db()->prepare('INSERT INTO logins (email, token, code, created, expires, vibe) VALUES (?, ?, ?, ?, ?, ?)')
+            ->execute([$email, hsh($token), '', now(), gmdate('Y-m-d H:i:s', time() + LOGIN_MINUTES * 60), (int)$vibe]);
         $id = (int)db()->lastInsertId();
         db()->prepare('UPDATE logins SET code = ? WHERE id = ?')->execute([hsh("$id:$code"), $id]);
-        if (!login_mail($email, $ENV['base'] . '/api/verify?t=' . $token, $code)) {
+        if (!login_mail($email, $ENV['base'] . '/api/verify?t=' . $token, $code, $vibe)) {
             fail('The mail could not be sent. Please try again later.', 502);
         }
         out(['ok' => true]);
