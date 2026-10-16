@@ -140,6 +140,10 @@ function db(): PDO
         $pdo->exec("ALTER TABLE users ADD COLUMN vibe_text TEXT NOT NULL DEFAULT ''");
         $pdo->exec("ALTER TABLE users ADD COLUMN vibe_sent TEXT");                // (when it went to VIBE's list: live only)
     }
+    if (!in_array('vibe_ip', $has('users'), true)) {     // (the proof of consent, as VIBE keeps it: the confirming IP, country)
+        $pdo->exec("ALTER TABLE users ADD COLUMN vibe_ip TEXT NOT NULL DEFAULT ''");
+        $pdo->exec("ALTER TABLE users ADD COLUMN vibe_country TEXT NOT NULL DEFAULT ''");
+    }
     return $pdo;
 }
 
@@ -398,8 +402,11 @@ function use_login(array $l): void
     db()->prepare('UPDATE logins SET used = ? WHERE id = ?')->execute([now(), $l['id']]);
     start_session($l['email']);
     if ((int)($l['vibe'] ?? 0)) {                       // (the mail said so: signing in with it is the double opt-in)
-        db()->prepare('UPDATE users SET vibe_at = ?, vibe_text = ? WHERE email = ? AND vibe_at IS NULL')
-            ->execute([now(), VIBE_CONSENT, $l['email']]);
+        // each ticked sign-in is a consent of its own (after an unsubscribe too): VIBE's sync (vibe/app/hub_sync.php,
+        // live only) takes every row with vibe_sent empty into its list, an address already on it stays as it is
+        $c = strtoupper((string)($_SERVER['HTTP_CF_IPCOUNTRY'] ?? ''));
+        db()->prepare('UPDATE users SET vibe_at = ?, vibe_text = ?, vibe_ip = ?, vibe_country = ?, vibe_sent = NULL WHERE email = ?')
+            ->execute([now(), VIBE_CONSENT, client_ip(), preg_match('/^[A-Z]{2}$/', $c) && $c !== 'XX' && $c !== 'T1' ? $c : '', $l['email']]);
     }
 }
 
