@@ -94,7 +94,7 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          what="SLOOP 2.4 with up to twelve DX7 voice banks, kept and named in the editor, presets by kind. Test builds: "
               "back up first."),
     dict(id="sloopdx", vintage=True, added="2026-10-08", editor="https://dx7.designburgapps.com/webapp/editor/",
-         kind=["groove", "synth"], name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_93\d",
+         kind=["groove", "synth"], name="sloopDX", author="zvenson", repo="zvenson/dxsloop", ident=r"FM-1_9[34]\d",   # (3.x: 93X, 4.x: 94X)
          src="sloopdx:docs/firmware", site="https://dx7.designburgapps.com",
          what="SLOOP's live workflow with Dexed's DX7 engine and 128 steps a track: six operators, 32 algorithms, "
               "your own .syx banks, every voice edited on the FM-1, FM drums you program."),
