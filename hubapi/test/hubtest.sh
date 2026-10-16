@@ -37,6 +37,9 @@ chk "SMK-37: own id" "$(P rate '{"fw":"smk37:obervave","stars":5}')" '"smk37:obe
 chk "SMK-37: unknown id" "$(P fav '{"fw":"smk37:nothere","on":1}')" 'unknown firmware'
 chk "SMK-37: the FM-1 id stays apart" "$(curl -s $B/api/ratings)" '"zp12":\[4,1\],"smk37:obervave"\|"smk37:obervave":\[5,1\],"zp12":\[4,1\]'
 P rate '{"fw":"smk37:obervave","stars":0}' >/dev/null
+chk "link card: rate" "$(P rate '{"fw":"baudgirl","stars":5}')" '"baudgirl":\[5,1\]'
+chk "link card: fav" "$(P fav '{"fw":"baudgirl","on":1}')" '"favs":\[[^]]*"baudgirl"'
+P rate '{"fw":"baudgirl","stars":0}' >/dev/null; P fav '{"fw":"baudgirl","on":0}' >/dev/null
 chk "rate 6" "$(P rate '{"fw":"zp12","stars":6}')" '1 to 5'
 chk "public ratings" "$(curl -s $B/api/ratings)" '"zp12":\[4,1\]'
 chk "no address in public" "$(curl -s $B/api/ratings | grep -c tester || true)" '^0$'

@@ -499,7 +499,7 @@
   </div>
   <p class="nomatch" id="nomatch" hidden></p>
   <div class="grid"><div id="grid" class="fws"><p class="meta">Loading the catalogue…</p></div>
-    <section class="fw ext" id="baudgirl" data-id="baudgirl" style="--c: #ff3fa4">
+    <section class="fw ext" id="baudgirl" data-id="baudgirl" data-hub="baudgirl" style="--c: #ff3fa4">
       <div class="shot"><div class="slot ext"><b>FM-1+VA</b>Baud Girl</div></div>
       <div class="head"><div>
         <h3>Baud Girl<small>FM-1+VA</small></h3>
@@ -1016,8 +1016,8 @@ const found = (f) => hits([f.name, f.id, f.author, f.what, f.product, ...kindsOf
 const inKind = (f, k) => k === "all" || (k === "fav" ? isFav(f.id) : kindsOf(f).includes(k));
 function chips() {
   if (kind !== "fav" && !KINDS.some(([k]) => k === kind)) kind = "all";
-  const nf = cat.filter((f) => isFav(f.id)).length;
-  $("chips").innerHTML = (nf || kind === "fav" ? `<button role="tab" data-k="fav" aria-selected="${kind === "fav"}" title="Your favourites${me ? "" : " (on this browser; sign in to keep them on every device)"}">♥ Favourites<span>${cat.filter((f) => isFav(f.id) && found(f)).length}</span></button>` : "")
+  const extFav = isFav(EXT.dataset.hub), nf = cat.filter((f) => isFav(f.id)).length + extFav;   // (+ the link card's heart)
+  $("chips").innerHTML = (nf || kind === "fav" ? `<button role="tab" data-k="fav" aria-selected="${kind === "fav"}" title="Your favourites${me ? "" : " (on this browser; sign in to keep them on every device)"}">♥ Favourites<span>${cat.filter((f) => isFav(f.id) && found(f)).length + (extFav && hits(EXT.textContent))}</span></button>` : "")
     + KINDS.map(([k, label]) => {
     const of = (l) => l.filter((f) => inKind(f, k));
     return of(cat).length ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${of(cat.filter(found)).length}</span></button>` : "";
@@ -1111,8 +1111,10 @@ const ordered = (l) => [...OURS.map((i) => l.find((f) => f.id === i)).filter(Boo
 function render() {
   const w = whoIs(current);
   $("grid").innerHTML = "";
-  for (const [i, f] of sorted().entries()) {
-    if (i === EXT_AT && sort === "installs") $("grid").append(EXT);
+  const list = sorted();
+  const extAt = sort === "installs" ? EXT_AT : sort === "rating" ? list.findIndex((f) => score(f.id) < score(EXT.dataset.hub)) : -1;   // (else last)
+  for (const [i, f] of list.entries()) {
+    if (i === extAt) $("grid").append(EXT);
     const isNow = w && w.fw === f;
     const el = document.createElement("article");
     el.className = "fw" + (isNow ? " now" : "");
@@ -1137,10 +1139,11 @@ function render() {
     $("grid").append(el);
   }
   if (!EXT.isConnected) $("grid").append(EXT);
+  paintCard(EXT);
   filter();
 }
 // the account (web/hubaccount.js): this page's cards, names, what to redo after a heart or a rating
-const HUB = { cards: () => [...$("grid").querySelectorAll("article.fw")], name: (id) => (cat.find((x) => x.id === id) || {}).name || id,
+const HUB = { cards: () => [...$("grid").querySelectorAll("article.fw"), EXT], name: (id) => id === EXT.dataset.hub ? "Baud Girl" : (cat.find((x) => x.id === id) || {}).name || id,
               refresh: () => { chips(); filter(); }, resort: () => { if (sort === "rating") render(); } };
 // FAVOURITES AND RATINGS (/api/, hubapi/api.php), the same on every device page (tools/make_fm1.py puts this file in at
 // /*ACCOUNT*/; its style is web/hubaccount.css). Favourites work without an account: on this browser only (localStorage).
@@ -1319,7 +1322,7 @@ function filter() {
     el.hidden = (!inKind(f, kind) && !el.classList.contains("now")) || !found(f);
     shown += !el.hidden;
   }
-  EXT.hidden = (kind !== "all" && !["synth", "groove"].includes(kind)) || !hits(EXT.textContent);   // (no heart: not in the catalogue)   // (a link card, not in the catalogue)
+  EXT.hidden = (kind === "fav" ? !isFav(EXT.dataset.hub) : kind !== "all" && !["synth", "groove"].includes(kind)) || !hits(EXT.textContent);   // (a link card, not in the catalogue: its heart and stars all the same)
   shown += !EXT.hidden;
   const nm = $("nomatch");
   nm.hidden = shown > 0;
