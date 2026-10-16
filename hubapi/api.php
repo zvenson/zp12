@@ -4,7 +4,8 @@
 //   HUB_DATA     its own folder (hub.sqlite, secret.txt): the test site and the live one never share accounts
 //   HUB_CATALOG  its catalog.json (the firmware ids one may rate)
 //   HUB_BASE     its address, for the links in the mails (https://thefirmwarehub.com)
-//   HUB_MAILCFG  VIBE's config.php: the SMTP account (zven@thefirmwarehub.com) is borrowed from there
+//   HUB_MAILCFG  VIBE's config.php: the SMTP account (zven@thefirmwarehub.com) is borrowed from there; the mails go out
+//                as HUB_FROM (no-reply@thefirmwarehub.com: replies and bounces never land in a mailbox someone reads)
 // Routes: GET me, GET ratings, POST login, POST code, GET|POST verify, POST logout, POST fav, POST rate, POST merge, POST delete.
 // POSTs need the header X-Hub: 1 (a form on another site cannot send it: no CSRF token needed) and JSON.
 declare(strict_types=1);
@@ -19,6 +20,7 @@ $ENV = [
     'catalog' => getenv('HUB_CATALOG') ?: ($_SERVER['HUB_CATALOG'] ?? ''),
     'base' => rtrim(getenv('HUB_BASE') ?: ($_SERVER['HUB_BASE'] ?? ''), '/'),
     'mailcfg' => getenv('HUB_MAILCFG') ?: ($_SERVER['HUB_MAILCFG'] ?? ''),
+    'from' => getenv('HUB_FROM') ?: ($_SERVER['HUB_FROM'] ?? 'no-reply@thefirmwarehub.com'),
 ];
 
 header('Content-Type: application/json; charset=utf-8');
@@ -258,7 +260,7 @@ function login_mail(string $to, string $link, string $code): bool
     $text = "Your sign-in code for the FM-1 Firmware Hub:\n\n    $code\n\nType it on the page, or open this link on the device "
         . "you want to sign in on:\n$link\n\nBoth work once, for " . LOGIN_MINUTES . " minutes. No password needed: your favourites "
         . "and ratings follow your address to every device.\n\nYou did not ask for this? Then ignore it: without the code or the link "
-        . "nobody signs in.\n-- \nThe FM-1 Firmware Hub · $host\n";
+        . "nobody signs in.\n-- \nThe FM-1 Firmware Hub · $host (this address does not read replies)\n";
     $e = fn(string $s) => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
     $html = '<!doctype html><html><body style="margin:0;background:#121011;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;'
         . 'color:#efe8e1;font-size:16px;line-height:1.5"><div style="max-width:520px;margin:0 auto">'
@@ -272,7 +274,7 @@ function login_mail(string $to, string $link, string $code): bool
         . 'favourites and ratings follow your address to every device. You did not ask for this? Ignore it, nobody signs in without the code or the link.</p>'
         . '<p style="font-size:12px;color:#6f6863;margin-top:32px;border-top:1px solid #2a2627;padding-top:16px">The FM-1 Firmware Hub · '
         . $e($host) . '</p></div></body></html>';
-    return send_mail($m, $to, "Your sign-in code: $code", $text, $html, $host);
+    return send_mail(['from' => $ENV['from']] + $m, $to, "Your sign-in code: $code", $text, $html, $host);
 }
 
 // a small SMTP client (as VIBE's mailer.php: STARTTLS on 587, AUTH LOGIN)
