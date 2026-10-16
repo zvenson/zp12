@@ -318,6 +318,58 @@ def stars_daily(f, was):
         return {"stars": was.get("stars"), "starsDay": was.get("starsDay")}
 
 
+SMK_INSTALLER = "https://genkigenki.github.io/smk37/"   # (genkigenki's installer: its const FW names each port's version)
+
+
+def smk_version(tag):
+    """a tag or an installer's version as the SMK-37 page shows it: smk37-v1.3.1-beta, v0.9.24-beta -> 1.3.1 beta, 0.9.24 beta"""
+    v = re.sub(r"^.*?(?=\d+\.\d)", "", tag, count=1)             # (from the first number with a dot: smk37-v1.3.1 -> 1.3.1)
+    return re.sub(r"[-_ ]?(beta|alpha|rc)\b", r" \1", v, flags=re.I)
+
+
+def smk37(old):
+    """the SMK-37 page's versions and stars, live (the page is static, from git; it takes these from catalog.json): the ports'
+    and Makkuro37's from genkigenki's installer, the others' from their newest tag (web/smk37.json "tags": a pattern).
+    A firmware on the installer but not on the page: a problem, for the admin's task page"""
+    d = json.loads((HERE / "web" / "smk37.json").read_text(encoding="utf-8"))
+    vers, problems, inst = dict(old.get("versions", {})), [], None
+    try:
+        page = get(SMK_INSTALLER, "text/html").decode()
+        inst = {f["id"]: f for f in json.loads(re.search(r"const FW = (\[.*?\]);\n", page, re.S).group(1))}
+    except Exception as e:
+        problems.append({"id": "smk37", "name": "SMK-37 installer", "repo": "genkigenki/smk37", "error": f"its version list: {e}"[:300]})
+    ours = {f["id"] for f in d["own"] + d["ports"]}
+    for f in d["own"] + d["ports"]:
+        try:
+            if f.get("tags"):                             # (the newest tag that matches, by its numbers)
+                tags = [t["name"] for t in json.loads(get(f"https://api.github.com/repos/{f['tags_repo']}/tags?per_page=100"))
+                        if re.fullmatch(f["tags"], t["name"])]
+                num = lambda t: [int(n) for n in re.findall(r"\d+", smk_version(t))]
+                v = smk_version(max(tags, key=num))
+            elif inst is not None and f["id"] in inst:
+                v = smk_version(inst[f["id"]]["version"])
+            else:
+                continue
+            vers[f["id"]] = {"version": v, "beta": bool(re.search(r"beta|alpha|rc", v, re.I))}
+        except Exception as e:                        # (the last known version stays)
+            problems.append({"id": f["id"], "name": f["name"] + " (SMK-37)", "repo": f.get("tags_repo", ""), "error": str(e)[:300]})
+    for i, f in (inst or {}).items():
+        if i not in ours:
+            problems.append({"id": i, "name": f["name"] + " (SMK-37)", "repo": "genkigenki/smk37",
+                             "error": f"on genkigenki's installer ({f['version']}), not on the hub: a card for web/smk37.json"})
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    st, day = dict(old.get("stars", {})), old.get("starsDay")
+    if day != today:                                  # (the stars once a day, as the FM-1's)
+        home = lambda f: f["orig_repo"] if "orig_repo" in f else f["source"].split("github.com/")[1].split("/tree/")[0].split("/blob/")[0]
+        for r in sorted({home(f) for f in d["own"] + d["ports"]}):
+            try:
+                st[r] = stars(r)
+            except Exception:
+                pass
+        day = today
+    return {"versions": vers, "stars": st, "starsDay": day}, problems
+
+
 def latest_pages(spec, repo):
     """the package a GitHub Pages installer names (a project without releases, built from main): in its meta, else the
     first .fwsc the page links; or the spec is the package itself. The version: the meta's, else the file name's
@@ -461,6 +513,12 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
         print(f"fm1_sync: {f['name']:8} {version:14} {date[:10]}  {ident:14} {len(raw)} B")
     # (what went wrong this run: DIR/problems.json, not served (nginx serves only catalog.json and fw/); the VIBE admin's
     # task page shows it, mounted read-only into vibe-php)
+    try:
+        old_smk = json.loads((out / "catalog.json").read_text()).get("smk37", {})
+    except (OSError, ValueError):
+        old_smk = {}
+    smk, smk_problems = smk37(old_smk)
+    problems += smk_problems
     (out / "problems.json").write_text(json.dumps({"at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
                                                    "problems": problems}, indent=1, ensure_ascii=False) + "\n")
     inst = installs(old)
@@ -469,7 +527,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
             c["installs"] = inst[c["id"]]
         else:
             c.pop("installs", None)
-    if list(old.values()) == cat:                     # (the order counts too: it is the page's)
+    if list(old.values()) == cat and old_smk == smk:  # (the order counts too: it is the page's)
         print("fm1_sync: unchanged")
         return
     for p in (out / "fw").glob("*.fwsc"):
@@ -477,7 +535,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
             p.unlink()
     tmp = out / "catalog.json.tmp"                    # (whole or not at all: the page may be reading it)
     tmp.write_text(json.dumps({"updated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
-                               "firmwares": cat}, indent=1, ensure_ascii=False) + "\n")
+                               "firmwares": cat, "smk37": smk}, indent=1, ensure_ascii=False) + "\n")
     tmp.replace(out / "catalog.json")
     print("fm1_sync: catalogue written")
     if purge:

@@ -312,6 +312,21 @@ $("connect").onclick = async () => {
 };
 lineup();
 opts(); applyView(); sorts(); order(); chips(); jump();
+// the versions and stars as of now: the sync puts them into catalog.json every few hours (this page is built only now and then)
+fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.json()).then(({ smk37 }) => {
+  if (!smk37) return;
+  for (const el of cards) {
+    const v = (smk37.versions || {})[el.id.slice(3)], n = (smk37.stars || {})[el.dataset.repo];
+    if (v) {
+      el.querySelector("h3 small").textContent = v.version;
+      const b = el.querySelector(".tag.beta");
+      if (v.beta && !b) el.querySelector(".tags").insertAdjacentHTML("afterbegin", '<span class="tag beta">beta</span>');
+      if (!v.beta && b) b.remove();
+    }
+    if (typeof n === "number") { el.dataset.stars = n; el.querySelector("h3 a.star").textContent = "★ Star · " + n; }
+  }
+  order();
+}).catch(() => {});                                     // (offline, or no catalogue: the built versions stay)
 </script>
 
 <!--FOOTER-->

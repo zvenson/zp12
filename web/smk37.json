@@ -1,17 +1,16 @@
 {
- "_": "The SMK-37 page's firmwares (tools/make_fm1.py renders web/smk37.html's <!--SMK-CARDS--> from it). Versions as on the makers' installers (genkigenki.github.io/smk37: its const FW); update them here when they change. The ports' kinds come from tools/fm1_sync.py (their FM-1 entries).",
+ "_": "The SMK-37 page's firmwares (tools/make_fm1.py renders web/smk37.html's <!--SMK-CARDS--> from it). The versions here are the page's fallback: tools/fm1_sync.py reads the live ones every run (genkigenki.github.io/smk37's const FW; \"tags\": the newest tag of \"tags_repo\" that matches) into catalog.json, and the page takes them from there. The ports' kinds come from tools/fm1_sync.py (their FM-1 entries).",
  "own": [
   {
    "id": "felucca-smk",
    "name": "Felucca SMK",
-   "version": "0.9.24 beta",
+   "version": "0.9.27",
    "by": "Chance Roth (ChanceTheMaker)",
    "img": "img/smk-mix.png",
    "kind": [
     "synth",
     "groove"
    ],
-   "beta": true,
    "models": "Pro · Elite",
    "what": "Felucca's synthesis and sequencing on the SMK's 37 keys, pads, knobs, faders, wheels and display: engines from FM6 to phase distortion, chiptune and samples, a step sequencer, a browser Studio and a simulator.",
    "note": "Its installer builds the package from the keyboard's official firmware 016 and its calibration: 016 first, back up before.",
@@ -26,7 +25,9 @@
      "✎ Studio",
      "https://chancethemaker.github.io/felucca-smk/editor.html"
     ]
-   ]
+   ],
+   "tags": "v\\d.*",
+   "tags_repo": "ChanceTheMaker/felucca-smk"
   },
   {
    "id": "obervave",
@@ -57,7 +58,9 @@
      "On the FM-1 hub",
      "/#fw-obervave"
     ]
-   ]
+   ],
+   "tags": "smk37-v\\d.*",
+   "tags_repo": "zvenson/obervave"
   },
   {
    "id": "makkuro37",
@@ -78,13 +81,33 @@
      "https://genkigenki.github.io/smk37/makkuro37-sim/"
     ]
    ]
+  },
+  {
+   "id": "vector37",
+   "name": "Vector37",
+   "version": "0.2.2",
+   "by": "genkigenki",
+   "img": "img/vector37.png",
+   "kind": [
+    "synth"
+   ],
+   "models": "Pro · Elite · MKE-P37",
+   "what": "An orbiting overtone synth: four corners of two overtone generators each, a sun on a path and a moon around it decide how much of each you hear. Pads and knobs are the planets, the faders the path; eight sounds, MIDI out on the 3.5 mm jack. After the Beetlecrab Vector.",
+   "install": "https://genkigenki.github.io/smk37/",
+   "source": "https://github.com/genkigenki/Vector37",
+   "links": [
+    [
+     "▶ Simulator",
+     "https://genkigenki.github.io/smk37/vector37-sim/"
+    ]
+   ]
   }
  ],
  "ports": [
   {
    "id": "snoop37",
    "name": "Snoop37",
-   "version": "2.6.3",
+   "version": "2.6.5",
    "by": "isod89",
    "port": "genkigenki",
    "fm1": "sloop",

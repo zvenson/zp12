@@ -56,7 +56,7 @@ def smk_cards():
             links += f'<a href="/#fw-{e(f["fm1"])}">On the FM-1 hub</a>'
         links += "".join(f'<a href="{e(u)}">{e(t)}</a>' if u.startswith("/") else out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
         n = stars.get(home(f))                          # (data-stars, data-name: the page's Sort; .head: the list view's name column)
-        return (f'<article class="fw" id="fw-{e(f["id"])}" data-kind="{" ".join(kind + ["vintage"] * old)}" data-stars="{-1 if n is None else n}" '
+        return (f'<article class="fw" id="fw-{e(f["id"])}" data-kind="{" ".join(kind + ["vintage"] * old)}" data-stars="{-1 if n is None else n}" data-repo="{e(home(f))}" '
                 f'data-name="{e(f["name"])}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
                 f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <div class="head"><h3>{e(f["name"])}<small>{e(f["version"])}</small>'
                 f'<a class="star" href="https://github.com/{e(home(f))}" target="_blank" rel="noopener" title="Star it on GitHub">'
