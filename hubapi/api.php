@@ -162,12 +162,14 @@ function throttle(string $key, int $max, int $secs): bool
     return true;
 }
 
-// the firmware ids one may rate: those in the site's catalogue
+// the firmware ids one may rate: those in the site's catalogue, the FM-1's as they are, the SMK-37's as smk37:<id>
+// (their own ratings: an SMK-37 build is not the FM-1 one)
 function firmware_ids(): array
 {
     global $ENV;
     $c = json_decode((string)@file_get_contents($ENV['catalog']), true);
-    return array_column($c['firmwares'] ?? [], 'id');
+    return array_merge(array_column($c['firmwares'] ?? [], 'id'),
+                       array_map(fn($k) => 'smk37:' . $k, array_keys($c['smk37']['versions'] ?? [])));
 }
 
 function valid_fw($fw): string

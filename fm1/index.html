@@ -356,6 +356,7 @@
   details { margin-top: 40px; text-align: center; } summary { cursor: pointer; color: var(--dim); }
   details p { max-width: 760px; margin: 12px auto; text-align: left; }
   pre#log { white-space: pre-wrap; font-size: 12px; color: var(--dim); max-height: 180px; overflow: auto; text-align: left; }
+/* web/hubaccount.css: the favourites, ratings and the account (web/hubaccount.js), on every device page */
   /* favourites and ratings (/api/: hubapi/api.php): a heart on each card, five stars beside its maker, the account in the toolbar */
   .fw .fav { position: absolute; top: 12px; right: 12px; z-index: 2; width: 42px; height: 42px; padding: 0; border-radius: 50%;
              display: grid; place-items: center; background: rgba(18, 16, 17, .72); color: var(--fg); box-shadow: inset 0 0 0 1px var(--line);
@@ -364,8 +365,8 @@
   .fw .fav[aria-pressed="true"] { color: #ff3f6e; box-shadow: inset 0 0 0 1px #ff3f6e; }
   .fw .fav.pop { animation: favpop .45s ease-out; }
   @keyframes favpop { 40% { transform: scale(1.3); } }
-  .fws.list > .fw .fav { top: 50%; left: 46px; right: auto; width: 30px; height: 30px; font-size: 14px; transform: translateY(-50%); }
-  .fws.list > .fw .fav.pop { animation: none; }
+  :is(.fws, .grid).list > .fw .fav { top: 50%; left: 46px; right: auto; width: 30px; height: 30px; font-size: 14px; transform: translateY(-50%); }
+  :is(.fws, .grid).list > .fw .fav.pop { animation: none; }
   .rate { display: inline-flex; align-items: center; gap: 1px; white-space: nowrap; vertical-align: 1px; }
   .rate button { background: transparent; box-shadow: none; padding: 0 1px; font-size: 17px; line-height: 1; color: rgba(239, 232, 225, .22);
                  border-radius: 3px; transition: color .1s, transform .1s; }
@@ -494,7 +495,7 @@
   <div class="tools" id="tools">
     <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
     <div class="tools-r"><div class="sorts" id="sorts" role="group" aria-label="Sort"></div>
-      <div class="sorts" id="opts" role="group" aria-label="View"></div><div class="sorts" id="acct"></div></div>
+      <div class="sorts" id="opts" role="group" aria-label="View"></div></div>
   </div>
   <p class="nomatch" id="nomatch" hidden></p>
   <div class="grid"><div id="grid" class="fws"><p class="meta">Loading the catalogue…</p></div>
@@ -1105,7 +1106,7 @@ function render() {
     const isNow = w && w.fw === f;
     const el = document.createElement("article");
     el.className = "fw" + (isNow ? " now" : "");
-    el.dataset.id = f.id; el.id = "fw-" + f.id;
+    el.dataset.id = f.id; el.dataset.hub = f.id; el.id = "fw-" + f.id;
     el.style.setProperty("--c", LOOK[f.id] || "#3b4bf5");
     el.innerHTML = `<button type="button" class="fav" data-id="${esc(f.id)}" aria-pressed="false"></button><div class="shot${WIDE.has(f.id) ? " wide" : ""}"><img src="img/${esc(f.id)}.png${iv(f.id)}" alt="${esc(f.name)} for the M-VAVE FM-1: its screen" loading="lazy"></div>
       <div class="head"><div>
@@ -1128,15 +1129,23 @@ function render() {
   if (!EXT.isConnected) $("grid").append(EXT);
   filter();
 }
-// FAVOURITES AND RATINGS (/api/, hubapi/api.php). Favourites work without an account: on this browser only (localStorage).
-// Ratings need one: a sign-in by mail, no password (a link, or a 6-digit code typed on any device); signed in, favourites and
-// ratings follow the address to every device, and the browser's favourites move into the account.
+// the account (web/hubaccount.js): this page's cards, names, what to redo after a heart or a rating
+const HUB = { cards: () => [...$("grid").querySelectorAll("article.fw")], name: (id) => (cat.find((x) => x.id === id) || {}).name || id,
+              refresh: () => { chips(); filter(); }, resort: () => { if (sort === "rating") render(); } };
+// FAVOURITES AND RATINGS (/api/, hubapi/api.php), the same on every device page (tools/make_fm1.py puts this file in at
+// /*ACCOUNT*/; its style is web/hubaccount.css). Favourites work without an account: on this browser only (localStorage).
+// Ratings need one: a sign-in by mail, no password (a link, or a 6-digit code typed on any device); signed in, favourites
+// and ratings follow the address to every device, and the browser's favourites move into the account.
+// The page sets HUB before this: cards() its card elements (each with data-hub = its id: "zp12", "smk37:obervave"),
+// name(id), refresh() (the chips and the filter again), resort() (the order again, when it is by rating).
 const FAV_KEY = "fm1hub.favs", PEND_KEY = "fm1hub.pending";
-let me = null, rates = {};                              // me: {email, favs, ratings: {id: 1..5}} or null; rates: {id: [average, count]}
+let me = null, rates = {};                              // me: {email, vibe, favs, ratings: {id: 1..5}} or null; rates: {id: [average, count]}
 let localFavs = (() => { try { const l = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); return Array.isArray(l) ? l : []; } catch (e) { return []; } })();
 const keepLocal = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify(localFavs)); } catch (e) {} };
 const isFav = (id) => (me ? me.favs : localFavs).includes(id);
 const score = (id) => { const r = rates[id]; return r ? (r[0] * r[1] + 3 * 2) / (r[1] + 2) : 0; };   // (a few votes weigh little: 2 of 3 stars in front)
+const hubEsc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const hub$ = (id) => document.getElementById(id);
 async function api(path, data) {
   const r = await fetch("/api/" + path, data === undefined ? { cache: "no-store", credentials: "same-origin" }
     : { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-Hub": "1" }, body: JSON.stringify(data) });
@@ -1151,61 +1160,58 @@ function toast(text) {
   t.className = "toast"; t.textContent = text; t.setAttribute("role", "status");
   document.body.append(t); setTimeout(() => t.remove(), 3200);
 }
-// one card's heart and stars, as they are now (after a render, a click, a sign-in)
+// one card's heart and stars, as they are now (after a render, a click, a sign-in); a card without them gets them here
 function paintCard(el) {
-  const id = el.dataset.id, f = cat.find((x) => x.id === id);
-  const h = el.querySelector(".fav");
-  if (h) {
-    const on = isFav(id);
-    h.setAttribute("aria-pressed", on); h.textContent = on ? "♥" : "♡";
-    h.title = on ? "In your favourites: click to take it out" : "Add to your favourites";
-    h.setAttribute("aria-label", h.title + ": " + (f ? f.name : id));
-    h.onclick = () => toggleFav(id, h);
-  }
-  const r = el.querySelector(".rate");
-  if (r) {
-    const mine = me && me.ratings[id], avg = rates[id], fill = mine || (avg ? Math.round(avg[0]) : 0);
-    r.classList.toggle("mine", !!mine);
-    r.title = mine ? `Your rating: ${mine} of 5. Click to change, click it again to take it back` : me ? "Rate it: click a star" : "Rate it (sign in by mail, no password)";
-    r.innerHTML = [1, 2, 3, 4, 5].map((n) => `<button type="button" data-n="${n}" class="${n <= fill ? "on" : ""}" aria-label="${n} of 5 stars">★</button>`).join("")
-      + `<span class="rn">${avg ? `<b>${avg[0].toFixed(1)}</b> (${avg[1]})` : "rate it"}</span>`;
-    const bs = [...r.querySelectorAll("button")];
-    bs.forEach((b) => {
-      b.onmouseenter = () => bs.forEach((x) => x.classList.toggle("hov", +x.dataset.n <= +b.dataset.n));
-      b.onclick = () => rate(id, +b.dataset.n === mine ? 0 : +b.dataset.n);
-    });
-    r.onmouseleave = () => bs.forEach((x) => x.classList.remove("hov"));
-  }
+  const id = el.dataset.hub;
+  if (!id) return;
+  let h = el.querySelector(".fav");
+  if (!h) { h = document.createElement("button"); h.type = "button"; h.className = "fav"; el.prepend(h); }
+  const on = isFav(id);
+  h.setAttribute("aria-pressed", on); h.textContent = on ? "♥" : "♡";
+  h.title = on ? "In your favourites: click to take it out" : "Add to your favourites";
+  h.setAttribute("aria-label", h.title + ": " + HUB.name(id));
+  h.onclick = () => toggleFav(id, h);
+  let r = el.querySelector(".rate");
+  if (!r) { const by = el.querySelector(".by"); if (!by) return; r = document.createElement("span"); r.className = "rate"; by.append(r); }
+  const mine = me && me.ratings[id], avg = rates[id], fill = mine || (avg ? Math.round(avg[0]) : 0);
+  r.classList.toggle("mine", !!mine);
+  r.title = mine ? `Your rating: ${mine} of 5. Click to change, click it again to take it back` : me ? "Rate it: click a star" : "Rate it (sign in by mail, no password)";
+  r.innerHTML = [1, 2, 3, 4, 5].map((n) => `<button type="button" data-n="${n}" class="${n <= fill ? "on" : ""}" aria-label="${n} of 5 stars">★</button>`).join("")
+    + `<span class="rn">${avg ? `<b>${avg[0].toFixed(1)}</b> (${avg[1]})` : "rate it"}</span>`;
+  const bs = [...r.querySelectorAll("button")];
+  bs.forEach((b) => {
+    b.onmouseenter = () => bs.forEach((x) => x.classList.toggle("hov", +x.dataset.n <= +b.dataset.n));
+    b.onclick = () => rate(id, +b.dataset.n === mine ? 0 : +b.dataset.n);
+  });
+  r.onmouseleave = () => bs.forEach((x) => x.classList.remove("hov"));
 }
-const paintAll = () => { $("grid").querySelectorAll("article.fw").forEach(paintCard); acct(); };
+const paintAll = () => { HUB.cards().forEach(paintCard); acct(); };
 async function toggleFav(id, h) {
   const on = !isFav(id);
   h.classList.remove("pop"); void h.offsetWidth; if (on) h.classList.add("pop");
   evA(on ? "Fav" : "Unfav", id);
   if (!me) {
     localFavs = on ? [...new Set([...localFavs, id])] : localFavs.filter((x) => x !== id);
-    keepLocal(); paintAll(); chips();
+    keepLocal(); paintAll(); HUB.refresh();
     if (on && localFavs.length === 1) toast("Saved on this browser. Sign in to keep your favourites on every device.");
     return;
   }
   me.favs = on ? [...new Set([...me.favs, id])] : me.favs.filter((x) => x !== id);   // (at once; the server's answer follows)
-  paintAll(); chips();
+  paintAll(); HUB.refresh();
   try { me = (await api("fav", { fw: id, on })).user; } catch (e) { toast(e.message); await loadMe(); }
-  paintAll(); chips();
+  paintAll(); HUB.refresh();
 }
 async function rate(id, stars) {
   if (!me) {                                            // (after the sign-in this rating is given: kept until then)
     try { localStorage.setItem(PEND_KEY, JSON.stringify({ fw: id, stars })); } catch (e) {}
-    const f = cat.find((x) => x.id === id);
-    return dialog("email", `To rate ${f ? f.name : "it"}, sign in. One account, no password: a link or a code by mail.`);
+    return dialog("email", `To rate ${HUB.name(id)}, sign in. One account, no password: a link or a code by mail.`);
   }
   try {
     const j = await api("rate", { fw: id, stars });
     me = j.user; rates = j.ratings; evA(stars ? "Rate" : "Unrate", id + (stars ? " " + stars : ""));
-    if (stars) toast(`Thanks! ${stars} of 5 for ${(cat.find((x) => x.id === id) || {}).name || id}.`);
+    if (stars) toast(`Thanks! ${stars} of 5 for ${HUB.name(id)}.`);
   } catch (e) { toast(e.message); }
-  paintAll();
-  if (sort === "rating") render();
+  paintAll(); HUB.resort();
 }
 // after a sign-in: the browser's favourites into the account, a rating given before it
 async function signedIn(user) {
@@ -1216,76 +1222,83 @@ async function signedIn(user) {
   let p = null;
   try { p = JSON.parse(localStorage.getItem(PEND_KEY) || "null"); localStorage.removeItem(PEND_KEY); } catch (e) {}
   if (p && p.fw && p.stars) await rate(p.fw, p.stars);
-  paintAll(); chips(); filter();
+  paintAll(); HUB.refresh();
 }
+const JUST_IN = new URLSearchParams(location.search).has("signedin");   // (back from the mail's link: the address clean again)
+if (JUST_IN) { const u = new URLSearchParams(location.search); u.delete("signedin"); history.replaceState(null, "", location.pathname + (u.size ? "?" + u : "") + location.hash); }
 async function loadMe() {
   try {
     const j = await api("me");
     rates = j.ratings || {};
     if (j.user) { await signedIn(j.user); if (JUST_IN) toast("Signed in as " + j.user.email); }
-    else { me = null; paintAll(); chips(); filter(); }
-    if (sort === "rating") render();
-  } catch (e) { acct(); }                               // (no server: the hearts on this browser still work)
+    else { me = null; paintAll(); HUB.refresh(); }
+    HUB.resort();
+  } catch (e) { paintAll(); }                           // (no server: the hearts on this browser still work)
 }
-// the account button in the toolbar, and its dialog: the address, then the code; signed in: sign out, delete
+// the account button in the toolbar (beside View), and its dialog: the address, then the code; signed in: sign out, delete
 function acct() {
-  $("acct").innerHTML = me ? `<button type="button" class="in" title="Signed in as ${esc(me.email)}">Account</button>` : '<button type="button">Sign in</button>';
-  $("acct").querySelector("button").onclick = () => dialog(me ? "account" : "email");
+  let a = hub$("acct");
+  if (!a) { const o = hub$("opts"); if (!o) return; a = document.createElement("div"); a.className = "sorts"; a.id = "acct"; o.after(a); }
+  a.innerHTML = me ? `<button type="button" class="in" title="Signed in as ${hubEsc(me.email)}">Account</button>` : '<button type="button">Sign in</button>';
+  a.querySelector("button").onclick = () => dialog(me ? "account" : "email");
 }
 let mailTo = "";
 function dialog(step, why = "") {
-  const d = $("acctdlg"), b = $("acctbody");
+  let d = hub$("acctdlg");
+  if (!d) {
+    document.body.insertAdjacentHTML("beforeend", '<dialog class="dlg" id="acctdlg" aria-label="Your account"><form method="dialog" class="x"><button aria-label="Close">×</button></form><div id="acctbody"></div></dialog>');
+    d = hub$("acctdlg");
+  }
+  const b = hub$("acctbody");
   const privacy = '<p class="small">Your address is only used to sign you in (and for the VIBE FM list, if you tick it): no sharing. You can delete the account any time. <a href="/impressum/#datenschutz">Privacy</a></p>';
   if (step === "email") {
     b.innerHTML = `<h3>Sign in to the <b>hub</b></h3>
-      <p>${esc(why || "Rate firmwares and keep your favourites on every device.")}</p>
+      <p>${hubEsc(why || "Rate firmwares and keep your favourites on every device.")}</p>
       <p class="small">No password: we mail you a sign-in link and a 6-digit code. Either one signs you in.</p>
-      <form id="f-mail" novalidate><input type="email" id="in-mail" autocomplete="email" placeholder="you@example.com" required value="${esc(mailTo)}">
+      <form id="f-mail" novalidate><input type="email" id="in-mail" autocomplete="email" placeholder="you@example.com" required value="${hubEsc(mailTo)}">
       <label class="hp" aria-hidden="true">Website <input type="text" id="in-web" tabindex="-1" autocomplete="off"></label>
       <label class="vb"><input type="checkbox" id="in-vibe"> <span>Also put me on the <a href="/vibe/?ref=hub-account" target="_blank" rel="noopener">VIBE FM</a> list: news about VIBE FM, the synth made for open firmware. Unsubscribe any time.</span></label>
       <p class="err" id="d-err"></p><div class="row"><button class="go" id="b-send">Send me the mail</button>
       ${mailTo ? '<button type="button" class="lnk" id="b-have">I have a code</button>' : ""}</div></form>${privacy}`;
-    $("f-mail").onsubmit = async (e) => {
+    hub$("f-mail").onsubmit = async (e) => {
       e.preventDefault();
-      const email = $("in-mail").value.trim(), btn = $("b-send");
-      if (!/^\S+@\S+\.\S+$/.test(email)) { $("d-err").textContent = "Please check the address."; return; }
+      const email = hub$("in-mail").value.trim(), btn = hub$("b-send");
+      if (!/^\S+@\S+\.\S+$/.test(email)) { hub$("d-err").textContent = "Please check the address."; return; }
       btn.disabled = true; btn.textContent = "Sending…";
-      try { await api("login", { email, website: $("in-web").value, vibe: $("in-vibe").checked }); mailTo = email; evA("Login mail", $("in-vibe").checked ? "vibe" : ""); dialog("code"); }
-      catch (err) { $("d-err").textContent = err.message; btn.disabled = false; btn.textContent = "Send me the mail"; }
+      try { await api("login", { email, website: hub$("in-web").value, vibe: hub$("in-vibe").checked }); mailTo = email; evA("Login mail", hub$("in-vibe").checked ? "vibe" : ""); dialog("code"); }
+      catch (err) { hub$("d-err").textContent = err.message; btn.disabled = false; btn.textContent = "Send me the mail"; }
     };
-    if ($("b-have")) $("b-have").onclick = () => dialog("code");
+    if (hub$("b-have")) hub$("b-have").onclick = () => dialog("code");
   } else if (step === "code") {
     b.innerHTML = `<h3>Check your <b>inbox</b></h3>
-      <p>We sent a mail to <b>${esc(mailTo)}</b>. Click its link, or type its code here (on any device):</p>
+      <p>We sent a mail to <b>${hubEsc(mailTo)}</b>. Click its link, or type its code here (on any device):</p>
       <form id="f-code"><input class="code" id="in-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000" required>
       <p class="err" id="d-err"></p><div class="row"><button class="go" id="b-code">Sign in</button></div></form>
       <p class="small">Nothing there after a minute? Look in the spam folder. <button type="button" class="lnk" id="b-again">Another address or a new mail</button></p>`;
-    $("f-code").onsubmit = async (e) => {
+    hub$("f-code").onsubmit = async (e) => {
       e.preventDefault();
-      const btn = $("b-code"); btn.disabled = true;
-      try { const j = await api("code", { email: mailTo, code: $("in-code").value }); d.close(); evA("Login code"); await signedIn(j.user); toast("Signed in as " + j.user.email); }
-      catch (err) { $("d-err").textContent = err.message; btn.disabled = false; }
+      const btn = hub$("b-code"); btn.disabled = true;
+      try { const j = await api("code", { email: mailTo, code: hub$("in-code").value }); d.close(); evA("Login code"); await signedIn(j.user); toast("Signed in as " + j.user.email); }
+      catch (err) { hub$("d-err").textContent = err.message; btn.disabled = false; }
     };
-    $("b-again").onclick = () => dialog("email");
-    setTimeout(() => $("in-code").focus(), 50);
+    hub$("b-again").onclick = () => dialog("email");
+    setTimeout(() => hub$("in-code").focus(), 50);
   } else {
     b.innerHTML = `<h3>Your <b>account</b></h3>
-      <p>Signed in as <b>${esc(me.email)}</b>.</p>
+      <p>Signed in as <b>${hubEsc(me.email)}</b>.</p>
       ${me.vibe ? '<p class="small">On the <a href="/vibe/" target="_blank" rel="noopener">VIBE FM</a> list: each of its mails has an unsubscribe link.</p>' : ""}
-      <p class="small">${me.favs.length} favourite${me.favs.length === 1 ? "" : "s"}, ${Object.keys(me.ratings).length} rating${Object.keys(me.ratings).length === 1 ? "" : "s"}. On another device, sign in with the same address.</p>
+      <p class="small">${me.favs.length} favourite${me.favs.length === 1 ? "" : "s"}, ${Object.keys(me.ratings).length} rating${Object.keys(me.ratings).length === 1 ? "" : "s"} (all devices). On another device, sign in with the same address.</p>
       <p class="err" id="d-err"></p><div class="row"><button type="button" class="quiet" id="b-out">Sign out</button><button type="button" class="danger" id="b-del">Delete my account</button></div>${privacy}`;
-    $("b-out").onclick = async () => { try { await api("logout", {}); } catch (e) {} me = null; d.close(); paintAll(); chips(); filter(); toast("Signed out on this device."); };
-    $("b-del").onclick = async (e) => {
+    hub$("b-out").onclick = async () => { try { await api("logout", {}); } catch (e) {} me = null; d.close(); paintAll(); HUB.refresh(); toast("Signed out on this device."); };
+    hub$("b-del").onclick = async (e) => {
       if (e.currentTarget.dataset.sure !== "1") { e.currentTarget.dataset.sure = "1"; e.currentTarget.textContent = "Sure? Click again: all your favourites and ratings go"; return; }
       try { await api("delete", {}); me = null; d.close(); evA("Delete"); await loadMe(); toast("Your account is deleted."); }
-      catch (err) { $("d-err").textContent = err.message; }
+      catch (err) { hub$("d-err").textContent = err.message; }
     };
   }
   if (!d.open) d.showModal();
-  if (step === "email") setTimeout(() => $("in-mail").focus(), 50);
+  if (step === "email") setTimeout(() => hub$("in-mail").focus(), 50);
 }
-const JUST_IN = new URLSearchParams(location.search).has("signedin");   // (back from the mail's link: the address clean again)
-if (JUST_IN) setParam("signedin", "");
 
 // which cards show: the chip's kind (the one on your FM-1 stays in view) and the search; typing only hides and shows, no rebuild
 let shown = 0;
@@ -1548,7 +1561,6 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   }
 }).catch((e) => { $("grid").innerHTML = `<p class="meta">The catalogue could not be loaded: ${esc(e.message)}</p>`; });
 </script>
-<dialog class="dlg" id="acctdlg" aria-label="Your account"><form method="dialog" class="x"><button aria-label="Close">×</button></form><div id="acctbody"></div></dialog>
 <!--/email_off-->
 <!-- Matomo (self-hosted, matomo.designburgapps.com): one site per host (dx7 1, zp12 3, fm1 4, designburgapps.com 5);
      no cookies, IPs anonymised on the server, Do Not Track respected -->

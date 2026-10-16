@@ -168,6 +168,7 @@
   .card p { color: var(--text); margin: 0 0 16px; font-size: 15px; }
   .card a { display: inline-block; padding: 9px 16px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); font-weight: 600; font-size: 14.5px; }
   .card a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--pink); }
+/*ACCOUNTCSS*/
 /*FOOTER*/
   @media (max-width: 1300px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 1000px) { .hero { grid-template-columns: 1fr; } }
@@ -227,7 +228,7 @@
 // The choices are the FM-1 page's too (localStorage, the same keys, nothing sent anywhere): what you picked there stays here, and back
 const $ = (id) => document.getElementById(id);
 const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"], ["other", "Other"], ["vintage", "Vintage"]];
-const SORTS = [["stars", "Most stars"], ["name", "A–Z"]];  // (the FM-1 page's other orders need its catalogue: here by stars)
+const SORTS = [["rating", "Top rated"], ["name", "A–Z"]];   // (the hub's own ratings; no installs here: the makers' installers install)
 const KIND_KEY = "fm1hub.kind", SORT_KEY = "fm1hub.sort", VIEW_KEY = "fm1hub.view";
 const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const put = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -235,7 +236,7 @@ const cards = [...document.querySelectorAll("#grid .fw")], kindsOf = (el) => el.
 const P0 = new URLSearchParams(location.search), h0 = (location.hash || "").slice(1);
 const isKind = (k) => KINDS.some(([x]) => x === k);
 let kind = isKind(h0) ? h0 : get(KIND_KEY) || "all";
-let sort = SORTS.some(([s]) => s === P0.get("sort")) ? P0.get("sort") : get(SORT_KEY) === "name" ? "name" : "stars";
+let sort = SORTS.some(([s]) => s === P0.get("sort")) ? P0.get("sort") : get(SORT_KEY) === "name" ? "name" : "rating";
 const VIEW0 = matchMedia("(max-width: 560px)").matches ? "list" : "cards";   // (no choice yet: a phone starts with the list)
 let view = ["list", "cards"].includes(P0.get("view")) ? P0.get("view") : ["list", "cards"].includes(get(VIEW_KEY)) ? get(VIEW_KEY) : VIEW0;
 if (isKind(h0)) put(KIND_KEY, h0);
@@ -249,9 +250,11 @@ function setParam(k, v) {
   if (v) u.set(k, v); else u.delete(k);
   history.replaceState(null, "", location.pathname + (u.size ? "?" + u : "") + location.hash);
 }
+const inKind = (el, k) => k === "all" || (k === "fav" ? isFav(el.dataset.hub) : kindsOf(el).includes(k));
 function chips() {
-  if (!KINDS.some(([k]) => k === kind && (k === "all" || cards.some((el) => kindsOf(el).includes(k))))) kind = "all";   // (a kind with none here: all)
-  $("chips").innerHTML = KINDS.map(([k, label]) => {
+  if (kind !== "fav" && !KINDS.some(([k]) => k === kind && (k === "all" || cards.some((el) => kindsOf(el).includes(k))))) kind = "all";   // (a kind with none here: all)
+  const nf = cards.filter((el) => isFav(el.dataset.hub)).length;
+  $("chips").innerHTML = (nf || kind === "fav" ? `<button type="button" role="tab" data-k="fav" aria-selected="${kind === "fav"}" title="Your favourites">♥ Favourites<span>${nf}</span></button>` : "") + KINDS.map(([k, label]) => {
     const n = k === "all" ? cards.length : cards.filter((el) => kindsOf(el).includes(k)).length;
     return n ? `<button type="button" role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${n}</span></button>` : "";
   }).join("");
@@ -260,15 +263,15 @@ function chips() {
     history.replaceState(null, "", location.pathname + location.search + (kind === "all" ? "" : "#" + kind));
     chips();
   });
-  cards.forEach((el) => el.hidden = kind !== "all" && !kindsOf(el).includes(kind));
+  cards.forEach((el) => el.hidden = !inKind(el, kind));
 }
 function sorts() {
   $("sorts").innerHTML = '<label>Sort <select id="sortsel">' + SORTS.map(([k, label]) => `<option value="${k}"${k === sort ? " selected" : ""}>${label}</option>`).join("") + "</select></label>";
-  $("sortsel").onchange = (e) => { sort = e.target.value; put(SORT_KEY, sort); setParam("sort", sort === "stars" ? "" : sort); order(); };
+  $("sortsel").onchange = (e) => { sort = e.target.value; put(SORT_KEY, sort); setParam("sort", sort === "rating" ? "" : sort); order(); };
 }
 function order() {                                      // (the cards as written for the search engines, put in order here; "+" last)
-  const by = sort === "name" ? (a, b) => a.dataset.name.localeCompare(b.dataset.name, "en", { sensitivity: "base" })
-    : (a, b) => +b.dataset.stars - +a.dataset.stars;
+  const byName = (a, b) => a.dataset.name.localeCompare(b.dataset.name, "en", { sensitivity: "base" });
+  const by = sort === "name" ? byName : (a, b) => score(b.dataset.hub) - score(a.dataset.hub) || byName(a, b);
   [...cards].sort(by).forEach((el) => $("grid").insertBefore(el, plus));
 }
 function opts() {
@@ -311,20 +314,23 @@ $("connect").onclick = async () => {
     else now.textContent = names.length ? `No SMK-37 found (ports: ${[...new Set(names)].join(", ")})` : "No SMK-37 found: USB cable, switched on?";
   } catch (e) { now.textContent = "MIDI not allowed: " + (e.message || e); }
 };
+// the account (web/hubaccount.js): this page's cards (their ids smk37:<id>, apart from the FM-1's), names, what to redo
+const HUB = { cards: () => cards, name: (id) => (cards.find((el) => el.dataset.hub === id) || { dataset: {} }).dataset.name || id,
+              refresh: () => chips(), resort: () => { if (sort === "rating") order(); } };
+/*ACCOUNT*/
 lineup();
-opts(); applyView(); sorts(); order(); chips(); jump();
+opts(); applyView(); sorts(); order(); chips(); jump(); loadMe();
 // the versions and stars as of now: the sync puts them into catalog.json every few hours (this page is built only now and then)
 fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.json()).then(({ smk37 }) => {
   if (!smk37) return;
   for (const el of cards) {
-    const v = (smk37.versions || {})[el.id.slice(3)], n = (smk37.stars || {})[el.dataset.repo];
+    const v = (smk37.versions || {})[el.id.slice(3)];
     if (v) {
       el.querySelector("h3 small").textContent = v.version;
       const b = el.querySelector(".tag.beta");
       if (v.beta && !b) el.querySelector(".tags").insertAdjacentHTML("afterbegin", '<span class="tag beta">beta</span>');
       if (!v.beta && b) b.remove();
     }
-    if (typeof n === "number") { el.dataset.stars = n; el.querySelector("h3 a.star").textContent = "★ Star · " + n; }
   }
   order();
 }).catch(() => {});                                     // (offline, or no catalogue: the built versions stay)

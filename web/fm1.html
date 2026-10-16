@@ -277,53 +277,7 @@
   details { margin-top: 40px; text-align: center; } summary { cursor: pointer; color: var(--dim); }
   details p { max-width: 760px; margin: 12px auto; text-align: left; }
   pre#log { white-space: pre-wrap; font-size: 12px; color: var(--dim); max-height: 180px; overflow: auto; text-align: left; }
-  /* favourites and ratings (/api/: hubapi/api.php): a heart on each card, five stars beside its maker, the account in the toolbar */
-  .fw .fav { position: absolute; top: 12px; right: 12px; z-index: 2; width: 42px; height: 42px; padding: 0; border-radius: 50%;
-             display: grid; place-items: center; background: rgba(18, 16, 17, .72); color: var(--fg); box-shadow: inset 0 0 0 1px var(--line);
-             font-size: 20px; line-height: 1; backdrop-filter: blur(4px); }
-  .fw .fav:hover { box-shadow: inset 0 0 0 1px var(--c); filter: none; transform: none; }
-  .fw .fav[aria-pressed="true"] { color: #ff3f6e; box-shadow: inset 0 0 0 1px #ff3f6e; }
-  .fw .fav.pop { animation: favpop .45s ease-out; }
-  @keyframes favpop { 40% { transform: scale(1.3); } }
-  .fws.list > .fw .fav { top: 50%; left: 46px; right: auto; width: 30px; height: 30px; font-size: 14px; transform: translateY(-50%); }
-  .fws.list > .fw .fav.pop { animation: none; }
-  .rate { display: inline-flex; align-items: center; gap: 1px; white-space: nowrap; vertical-align: 1px; }
-  .rate button { background: transparent; box-shadow: none; padding: 0 1px; font-size: 17px; line-height: 1; color: rgba(239, 232, 225, .22);
-                 border-radius: 3px; transition: color .1s, transform .1s; }
-  .rate button.on { color: var(--beige); } .rate.mine button.on { color: var(--c); }
-  .rate:hover button { color: rgba(239, 232, 225, .22); }  .rate:hover button.hov { color: var(--c); transform: scale(1.12); }
-  .rate button:hover { filter: none; }
-  .rate .rn { margin-left: 7px; font-size: 13px; color: var(--dim); }  .rate .rn b { color: var(--fg); font-weight: 700; }
-  .by .rate { margin-left: 10px; }
-  @media (max-width: 560px) { .by .rate { display: flex; margin: 4px 0 0; } .rate button { font-size: 19px; padding: 0 2px; } }
-  #acct button { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); padding: 6px 12px; font-size: 13.5px; font-weight: 600; }
-  #acct button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
-  #acct button.in::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); margin-right: 7px; vertical-align: 1px; }
-  .chips button[data-k="fav"] { color: #ff6f8f; }  .chips button[data-k="fav"][aria-selected="true"] { background: #ff3f6e; color: #fff; }
-  dialog.dlg { width: min(440px, calc(100vw - 32px)); background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 14px;
-               padding: 28px 26px 24px; }
-  dialog.dlg::backdrop { background: rgba(0, 0, 0, .65); backdrop-filter: blur(2px); }
-  dialog.dlg h3 { margin: 0 0 10px; font-size: 22px; font-weight: 300; color: var(--fg); } dialog.dlg h3 b { font-weight: 800; color: var(--cyan); }
-  dialog.dlg p { margin: 8px 0; font-size: 15px; line-height: 1.5; } dialog.dlg .small { font-size: 13px; color: var(--dim); }
-  dialog.dlg .small a, dialog.dlg .lnk { color: var(--dim); text-decoration: underline; text-decoration-color: var(--line); }
-  dialog.dlg .lnk { background: transparent; box-shadow: none; padding: 0; font: inherit; font-size: 13.5px; cursor: pointer; }
-  dialog.dlg input[type=email], dialog.dlg input.code { width: 100%; box-sizing: border-box; margin: 12px 0 10px; background: #0e0c0d; color: var(--fg);
-               border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 16px; }
-  dialog.dlg input.code { font: 700 26px/1.2 ui-monospace, Menlo, monospace; letter-spacing: 8px; text-align: center; }
-  dialog.dlg input:focus { outline: none; border-color: var(--cyan); }
-  dialog.dlg label.vb { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; line-height: 1.45; color: var(--text); margin: 2px 0 6px; cursor: pointer; }
-  dialog.dlg label.vb input { margin-top: 3px; accent-color: #ff6a1a; flex: none; width: 16px; height: 16px; }
-  dialog.dlg label.vb a { color: #ff8a4a; font-weight: 700; }
-  dialog.dlg .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-  dialog.dlg .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 14px; }
-  dialog.dlg .row .go { background: var(--cyan); color: #121011; }
-  dialog.dlg .row .quiet { background: transparent; color: var(--fg); box-shadow: inset 0 0 0 1px var(--line); }
-  dialog.dlg .row .danger { background: transparent; color: #ff6f8f; box-shadow: none; padding-left: 0; padding-right: 0; font-size: 13.5px; margin-left: auto; }
-  dialog.dlg .err { color: #ff6f8f; font-size: 14px; min-height: 1.2em; margin: 4px 0 0; }
-  dialog.dlg .x { position: absolute; top: 10px; right: 10px; margin: 0; }
-  dialog.dlg .x button { background: transparent; box-shadow: none; color: var(--dim); font-size: 22px; padding: 4px 10px; }
-  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); z-index: 90; background: var(--fg); color: #121011; font-weight: 600;
-           padding: 11px 18px; border-radius: 10px; font-size: 14.5px; box-shadow: 0 8px 30px rgba(0, 0, 0, .5); max-width: calc(100vw - 32px); }
+/*ACCOUNTCSS*/
 /*FOOTER*/
   @media (max-width: 1000px) { .hero { grid-template-columns: 1fr; } }
   @media (prefers-reduced-motion: reduce) { .lineup .lt { animation: none; } .lineup .row { overflow-x: auto; scrollbar-width: none; } }
@@ -367,7 +321,7 @@
   <div class="tools" id="tools">
     <div class="chips" id="chips" role="tablist" aria-label="Show"></div>
     <div class="tools-r"><div class="sorts" id="sorts" role="group" aria-label="Sort"></div>
-      <div class="sorts" id="opts" role="group" aria-label="View"></div><div class="sorts" id="acct"></div></div>
+      <div class="sorts" id="opts" role="group" aria-label="View"></div></div>
   </div>
   <p class="nomatch" id="nomatch" hidden></p>
   <div class="grid"><div id="grid" class="fws"><p class="meta">Loading the catalogue…</p></div>
@@ -665,7 +619,7 @@ function render() {
     const isNow = w && w.fw === f;
     const el = document.createElement("article");
     el.className = "fw" + (isNow ? " now" : "");
-    el.dataset.id = f.id; el.id = "fw-" + f.id;
+    el.dataset.id = f.id; el.dataset.hub = f.id; el.id = "fw-" + f.id;
     el.style.setProperty("--c", LOOK[f.id] || "#3b4bf5");
     el.innerHTML = `<button type="button" class="fav" data-id="${esc(f.id)}" aria-pressed="false"></button><div class="shot${WIDE.has(f.id) ? " wide" : ""}"><img src="img/${esc(f.id)}.png${iv(f.id)}" alt="${esc(f.name)} for the M-VAVE FM-1: its screen" loading="lazy"></div>
       <div class="head"><div>
@@ -688,164 +642,10 @@ function render() {
   if (!EXT.isConnected) $("grid").append(EXT);
   filter();
 }
-// FAVOURITES AND RATINGS (/api/, hubapi/api.php). Favourites work without an account: on this browser only (localStorage).
-// Ratings need one: a sign-in by mail, no password (a link, or a 6-digit code typed on any device); signed in, favourites and
-// ratings follow the address to every device, and the browser's favourites move into the account.
-const FAV_KEY = "fm1hub.favs", PEND_KEY = "fm1hub.pending";
-let me = null, rates = {};                              // me: {email, favs, ratings: {id: 1..5}} or null; rates: {id: [average, count]}
-let localFavs = (() => { try { const l = JSON.parse(localStorage.getItem(FAV_KEY) || "[]"); return Array.isArray(l) ? l : []; } catch (e) { return []; } })();
-const keepLocal = () => { try { localStorage.setItem(FAV_KEY, JSON.stringify(localFavs)); } catch (e) {} };
-const isFav = (id) => (me ? me.favs : localFavs).includes(id);
-const score = (id) => { const r = rates[id]; return r ? (r[0] * r[1] + 3 * 2) / (r[1] + 2) : 0; };   // (a few votes weigh little: 2 of 3 stars in front)
-async function api(path, data) {
-  const r = await fetch("/api/" + path, data === undefined ? { cache: "no-store", credentials: "same-origin" }
-    : { method: "POST", credentials: "same-origin", headers: { "Content-Type": "application/json", "X-Hub": "1" }, body: JSON.stringify(data) });
-  let j = {};
-  try { j = await r.json(); } catch (e) {}
-  if (!r.ok || !j.ok) { const err = new Error(j.error || `The hub's server did not answer (${r.status}).`); err.status = r.status; throw err; }
-  return j;
-}
-const evA = (action, name) => { try { (window._paq = window._paq || []).push(["trackEvent", "Account", action, name || ""]); } catch (e) {} };
-function toast(text) {
-  const t = document.createElement("div");
-  t.className = "toast"; t.textContent = text; t.setAttribute("role", "status");
-  document.body.append(t); setTimeout(() => t.remove(), 3200);
-}
-// one card's heart and stars, as they are now (after a render, a click, a sign-in)
-function paintCard(el) {
-  const id = el.dataset.id, f = cat.find((x) => x.id === id);
-  const h = el.querySelector(".fav");
-  if (h) {
-    const on = isFav(id);
-    h.setAttribute("aria-pressed", on); h.textContent = on ? "♥" : "♡";
-    h.title = on ? "In your favourites: click to take it out" : "Add to your favourites";
-    h.setAttribute("aria-label", h.title + ": " + (f ? f.name : id));
-    h.onclick = () => toggleFav(id, h);
-  }
-  const r = el.querySelector(".rate");
-  if (r) {
-    const mine = me && me.ratings[id], avg = rates[id], fill = mine || (avg ? Math.round(avg[0]) : 0);
-    r.classList.toggle("mine", !!mine);
-    r.title = mine ? `Your rating: ${mine} of 5. Click to change, click it again to take it back` : me ? "Rate it: click a star" : "Rate it (sign in by mail, no password)";
-    r.innerHTML = [1, 2, 3, 4, 5].map((n) => `<button type="button" data-n="${n}" class="${n <= fill ? "on" : ""}" aria-label="${n} of 5 stars">★</button>`).join("")
-      + `<span class="rn">${avg ? `<b>${avg[0].toFixed(1)}</b> (${avg[1]})` : "rate it"}</span>`;
-    const bs = [...r.querySelectorAll("button")];
-    bs.forEach((b) => {
-      b.onmouseenter = () => bs.forEach((x) => x.classList.toggle("hov", +x.dataset.n <= +b.dataset.n));
-      b.onclick = () => rate(id, +b.dataset.n === mine ? 0 : +b.dataset.n);
-    });
-    r.onmouseleave = () => bs.forEach((x) => x.classList.remove("hov"));
-  }
-}
-const paintAll = () => { $("grid").querySelectorAll("article.fw").forEach(paintCard); acct(); };
-async function toggleFav(id, h) {
-  const on = !isFav(id);
-  h.classList.remove("pop"); void h.offsetWidth; if (on) h.classList.add("pop");
-  evA(on ? "Fav" : "Unfav", id);
-  if (!me) {
-    localFavs = on ? [...new Set([...localFavs, id])] : localFavs.filter((x) => x !== id);
-    keepLocal(); paintAll(); chips();
-    if (on && localFavs.length === 1) toast("Saved on this browser. Sign in to keep your favourites on every device.");
-    return;
-  }
-  me.favs = on ? [...new Set([...me.favs, id])] : me.favs.filter((x) => x !== id);   // (at once; the server's answer follows)
-  paintAll(); chips();
-  try { me = (await api("fav", { fw: id, on })).user; } catch (e) { toast(e.message); await loadMe(); }
-  paintAll(); chips();
-}
-async function rate(id, stars) {
-  if (!me) {                                            // (after the sign-in this rating is given: kept until then)
-    try { localStorage.setItem(PEND_KEY, JSON.stringify({ fw: id, stars })); } catch (e) {}
-    const f = cat.find((x) => x.id === id);
-    return dialog("email", `To rate ${f ? f.name : "it"}, sign in. One account, no password: a link or a code by mail.`);
-  }
-  try {
-    const j = await api("rate", { fw: id, stars });
-    me = j.user; rates = j.ratings; evA(stars ? "Rate" : "Unrate", id + (stars ? " " + stars : ""));
-    if (stars) toast(`Thanks! ${stars} of 5 for ${(cat.find((x) => x.id === id) || {}).name || id}.`);
-  } catch (e) { toast(e.message); }
-  paintAll();
-  if (sort === "rating") render();
-}
-// after a sign-in: the browser's favourites into the account, a rating given before it
-async function signedIn(user) {
-  me = user;
-  if (localFavs.length) {
-    try { me = (await api("merge", { favs: localFavs })).user; localFavs = []; keepLocal(); } catch (e) {}
-  }
-  let p = null;
-  try { p = JSON.parse(localStorage.getItem(PEND_KEY) || "null"); localStorage.removeItem(PEND_KEY); } catch (e) {}
-  if (p && p.fw && p.stars) await rate(p.fw, p.stars);
-  paintAll(); chips(); filter();
-}
-async function loadMe() {
-  try {
-    const j = await api("me");
-    rates = j.ratings || {};
-    if (j.user) { await signedIn(j.user); if (JUST_IN) toast("Signed in as " + j.user.email); }
-    else { me = null; paintAll(); chips(); filter(); }
-    if (sort === "rating") render();
-  } catch (e) { acct(); }                               // (no server: the hearts on this browser still work)
-}
-// the account button in the toolbar, and its dialog: the address, then the code; signed in: sign out, delete
-function acct() {
-  $("acct").innerHTML = me ? `<button type="button" class="in" title="Signed in as ${esc(me.email)}">Account</button>` : '<button type="button">Sign in</button>';
-  $("acct").querySelector("button").onclick = () => dialog(me ? "account" : "email");
-}
-let mailTo = "";
-function dialog(step, why = "") {
-  const d = $("acctdlg"), b = $("acctbody");
-  const privacy = '<p class="small">Your address is only used to sign you in (and for the VIBE FM list, if you tick it): no sharing. You can delete the account any time. <a href="/impressum/#datenschutz">Privacy</a></p>';
-  if (step === "email") {
-    b.innerHTML = `<h3>Sign in to the <b>hub</b></h3>
-      <p>${esc(why || "Rate firmwares and keep your favourites on every device.")}</p>
-      <p class="small">No password: we mail you a sign-in link and a 6-digit code. Either one signs you in.</p>
-      <form id="f-mail" novalidate><input type="email" id="in-mail" autocomplete="email" placeholder="you@example.com" required value="${esc(mailTo)}">
-      <label class="hp" aria-hidden="true">Website <input type="text" id="in-web" tabindex="-1" autocomplete="off"></label>
-      <label class="vb"><input type="checkbox" id="in-vibe"> <span>Also put me on the <a href="/vibe/?ref=hub-account" target="_blank" rel="noopener">VIBE FM</a> list: news about VIBE FM, the synth made for open firmware. Unsubscribe any time.</span></label>
-      <p class="err" id="d-err"></p><div class="row"><button class="go" id="b-send">Send me the mail</button>
-      ${mailTo ? '<button type="button" class="lnk" id="b-have">I have a code</button>' : ""}</div></form>${privacy}`;
-    $("f-mail").onsubmit = async (e) => {
-      e.preventDefault();
-      const email = $("in-mail").value.trim(), btn = $("b-send");
-      if (!/^\S+@\S+\.\S+$/.test(email)) { $("d-err").textContent = "Please check the address."; return; }
-      btn.disabled = true; btn.textContent = "Sending…";
-      try { await api("login", { email, website: $("in-web").value, vibe: $("in-vibe").checked }); mailTo = email; evA("Login mail", $("in-vibe").checked ? "vibe" : ""); dialog("code"); }
-      catch (err) { $("d-err").textContent = err.message; btn.disabled = false; btn.textContent = "Send me the mail"; }
-    };
-    if ($("b-have")) $("b-have").onclick = () => dialog("code");
-  } else if (step === "code") {
-    b.innerHTML = `<h3>Check your <b>inbox</b></h3>
-      <p>We sent a mail to <b>${esc(mailTo)}</b>. Click its link, or type its code here (on any device):</p>
-      <form id="f-code"><input class="code" id="in-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000" required>
-      <p class="err" id="d-err"></p><div class="row"><button class="go" id="b-code">Sign in</button></div></form>
-      <p class="small">Nothing there after a minute? Look in the spam folder. <button type="button" class="lnk" id="b-again">Another address or a new mail</button></p>`;
-    $("f-code").onsubmit = async (e) => {
-      e.preventDefault();
-      const btn = $("b-code"); btn.disabled = true;
-      try { const j = await api("code", { email: mailTo, code: $("in-code").value }); d.close(); evA("Login code"); await signedIn(j.user); toast("Signed in as " + j.user.email); }
-      catch (err) { $("d-err").textContent = err.message; btn.disabled = false; }
-    };
-    $("b-again").onclick = () => dialog("email");
-    setTimeout(() => $("in-code").focus(), 50);
-  } else {
-    b.innerHTML = `<h3>Your <b>account</b></h3>
-      <p>Signed in as <b>${esc(me.email)}</b>.</p>
-      ${me.vibe ? '<p class="small">On the <a href="/vibe/" target="_blank" rel="noopener">VIBE FM</a> list: each of its mails has an unsubscribe link.</p>' : ""}
-      <p class="small">${me.favs.length} favourite${me.favs.length === 1 ? "" : "s"}, ${Object.keys(me.ratings).length} rating${Object.keys(me.ratings).length === 1 ? "" : "s"}. On another device, sign in with the same address.</p>
-      <p class="err" id="d-err"></p><div class="row"><button type="button" class="quiet" id="b-out">Sign out</button><button type="button" class="danger" id="b-del">Delete my account</button></div>${privacy}`;
-    $("b-out").onclick = async () => { try { await api("logout", {}); } catch (e) {} me = null; d.close(); paintAll(); chips(); filter(); toast("Signed out on this device."); };
-    $("b-del").onclick = async (e) => {
-      if (e.currentTarget.dataset.sure !== "1") { e.currentTarget.dataset.sure = "1"; e.currentTarget.textContent = "Sure? Click again: all your favourites and ratings go"; return; }
-      try { await api("delete", {}); me = null; d.close(); evA("Delete"); await loadMe(); toast("Your account is deleted."); }
-      catch (err) { $("d-err").textContent = err.message; }
-    };
-  }
-  if (!d.open) d.showModal();
-  if (step === "email") setTimeout(() => $("in-mail").focus(), 50);
-}
-const JUST_IN = new URLSearchParams(location.search).has("signedin");   // (back from the mail's link: the address clean again)
-if (JUST_IN) setParam("signedin", "");
+// the account (web/hubaccount.js): this page's cards, names, what to redo after a heart or a rating
+const HUB = { cards: () => [...$("grid").querySelectorAll("article.fw")], name: (id) => (cat.find((x) => x.id === id) || {}).name || id,
+              refresh: () => { chips(); filter(); }, resort: () => { if (sort === "rating") render(); } };
+/*ACCOUNT*/
 
 // which cards show: the chip's kind (the one on your FM-1 stays in view) and the search; typing only hides and shows, no rebuild
 let shown = 0;
@@ -1108,6 +908,5 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   }
 }).catch((e) => { $("grid").innerHTML = `<p class="meta">The catalogue could not be loaded: ${esc(e.message)}</p>`; });
 </script>
-<dialog class="dlg" id="acctdlg" aria-label="Your account"><form method="dialog" class="x"><button aria-label="Close">×</button></form><div id="acctbody"></div></dialog>
 </body>
 </html>

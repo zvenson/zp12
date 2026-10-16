@@ -57,10 +57,9 @@ def smk_cards():
         links += "".join(f'<a href="{e(u)}">{e(t)}</a>' if u.startswith("/") else out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
         n = stars.get(home(f))                          # (data-stars, data-name: the page's Sort; .head: the list view's name column)
         return (f'<article class="fw" id="fw-{e(f["id"])}" data-kind="{" ".join(kind + ["vintage"] * old)}" data-stars="{-1 if n is None else n}" data-repo="{e(home(f))}" '
-                f'data-name="{e(f["name"])}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
+                f'data-hub="smk37:{e(f["id"])}" data-name="{e(f["name"])}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
                 f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <div class="head"><h3>{e(f["name"])}<small>{e(f["version"])}</small>'
-                f'<a class="star" href="https://github.com/{e(home(f))}" target="_blank" rel="noopener" title="Star it on GitHub">'
-                f'★ Star{"" if stars.get(home(f)) is None else " · " + str(stars[home(f)])}</a></h3>'
+                f'</h3>'
                 f'<div class="by">{by}</div><div class="tags">{tags}</div></div>\n  <p class="what">{e(f["what"])}</p>'
                 + (f'<div class="note">{e(f["note"])}</div>' if f.get("note") else "")
                 + f'<div class="links">{links}</div><div class="meta">GPL-3.0 · {out(f["source"], "source")}</div></article>\n')
@@ -101,6 +100,9 @@ def devices(text, dev, ref="hub"):
     text = (text.replace("/*VIBEBAR*/\n", (HERE / "web" / "vibe-banner.css").read_text(encoding="utf-8"))   # (the VIBE line on top, ?ref= per page)
                 .replace("<!--VIBEBAR-->\n", (HERE / "web" / "vibe-banner.html").read_text(encoding="utf-8").replace("<!--REF-->", ref)))
     text = text.replace("/*FOOTER*/\n", (HERE / "web" / "footer.css").read_text(encoding="utf-8")).replace("<!--FOOTER-->\n", foot)
+    # (the favourites, ratings and the account: one code, one style for every device page, web/hubaccount.*)
+    text = (text.replace("/*ACCOUNTCSS*/\n", (HERE / "web" / "hubaccount.css").read_text(encoding="utf-8"))
+                .replace("/*ACCOUNT*/\n", (HERE / "web" / "hubaccount.js").read_text(encoding="utf-8")))
     # (Cloudflare's email obfuscation off for our pages: the addresses stay plain text and links, also without JavaScript;
     #  the legal notice needs its address readable)
     text = text.replace("<body>\n", "<body>\n<!--email_off-->\n", 1).replace("</body>", "<!--/email_off-->\n</body>", 1)
