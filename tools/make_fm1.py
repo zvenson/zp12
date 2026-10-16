@@ -42,6 +42,10 @@ def smk_cards():
     out = lambda u, t, c="": f'<a{c} href="{e(u)}" target="_blank" rel="noopener">{t}</a>'
     home = lambda f: f["orig_repo"] if "orig_repo" in f else f["source"].split("github.com/")[1].split("/tree/")[0].split("/blob/")[0]
     stars = smk_stars(sorted({home(f) for f in d["own"] + d["ports"]}))
+    # each card in its firmware's colour, the FM-1 page's (its LOOK): a port its FM-1 original's, Felucca SMK Felucca's
+    page = (HERE / "web" / "fm1.html").read_text(encoding="utf-8")
+    look = dict(re.findall(r'(\w+): "(#[0-9a-f]{6})"', page[page.index("const LOOK"):page.index("};", page.index("const LOOK"))]))
+    colour = lambda f: look.get(f.get("fm1") or {"felucca-smk": "felucca"}.get(f["id"], f["id"]))
     def card(f, port):
         kind = kinds[f["fm1"]] if port else f["kind"]
         old = f.get("fm1", f["id"]) in vintage
@@ -56,7 +60,8 @@ def smk_cards():
             links += f'<a href="/#fw-{e(f["fm1"])}">On the FM-1 hub</a>'
         links += "".join(f'<a href="{e(u)}">{e(t)}</a>' if u.startswith("/") else out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
         n = stars.get(home(f))                          # (data-stars, data-name: the page's Sort; .head: the list view's name column)
-        return (f'<article class="fw" id="fw-{e(f["id"])}" data-kind="{" ".join(kind + ["vintage"] * old)}" data-stars="{-1 if n is None else n}" data-repo="{e(home(f))}" '
+        c = colour(f)
+        return (f'<article class="fw" id="fw-{e(f["id"])}"{f' style="--c: {c}"' if c else ""} data-kind="{" ".join(kind + ["vintage"] * old)}" data-stars="{-1 if n is None else n}" data-repo="{e(home(f))}" '
                 f'data-hub="smk37:{e(f["id"])}" data-name="{e(f["name"])}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
                 f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <div class="head"><h3>{e(f["name"])}<small>{e(f["version"])}</small>'
                 f'</h3>'

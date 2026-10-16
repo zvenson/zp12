@@ -498,7 +498,10 @@ const LOOK = { dinghy: "#8f62f0", felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx:
                chord: "#f2564e", fumi: "#b08a5a", maku: "#f0806a", rainbow: "#ffd23f", obervave: "#3c82eb",
                pigeon: "#b49cff", cs1: "#f2a93b", hyp1: "#a35cff", tonitor: "#00d6ff", noizdemons: "#7dff3c", coralflower: "#ff7aa8",
                mc1: "#ff8a1e", beetle: "#ff3ad0", min1: "#3f7be0", purplemonkey: "#9b5cff", gammawave: "#ffb800", tuna: "#3db7e4",
-               frodhes: "#e8a33d", fomajam: "#a3e635" };
+               frodhes: "#e8a33d", fomajam: "#a3e635",
+               amb: "#f6d79a", ctl: "#ef4a33", winampfm: "#5b7bff", mycelium: "#9ccce4", polly: "#7b93e0", etch: "#cfcfcf", fm106: "#2a9fd6",
+               tribe: "#fc6c54", duell: "#e6e6e6", skiff: "#fcb424", fart: "#84cc9c", orbit: "#4f7ff0", felucca8: "#afd9f4",
+               vector37: "#5fc48a", makkuro37: "#d0524f" };   // (the SMK-37 page takes its colours from here too: tools/make_fm1.py)
 const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"], ["other", "Other"], ["vintage", "Vintage"]];
 const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords", dev: "for developers", other: "other", vintage: "vintage" };
 const kindsOf = (f) => [].concat(f.kind || [], f.vintage ? ["vintage"] : []);   // (vintage: a classic instrument rebuilt, a group of its own)
