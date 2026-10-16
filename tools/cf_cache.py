@@ -33,7 +33,7 @@ SITES = {
         check=["https://zp12.designburgapps.com/", "https://zp12.designburgapps.com/zp12-beat.mp4",
                "https://zp12.designburgapps.com/editor/", "https://dx7.designburgapps.com/"]),
     "thefirmwarehub.com": dict(   # (www and the old fm1 host only redirect; /src/ is a live listing of the sync's copies)
-        hosts=["thefirmwarehub.com"], ref="firmwarehub-static", label="thefirmwarehub", nocache=("/vibe", "/src/"),
+        hosts=["thefirmwarehub.com"], ref="firmwarehub-static", label="thefirmwarehub", nocache=("/vibe", "/src/", "/api/"),
         file_browser=None,        # (the browser keeps nginx's own times: /fw/ immutable, pictures 6 h, /play/ 1 h)
         docs={"thefirmwarehub.com": HERE / "fm1"},
         check=["https://thefirmwarehub.com/", "https://thefirmwarehub.com/kb/", "https://thefirmwarehub.com/catalog.json",
