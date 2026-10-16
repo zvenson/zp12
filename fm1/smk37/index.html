@@ -251,10 +251,12 @@
   footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; line-height: 1.7; padding: 34px 0 54px; text-align: center; }
   footer .wrap { max-width: 900px; } footer a { color: var(--text); }
   @media (max-width: 1300px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 1100px) { .hero { grid-template-columns: 1fr; } }
+  @media (max-width: 1000px) { .hero { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .lineup .lt { animation: none; } .lineup .row { overflow-x: auto; scrollbar-width: none; } }
   @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
   @media (max-width: 760px) { header { padding: 40px 0 28px; } .fw { padding: 0 22px 22px; } .fw .shot { margin: 0 -22px 8px; --h: 220px; }
-    .lead { font-size: 17.5px; } nav .home { display: none; } .status { font-size: 13px; } .models { padding: 16px 18px; font-size: 14.5px; } }
+    .lead { font-size: 17.5px; } nav .home { display: none; } .status { font-size: 13px; } .models { padding: 16px 18px; font-size: 14.5px; }
+    .bar > * { width: 100%; } .lineup { --t: 68px; gap: 6px; } .lineup .lt { gap: 6px; } .lineup img { border-radius: 8px; } }
 </style>
 </head>
 <body>
