@@ -994,7 +994,8 @@ function sorts() {
 }
 // the view: the cards or a list, a row each (?view=list, else the last choice, localStorage)
 const P0 = new URLSearchParams(location.search), VIEW_KEY = "fm1hub.view";
-let view = P0.get("view") === "list" || P0.get("view") === "cards" ? P0.get("view") : (() => { try { return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "cards"; } catch (e) { return "cards"; } })();
+const VIEW0 = matchMedia("(max-width: 560px)").matches ? "list" : "cards";   // (no choice yet: a phone starts with the list)
+let view = P0.get("view") === "list" || P0.get("view") === "cards" ? P0.get("view") : (() => { try { const v = localStorage.getItem(VIEW_KEY); return v === "list" || v === "cards" ? v : VIEW0; } catch (e) { return VIEW0; } })();
 if (P0.get("view") === view) try { localStorage.setItem(VIEW_KEY, view); } catch (e) {}
 function setParam(k, v) {
   const u = new URLSearchParams(location.search);

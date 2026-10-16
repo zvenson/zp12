@@ -236,7 +236,8 @@ const P0 = new URLSearchParams(location.search), h0 = (location.hash || "").slic
 const isKind = (k) => KINDS.some(([x]) => x === k);
 let kind = isKind(h0) ? h0 : get(KIND_KEY) || "all";
 let sort = SORTS.some(([s]) => s === P0.get("sort")) ? P0.get("sort") : get(SORT_KEY) === "name" ? "name" : "stars";
-let view = ["list", "cards"].includes(P0.get("view")) ? P0.get("view") : get(VIEW_KEY) === "list" ? "list" : "cards";
+const VIEW0 = matchMedia("(max-width: 560px)").matches ? "list" : "cards";   // (no choice yet: a phone starts with the list)
+let view = ["list", "cards"].includes(P0.get("view")) ? P0.get("view") : ["list", "cards"].includes(get(VIEW_KEY)) ? get(VIEW_KEY) : VIEW0;
 if (isKind(h0)) put(KIND_KEY, h0);
 if (P0.get("view") === view) put(VIEW_KEY, view);
 if (P0.get("sort") === sort) put(SORT_KEY, sort);   // (a link with ?view= or ?sort=: kept, as a click)
