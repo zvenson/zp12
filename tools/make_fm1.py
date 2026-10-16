@@ -36,6 +36,7 @@ def smk_cards():
     sys.path.insert(0, str(HERE / "tools"))
     import fm1_sync                                     # (a port's kinds: its FM-1 entry's, as the FM-1 page shows them)
     kinds = {f["id"]: [f["kind"]] if isinstance(f["kind"], str) else f["kind"] for f in fm1_sync.FIRMWARES}
+    vintage = {f["id"] for f in fm1_sync.FIRMWARES if f.get("vintage")}   # (a classic instrument rebuilt: as on the FM-1 page)
     label = {"synth": "synth", "groove": "groovebox", "drums": "drums · sampler", "chords": "chords", "dev": "for developers", "other": "other"}
     e = lambda x: html.escape(str(x), quote=True)
     out = lambda u, t, c="": f'<a{c} href="{e(u)}" target="_blank" rel="noopener">{t}</a>'
@@ -43,19 +44,24 @@ def smk_cards():
     stars = smk_stars(sorted({home(f) for f in d["own"] + d["ports"]}))
     def card(f, port):
         kind = kinds[f["fm1"]] if port else f["kind"]
+        old = f.get("fm1", f["id"]) in vintage
         tags = ('<span class="tag beta">beta</span>' if f.get("beta") else "") + ('<span class="tag port">FM-1 port</span>' if port else "") + \
-            "".join(f'<span class="tag kind">{label[k]}</span>' for k in kind) + f'<span class="tag model">{e(f["models"])}</span>'
+            "".join(f'<span class="tag kind">{label[k]}</span>' for k in kind) + \
+            ('<span class="tag vintage" title="Built after a classic instrument (the description says which)">vintage</span>' if old else "") + \
+            f'<span class="tag model">{e(f["models"])}</span>'
         by = (f'{e(f["orig"])} by {out("https://github.com/" + f["orig_repo"], e(f["by"]))}, SMK-37 build by '
               f'{out("https://github.com/genkigenki", "genkigenki")}' if port else f'by {e(f["by"])}')
         links = out(f["install"], f.get("install_label", "Install on its installer ↗"), ' class="go"')
         if port:
             links += f'<a href="/#fw-{e(f["fm1"])}">On the FM-1 hub</a>'
         links += "".join(f'<a href="{e(u)}">{e(t)}</a>' if u.startswith("/") else out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
-        return (f'<article class="fw" id="fw-{e(f["id"])}" data-kind="{" ".join(kind)}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
-                f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <h3>{e(f["name"])}<small>{e(f["version"])}</small>'
+        n = stars.get(home(f))                          # (data-stars, data-name: the page's Sort; .head: the list view's name column)
+        return (f'<article class="fw" id="fw-{e(f["id"])}" data-kind="{" ".join(kind + ["vintage"] * old)}" data-stars="{-1 if n is None else n}" '
+                f'data-name="{e(f["name"])}"><div class="shot{" wide" if f.get("wide") else ""}"><img src="{e(f["img"])}" '
+                f'alt="{e(f["name"])} on the SMK-37" loading="lazy"></div>\n  <div class="head"><h3>{e(f["name"])}<small>{e(f["version"])}</small>'
                 f'<a class="star" href="https://github.com/{e(home(f))}" target="_blank" rel="noopener" title="Star it on GitHub">'
                 f'★ Star{"" if stars.get(home(f)) is None else " · " + str(stars[home(f)])}</a></h3>'
-                f'<div class="by">{by}</div><div class="tags">{tags}</div>\n  <p class="what">{e(f["what"])}</p>'
+                f'<div class="by">{by}</div><div class="tags">{tags}</div></div>\n  <p class="what">{e(f["what"])}</p>'
                 + (f'<div class="note">{e(f["note"])}</div>' if f.get("note") else "")
                 + f'<div class="links">{links}</div><div class="meta">GPL-3.0 · {out(f["source"], "source")}</div></article>\n')
     return "".join(card(f, False) for f in d["own"]), "".join(card(f, True) for f in d["ports"]), str(len(d["own"]) + len(d["ports"]))

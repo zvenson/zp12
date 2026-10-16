@@ -894,6 +894,7 @@ heights.observe(document.querySelector("nav")); heights.observe($("tools"));
 function jump() {                                       // (after the first renders have settled: the card as it stays)
   setTimeout(() => {
     const m = /^#fw-([\w-]+)$/.exec(location.hash), el = location.hash === "#submit" ? $("submit") : m && $("grid").querySelector(`.fw[data-id="${m[1]}"]`);
+    if (el && el.hidden && kind !== "all") { kind = "all"; chips(); filter(); }   // (a kind kept from before hides it: all, for this visit)
     if (!el || el.hidden) return;
     if (el.id === "submit") scrollTo(0, el.getBoundingClientRect().top + scrollY - stuck() - 16);   // (under the nav, which stays on top)
     else el.scrollIntoView({ block: "center" });
@@ -940,7 +941,12 @@ const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler
 const kindsOf = (f) => [].concat(f.kind || [], f.vintage ? ["vintage"] : []);   // (vintage: a classic instrument rebuilt, a group of its own)
 const BUILD_AT = { dinghy: "#build-your-own" };                       // (the step-by-step manual in its README)
 const devOnly = (f) => kindsOf(f).length === 1 && kindsOf(f)[0] === "dev";   // (a base to build on: no beta tag; installable all the same)
-let kind = (location.hash || "").slice(1);                             // (#drums: a link straight to one kind)
+// the kind: #drums (a link straight to one kind), else the last choice (localStorage, shared with the SMK-37 page: the choice stays
+// from page to page), else all
+const KIND_KEY = "fm1hub.kind", h0 = (location.hash || "").slice(1);
+let kind = KINDS.some(([k]) => k === h0) ? h0 : (() => { try { return localStorage.getItem(KIND_KEY) || "all"; } catch (e) { return "all"; } })();
+const keepKind = () => { try { localStorage.setItem(KIND_KEY, kind); } catch (e) {} };
+if (kind === h0) keepKind();
 // the search: every word somewhere in a card (name, maker, what it does, its kinds), accents and case ignored; ?q= in the address
 const fold = (s) => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 let q = new URLSearchParams(location.search).get("q") || "";
@@ -954,7 +960,7 @@ function chips() {
     return of(cat).length ? `<button role="tab" data-k="${k}" aria-selected="${k === kind}">${label}<span>${of(cat.filter(found)).length}</span></button>` : "";
   }).join("");
   $("chips").querySelectorAll("button").forEach((b) => b.onclick = () => {
-    kind = b.dataset.k; history.replaceState(null, "", kind === "all" ? location.pathname + location.search : "#" + kind);
+    kind = b.dataset.k; keepKind(); history.replaceState(null, "", kind === "all" ? location.pathname + location.search : "#" + kind);
     chips(); render();
   });
 }
@@ -964,7 +970,7 @@ const SORTS = [["stars", "Most stars"], ["installs", "Most installed via the hub
 const SORT_KEY = "fm1hub.sort", isSort = (k) => SORTS.some(([s]) => s === k);
 let sort = (() => {
   const q = new URLSearchParams(location.search).get("sort");
-  if (isSort(q)) return q;
+  if (isSort(q)) { try { localStorage.setItem(SORT_KEY, q); } catch (e) {} return q; }   // (a link with it: kept, as a click)
   try { const s = localStorage.getItem(SORT_KEY); if (isSort(s)) return s; } catch (e) {}
   return "stars";
 })();
@@ -989,6 +995,7 @@ function sorts() {
 // the view: the cards or a list, a row each (?view=list, else the last choice, localStorage)
 const P0 = new URLSearchParams(location.search), VIEW_KEY = "fm1hub.view";
 let view = P0.get("view") === "list" || P0.get("view") === "cards" ? P0.get("view") : (() => { try { return localStorage.getItem(VIEW_KEY) === "list" ? "list" : "cards"; } catch (e) { return "cards"; } })();
+if (P0.get("view") === view) try { localStorage.setItem(VIEW_KEY, view); } catch (e) {}
 function setParam(k, v) {
   const u = new URLSearchParams(location.search);
   if (v) u.set(k, v); else u.delete(k);
@@ -1082,7 +1089,7 @@ function filter() {
   nm.hidden = shown > 0;
   if (!shown) {
     nm.innerHTML = `No firmware matches “${esc(q.trim())}”${kind !== "all" ? " in this group" : ""}. <button type="button">Show all</button>`;
-    nm.querySelector("button").onclick = () => { kind = "all"; setQ(""); history.replaceState(null, "", location.pathname + location.search); chips(); filter(); };
+    nm.querySelector("button").onclick = () => { kind = "all"; keepKind(); setQ(""); history.replaceState(null, "", location.pathname + location.search); chips(); filter(); };
   }
 }
 function setQ(v) {                                      // (the box, the address: ?q=, beside ?sort= and the #kind)
