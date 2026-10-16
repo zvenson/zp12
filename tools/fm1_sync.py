@@ -243,6 +243,12 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://ficusficusov.github.io/CoralFlower/",
          what="Chords after the Orchid, with a UX made for the FM-1: one key turns every note into a chord with a bass, "
               "27 scales, an arpeggiator, a looper, a plate reverb, and a pixel flower that grows as you play."),
+    dict(id="vector37", added="2026-10-16", play="https://genkigenki.github.io/smk37/vector37-sim/",
+         kind="synth", name="Vector37", author="genkigenki", repo="genkigenki/Vector37", ident=r"FM-1_\d{3,8}",
+         src="smk:vector37",                            # (no releases: the FM-1 package on genkigenki's SMK-37 installer)
+         what="An orbiting overtone synth: four corners of two overtone generators each, a sun on a path and a moon "
+              "around it decide how much of each you hear; the knobs shape the selected planet. Made for the SMK-37, "
+              "here its FM-1 build. After the Beetlecrab Vector."),
 ]
 
 
@@ -415,6 +421,22 @@ def latest_repo(spec, repo):
     return get(pk["download_url"], "application/octet-stream"), version, date, None, f"https://github.com/{repo}/tree/v{version}"
 
 
+def latest_smk(spec, repo):
+    """the FM-1 package of a firmware made for the SMK-37 (smk:<id>): its "fm1" variant on genkigenki's installer, whose
+    const FW names the version and the package; the date: the package's Last-Modified"""
+    fid = spec.split(":", 1)[1]
+    page = get(SMK_INSTALLER, "text/html").decode()
+    f = {x["id"]: x for x in json.loads(re.search(r"const FW = (\[.*?\]);\n", page, re.S).group(1))}[fid]
+    v = f["v"]["fm1"]
+    with urllib.request.urlopen(urllib.request.Request(urllib.parse.urljoin(SMK_INSTALLER, v["pkg"]),
+                                                       headers={"User-Agent": "fm1-switcher (designburgapps.com)"}), timeout=60) as r:
+        raw = r.read()
+        date = parsedate_to_datetime(r.headers["Last-Modified"]).strftime("%Y-%m-%dT%H:%M:%SZ")
+    if hashlib.sha256(raw).hexdigest() != v["sha256"]:
+        raise ValueError(f"{f['version']}: the package is not the one the installer names (sha256)")
+    return raw, f["version"], date, None, f"https://github.com/{repo}"
+
+
 def latest_local(spec, sloopdx):
     where, sub = spec.split(":", 1)
     root = (Path(sloopdx) if where == "sloopdx" else HERE) / sub
@@ -472,7 +494,8 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
         try:
             raw, version, date, rel_url, src_url = latest_github(f["repo"], f.get("pkg", r"[^/\"]+\.fwsc"), f.get("ver")) if f["src"] == "github" \
                 else latest_pages(f["src"], f["repo"]) if f["src"].startswith("pages:") \
-                else latest_repo(f["src"], f["repo"]) if f["src"].startswith("repo:") else latest_local(f["src"], sloopdx)
+                else latest_repo(f["src"], f["repo"]) if f["src"].startswith("repo:") \
+                else latest_smk(f["src"], f["repo"]) if f["src"].startswith("smk:") else latest_local(f["src"], sloopdx)
             ident = product_of(raw)
             # (Felucca's update loader; loader="mvave": M-VAVE's own, the official V15 with its app replaced, installed
             # and resumed as the official one is: page.install() passes the identity to resume())
