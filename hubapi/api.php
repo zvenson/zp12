@@ -268,8 +268,8 @@ function all_ratings(): array
 function login_mail(string $to, string $link, string $code, bool $vibe = false): bool
 {
     global $ENV;
-    $vibe = is_file($ENV['mailcfg']) ? require $ENV['mailcfg'] : [];
-    $m = $vibe['mail'] ?? null;
+    $cfg = is_file($ENV['mailcfg']) ? require $ENV['mailcfg'] : [];   // (VIBE's config: its SMTP account)
+    $m = $cfg['mail'] ?? null;
     if (!$m) {
         error_log('hub: no mail config');
         return false;
