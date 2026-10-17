@@ -1663,7 +1663,9 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
       bar.classList.add("wide");
       bar.innerHTML = `<img class="qr" src="/app/qr.svg" alt="QR code: thefirmwarehub.com" width="132" height="132"><div class="t">
         <b>The Firmware Hub on your phone</b>
-        <span>Scan the code, then <b>Install</b> (Android, Chrome) or Share ${SHARE} <b>Add to Home Screen</b> (iPhone).</span>
+        <span>Scan the code with your phone’s camera. The hub opens, then:</span>
+        <span><b>Android:</b> tap <b>Install</b> in the bar at the bottom (or <b>📱 Get the app</b>).</span>
+        <span><b>iPhone:</b> tap Share ${SHARE} then <b>Add to Home Screen</b>.</span>
         <small>Always the newest firmwares, your favourites and stars on every device. Installing a firmware from the phone: Android with Chrome and a USB-C cable (iPhone: no Web MIDI yet).</small>
         ${prompt ? '<span class="pc">Or as an app on this computer: <button class="go" type="button">Install</button></span>' : ""}</div>`;
     }
