@@ -486,7 +486,7 @@ function whoIs(text) {
   const exact = cat.filter((f) => f.product === text);
   if (exact.length === 1) return { fw: exact[0], exact: true };
   if (exact.length > 1) return { name: exact.map((f) => f.name).join(" or ") };   // (the same identity: SLOOP and Hortator)
-  let fam = cat.filter((f) => new RegExp("^" + f.ident + "$").test(text));   // (several share numbers: only a single match names one,
+  let fam = cat.filter((f) => new RegExp("^(?:" + f.ident + ")$").test(text));   // (several share numbers: only a single match names one,
   if (fam.length > 1) fam = fam.filter((f) => f.ident !== "FM-1_\\d{3,8}");   //  a firmware's own range before "any FM-1")
   return fam.length === 1 ? { fw: fam[0], exact: false } : { name: "another firmware (" + text + ")" };
 }

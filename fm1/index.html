@@ -510,7 +510,7 @@
       </div>
       <div class="tiles">
         <a class="tile cc-merch" href="https://the-firmware-hub.myspreadshop.de/make+firmware+not+war-A32661688835530cb?sellable=rlac1svn88nf-20&amp;appearance=2" data-shop="Firmwear|spreadshop" target="_blank" rel="noopener"><span class="pic"><img src="/img/merch.png?v=5fe2f657" alt=""></span>
-          <span><b>Make Firmware, Not War Hoodie</b></span></a>
+          <span><b>Firmwear</b></span></a>
         <a class="tile cc-de" href="https://link.amazon/B08QY1yVZ" data-shop="FM-1|amazon.de" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
           <span><b>Get the M-VAVE FM-1</b><small>on Amazon.de · Ad (Anzeige) *</small></span></a>
         <a class="tile cc-de" href="https://link.amazon/B0f2qKAUl" data-shop="SMK-37 Pro|amazon.de" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
@@ -1051,7 +1051,7 @@ function whoIs(text) {
   const exact = cat.filter((f) => f.product === text);
   if (exact.length === 1) return { fw: exact[0], exact: true };
   if (exact.length > 1) return { name: exact.map((f) => f.name).join(" or ") };   // (the same identity: SLOOP and Hortator)
-  let fam = cat.filter((f) => new RegExp("^" + f.ident + "$").test(text));   // (several share numbers: only a single match names one,
+  let fam = cat.filter((f) => new RegExp("^(?:" + f.ident + ")$").test(text));   // (several share numbers: only a single match names one,
   if (fam.length > 1) fam = fam.filter((f) => f.ident !== "FM-1_\\d{3,8}");   //  a firmware's own range before "any FM-1")
   return fam.length === 1 ? { fw: fam[0], exact: false } : { name: "another firmware (" + text + ")" };
 }
