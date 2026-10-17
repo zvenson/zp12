@@ -326,7 +326,8 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
     (smk / "img").mkdir(parents=True, exist_ok=True)
     (smk / "index.html").write_text(devices((HERE / "web" / "smk37.html").read_text(encoding="utf-8"), "smk37", "smk37"), encoding="utf-8")
     # the browser simulators, as their repos build them: OberVave's (web/sim/build.sh), zp12's (this repo: sim/build.sh)
-    for name, sim in (("obervave", HERE.parent / "obervave" / "docs" / "sim"), ("zp12", HERE / "docs" / "sim")):
+    for name, sim in (("obervave", HERE.parent / "obervave" / "docs" / "sim"), ("zp12", HERE / "docs" / "sim"),
+                      ("shineon", HERE.parent / "shineon" / "docs" / "sim")):
         if sim.exists():
             play = HERE / "fm1" / "play" / name
             play.mkdir(parents=True, exist_ok=True)
