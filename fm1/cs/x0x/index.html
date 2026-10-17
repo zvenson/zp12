@@ -150,7 +150,7 @@
   header { border-top: 6px solid var(--c); } header > .wrap { position: relative; }
   .brand { position: absolute; top: -24px; right: clamp(16px, 4vw, 72px); display: flex; align-items: center; gap: 10px;
            color: var(--fg); font-weight: 700; font-size: 15px; letter-spacing: .2px; }
-  .brand img { width: 34px; height: 34px; border-radius: 8px; } .brand:hover { text-decoration: none; color: var(--c); }
+  .brand img { width: 38px; height: 38px; filter: brightness(1.45) saturate(1.1); }   /* (the lila signet, lighter on the dark page; as it is in print) */ .brand:hover { text-decoration: none; color: var(--c); }
   html.embed .brand { top: -6px; }
   .eyebrow { color: var(--c); }
   .cshead { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 26px; align-items: center; padding-right: 220px; }
@@ -186,7 +186,7 @@
   @media (max-width: 560px) { .cshead { grid-template-columns: 84px minmax(0, 1fr); gap: 16px; } .cshead img { width: 84px; height: 84px; } }
   @media print { html, body { background: #fff !important; color: #000; } a.vibe, nav, .strip, footer, .acts, .page-only { display: none !important; }
                  .sec, .tips { background: #fff; border-color: #bbb; break-inside: avoid; } .sec dd, .tips ul { color: #222; } kbd { background: #eee; color: #000; box-shadow: inset 0 0 0 1px #999; }
-                 header { background: none; padding: 0 0 10px; border-top: 6px solid var(--c); } .brand { color: #000; top: 4px; }
+                 header { background: none; padding: 0 0 10px; border-top: 6px solid var(--c); } .brand { color: #000; top: 4px; } .brand img { filter: none; }
                  .cshead h1, .cshead h1 b, .lead, .ver, .kb .legend, .tips li, .fine { color: #111 !important; } .sec h2 { color: #111; }
                  .sec { border-top: 3px solid var(--c); } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
   /* the footer (web/footer.html, the same on every page: tools/make_fm1.py puts it in, the credits from the catalogues) */
@@ -308,7 +308,7 @@
 <div class="strip"><i></i><i></i><i></i><i></i></div>
 
 <header style="--c: #f4c0cb"><div class="wrap">
-  <a class="brand" href="https://thefirmwarehub.com/" target="_top" title="The Firmware Hub: every FM-1 firmware, one click"><img src="/app/icon-192.png" alt="" width="34" height="34"><span>thefirmwarehub.com</span></a>
+  <a class="brand" href="https://thefirmwarehub.com/" target="_top" title="The Firmware Hub: every FM-1 firmware, one click"><img src="/img/signet-lila.svg" alt="" width="38" height="38"><span>thefirmwarehub.com</span></a>
   <div class="cshead"><img src="/img/x0x.png?v=20a9c76f" alt="X0X on the FM-1's screen" width="132" height="132">
   <div><p class="eyebrow page-only">The Firmware Hub · Cheat sheet</p>
   <h1><b>X0X</b> at a glance</h1>
@@ -328,8 +328,7 @@
 <section class="sec"><h2>Recovery</h2><dl><dt><small>hold</small> <kbd>OCT-</kbd><span class="plus">+</span><small>hold</small> <kbd>OCT+</kbd></dt><dd>After 5 seconds: update mode. Let go early to cancel.</dd><dt><small>hold</small> <kbd>OCT-</kbd><span class="plus">+</span><small>hold</small> <kbd>OCT+</kbd><span class="plus">+</span><small>power on</small></dt><dd>Calibrate the buttons and knobs.</dd><dt><small>tap</small> <kbd>PLAY</kbd></dt><dd>In SAFE MODE: try starting X0X normally again.</dd></dl></section>
 </div>
 <div class="tips"><h2>Good to know</h2><ul><li>Quick beat: black key 1 (kick), then white keys 1, 5, 9, 13, then PLAY.</li><li>Hold any button for a second on its own: a card explains what it does here.</li><li>With the pattern stopped, X0X autosaves 4 seconds after your last change.</li><li>The factory mix pumps hard. For a clean mix, set COMP and PUMP to 0 on LFO &gt; MASTER.</li><li>While a pattern plays, picking a drum is silent so you don&#x27;t add stray hits.</li></ul></div>
-<p class="fine">A community cheat sheet by the hub, not by the firmware's makers: when in doubt, their manual is right.
-  Spotted a mistake? <a href="mailto:zven@thefirmwarehub.com?subject=Cheat%20sheet%20x0x">zven@thefirmwarehub.com</a></p>
+<p class="fine">A community cheat sheet by the hub, not by the firmware's makers: when in doubt, their manual is right.</p>
 </div></main>
 
 <footer><div class="wrap">

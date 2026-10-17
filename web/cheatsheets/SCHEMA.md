@@ -39,5 +39,5 @@ MIDI & sync · Settings · Recovery. Rows: 3-10 per section. Only what the firmw
   MIDI & sync, Settings, Recovery (other titles go last). Use exactly these titles.
 - Key zones get the hub's colours in their order (cyan, pink, beige, blue, orange, lilac, green, yellow); a zone whose
   label says "same" is grey. The "color" in the JSON is ignored.
-- Every sheet: the hub's mark + "thefirmwarehub.com" top right, the firmware's colour from its card (LOOK in web/fm1.html)
+- Every sheet: the lila signet (fm1/img/signet-lila.svg) + "thefirmwarehub.com" top right (no mail address on the sheet), the firmware's colour from its card (LOOK in web/fm1.html)
   as the band, name, frames and the Install button; template web/cs-sheet.html (not web/cheatsheet.html: zp12's own sheet).
