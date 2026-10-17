@@ -97,6 +97,7 @@
   .mega .tile b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; line-height: 1.3; }
   .mega .tile small { display: block; color: var(--dim); font-size: 13.5px; margin-top: 2px; }
   .mega .tile.vibe-t .pic img { object-position: 70% 50%; image-rendering: auto; } .mega .tile.vibe-t b { color: #ff6a1a; }
+  .mega .tile.tools-t .pic svg { width: 36px; height: 36px; fill: none; stroke: var(--cyan); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
   .mega .tile.add .pic { border-style: dashed; background: transparent; color: var(--pink); font-size: 34px; font-weight: 200; }
   @media (max-width: 760px) { .mega .in { grid-template-columns: 1fr; padding-top: 14px; padding-bottom: 18px; } .mega .side { display: none; }
                               .mega .pic { width: 56px; height: 56px; } }
@@ -219,7 +220,7 @@
       <div class="side">
         <p class="k">The Firmware Hub</p>
         <p>Open-source firmware for small music machines, from their makers, installed in the browser.</p>
-        <a href="/">All FM-1 firmwares</a><a href="/kb/">Knowledge Base</a><a href="/#submit">Submit a firmware</a><a href="/vibe/?ref=menu">VIBE FM Mk1</a>
+        <a href="/">All FM-1 firmwares</a><a href="/kb/">Knowledge Base</a><a href="/tools/">Tools</a><a href="/#submit">Submit a firmware</a><a href="/vibe/?ref=menu">VIBE FM Mk1</a>
         <a id="getapp" href="/#app">Get the app</a>
         <hr><p>Made firmware for another device?</p>
         <a class="mail" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device">zven@thefirmwarehub.com</a>
@@ -231,6 +232,8 @@
           <span><b>M-VAVE SMK-37 Pro</b><small>15 firmwares · Pro, Elite, MKE-P37</small></span></a>
         <a class="tile vibe-t" href="/vibe/?ref=menu" data-dev="vibe"><span class="pic"><img src="/vibe/assets/img/banner-device.jpg" alt=""></span>
           <span><b>VIBE FM Mk1</b><small>Hardware with open firmware · join the list</small></span></a>
+        <a class="tile tools-t" href="/tools/" data-dev="tools"><span class="pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0 5.2 5.2l-8.6 8.6a2.1 2.1 0 0 1-3-3l8.6-8.6a4 4 0 0 0-2.2-2.2Z"/><path d="M14.7 6.3 17 4l3 3-2.3 2.3"/></svg></span>
+          <span><b>Tools</b><small>Emulators, editors, rescue</small></span></a>
         <a class="tile add" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device"><span class="pic">+</span>
           <span><b>Your device</b><small>Firmware for another machine? Tell us.</small></span></a>
       </div>
@@ -410,6 +413,8 @@
   <div class="note"><p>Confirmed by its author: the official V15 and Felucca. Most firmwares on the hub boot in it; a few
     still stop at an instruction or a chip part the emulator does not have yet (in our tests AMB-1, TRIBE, Bubba Machine,
     DUELL and FM-106). Its browser build is experimental and still far slower than real time.</p></div>
+  <p>More emulators, among them <a href="https://joakimeriksson.github.io/fm1-emu/" target="_blank" rel="noopener">fm1-emu</a> by Joakim
+    Eriksson in the browser, editors and backup tools: <a href="/tools/">Tools</a>.</p>
   <p><b>For authors:</b> boot your release in it before you publish. It catches a package that does not start before
     anyone's FM-1 does, and it is how the hub's videos are recorded: unchanged packages, real screens, real sound.</p>
 </section>
@@ -491,7 +496,7 @@
   here, it installs from baudgirl.com. The update path is Felucca's, as sloopDX carries it. M-VAVE, FM-1 and SMK-37 are trademarks of
   their owners; not affiliated with M-VAVE. E-mu and SP-1200 are trademarks of their owners. Unofficial firmware, free and without
   warranty: you install it at your own risk.
-  <br><a href="https://designburg.net/">designburg.net</a> · <a href="/impressum/">Impressum</a> · <a href="/impressum/#datenschutz">Datenschutz</a>
+  <br><a href="https://designburg.net/">designburg.net</a> · <a href="/tools/">Tools</a> · <a href="/impressum/">Impressum</a> · <a href="/impressum/#datenschutz">Datenschutz</a>
   · <a href="https://www.youtube.com/@sonzven?sub_confirmation=1" target="_blank" rel="noopener">▶ YouTube: @sonzven</a>
   · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a><span id="updated"></span>
 </div></footer>

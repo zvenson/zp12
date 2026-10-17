@@ -1,0 +1,184 @@
+{
+ "_": "The Tools page's cards (tools/make_fm1.py renders web/tools.html's <!--TOOLS--> from it, static for the search engines). Each: name, what (one plain line), by ([name, link], ...), devices, licence, links ([label, url]: the first is the main one), source. Every link checked when added (2026-10-17). \"official\": the box apart (not open source).",
+ "groups": [
+  {
+   "id": "try",
+   "title": "Try without a device",
+   "sub": "Run the firmwares on your computer: nothing installed, nothing touches your FM-1.",
+   "tools": [
+    {
+     "id": "fm1-emu",
+     "name": "fm1-emu",
+     "what": "Emulates the FM-1 and runs its firmwares unchanged: in the browser, as a desktop app, or as an AU / VST3 instrument in your DAW. It loads the hub's firmwares, and has the SMK-37 too.",
+     "by": [["Joakim Eriksson", "https://github.com/joakimeriksson"]],
+     "devices": ["FM-1", "SMK-37"],
+     "licence": "MIT",
+     "links": [["Open in the browser", "https://joakimeriksson.github.io/fm1-emu/"], ["SMK-37", "https://joakimeriksson.github.io/fm1-emu/smk37/"]],
+     "source": "https://github.com/joakimeriksson/fm1-emu"
+    },
+    {
+     "id": "fm1-emulator",
+     "name": "fm1-emulator",
+     "what": "Emulates the FM-1's chip and board on QEMU and runs the same .fwsc package you would install, with the screen, keys, knobs and sound. A desktop app for macOS (Apple Silicon) and Linux (x86-64).",
+     "by": [["Simon Johansson", "https://github.com/simonjohansson"]],
+     "devices": ["FM-1"],
+     "licence": "GPL-2.0",
+     "links": [["Download", "https://github.com/simonjohansson/fm1-emulator/releases/latest"], ["How to use it", "/kb/#try"]],
+     "source": "https://github.com/simonjohansson/fm1-emulator"
+    }
+   ]
+  },
+  {
+   "id": "sounds",
+   "title": "Sounds & editors",
+   "sub": "Edit voices, manage banks, bring your own samples.",
+   "tools": [
+    {
+     "id": "fm1-editor",
+     "name": "FM1 Editor & Librarian",
+     "what": "A DX7 voice editor and patch librarian in the browser: banks, every DX7 parameter and the FM-1's effects, sent over USB MIDI. For the stock firmware and FM-1+VA.",
+     "by": [["Benny Sparra", "https://github.com/benny-sparra"]],
+     "devices": ["FM-1"],
+     "licence": "MIT",
+     "links": [["Open the editor", "https://fm1-editor.com/"]],
+     "source": "https://github.com/benny-sparra/fm1-dx7-patch-importer"
+    },
+    {
+     "id": "dexed",
+     "name": "Dexed",
+     "what": "The DX7 as a free plugin and app: edit voices and banks and send them as SysEx. The stock FM-1 takes DX7 SysEx.",
+     "by": [["Pascal Gauthier (asb2m10)", "https://github.com/asb2m10"]],
+     "devices": ["FM-1"],
+     "licence": "GPL-3.0",
+     "links": [["Download", "https://asb2m10.github.io/dexed/"]],
+     "source": "https://github.com/asb2m10/dexed"
+    },
+    {
+     "id": "zp12-tools",
+     "name": "zp12 sample editor + backup",
+     "what": "Your own samples on the zp12 firmware: drop a WAV, trim it or chop a loop, hear it as the FM-1 plays it, put it on a pad. And a backup of zp12's loops, sounds, songs and samples.",
+     "by": [["zvenson", "https://github.com/zvenson"]],
+     "devices": ["FM-1"],
+     "licence": "GPL-3.0",
+     "links": [["Sample editor", "https://zp12.designburgapps.com/editor/"], ["Backup", "https://zp12.designburgapps.com/backup/"]],
+     "source": "https://github.com/zvenson/zp12"
+    },
+    {
+     "id": "sloopdx-editor",
+     "name": "sloopDX editor",
+     "what": "The sloopDX firmware's editor in the browser: DX7 voices, sounds, sequencer and tracks, .syx bank upload and a backup.",
+     "by": [["zvenson", "https://github.com/zvenson"]],
+     "devices": ["FM-1"],
+     "licence": "GPL-3.0",
+     "links": [["Open the editor", "https://dx7.designburgapps.com/webapp/editor/"]],
+     "source": "https://github.com/zvenson/dxsloop"
+    },
+    {
+     "id": "fm1-workbench-community",
+     "name": "FM-1 Workbench (community)",
+     "what": "A community workbench in the browser: DX7 voice library and editor, a drum sequencer, a MIDI file player and a speech tab, with a software FM-1 when none is connected. Also an Android app and a VST3 / CLAP controller. Not M-VAVE's FM1 Workbench.",
+     "by": [["thegiantsnail", "https://github.com/thegiantsnail"]],
+     "devices": ["FM-1"],
+     "licence": "GPL-3.0",
+     "links": [["Open the workbench", "https://fm1-workbench.web.app/"]],
+     "source": "https://github.com/thegiantsnail/fm1-workbench-public"
+    }
+   ]
+  },
+  {
+   "id": "rescue",
+   "title": "Backup & rescue",
+   "sub": "Save the whole flash before you experiment, and bring back an FM-1 that no installer reaches.",
+   "tools": [
+    {
+     "id": "fm1-rescue",
+     "name": "The hub's Rescue",
+     "what": "Puts a firmware back on an FM-1 that no installer reaches any more, through the chip's own bootloader. A Python script for Linux.",
+     "by": [["zvenson", "https://github.com/zvenson"]],
+     "devices": ["FM-1"],
+     "licence": "GPL-3.0",
+     "links": [["How to rescue", "/#rescue"]],
+     "source": "/rescue/fm1_rescue.py"
+    },
+    {
+     "id": "unbricker",
+     "name": "MvaveFM1Unbricker",
+     "what": "Unbricks an FM-1: first a full flash backup (read twice and compared), then it writes the firmware and checks every byte. Windows and Linux; macOS through the FM-1 Transporter.",
+     "by": [["Quixotic7", "https://github.com/Quixotic7"]],
+     "devices": ["FM-1"],
+     "licence": "MIT",
+     "links": [],
+     "source": "https://github.com/Quixotic7/MvaveFM1Unbricker"
+    },
+    {
+     "id": "m-flasher",
+     "name": "M-Flasher",
+     "what": "Backs up, restores and installs firmware through the chip's USB download mode, so it also works when the firmware is broken. Windows, macOS and Linux.",
+     "by": [["jvitkauskas", "https://github.com/jvitkauskas"]],
+     "devices": ["FM-1", "SMK-37"],
+     "licence": "MIT",
+     "links": [],
+     "source": "https://github.com/jvitkauskas/m-flasher"
+    },
+    {
+     "id": "fm1-transporter",
+     "name": "FM-1 Transporter",
+     "what": "Hardware: a Seeed XIAO RP2040 wired to the FM-1's USB lines reads and writes its whole flash, 1 MiB in about three seconds.",
+     "by": [["kurogedelic", "https://github.com/kurogedelic"]],
+     "devices": ["FM-1"],
+     "licence": "MIT",
+     "links": [],
+     "source": "https://github.com/kurogedelic/FM-1-transporter"
+    }
+   ]
+  },
+  {
+   "id": "dev",
+   "title": "For developers",
+   "sub": "Build your own firmware, port one, or look under the hood.",
+   "tools": [
+    {
+     "id": "build",
+     "name": "Build your own",
+     "what": "Dinghy is the smallest FM-1 firmware to build on, with the plumbing done and documented. Felucca's BUILDING.md shows how a full firmware is built, and felucca-bsp is the chip and board layer under it.",
+     "by": [["zvenson", "https://github.com/zvenson"], ["hugelton", "https://github.com/hugelton"]],
+     "devices": ["FM-1"],
+     "licence": "GPL-3.0 · felucca-bsp MPL-2.0",
+     "links": [["Dinghy", "https://github.com/zvenson/dinghy"], ["Felucca BUILDING.md", "https://github.com/hugelton/Felucca/blob/main/BUILDING.md"], ["felucca-bsp", "https://github.com/hugelton/felucca-bsp"]],
+     "source": ""
+    },
+    {
+     "id": "fm1-to-smk37",
+     "name": "fm1-to-smk37",
+     "what": "A guide to moving FM-1 firmwares to the SMK-37: what changes, and how the hub's SMK-37 ports were made.",
+     "by": [["genkigenki", "https://github.com/genkigenki"]],
+     "devices": ["FM-1", "SMK-37"],
+     "licence": "CC BY-NC 4.0 (documentation, non-commercial licence)",
+     "links": [],
+     "source": "https://github.com/genkigenki/fm1-to-smk37"
+    },
+    {
+     "id": "under-the-hood",
+     "name": "Under the hood",
+     "what": "FM-1-RE: the reverse engineering of the FM-1's firmware and its update protocol. jl-uboot-tool: a flasher and dumper for JieLi chips like the FM-1's.",
+     "by": [["AL-255", "https://github.com/AL-255"], ["kagaimiq", "https://github.com/kagaimiq"]],
+     "devices": ["FM-1"],
+     "licence": "WTFPL · MIT",
+     "links": [["FM-1-RE", "https://github.com/AL-255/FM-1-RE"], ["jl-uboot-tool", "https://github.com/kagaimiq/jl-uboot-tool"]],
+     "source": ""
+    }
+   ]
+  }
+ ],
+ "official": {
+  "id": "mvave-workbench",
+  "name": "M-VAVE FM1 Workbench",
+  "what": "M-VAVE's own editor and simulator in the browser (Chinese or English): play and edit, projects, sounds and samples, and switching the firmware between the official V15 and their Open V13.",
+  "note": "Not open source as a whole: the app is GPL-3.0 with an SDK exception, the sound engine is a closed library. The way back is V15, from the same page.",
+  "by": [["M-VAVE", "https://open.m-vave.com/fm1-workbench"]],
+  "devices": ["FM-1"],
+  "licence": "App GPL-3.0, engine closed",
+  "links": [["Open the workbench", "https://open.m-vave.com/fm1-workbench"]],
+  "source": ""
+ }
+}
