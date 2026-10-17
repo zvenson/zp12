@@ -308,6 +308,11 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="pages:https://hericdk.github.io/nomanskyFM/", site="https://hericdk.github.io/nomanskyFM/",   # (no releases: the package its installer names)
          what="A space adventure while you make music, built on SLOOP 2.7.1: fly between planets with two knobs, land, "
               "mine, fight sentinels and warp between stars, every SLOOP screen floating over the game."),
+    dict(id="fm1quest", added="2026-10-18", play="https://fm1.quest/sim/", editor="https://fm1.quest/editor/",
+         kind=["groove", "other"], name="FM1 Quest", author="Hericdk", repo="hericdk/fm1-quest", ident=r"FM-1_900",
+         src="github", site="https://fm1.quest/en/",   # (its tags are builds: quest-38 is its v0.21)
+         what="A pixel-art RPG while you make music, built on SLOOP: four heroes, one a track, walk through a village "
+              "and fight monsters and bosses as your loop plays, every SLOOP screen redrawn in the game's style."),
 ]
 
 
