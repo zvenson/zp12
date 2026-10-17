@@ -303,6 +303,11 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          what="A pocket tracker for any style: six tracks with an engine each (pulse, 4-bit wave, noise, 6-operator FM, "
               "drum kit or sample), patterns chained into a song, 32 live effects and tools that write beats for you. "
               "A beta, not yet tried on a real FM-1 by its maker."),
+    dict(id="nmsfm", added="2026-10-18", play="https://hericdk.github.io/nomanskyFM/sim/",
+         kind=["groove", "other"], name="No Man Sky FM", author="Hericdk", repo="hericdk/nomanskyFM", ident=r"FM-1_900",
+         src="pages:https://hericdk.github.io/nomanskyFM/", site="https://hericdk.github.io/nomanskyFM/",   # (no releases: the package its installer names)
+         what="A space adventure while you make music, built on SLOOP 2.7.1: fly between planets with two knobs, land, "
+              "mine, fight sentinels and warp between stars, every SLOOP screen floating over the game."),
 ]
 
 
