@@ -371,7 +371,7 @@
         <p class="k">The Firmware Hub</p>
         <p>Open-source firmware for small music machines, from their makers, installed in the browser.</p>
         <a href="/">All FM-1 firmwares</a><a href="/kb/">Knowledge Base</a><a href="/#submit">Submit a firmware</a><a href="/vibe/?ref=menu">VIBE FM Mk1</a>
-        <a id="getapp" href="/#app">Get the app</a>
+        <a id="getapp" href="/#app">Get app</a>
         <hr><p>Made firmware for another device?</p>
         <a class="mail" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device">zven@thefirmwarehub.com</a>
       </div>
@@ -863,7 +863,7 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
     if (standalone && away && Date.now() - away > 30 * 60e3 && !busy) location.reload();
   });
 
-  // the bar at the bottom: on a phone, once (closed: 60 days quiet); "Get the app" in the Devices menu shows it any time
+  // the bar at the bottom: on a phone, once (closed: 60 days quiet); "Get app" in the Devices menu shows it any time
   const KEY = "fm1hub.appbar";
   let prompt = null, bar = null;
   const quiet = () => { try { return Date.now() < +(localStorage.getItem(KEY) || 0); } catch { return false; } };
@@ -892,7 +892,7 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
       bar.innerHTML = `<img class="qr" src="/app/qr.svg" alt="QR code: thefirmwarehub.com" width="132" height="132"><div class="t">
         <b>The Firmware Hub on your Android phone</b>
         <span>Scan the code with your phone’s camera. The hub opens, then:</span>
-        <span>On <b>Android</b>, tap <b>Install</b> in the bar at the bottom (or <b>📱 Get the app</b>).</span>
+        <span>On <b>Android</b>, tap <b>Install</b> in the bar at the bottom (or <b>📱 Get app</b>).</span>
         <small>Always the newest firmwares, your favourites and stars on every device. Installing a firmware from the phone: Android with Chrome and a USB-C cable. The app is for Android only: iPhones have no Web MIDI yet.</small>
         ${prompt ? '<span class="pc">Or as an app on this computer: <button class="go" type="button">Install</button></span>' : ""}</div>`;
     }
@@ -924,10 +924,10 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
       new MutationObserver(fit).observe(chips, { childList: true, subtree: true });
       chips.addEventListener("scroll", fit, { passive: true });
     }
-    // visible: "Get the app" beside the page's buttons (FM-1, SMK-37), and in the Devices menu; gone inside the app
+    // visible: "Get app" beside the page's buttons (FM-1, SMK-37), and in the Devices menu; gone inside the app
     const row = document.querySelector("header .bar");
     if (row && !standalone && !ios) {
-      const b = Object.assign(document.createElement("a"), { className: "btn ghost getapp", href: "#app", textContent: "📱 Get the app" });
+      const b = Object.assign(document.createElement("a"), { className: "btn ghost getapp", href: "#app", textContent: "📱 Get app" });
       row.insertBefore(b, row.querySelector(".btn.coffee"));
     }
     document.querySelectorAll("#getapp, .getapp").forEach((a) => {
