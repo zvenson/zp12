@@ -1,0 +1,122 @@
+{
+ "id": "zp12",
+ "name": "zp12",
+ "version": "2.4.2",
+ "ref": "68130ae",
+ "manual": "https://zp12.designburgapps.com/#cheatsheet",
+ "intro": "A 12-bit sampler drum machine: the white keys are 16 pads, the black keys 11 loops; REC, then PLAY records a beat.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    { "do": ["tap HOME"], "what": "Back to the faders: KNOB 1-4 = channel volumes 1-4." },
+    { "do": ["tap SEL"], "what": "KNOB 1-4 become faders 5-8; tap again for 1-4." },
+    { "do": ["tap EDIT"], "what": "Pad pages; each tap the next: WAVE, SOUND, TRUNC, OUT, SENDS." },
+    { "do": ["tap FX"], "what": "Mix effect pages: FILTER, CHORUS, DELAY, REVERB." },
+    { "do": ["tap SEQ"], "what": "Loop pages: LOOP, TOOLS, SONG." },
+    { "do": ["tap GLO"], "what": "Setup pages: SETUP, CLICK, OUTPUT." },
+    { "do": ["turn ALGORITHM"], "what": "Pick the pad to edit (A1-D8) without playing it." },
+    { "do": ["turn SELECT"], "what": "Tempo, half a BPM per click." }
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    { "do": ["white key 1-16"], "what": "Play pads: keys 1-8 bank A, 9-16 bank B." },
+    { "do": ["tap OCT+"], "what": "Banks C + D on the keys (OCT-: back to A + B)." },
+    { "do": ["black key 1-11"], "what": "Go to loop 1-11 (while playing: at the loop's end)." },
+    { "do": ["turn PRESETS"], "what": "Swap the sample on the pad you hit last." },
+    { "do": ["tap ARP"], "what": "MULTI PITCH: last pad on all 27 keys; ARP again: off." },
+    { "do": ["hold GLO", "white key 1-8"], "what": "Mute channels 1-8 (keys 9-16: solo)." },
+    { "do": ["tap ENV"], "what": "Tap tempo: tap it on the beat, twice or more." }
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    { "do": ["turn KNOB 1"], "what": "On the faders: volume of channel 1 (KNOB 2-4: 2-4)." },
+    { "do": ["tap EDIT", "turn KNOB 1"], "what": "WAVE page: choose the pad's sample." },
+    { "do": ["EDIT twice", "turn KNOB 1"], "what": "SOUND page: tune (KNOB 2 fine, 3 decay, 4 level)." },
+    { "do": ["EDIT 3 times", "turn KNOB 4"], "what": "TRUNC page: SPEED 33, lower and grittier (KNOB 3 reverse)." },
+    { "do": ["EDIT 4 times", "turn KNOB 2"], "what": "OUT page: pan; CUT and RESO filter pads 1-2 only." }
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    { "do": ["tap PLAY"], "what": "Start / stop the loop." },
+    { "do": ["tap REC", "tap PLAY"], "what": "Arm, count in 4 3 2 1, then record." },
+    { "do": ["tap REC"], "what": "While playing: overdub on / off." },
+    { "do": ["tap REC"], "what": "End the first take: an AUTO loop takes its length." },
+    { "do": ["hold REC"], "what": "Hold 2 seconds: clear the loop." },
+    { "do": ["hold SEQ", "white key 1-16"], "what": "Set / clear the last pad's 16 steps." },
+    { "do": ["hold SEQ", "tap OCT+"], "what": "Step grid: next bar (OCT-: previous bar)." },
+    { "do": ["hold LFO", "white key 1-16"], "what": "Erase that pad's hits (stopped: all at once)." },
+    { "do": ["tap SEQ", "turn KNOB 2"], "what": "Loop length: AUTO or 1-32 bars (KNOB 3 quantise, 4 swing)." },
+    { "do": ["GLO twice", "turn KNOB 2"], "what": "Count-in: off, 1 bar or 2 bars." }
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    { "do": ["hold FX", "white key 1-4"], "what": "Punch-in while held: roll 1/8, roll 1/16, reverse, tape stop." },
+    { "do": ["hold FX", "hold OCT-"], "what": "Reverb throw while held (OCT+: echo throw)." },
+    { "do": ["tap FX", "turn KNOB 1"], "what": "DJ filter on the mix: left low-pass, right high-pass." },
+    { "do": ["EDIT 5 times", "turn KNOB 4"], "what": "SENDS page: this pad's reverb (KNOB 3 delay, 2 chorus, 1 drive)." }
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    { "do": ["tap SAVE"], "what": "Save now (playing: at the stop); it also saves by itself." },
+    { "do": ["hold SAVE", "black key 1-11"], "what": "Copy this loop into that loop." },
+    { "do": ["tap SEQ", "turn KNOB 1"], "what": "Stopped: pick loop 1-16 (12-16 have no black key)." }
+   ]
+  },
+  {
+   "title": "Recovery",
+   "rows": [
+    { "do": ["hold EDIT", "tap OCT-"], "what": "Undo the last clear, erase or copy (again: redo)." },
+    { "do": ["tap GLO", "turn KNOB 4", "turn KNOB 4"], "what": "Stopped: factory reset; all loops and songs are gone." },
+    { "do": ["hold OCT-", "power on"], "what": "USB rescue mode: reinstall from the web installer." }
+   ]
+  }
+ ],
+ "keys": [
+  { "keys": [0, 2, 4, 6, 7, 9, 11, 12], "label": "Pads 1-8 of bank A (OCT+: bank C)", "color": "#42f5f5" },
+  { "keys": [14, 16, 18, 19, 21, 23, 24, 26], "label": "Pads 1-8 of bank B (OCT+: bank D)", "color": "#ff7ac8" },
+  { "keys": "black", "label": "Loops 1-11", "color": "#e8d8b0" }
+ ],
+ "tips": [
+  "First beat: REC, PLAY, wait for 4 3 2 1, play white key 1 (kick) and 2 (snare), REC again.",
+  "Factory kit: A1 kick, A2 snare, A3 hat, A4 clap; B1-B4 the same, lower and grittier.",
+  "AUTO CORRECT (1/16) puts your hits on the grid; set it on SEQ > LOOP, KNOB 3.",
+  "A pad plays on the channel of its position: pad 3 of every bank is fader 3.",
+  "Turn TUNE, FINE, DECAY or CUT while recording: those hits keep the change.",
+  "Pages close by themselves after 12 s (GLO > SETUP > BACK changes that).",
+  "Sound dull or thin? FX > FILTER back to the centre (OFF); mute, solo and the DJ filter are not saved.",
+  "Songs: SEQ three times opens SONG; chain loops there and PLAY plays the song.",
+  "Own samples and backups: zp12.designburgapps.com/editor and /backup (Chrome or Edge, USB).",
+  "USB MIDI: notes 36-67 play pads A1-D8; Program Change 0-15 picks loop 1-16."
+ ],
+ "checked": [
+  "sp_ui.c enum B_*: printed labels FX SEL ENV LFO EDIT GLO HOME SAVE ARP SEQ PLAY REC OCT- OCT+ (SEL is SLOOP's SCL); zp12.c encoders: 0 SELECT tempo (bpm10 +5 per detent = 0.5 BPM, 40-240), 1 ALGORITHM ui.sel, 2-5 KNOB 1-4, 6 PRESETS ui_preset -> wave_step.",
+  "sp_ui.c white_of/key_pad: 16 white keys, white 1-8 = pair*16 + 0..7 (bank A/C), 9-16 = +8..15 (bank B/D); key 12 (F4) = white 8; black keys counted 0..10 -> ui_loop (RQ_LOOP), 'LOOP n NEXT' while playing; zones use key indices 0..26 = F3..G5.",
+  "sp_ui.c button(): HOME -> PG_HOME; SEL toggles ui.shift (faders 5-8) and goes home; EDIT cycles WAVE..SENDS; FX cycles FILTER..REVERB; SEQ LOOP/TOOLS/SONG (tap < 350 ms in zp12.c); GLO SETUP/CLICK/OUTPUT (on release if no key used); ARP toggles ui.multi; ENV tap_tempo; PLAY RQ_PLAY/RQ_STOP; OCT+/OCT- ui.pair, or step bar while SEQ held; EDIT held + OCT- RQ_UNDO (again redo, sp_seq.c).",
+  "sp_ui.c key_down(): FX held -> punch names ROLL 1/8, ROLL 1/16, REVERSE, TAPE STOP (zp12.c pn.req, sp_punch.c); GLO held white 1-8 sp_mute, 9-16 sp_solo; SAVE held + black key RQ_COPY into that loop; SEQ held white key RQ_STEP for ui.sel; LFO held: erase (stopped RQ_WIPE at once, playing sq.erase in zp12.c); MULTI PITCH pad_hit_at(ui.sel, k-12).",
+  "sp_ui.c button(): FX held + OCT- 'REV THROW', OCT+ 'ECHO THROW' (zp12.c sp_thr_req while held).",
+  "sp_ui.c ui_holds(): REC acts on press; held 0.7 s + UI_HOLD_MS 1.3 s clears the loop and undoes the press; SAVE tapped = save_req; sp_seq.c RQ_REC: playing overdub on/off (DUB BAR waits for the next 1), stopped toggles rec_arm; sq_play: armed PLAY starts recording after cin_bars count-in; sq_stop_rec gives an AUTO segment its length.",
+  "sp_ui.c knob(): HOME faders; WAVE K1 sample; SOUND K1 TUNE -24..+12, K2 FINE, K3 DECAY, K4 LEVEL; TRUNC K3 DIR, K4 SPEED 45/33; OUT K1 CHOP, K2 PAN, K3/K4 CUT/RESO only channels 1-2; SENDS K1 DRIVE, K2 CHO, K3 DLY, K4 REV; FILTER K1 djf (negative LP, positive HP); LOOP K1 loop (stopped only), K2 BARS AUTO/1-32, K3 QUANT, K4 SWING; CLICK K1 CLICK, K2 COUNT OFF/1 BAR/2 BARS, K3 DUB; SETUP K4 RESET via again() twice within 1.5 s, stopped only -> zp12.c factory_req clears loops and songs.",
+  "zp12.c: ui.back = 1 -> UI_BACK_S 12 s; autosave when stopped, quiet and 3 s after a change; SAVE while playing -> 'SAVES AT STOP'; USB MIDI notes 36-67 -> pads, Program Change 0-15 -> ui_loop.",
+  "zp12.c fm1_cstart: recovery_key() -> bootguard_manual: OCT- alone at power-on -> recovery_main (USB rescue).",
+  "tools/gen_kit.py LAYOUT_A KICK SNARE HAT CLAP...; LAYOUT_B KICK-7 SNARE-7 OHAT CLAP-7 (TUNE -7 + SPEED 33 per web/cheatsheet.html).",
+  "Manual URL https://zp12.designburgapps.com/ returns 200 and contains id=\"cheatsheet\"."
+ ],
+ "unsure": [
+  "CLAUDE.md says pages return after 6 s; the code's default is 12 s (ui.back = 1, UI_BACK_S) as Sven's cheat sheet says: followed the code.",
+  "CLAUDE.md says 'SEL held 5-8' and FX pages 'CHORUS, DELAY, REVERB'; the code makes SEL a toggle and FX starts with FILTER: followed the code (matches web/cheatsheet.html).",
+  "\"do\" items 'EDIT 3 times' / 'EDIT 4 times' / 'EDIT 5 times' go beyond the schema's verb list ('X twice'); counted from HOME (EDIT steps WAVE > SOUND > TRUNC > OUT > SENDS). Change the wording if make_fm1 rejects it.",
+  "B1-B4 'lower and grittier' from web/cheatsheet.html (TUNE -7 + SPEED 33) and gen_kit.py names; the per-pad tune values were not checked in the generated kit header.",
+  "Not covered on purpose: CHOP groups, SEQ > TOOLS clear/copy, song editing details, GLO > OUTPUT SMOOTH, click modes (left to the full manual)."
+ ]
+}

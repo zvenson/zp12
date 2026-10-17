@@ -546,6 +546,23 @@ def installs(old):
 
 
 
+def stale_sheets(cat):
+    """the cheat sheets (web/cheatsheets/<id>.json) written for an older release than the catalogue's: a task for the VIBE
+    admin's page (the sheet's page itself says so to its readers)"""
+    now = {f["id"]: (f["name"], f.get("version")) for f in cat}
+    out = []
+    for p in sorted((Path(__file__).resolve().parents[1] / "web" / "cheatsheets").glob("*.json")):
+        try:
+            d = json.loads(p.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        name, v = now.get(d.get("id"), (d.get("name", p.stem), None))
+        if v and v != d.get("version"):
+            out.append({"id": "cs:" + d["id"], "name": f"Cheat sheet {name}", "repo": "",
+                        "error": f"written for {d.get('version')}, the firmware is now {v}: update web/cheatsheets/{p.name}"})
+    return out
+
+
 def dead_links(cat):
     """the links the pages send people to, checked each run: the Tools page's (web/tools.json) and the firmwares' play /
     editor / site; a dead one (4xx / 5xx / no answer) a problem for the VIBE admin's task page. Our own pages left out."""
@@ -641,6 +658,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
     smk, smk_problems = smk37(old_smk)
     problems += smk_problems
     problems += dead_links(cat)
+    problems += stale_sheets(cat)
     (out / "problems.json").write_text(json.dumps({"at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
                                                    "problems": problems}, indent=1, ensure_ascii=False) + "\n")
     inst = installs(old)
