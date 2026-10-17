@@ -97,7 +97,6 @@
   .mega .tile b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; line-height: 1.3; }
   .mega .tile small { display: block; color: var(--dim); font-size: 13.5px; margin-top: 2px; }
   .mega .tile.vibe-t .pic img { object-position: 70% 50%; image-rendering: auto; } .mega .tile.vibe-t b { color: #ff6a1a; }
-  .mega .tile.tools-t .pic svg { width: 36px; height: 36px; fill: none; stroke: var(--cyan); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
   .mega .tile.add .pic { border-style: dashed; background: transparent; color: var(--pink); font-size: 34px; font-weight: 200; }
   @media (max-width: 760px) { .mega .in { grid-template-columns: 1fr; padding-top: 14px; padding-bottom: 18px; } .mega .side { display: none; }
                               .mega .pic { width: 56px; height: 56px; } }
@@ -107,7 +106,7 @@
             --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9; --cyan: #42f5f5; --pink: #f4c0cb; --beige: #e6d1b9; }
   nav.top .find { position: relative; flex: 0 1 460px; margin: 0 auto; }
   nav.top .kbl { margin-right: 0; }                    /* (the search takes the free space on both sides: between the links) */
-  @media (min-width: 1700px) { nav.top .wrap { position: relative; } nav.top .kbl { margin-right: auto; }
+  @media (min-width: 1700px) { nav.top .wrap { position: relative; } nav.top .home { margin-left: auto; }
                                nav.top .find { position: absolute; left: 50%; width: 460px; transform: translateX(-50%); } }
   @media (max-width: 900px) { nav.top .wrap { flex-wrap: wrap; height: auto; min-height: 60px; row-gap: 0; }
                               nav.top .find { order: 10; flex-basis: 100%; margin: 0 0 10px; } }
@@ -126,6 +125,9 @@
   @media (max-width: 560px) { nav .shopdd .ddb .ar { display: none; } nav .dd.shopdd { margin-left: 0; } }
   @media (max-width: 420px) { nav .ddb .ar { display: none; } }          /* (a phone with Shop: Devices, KB, Shop on the name's line) */
   @media (max-width: 760px) { #shopm .side { display: block; padding: 12px 16px; } #shopm .side > :not(.ad) { display: none; } }   /* (the notice stays) */
+  /* a narrow phone: name, Devices, Tools and Shop on one line (a little tighter) */
+  @media (max-width: 400px) { nav.top > .wrap { column-gap: 8px; } nav.top .mark { font-size: 17px; } }
+  @media (max-width: 370px) { nav.top > .wrap { column-gap: 6px; } nav.top .mark { font-size: 16px; } nav .dd { margin-left: 2px; } }
   .strip { display: flex; height: 4px; } .strip i { flex: 1; }
   .strip i:nth-child(1) { background: var(--cyan); } .strip i:nth-child(2) { background: var(--blue); }
   .strip i:nth-child(3) { background: var(--pink); } .strip i:nth-child(4) { background: var(--beige); }
@@ -221,7 +223,7 @@
       <div class="side">
         <p class="k">The Firmware Hub</p>
         <p>Open-source firmware for small music machines, from their makers, installed in the browser.</p>
-        <a href="/">All FM-1 firmwares</a><a href="/kb/">Knowledge Base</a><a href="/tools/">Tools</a><a href="/#submit">Submit a firmware</a><a href="/vibe/?ref=menu">VIBE FM Mk1</a>
+        <a href="/">All FM-1 firmwares</a><a href="/kb/">Knowledge Base</a><a href="/#submit">Submit a firmware</a><a href="/vibe/?ref=menu">VIBE FM Mk1</a>
         <a id="getapp" href="/#app">Get the app</a>
         <hr><p>Made firmware for another device?</p>
         <a class="mail" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device">zven@thefirmwarehub.com</a>
@@ -233,14 +235,12 @@
           <span><b>M-VAVE SMK-37 Pro</b><small>15 firmwares · Pro, Elite, MKE-P37</small></span></a>
         <a class="tile vibe-t" href="/vibe/?ref=menu" data-dev="vibe"><span class="pic"><img src="/vibe/assets/img/banner-device.jpg" alt=""></span>
           <span><b>VIBE FM Mk1</b><small>Hardware with open firmware · join the list</small></span></a>
-        <a class="tile tools-t" href="/tools/" data-dev="tools" aria-current="page"><span class="pic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a4 4 0 0 0 5.2 5.2l-8.6 8.6a2.1 2.1 0 0 1-3-3l8.6-8.6a4 4 0 0 0-2.2-2.2Z"/><path d="M14.7 6.3 17 4l3 3-2.3 2.3"/></svg></span>
-          <span><b>Tools</b><small>Emulators, editors, rescue</small></span></a>
         <a class="tile add" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device"><span class="pic">+</span>
           <span><b>Your device</b><small>Firmware for another machine? Tell us.</small></span></a>
       </div>
     </div></div>
   </div>
-  <a class="kbl" href="/kb/" title="Knowledge Base: how a firmware gets onto the FM-1"><span class="lg">Knowledge Base</span><span class="sm">KB</span></a>
+  <a class="kbl tll" aria-current="page" href="/tools/" title="Tools: emulators, editors, backup and rescue, and the Knowledge Base">Tools</a>
   <div class="dd shopdd" id="shopdd" hidden>
     <button class="ddb" type="button" aria-expanded="false" aria-controls="shopm">Shop<span class="ar" aria-hidden="true">▼</span></button>
     <div class="mega" id="shopm"><div class="wrap in">
@@ -298,68 +298,68 @@
   <h1>Tools for the <b>FM-1</b> and the <b>SMK-37</b>.</h1>
   <p class="lead">Everything around the firmwares: emulators, editors, backup and rescue, building your own. Open source,
     from their makers; we only link.</p>
-  <div class="jump"><a href="#try">Try without a device</a><a href="#sounds">Sounds &amp; editors</a><a href="#rescue">Backup &amp; rescue</a><a href="#dev">For developers</a><a href="#official">Official</a></div>
+  <div class="jump"><a href="#try">Try without a device</a><a href="#sounds">Sounds &amp; editors</a><a href="#rescue">Backup &amp; rescue</a><a href="#dev">For developers</a><a href="#official">Official</a><a href="/kb/" title="How a firmware gets onto the FM-1: the protocol, the identities, building, rescue">📖 Knowledge Base</a></div>
 </div></header>
 
 <main><div class="wrap">
 <section class="grp" id="try"><h2>Try without a device</h2><p class="sub">Run the firmwares on your computer: nothing installed, nothing touches your FM-1.</p>
 <div class="grid">
 <article class="tool" id="t-fm1-emu"><h3>fm1-emu</h3>
-  <div class="by">by <a href="https://github.com/joakimeriksson" target="_blank" rel="noopener">Joakim Eriksson</a></div><div class="tags"><span class="tag fm1">FM-1</span><span class="tag smk">SMK-37</span></div>
-  <p class="what">Emulates the FM-1 and runs its firmwares unchanged: in the browser, as a desktop app, or as an AU / VST3 instrument in your DAW. It loads the hub&#x27;s firmwares, and has the SMK-37 too.</p><div class="links"><a class="go" href="https://joakimeriksson.github.io/fm1-emu/" target="_blank" rel="noopener">Open in the browser ↗</a><a href="https://joakimeriksson.github.io/fm1-emu/smk37/" target="_blank" rel="noopener">SMK-37 ↗</a><a href="https://github.com/joakimeriksson/fm1-emu" target="_blank" rel="noopener">Source ↗</a></div><div class="lic">Licence: MIT</div></article>
+  <div class="by">by <a href="https://github.com/joakimeriksson" target="_blank" rel="nofollow noopener">Joakim Eriksson</a></div><div class="tags"><span class="tag fm1">FM-1</span><span class="tag smk">SMK-37</span></div>
+  <p class="what">Emulates the FM-1 and runs its firmwares unchanged: in the browser, as a desktop app, or as an AU / VST3 instrument in your DAW. It loads the hub&#x27;s firmwares, and has the SMK-37 too.</p><div class="links"><a class="go" href="https://joakimeriksson.github.io/fm1-emu/" target="_blank" rel="nofollow noopener">Open in the browser ↗</a><a href="https://joakimeriksson.github.io/fm1-emu/smk37/" target="_blank" rel="nofollow noopener">SMK-37 ↗</a><a href="https://github.com/joakimeriksson/fm1-emu" target="_blank" rel="nofollow noopener">Source ↗</a></div><div class="lic">Licence: MIT</div></article>
 <article class="tool" id="t-fm1-emulator"><h3>fm1-emulator</h3>
-  <div class="by">by <a href="https://github.com/simonjohansson" target="_blank" rel="noopener">Simon Johansson</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">Emulates the FM-1&#x27;s chip and board on QEMU and runs the same .fwsc package you would install, with the screen, keys, knobs and sound. A desktop app for macOS (Apple Silicon) and Linux (x86-64).</p><div class="links"><a class="go" href="https://github.com/simonjohansson/fm1-emulator/releases/latest" target="_blank" rel="noopener">Download ↗</a><a href="/kb/#try">How to use it</a><a href="https://github.com/simonjohansson/fm1-emulator" target="_blank" rel="noopener">Source ↗</a></div><div class="lic">Licence: GPL-2.0</div></article>
+  <div class="by">by <a href="https://github.com/simonjohansson" target="_blank" rel="nofollow noopener">Simon Johansson</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">Emulates the FM-1&#x27;s chip and board on QEMU and runs the same .fwsc package you would install, with the screen, keys, knobs and sound. A desktop app for macOS (Apple Silicon) and Linux (x86-64).</p><div class="links"><a class="go" href="https://github.com/simonjohansson/fm1-emulator/releases/latest" target="_blank" rel="nofollow noopener">Download ↗</a><a href="/kb/#try">How to use it</a><a href="https://github.com/simonjohansson/fm1-emulator" target="_blank" rel="nofollow noopener">Source ↗</a></div><div class="lic">Licence: GPL-2.0</div></article>
 </div></section>
 <section class="grp" id="sounds"><h2>Sounds &amp; editors</h2><p class="sub">Edit voices, manage banks, bring your own samples.</p>
 <div class="grid">
 <article class="tool" id="t-fm1-editor"><h3>FM1 Editor &amp; Librarian</h3>
-  <div class="by">by <a href="https://github.com/benny-sparra" target="_blank" rel="noopener">Benny Sparra</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">A DX7 voice editor and patch librarian in the browser: banks, every DX7 parameter and the FM-1&#x27;s effects, sent over USB MIDI. For the stock firmware and FM-1+VA.</p><div class="links"><a class="go" href="https://fm1-editor.com/" target="_blank" rel="noopener">Open the editor ↗</a><a href="https://github.com/benny-sparra/fm1-dx7-patch-importer" target="_blank" rel="noopener">Source ↗</a></div><div class="lic">Licence: MIT</div></article>
+  <div class="by">by <a href="https://github.com/benny-sparra" target="_blank" rel="nofollow noopener">Benny Sparra</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">A DX7 voice editor and patch librarian in the browser: banks, every DX7 parameter and the FM-1&#x27;s effects, sent over USB MIDI. For the stock firmware and FM-1+VA.</p><div class="links"><a class="go" href="https://fm1-editor.com/" target="_blank" rel="nofollow noopener">Open the editor ↗</a><a href="https://github.com/benny-sparra/fm1-dx7-patch-importer" target="_blank" rel="nofollow noopener">Source ↗</a></div><div class="lic">Licence: MIT</div></article>
 <article class="tool" id="t-dexed"><h3>Dexed</h3>
-  <div class="by">by <a href="https://github.com/asb2m10" target="_blank" rel="noopener">Pascal Gauthier (asb2m10)</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">The DX7 as a free plugin and app: edit voices and banks and send them as SysEx. The stock FM-1 takes DX7 SysEx.</p><div class="links"><a class="go" href="https://asb2m10.github.io/dexed/" target="_blank" rel="noopener">Download ↗</a><a href="https://github.com/asb2m10/dexed" target="_blank" rel="noopener">Source ↗</a></div><div class="lic">Licence: GPL-3.0</div></article>
+  <div class="by">by <a href="https://github.com/asb2m10" target="_blank" rel="nofollow noopener">Pascal Gauthier (asb2m10)</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">The DX7 as a free plugin and app: edit voices and banks and send them as SysEx. The stock FM-1 takes DX7 SysEx.</p><div class="links"><a class="go" href="https://asb2m10.github.io/dexed/" target="_blank" rel="nofollow noopener">Download ↗</a><a href="https://github.com/asb2m10/dexed" target="_blank" rel="nofollow noopener">Source ↗</a></div><div class="lic">Licence: GPL-3.0</div></article>
 <article class="tool" id="t-zp12-tools"><h3>zp12 sample editor + backup</h3>
-  <div class="by">by <a href="https://github.com/zvenson" target="_blank" rel="noopener">zvenson</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">Your own samples on the zp12 firmware: drop a WAV, trim it or chop a loop, hear it as the FM-1 plays it, put it on a pad. And a backup of zp12&#x27;s loops, sounds, songs and samples.</p><div class="links"><a class="go" href="https://zp12.designburgapps.com/editor/" target="_blank" rel="noopener">Sample editor ↗</a><a href="https://zp12.designburgapps.com/backup/" target="_blank" rel="noopener">Backup ↗</a><a href="https://github.com/zvenson/zp12" target="_blank" rel="noopener">Source ↗</a></div><div class="lic">Licence: GPL-3.0</div></article>
+  <div class="by">by <a href="https://github.com/zvenson" target="_blank" rel="nofollow noopener">zvenson</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">Your own samples on the zp12 firmware: drop a WAV, trim it or chop a loop, hear it as the FM-1 plays it, put it on a pad. And a backup of zp12&#x27;s loops, sounds, songs and samples.</p><div class="links"><a class="go" href="https://zp12.designburgapps.com/editor/" target="_blank" rel="nofollow noopener">Sample editor ↗</a><a href="https://zp12.designburgapps.com/backup/" target="_blank" rel="nofollow noopener">Backup ↗</a><a href="https://github.com/zvenson/zp12" target="_blank" rel="nofollow noopener">Source ↗</a></div><div class="lic">Licence: GPL-3.0</div></article>
 <article class="tool" id="t-sloopdx-editor"><h3>sloopDX editor</h3>
-  <div class="by">by <a href="https://github.com/zvenson" target="_blank" rel="noopener">zvenson</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">The sloopDX firmware&#x27;s editor in the browser: DX7 voices, sounds, sequencer and tracks, .syx bank upload and a backup.</p><div class="links"><a class="go" href="https://dx7.designburgapps.com/webapp/editor/" target="_blank" rel="noopener">Open the editor ↗</a><a href="https://github.com/zvenson/dxsloop" target="_blank" rel="noopener">Source ↗</a></div><div class="lic">Licence: GPL-3.0</div></article>
+  <div class="by">by <a href="https://github.com/zvenson" target="_blank" rel="nofollow noopener">zvenson</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">The sloopDX firmware&#x27;s editor in the browser: DX7 voices, sounds, sequencer and tracks, .syx bank upload and a backup.</p><div class="links"><a class="go" href="https://dx7.designburgapps.com/webapp/editor/" target="_blank" rel="nofollow noopener">Open the editor ↗</a><a href="https://github.com/zvenson/dxsloop" target="_blank" rel="nofollow noopener">Source ↗</a></div><div class="lic">Licence: GPL-3.0</div></article>
 <article class="tool" id="t-fm1-workbench-community"><h3>FM-1 Workbench (community)</h3>
-  <div class="by">by <a href="https://github.com/thegiantsnail" target="_blank" rel="noopener">thegiantsnail</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">A community workbench in the browser: DX7 voice library and editor, a drum sequencer, a MIDI file player and a speech tab, with a software FM-1 when none is connected. Also an Android app and a VST3 / CLAP controller. Not M-VAVE&#x27;s FM1 Workbench.</p><div class="links"><a class="go" href="https://fm1-workbench.web.app/" target="_blank" rel="noopener">Open the workbench ↗</a><a href="https://github.com/thegiantsnail/fm1-workbench-public" target="_blank" rel="noopener">Source ↗</a></div><div class="lic">Licence: GPL-3.0</div></article>
+  <div class="by">by <a href="https://github.com/thegiantsnail" target="_blank" rel="nofollow noopener">thegiantsnail</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">A community workbench in the browser: DX7 voice library and editor, a drum sequencer, a MIDI file player and a speech tab, with a software FM-1 when none is connected. Also an Android app and a VST3 / CLAP controller. Not M-VAVE&#x27;s FM1 Workbench.</p><div class="links"><a class="go" href="https://fm1-workbench.web.app/" target="_blank" rel="nofollow noopener">Open the workbench ↗</a><a href="https://github.com/thegiantsnail/fm1-workbench-public" target="_blank" rel="nofollow noopener">Source ↗</a></div><div class="lic">Licence: GPL-3.0</div></article>
 </div></section>
 <section class="grp" id="rescue"><h2>Backup &amp; rescue</h2><p class="sub">Save the whole flash before you experiment, and bring back an FM-1 that no installer reaches.</p>
 <div class="grid">
 <article class="tool" id="t-fm1-rescue"><h3>The hub&#x27;s Rescue</h3>
-  <div class="by">by <a href="https://github.com/zvenson" target="_blank" rel="noopener">zvenson</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <div class="by">by <a href="https://github.com/zvenson" target="_blank" rel="nofollow noopener">zvenson</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
   <p class="what">Puts a firmware back on an FM-1 that no installer reaches any more, through the chip&#x27;s own bootloader. A Python script for Linux.</p><div class="links"><a class="go" href="/#rescue">How to rescue</a><a href="/rescue/fm1_rescue.py">Source</a></div><div class="lic">Licence: GPL-3.0</div></article>
 <article class="tool" id="t-unbricker"><h3>MvaveFM1Unbricker</h3>
-  <div class="by">by <a href="https://github.com/Quixotic7" target="_blank" rel="noopener">Quixotic7</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">Unbricks an FM-1: first a full flash backup (read twice and compared), then it writes the firmware and checks every byte. Windows and Linux; macOS through the FM-1 Transporter.</p><div class="links"><a class="go" href="https://github.com/Quixotic7/MvaveFM1Unbricker" target="_blank" rel="noopener">Source on GitHub ↗</a></div><div class="lic">Licence: MIT</div></article>
+  <div class="by">by <a href="https://github.com/Quixotic7" target="_blank" rel="nofollow noopener">Quixotic7</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">Unbricks an FM-1: first a full flash backup (read twice and compared), then it writes the firmware and checks every byte. Windows and Linux; macOS through the FM-1 Transporter.</p><div class="links"><a class="go" href="https://github.com/Quixotic7/MvaveFM1Unbricker" target="_blank" rel="nofollow noopener">Source on GitHub ↗</a></div><div class="lic">Licence: MIT</div></article>
 <article class="tool" id="t-m-flasher"><h3>M-Flasher</h3>
-  <div class="by">by <a href="https://github.com/jvitkauskas" target="_blank" rel="noopener">jvitkauskas</a></div><div class="tags"><span class="tag fm1">FM-1</span><span class="tag smk">SMK-37</span></div>
-  <p class="what">Backs up, restores and installs firmware through the chip&#x27;s USB download mode, so it also works when the firmware is broken. Windows, macOS and Linux.</p><div class="links"><a class="go" href="https://github.com/jvitkauskas/m-flasher" target="_blank" rel="noopener">Source on GitHub ↗</a></div><div class="lic">Licence: MIT</div></article>
+  <div class="by">by <a href="https://github.com/jvitkauskas" target="_blank" rel="nofollow noopener">jvitkauskas</a></div><div class="tags"><span class="tag fm1">FM-1</span><span class="tag smk">SMK-37</span></div>
+  <p class="what">Backs up, restores and installs firmware through the chip&#x27;s USB download mode, so it also works when the firmware is broken. Windows, macOS and Linux.</p><div class="links"><a class="go" href="https://github.com/jvitkauskas/m-flasher" target="_blank" rel="nofollow noopener">Source on GitHub ↗</a></div><div class="lic">Licence: MIT</div></article>
 <article class="tool" id="t-fm1-transporter"><h3>FM-1 Transporter</h3>
-  <div class="by">by <a href="https://github.com/kurogedelic" target="_blank" rel="noopener">kurogedelic</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">Hardware: a Seeed XIAO RP2040 wired to the FM-1&#x27;s USB lines reads and writes its whole flash, 1 MiB in about three seconds.</p><div class="links"><a class="go" href="https://github.com/kurogedelic/FM-1-transporter" target="_blank" rel="noopener">Source on GitHub ↗</a></div><div class="lic">Licence: MIT</div></article>
+  <div class="by">by <a href="https://github.com/kurogedelic" target="_blank" rel="nofollow noopener">kurogedelic</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">Hardware: a Seeed XIAO RP2040 wired to the FM-1&#x27;s USB lines reads and writes its whole flash, 1 MiB in about three seconds.</p><div class="links"><a class="go" href="https://github.com/kurogedelic/FM-1-transporter" target="_blank" rel="nofollow noopener">Source on GitHub ↗</a></div><div class="lic">Licence: MIT</div></article>
 </div></section>
 <section class="grp" id="dev"><h2>For developers</h2><p class="sub">Build your own firmware, port one, or look under the hood.</p>
 <div class="grid">
 <article class="tool" id="t-build"><h3>Build your own</h3>
-  <div class="by">by <a href="https://github.com/zvenson" target="_blank" rel="noopener">zvenson</a> and <a href="https://github.com/hugelton" target="_blank" rel="noopener">hugelton</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">Dinghy is the smallest FM-1 firmware to build on, with the plumbing done and documented. Felucca&#x27;s BUILDING.md shows how a full firmware is built, and felucca-bsp is the chip and board layer under it.</p><div class="links"><a class="go" href="https://github.com/zvenson/dinghy" target="_blank" rel="noopener">Dinghy ↗</a><a href="https://github.com/hugelton/Felucca/blob/main/BUILDING.md" target="_blank" rel="noopener">Felucca BUILDING.md ↗</a><a href="https://github.com/hugelton/felucca-bsp" target="_blank" rel="noopener">felucca-bsp ↗</a></div><div class="lic">Licence: GPL-3.0 · felucca-bsp MPL-2.0</div></article>
+  <div class="by">by <a href="https://github.com/zvenson" target="_blank" rel="nofollow noopener">zvenson</a> and <a href="https://github.com/hugelton" target="_blank" rel="nofollow noopener">hugelton</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">Dinghy is the smallest FM-1 firmware to build on, with the plumbing done and documented. Felucca&#x27;s BUILDING.md shows how a full firmware is built, and felucca-bsp is the chip and board layer under it.</p><div class="links"><a class="go" href="https://github.com/zvenson/dinghy" target="_blank" rel="nofollow noopener">Dinghy ↗</a><a href="https://github.com/hugelton/Felucca/blob/main/BUILDING.md" target="_blank" rel="nofollow noopener">Felucca BUILDING.md ↗</a><a href="https://github.com/hugelton/felucca-bsp" target="_blank" rel="nofollow noopener">felucca-bsp ↗</a></div><div class="lic">Licence: GPL-3.0 · felucca-bsp MPL-2.0</div></article>
 <article class="tool" id="t-fm1-to-smk37"><h3>fm1-to-smk37</h3>
-  <div class="by">by <a href="https://github.com/genkigenki" target="_blank" rel="noopener">genkigenki</a></div><div class="tags"><span class="tag fm1">FM-1</span><span class="tag smk">SMK-37</span></div>
-  <p class="what">A guide to moving FM-1 firmwares to the SMK-37: what changes, and how the hub&#x27;s SMK-37 ports were made.</p><div class="links"><a class="go" href="https://github.com/genkigenki/fm1-to-smk37" target="_blank" rel="noopener">Source on GitHub ↗</a></div><div class="lic">Licence: CC BY-NC 4.0 (documentation, non-commercial licence)</div></article>
+  <div class="by">by <a href="https://github.com/genkigenki" target="_blank" rel="nofollow noopener">genkigenki</a></div><div class="tags"><span class="tag fm1">FM-1</span><span class="tag smk">SMK-37</span></div>
+  <p class="what">A guide to moving FM-1 firmwares to the SMK-37: what changes, and how the hub&#x27;s SMK-37 ports were made.</p><div class="links"><a class="go" href="https://github.com/genkigenki/fm1-to-smk37" target="_blank" rel="nofollow noopener">Source on GitHub ↗</a></div><div class="lic">Licence: CC BY-NC 4.0 (documentation, non-commercial licence)</div></article>
 <article class="tool" id="t-under-the-hood"><h3>Under the hood</h3>
-  <div class="by">by <a href="https://github.com/AL-255" target="_blank" rel="noopener">AL-255</a> and <a href="https://github.com/kagaimiq" target="_blank" rel="noopener">kagaimiq</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">FM-1-RE: the reverse engineering of the FM-1&#x27;s firmware and its update protocol. jl-uboot-tool: a flasher and dumper for JieLi chips like the FM-1&#x27;s.</p><div class="links"><a class="go" href="https://github.com/AL-255/FM-1-RE" target="_blank" rel="noopener">FM-1-RE ↗</a><a href="https://github.com/kagaimiq/jl-uboot-tool" target="_blank" rel="noopener">jl-uboot-tool ↗</a></div><div class="lic">Licence: WTFPL · MIT</div></article>
+  <div class="by">by <a href="https://github.com/AL-255" target="_blank" rel="nofollow noopener">AL-255</a> and <a href="https://github.com/kagaimiq" target="_blank" rel="nofollow noopener">kagaimiq</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">FM-1-RE: the reverse engineering of the FM-1&#x27;s firmware and its update protocol. jl-uboot-tool: a flasher and dumper for JieLi chips like the FM-1&#x27;s.</p><div class="links"><a class="go" href="https://github.com/AL-255/FM-1-RE" target="_blank" rel="nofollow noopener">FM-1-RE ↗</a><a href="https://github.com/kagaimiq/jl-uboot-tool" target="_blank" rel="nofollow noopener">jl-uboot-tool ↗</a></div><div class="lic">Licence: WTFPL · MIT</div></article>
 </div></section>
 <section class="official" id="official"><h2>Official, not open source</h2><p class="sub">From M-VAVE itself, for comparison: not one of the open projects above.</p>
 <article class="tool" id="t-mvave-workbench"><h3>M-VAVE FM1 Workbench</h3>
-  <div class="by">by <a href="https://open.m-vave.com/fm1-workbench" target="_blank" rel="noopener">M-VAVE</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
-  <p class="what">M-VAVE&#x27;s own editor and simulator in the browser (Chinese or English): play and edit, projects, sounds and samples, and switching the firmware between the official V15 and their Open V13.</p><p class="note">Not open source as a whole: the app is GPL-3.0 with an SDK exception, the sound engine is a closed library. The way back is V15, from the same page.</p><div class="links"><a class="go" href="https://open.m-vave.com/fm1-workbench" target="_blank" rel="noopener">Open the workbench ↗</a></div><div class="lic">Licence: App GPL-3.0, engine closed</div></article>
+  <div class="by">by <a href="https://open.m-vave.com/fm1-workbench" target="_blank" rel="nofollow noopener">M-VAVE</a></div><div class="tags"><span class="tag fm1">FM-1</span></div>
+  <p class="what">M-VAVE&#x27;s own editor and simulator in the browser (Chinese or English): play and edit, projects, sounds and samples, and switching the firmware between the official V15 and their Open V13.</p><p class="note">Not open source as a whole: the app is GPL-3.0 with an SDK exception, the sound engine is a closed library. The way back is V15, from the same page.</p><div class="links"><a class="go" href="https://open.m-vave.com/fm1-workbench" target="_blank" rel="nofollow noopener">Open the workbench ↗</a></div><div class="lic">Licence: App GPL-3.0, engine closed</div></article>
 </section>
 <p class="tell">Made a tool? Tell us: <a href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20a%20tool">zven@thefirmwarehub.com</a></p>
 <p class="fine">Each tool belongs to its makers, under its own licence. We do not develop, test or support the others' tools:
@@ -378,7 +378,7 @@
   here, it installs from baudgirl.com. The update path is Felucca's, as sloopDX carries it. M-VAVE, FM-1 and SMK-37 are trademarks of
   their owners; not affiliated with M-VAVE. E-mu and SP-1200 are trademarks of their owners. Unofficial firmware, free and without
   warranty: you install it at your own risk.
-  <br><a href="https://designburg.net/">designburg.net</a> · <a href="/tools/">Tools</a> · <a href="/impressum/">Impressum</a> · <a href="/impressum/#datenschutz">Datenschutz</a>
+  <br><a href="https://designburg.net/">designburg.net</a> · <a href="/tools/">Tools</a> · <a href="/kb/">Knowledge Base</a> · <a href="/impressum/">Impressum</a> · <a href="/impressum/#datenschutz">Datenschutz</a>
   · <a href="https://www.youtube.com/@sonzven?sub_confirmation=1" target="_blank" rel="noopener">▶ YouTube: @sonzven</a>
   · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a><span id="updated"></span>
 </div></footer>

@@ -76,8 +76,8 @@ def tools_cards():
     M-VAVE's own (not open source) in a box apart. Returns (the jump links, the sections)"""
     d = json.loads((HERE / "web" / "tools.json").read_text(encoding="utf-8"))
     e = lambda x: html.escape(str(x), quote=True)
-    def a(u, t, c=""):                                  # (our own pages in the same tab, the others' in a new one)
-        return f'<a{c} href="{e(u)}">{t}</a>' if u.startswith("/") else f'<a{c} href="{e(u)}" target="_blank" rel="noopener">{t} ↗</a>'
+    def a(u, t, c=""):                                  # (our own pages in the same tab, the others' in a new one, nofollow: no link juice)
+        return f'<a{c} href="{e(u)}">{t}</a>' if u.startswith("/") else f'<a{c} href="{e(u)}" target="_blank" rel="nofollow noopener">{t} ↗</a>'
     def card(t):
         by = " and ".join(a(u, e(n)).replace(" ↗", "") for n, u in t["by"])
         tags = "".join(f'<span class="tag {"smk" if d_ == "SMK-37" else "fm1"}">{e(d_)}</span>' for d_ in t["devices"])
@@ -123,8 +123,8 @@ def devices(text, dev, ref="hub"):
     """the devices menu (web/devices.css, web/devices.html) into a page: /*DEVICES*/ in its style, <!--DEVICES--> in its nav;
     the page's own device marked"""
     menu = (HERE / "web" / "devices.html").read_text(encoding="utf-8").replace(f'data-dev="{dev}"', f'data-dev="{dev}" aria-current="page"')
-    if ref == "kb":                                     # (the Knowledge Base link beside Devices: marked on the KB itself)
-        menu = menu.replace('<a class="kbl"', '<a class="kbl" aria-current="page"')
+    if ref == "tools":                                  # (Tools beside it: marked on the Tools page)
+        menu = menu.replace('<a class="kbl tll"', '<a class="kbl tll" aria-current="page"', 1)
     own, ports, n = smk_cards()
     ours, fm1, smk = credits()
     foot = ((HERE / "web" / "footer.html").read_text(encoding="utf-8").replace("<!--F-OURS-->", ours)
