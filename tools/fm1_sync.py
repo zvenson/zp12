@@ -29,7 +29,8 @@ BLK, KEEP, BLOCKS = 0x30, 0x2F, 20                # (as fm1pkg.js productOf)
 # id, editor / play (its web editor, its version in the browser), kind (the page's filter, one or a list: synth,
 # groove, drums, chords, dev, other), added (the day it came on the hub, not its release), name, author, repo, the identity the running firmware reports (regex), what it is; source: "github" (the
 # latest release's .fwsc), "pages:<its web installer>" (no releases: the package its installer names), "repo:<dir>" (no releases: the newest
-# package committed in that directory of the repository, its tag v<version>) or a path in this machine's checkouts (our own, deployed from there)
+# package committed in that directory of the repository, its tag v<version>), "repo:<file>@<sha>" (no releases, no tags: that
+# package at that commit, pinned) or a path in this machine's checkouts (our own, deployed from there)
 # installs on the cards: Matomo's "Install OK" events of site 4 (the page sends "<name> <version>"), all versions
 # together; the token (view access is enough) in ~/.config/designburg/matomo-token, none there: no counts
 # (and only with FM1_INSTALLS=1: /srv/fm1/staging/sync.sh sets it, the live sync not yet)
@@ -290,6 +291,12 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://konsumer.js.org/fomajam/",
          what="A drum machine in the classic step-grid style: voices after the 909, 808, 707, 606, DMX and more, a "
               "machine per voice, accents and patterns. Play it in the browser first."),
+    dict(id="kawa", added="2026-10-17",
+         kind="groove", name="KAWA", author="Omnipotard (Guizmoh)", repo="Guizmoh/Kawa-Tracker-Fm1", ident=r"FM-1_95\d",
+         src="repo:kawa-0.2.fwsc@decda3cb0d9a194dffc31ecf6d18a9c64eb8261f",   # (no releases, no tags: the package in the repo, pinned)
+         what="A pocket tracker for any style: six tracks with an engine each (pulse, 4-bit wave, noise, 6-operator FM, "
+              "drum kit or sample), patterns chained into a song, 32 live effects and tools that write beats for you. "
+              "A beta, not yet tried on a real FM-1 by its maker."),
 ]
 
 
@@ -449,8 +456,15 @@ def latest_pages(spec, repo):
 
 def latest_repo(spec, repo):
     """the newest package committed in the repository (repo:<dir>; a project without releases yet): one API call for
-    the listing, one for the commit's date; the source at the tag v<version>"""
+    the listing, one for the commit's date; the source at the tag v<version>. repo:<file>@<sha>: that one package at
+    that commit (no releases, no tags: a fixed package, its source that commit's tree; a new one is a new pin here)"""
     sub = spec.split(":", 1)[1]
+    if "@" in sub:
+        path, sha = sub.rsplit("@", 1)
+        date = json.loads(get(f"https://api.github.com/repos/{repo}/commits/{sha}"))["commit"]["committer"]["date"]
+        version = re.sub(r"^[A-Za-z0-9]+[-_]v?|\.fwsc$", "", path.rsplit("/", 1)[-1])
+        return (get(f"https://raw.githubusercontent.com/{repo}/{sha}/{urllib.parse.quote(path)}", "application/octet-stream"),
+                version, date, None, f"https://github.com/{repo}/tree/{sha}")
     files = json.loads(get(f"https://api.github.com/repos/{repo}/contents/{sub}"))
     vkey = lambda f: [int(n) for n in re.findall(r"\d+", f["name"])]
     pkgs = sorted((f for f in files if f["name"].endswith(".fwsc")), key=vkey)
