@@ -89,6 +89,14 @@
   });
   addEventListener("appinstalled", () => { bar?.remove(); prompt = null; });
   addEventListener("DOMContentLoaded", () => {
+    // the kinds' row on a desktop (one line, see .chips in the page's style): the fade at its edge only while chips are hidden
+    const chips = document.getElementById("chips");
+    if (chips) {
+      const fit = () => chips.classList.toggle("fits", chips.scrollLeft + chips.clientWidth >= chips.scrollWidth - 2);
+      new ResizeObserver(fit).observe(chips);
+      new MutationObserver(fit).observe(chips, { childList: true, subtree: true });
+      chips.addEventListener("scroll", fit, { passive: true });
+    }
     // visible: "Get the app" beside the page's buttons (FM-1, SMK-37), and in the Devices menu; gone inside the app
     const row = document.querySelector("header .bar");
     if (row && !standalone && !ios) {
