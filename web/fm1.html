@@ -311,7 +311,6 @@
   <div class="bar">
     <button id="connect">Connect the FM-1</button>
     <div class="status" id="now">Not connected</div>
-    <a class="btn ghost" href="#official" title="Back to M-VAVE's own firmware">↩ Official firmware</a>
     <a class="btn ghost" href="#rescue" title="An FM-1 that no installer reaches any more">🛟 Rescue</a>
     <a class="btn coffee" href="https://paypal.me/zvenson" rel="noopener" title="The hub is free and stays free: support it on PayPal">☕ Support us</a>
     <a class="btn yt" href="https://www.youtube.com/@sonzven?sub_confirmation=1" target="_blank" rel="noopener" title="Videos of the firmwares on YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.2 3.6z"/></svg>YouTube</a>
@@ -509,7 +508,7 @@ const LOOK = { dinghy: "#8f62f0", felucca: "#afd9f4", sloop: "#e6d1b9", sloopdx:
                amb: "#f6d79a", ctl: "#ef4a33", winampfm: "#5b7bff", mycelium: "#9ccce4", polly: "#7b93e0", etch: "#cfcfcf", fm106: "#2a9fd6",
                tribe: "#fc6c54", duell: "#e6e6e6", skiff: "#fcb424", fart: "#84cc9c", orbit: "#4f7ff0", felucca8: "#afd9f4",
                vector37: "#5fc48a", makkuro37: "#d0524f" };   // (the SMK-37 page takes its colours from here too: tools/make_fm1.py)
-const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chords"], ["dev", "For devs"], ["other", "Other"], ["vintage", "Vintage"]];
+const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chords"], ["dev", "For devs"], ["other", "Other"], ["vintage", "Vintage"], ["play", "▶ Play in browser"]];
 const KIND_TAG = { synth: "synth", groove: "groovebox", drums: "drums · sampler", chords: "chords", dev: "for developers", other: "other", vintage: "vintage" };
 const kindsOf = (f) => [].concat(f.kind || [], f.vintage ? ["vintage"] : []);   // (vintage: a classic instrument rebuilt, a group of its own)
 const BUILD_AT = { dinghy: "#build-your-own" };                       // (the step-by-step manual in its README)
@@ -526,7 +525,7 @@ let q = new URLSearchParams(location.search).get("q") || "";
 const words = () => fold(q).split(/\s+/).filter(Boolean);
 const hits = (text) => { const t = fold(text); return words().every((w) => t.includes(w)); };
 const found = (f) => hits([f.name, f.id, f.author, f.what, f.product, ...kindsOf(f).map((k) => KIND_TAG[k] || k)].join(" "));
-const inKind = (f, k) => k === "all" || (k === "fav" ? isFav(f.id) : kindsOf(f).includes(k));
+const inKind = (f, k) => k === "all" || (k === "fav" ? isFav(f.id) : k === "play" ? !!f.play : kindsOf(f).includes(k));   // (play: an emulator to try it without an FM-1)
 function chips() {
   if (kind !== "fav" && !KINDS.some(([k]) => k === kind)) kind = "all";
   const extFav = isFav(EXT.dataset.hub), nf = cat.filter((f) => isFav(f.id)).length + extFav;   // (+ the link card's heart)
