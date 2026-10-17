@@ -25,6 +25,11 @@
     const shop = { DE: "de", AT: "de", US: "us" }[j.cc], el = document.getElementById("shopdd");
     if (shop && el) { el.dataset.cc = shop; el.removeAttribute("hidden"); }
   }).catch(() => {});
+  // (a click in the shop: a Matomo event "Shop" / the device / the store, beside the outlink Matomo counts anyway)
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest?.("#shopm a[data-shop]");
+    if (a) { const [dev, store] = a.dataset.shop.split("|"); try { (window._paq = window._paq || []).push(["trackEvent", "Shop", dev, store]); } catch {} }
+  });
 
   // the app left in the background for a while (a phone keeps it for days): the page anew when it comes back,
   // never while an install writes (fm1.html's `writing`) or a dialog is open
