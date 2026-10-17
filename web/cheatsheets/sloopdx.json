@@ -1,0 +1,131 @@
+{
+ "id": "sloopdx",
+ "name": "sloopDX",
+ "version": "4.0",
+ "ref": "872ff07ca2c344654e9fd8b976b94ea319efcd1e",
+ "manual": "https://github.com/zvenson/dxsloop/blob/main/SLOOP.md",
+ "intro": "SLOOP's live four-track groovebox with a real DX7 inside: three six-operator FM synths plus FM drums; ALGORITHM picks the track, PRESETS the voice, REC records.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    { "do": ["tap HOME"], "what": "Back to the TRACKS screen." },
+    { "do": ["turn ALGORITHM"], "what": "Pick the track: 1-3 DX7 synths, 4 FM drums." },
+    { "do": ["turn SELECT"], "what": "Tempo, on almost every page (not in the DX7 voice list)." },
+    { "do": ["tap LFO"], "what": "LFO pages; tap again for the next page (ENV likewise)." },
+    { "do": ["hold FX", "tap HOME"], "what": "Lock a held layer open; any other button closes it." },
+    { "do": ["hold HOME"], "what": "Settings menu: SCREEN, LIGHTS, AUDIO, SYSTEM; OCT- closes it." }
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    { "do": ["turn PRESETS"], "what": "The track's sound: DX7 voices, your bank, user presets; drums: kit." },
+    { "do": ["tap OCT-"], "what": "Octave down; both OCT buttons together: back to 0." },
+    { "do": ["hold OCT-", "white key 1-16"], "what": "Drum track: ghost hit (OCT+: hard hit)." },
+    { "do": ["hold SEL", "white key 1-16"], "what": "Set the song's key for all synths." },
+    { "do": ["hold SEL", "turn KNOB 1"], "what": "One-key chords: TRIAD, 7TH, 9TH, SUS4, POWER." },
+    { "do": ["hold ARP", "white key 1-16"], "what": "Note repeat / drum roll; KNOB 1 sets its rate." },
+    { "do": ["tap ARP", "turn KNOB 1"], "what": "Arp mode; OMNI makes the keys a chord harp." }
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    { "do": ["tap EDIT"], "what": "Synth track: the DX7 voice list. Drum track: the drum screen." },
+    { "do": ["turn SELECT", "turn ALGORITHM"], "what": "Voice list: SELECT picks a row, ALGORITHM sets its value." },
+    { "do": ["turn SELECT", "tap EDIT"], "what": "Voice list: open OP1-OP6, Pitch Env, LFO; HOME goes back." },
+    { "do": ["turn PRESETS"], "what": "Voice list: jump straight to the next / previous operator." },
+    { "do": ["turn KNOB 1"], "what": "Voice list: low-pass CUT (KNOB 2 RESO, 3 REL, 4 FDBK)." },
+    { "do": ["tap SAVE"], "what": "Voice list: store your voice edits into the DX7 bank." },
+    { "do": ["turn KNOB 2"], "what": "On TRACKS: level of the selected track (KNOB 4 pan)." },
+    { "do": ["hold GLO", "turn KNOB 1"], "what": "Level of track 1 (KNOB 2-4: tracks 2-4)." }
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    { "do": ["tap PLAY"], "what": "Start / stop all four tracks." },
+    { "do": ["tap REC"], "what": "Playing: record now, on top. Stopped: arm, first note starts." },
+    { "do": ["tap REC"], "what": "Empty song: play freely, REC on the next 1 closes the loop." },
+    { "do": ["hold REC"], "what": "Hold 2 seconds: clear the selected track." },
+    { "do": ["hold EDIT", "tap OCT-"], "what": "Undo (OCT+: redo)." },
+    { "do": ["hold SEQ", "white key 1-16"], "what": "Set or clear steps 1-16 (drums: the sound on KNOB 1)." },
+    { "do": ["hold SEQ", "turn KNOB 4"], "what": "Pattern length up to 128 (KNOB 2 step size, KNOB 3 swing)." },
+    { "do": ["hold EDIT", "white key 1-16"], "what": "Erase that note or drum sound from the loop." },
+    { "do": ["hold GLO", "white key 1-4"], "what": "Mute tracks 1-4 (keys 5-8: solo)." },
+    { "do": ["hold GLO", "white key 16"], "what": "Tap tempo." }
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    { "do": ["hold FX", "white key 1-16"], "what": "Punch-in effect while held (loops, stutter, reverse...)." },
+    { "do": ["hold FX", "black key 1-11"], "what": "More punch-ins: kills, rewind, freeze, fade out..." },
+    { "do": ["hold FX", "turn KNOB 1"], "what": "Master DJ filter (KNOB 2 dust, KNOB 3 duck)." },
+    { "do": ["hold FX", "hold OCT-"], "what": "Reverb throw while held (OCT+: echo throw)." },
+    { "do": ["tap FX"], "what": "Track sends; tap again: DIST, CHORUS, DELAY, REVERB, SLICER, INSERT." }
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    { "do": ["hold SAVE", "white key 5-8"], "what": "Save the loop as section A-D (used: press twice)." },
+    { "do": ["hold SAVE", "white key 1-4"], "what": "Play section A-D (on the next bar if playing)." },
+    { "do": ["tap SAVE"], "what": "On TRACKS: song screen; elsewhere: presets and section pages." },
+    { "do": ["tap SAVE", "tap SAVE"], "what": "Drum kit or sound page: store your kit as MY KIT." }
+   ]
+  },
+  {
+   "title": "Recovery",
+   "rows": [
+    { "do": ["hold OCT-", "power on"], "what": "USB rescue mode: reinstall from the web installer." },
+    { "do": ["hold OCT-", "hold OCT+", "power on"], "what": "Hardware calibration: teach each button and knob." },
+    { "do": ["hold OCT-", "hold OCT+"], "what": "Stopped, 5 seconds: update mode (UBOOT) for the installer." }
+   ]
+  }
+ ],
+ "keys": [
+  { "keys": [0, 2], "label": "Drums: kicks", "color": "#ff8a3d" },
+  { "keys": [4, 6], "label": "Drums: snare, clap", "color": "#ffb13d" },
+  { "keys": [7, 9, 11], "label": "Drums: hats, pedal hat", "color": "#ffd23d" },
+  { "keys": [12, 14], "label": "Drums: rim, snare 2", "color": "#ffb13d" },
+  { "keys": [16, 18], "label": "Drums: low tom, high tom", "color": "#ff8a3d" },
+  { "keys": [19, 21], "label": "Drums: crash, ride", "color": "#ffd23d" },
+  { "keys": [23, 24, 26], "label": "Drums: shaker, conga, cowbell", "color": "#ff8a3d" },
+  { "keys": "black", "label": "Drums: same sound as white key to the left", "color": "#8a8a8a" }
+ ],
+ "tips": [
+  "Every synth track is a real DX7: 6 operators, 32 algorithms, Dexed's engine; at CUT 127 a patch sounds as on a DX7.",
+  "PRESETS runs through 20 factory voices (EPIANO, FM BASS, BRASS...), then the 32 voices of your DX7 bank, then user presets.",
+  "Load your own DX7 banks (.syx, 32 voices) in the web editor: 8 banks fit in flash; the voice list's Bank row picks one.",
+  "Drums are FM too: kits DX KIT, 808 FM, ELECTRO, METAL and MY KIT. On the drum sound page the key you play picks the sound, KNOB 1-4 = TUNE, DECAY, SWEEP, BRIGHT.",
+  "Every function button is a layer: hold it and the keys and knobs change job; a short tap opens its pages.",
+  "Patterns go up to 128 steps: hold SEQ and tap OCT- / OCT+ for the 16-step pages.",
+  "MIDI: tap GLO and tap again for MIDI, MIDI 2, MIDI 3 (a channel per track, clock); GLO + black key 1 = MIDI LEARN.",
+  "Autosave: stop and leave it 2.5 s; it comes back as you left it at power-on."
+ ],
+ "checked": [
+  "Ref 872ff07 = the 4.0 release commit ('4.0: from SLOOP 2.6 / 2.7 ...'); no v4.0 tag. ui.c FELUCCA_VERSION 'sloopDX 4.0'; FM-1_940 comes from tools/build.py --release 4.0 (PRODUCT FM-1_9XY), as docs/webapp/installer meta at eeec0a6 says. No firmware change between 872ff07 and eeec0a6.",
+  "ui_input.c ui_input: HOME hold 0.7 s (btn_hold) -> menu, tap -> go_home (ui.c: FELUCCA_ARRANGER=1 -> TRACKS page); ALGORITHM -> track_select on every page (not in a take); SELECT -> G_BPM always (page_walk in ui.c is never called); PRESETS -> preset_go / drum kit on TRACKS, PRESETS page; OCT-/OCT+ octave -3..+3, both = 0, not on drum track; ENV/LFO open_family (same button again: next page).",
+  "ui_input.c tracks_edit: TRACKS KNOB 1 SWING, 2 LEVEL, 3 LEN, 4 PAN.",
+  "ui_input.c layers_input: layer + HOME tap = lock, other buttons (not PLAY/REC/OCT) unlock; EDIT + OCT-/OCT+ undo/redo; SEQ + OCT-/OCT+ step page; FX + OCT- / OCT+ = thr_req bit 0 / 1, ui_layers.c sub line 'rev throw' / 'echo throw'.",
+  "ui_input.c layer_tap: FX -> FAM_FX; EDIT on voice page -> voice_tap, on TRACKS with drum track -> studio_open(SC_DRUM), else FAM_EDIT (first page 'DX7' SC_VOICE in params.c); SAVE -> ve_store on voice page, SONG on TRACKS, drum_save_tap on drum page, else FAM_SAVE; ARP -> FAM_ARP; GLO -> FAM_GLO.",
+  "ui_input.c holds_input: REC press = rec_toggle; held 0.7 s + HOLD_CLEAR_MS 1300 (ui_layers.c) clears the track. ui_studio.c rec_toggle comment: playing = record at once, stopped = arm, empty project = free take closed by REC.",
+  "ui_layers.c layer_key: SEQ white keys step_down/up (drum: pen_lane), black keys pages; SEL any key -> P_ROOT of all synth parts; SAVE w 0-3 play/load A-D, 4-7 store (again within 3 s if used); GLO black key k==1 (F#3) ml_toggle, white 1-4 mute, 5-8 solo, 16 tap_tempo.",
+  "ui_layers.c layer_knobs: FX K1 G_FILT, K2 DUST, K3 DUCK (no K4 track filter in sloopDX); ARP K1 G_ROLL; SEQ K1 note/lane, K2 SDIV, K3 SSWING, K4 SLEN (NSTEP, 256 shared); SEL K1 CHORD (N_CHORD OFF TRIAD 7TH 9TH SUS4 POWER), K2 SCALE, K3 KEYS, K4 TRANS; GLO K1-3 track level, K4 G_DRLVL.",
+  "seq.c key_down: FX -> punch_fx_of_key (white 0-15, black 16-26; punch.c PUNCH_NAME 27 names); EDIT -> erase (drum + black key toggles live mute mode); ARP -> roll_start; key_lvl OCT- ghost / OCT+ hard. AM_OMNI: black keys chords (OMNI_ROOT).",
+  "ui_voice.c voice_screen_input: SELECT row, ALGORITHM value (Bank row: dx_bank_select of 8), PRESETS next/previous operator, HOME back to top / go_home, KNOB 1-2 CUT/RESO (P_E6/P_E7), 3-4 home_param = DX7 macro[2..3] = P_E4 REL, P_E5 FDBK (eng_dx7.c ENG_DX7 macro {E1 BRITE, E2 ATK, E4 REL, E5 FDBK}). VR_TOP rows OP1-OP6, Pitch Env, LFO, Name, Copy To, Init Voice, Store, More Pages.",
+  "eng_dx7.c DX7_PRESETS: 20 factory voices, CUT default 127. drums.c DRUM_KIT_NAMES DX KIT, 808 FM, ELECTRO, METAL, MY KIT; LANE_NAME order + key_of_lane (F G A B C D E per octave) -> white key indices 0,2,4,6,7,9,11,12,14,16,18,19,21,23,24,26; lane_of_key: black key = white key to its left; DM_DESC tune decay sweep bright noise level pan choke rev.",
+  "ui_studio.c: drum_edit_tap GRID -> KIT -> LANE; drum_save_tap KIT/LANE: SAVE twice -> ukit_bake MY KIT; drum_screen_input LANE page: key played picks drum_lane, KNOB 1-4 macros by dm_pg, PRESETS macro page.",
+  "params.c PAGES: FX family SENDS, DIST, CHORUS, DELAY, REVERB, SLICER, INSERT, INSERT 2; GLO family GLOBAL, MASTER, SYSTEM, DRUMS, MIDI, MIDI 2, MIDI 3, TEXTURE; N_AMODE OFF + 16 modes incl. OMNI, FLW.",
+  "main.c: OCT- + OCT+ at power-on -> panel_setup; OCT- + OCT+ held 5 s stopped -> UBOOT; recovery.c recovery_key -> bootguard_manual: OCT- alone. ui_menu.c: OCT- closes, ABOUT OCT+ twice FACTORY RESET. project.c AUTOSAVE_IDLE 2500 ms."
+ ],
+ "unsure": [
+  "Which drum screen page (GRID / KIT / LANE) tapping EDIT opens first: drum_page is kept between visits (static, starts at GRID), so the row stays generic.",
+  "Voice-list KNOB 3 / 4 = REL / FDBK read from home_param + ENG_DX7 macro; README only says '3 and 4 as on HOME'.",
+  "SEL + key: code accepts any of the 27 keys (black too); written as white keys to match the format.",
+  "MIDI (per-track channels, MIDI 2/3, clock out) and TEXTURE not checked row by row; only mentioned in a tip. 4.0 itself was not yet played on a device per README status (TODO at eeec0a6 says installed, load test clean).",
+  "Manual: used the repo's SLOOP.md (README calls it 'the full manual'); https://dx7.designburgapps.com is the installer/site."
+ ]
+}

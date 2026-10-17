@@ -1,0 +1,114 @@
+{
+ "id": "gammawave",
+ "name": "Pocket GammaWave",
+ "version": "1.0-GW",
+ "ref": "v1.0-GW",
+ "manual": "https://github.com/fvalente/GammaWave-FM1/blob/v1.0-GW/docs/MANUAL.md",
+ "intro": "A 4-6 track groove box with eight synth engines (FM6, DRUM-X, voice, organ ...), heavy drive types, vowel / scream filters and a 49-genre song generator: on HOME turn SELECT, press OCT+, then PLAY.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {"do": ["tap HOME"], "what": "HOME: one creature per track; KNOB 1-4 its main sound controls."},
+    {"do": ["turn ALGORITHM"], "what": "Pick the track: T1-T4 (T1-T6 with TRACKS 6)."},
+    {"do": ["turn SELECT"], "what": "Scroll the pages of this button; on HOME: the song generator."},
+    {"do": ["tap GLO"], "what": "MIXER, then GLOBAL (BPM, SWING, CLOCK, TUNE), then SYSTEM."},
+    {"do": ["tap OCT-"], "what": "Octave down (OCT+ up), both: 0. Dialogs: OCT- NO, OCT+ YES."},
+    {"do": ["hold HOME"], "what": "The MENU: display, controls, audio, system. HOME closes it."}
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {"do": ["turn PRESETS"], "what": "Browse sounds of every engine, then your user presets."},
+    {"do": ["hold GLO", "turn SELECT"], "what": "Tempo, from any page (SELECT alone no longer does it)."},
+    {"do": ["hold OCT-", "tap PLAY"], "what": "Song generator: KNOB 1 GENRE, OCT+ writes a piece, PLAY listens."},
+    {"do": ["hold OCT-", "tap ARP"], "what": "Next of six drive-and-filter looks on this track (HEARTH .. ECLIPSE)."},
+    {"do": ["hold LFO", "turn KNOB 1"], "what": "Macros M1-M4 (KNOB 1-4); stay latched until you tap LFO."},
+    {"do": ["tap ARP"], "what": "ARP: MODE, RATE, OCT, GATE; tap again for ARP 2 (HOLD)."}
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {"do": ["tap EDIT"], "what": "EDIT 1, EDIT 2 (engine knobs), FILTER, VOICE ...; tap for next."},
+    {"do": ["tap EDIT", "turn SELECT"], "what": "FILTER page: TYPE LP, HP, BP, COMB, VOWEL, SCREAM; CUT, RES."},
+    {"do": ["tap ENV"], "what": "ENV: ATK, DEC, SUS, REL; tap again for ENV DEST."},
+    {"do": ["tap LFO"], "what": "LFO, LFO DEST, MOD matrix and MSEQ pages; tap for next."},
+    {"do": ["hold EDIT", "turn SELECT"], "what": "Dice the sound: SELECT again rerolls, OCT+ keeps, OCT- cancels."},
+    {"do": ["hold EDIT", "white key 1"], "what": "INIT: the track's sound back to its engine default (asks first)."}
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {"do": ["tap PLAY"], "what": "Start / stop. With GLO held: restart from the top."},
+    {"do": ["tap SEQ"], "what": "STEP piano roll (DRUM: step grid); tap for the other SEQ pages."},
+    {"do": ["tap REC"], "what": "Arm the track: playback starts, the keys record live."},
+    {"do": ["tap SEQ", "tap REC"], "what": "Stopped on STEP: keys write the cursor step, PRESETS moves it."},
+    {"do": ["hold SEQ", "turn SELECT"], "what": "Dice a new sequence for this track; OCT+ keeps it."},
+    {"do": ["hold OCT-", "tap ENV"], "what": "MUTATE page, ORBIT on: the loop evolves every few bars."},
+    {"do": ["hold GLO", "black key 1-6"], "what": "Mute T1-T6 (latched); white keys 1-6 solo while held."},
+    {"do": ["hold REC", "white key 1"], "what": "Clear this track's steps and automation (no dialog)."},
+    {"do": ["hold SEQ", "tap REC"], "what": "CLEAR ALL SEQUENCES? on every track."}
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {"do": ["tap FX"], "what": "FX: DIST, CHORUS, DLY, REV sends; two quick taps: next FX section."},
+    {"do": ["tap FX", "turn SELECT"], "what": "DIST page: TYPE SOFT .. FOLD, HEARTH, BLAST, PLASMA, FLUX."},
+    {"do": ["hold FX", "white key 1-15"], "what": "Punch-in while held: REPEAT, LPF / HPF, OCT, STUTTER, ARP ..."},
+    {"do": ["hold FX", "turn KNOB 1"], "what": "Performance FILTER (KNOB 2 CRUSH, 3 THROW, 4 DEPTH)."},
+    {"do": ["hold FX", "turn SELECT"], "what": "Dice this track's effects; OCT+ keeps, OCT- cancels."}
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {"do": ["SAVE twice"], "what": "PROJECT: KNOB 1 project 1-8, KNOB 2 section A-D."},
+    {"do": ["SAVE twice", "turn KNOB 4", "tap OCT+"], "what": "Stopped: save the music there; name it, OCT+ again: SAVED."},
+    {"do": ["SAVE twice", "turn KNOB 3", "tap OCT+"], "what": "Load that section (stops playback)."},
+    {"do": ["tap SAVE"], "what": "USER: one sound in U01-U32 (KNOB 4 SAVE, OCT+)."},
+    {"do": ["hold SAVE", "white key 1-4"], "what": "Play section A-D (next bar); white keys 5-8 store A-D."},
+    {"do": ["hold GLO", "white key 9"], "what": "UNDO the last big change (dice, clear, load); again: redo."}
+   ]
+  },
+  {
+   "title": "Recovery",
+   "rows": [
+    {"do": ["hold OCT-", "hold OCT+", "power on"], "what": "HARDWARE CALIBRATION: teach every button and knob."},
+    {"do": ["hold OCT-", "hold OCT+"], "what": "5 s while running: update mode (UBOOT) for the web installer."},
+    {"do": ["hold REC", "power on"], "what": "Run on one core this session (clicks or crashes)."}
+   ]
+  }
+ ],
+ "tips": [
+  "Nothing survives power-off unless you save it into a section: RESTORE LAST (MENU > SYSTEM) is OFF by default, so the FM-1 starts empty.",
+  "T5 / T6 silent? TRACKS is 4 by default: GLO > SYSTEM > TRACKS 6 wakes them (more CPU).",
+  "STOP TO EDIT / STOP TO SAVE: saving and most edits need the transport stopped.",
+  "On the generator screen SELECT turns its three pages (GENRE / SEED / ENERGY / FORM, part amounts, LEAD / SWING ...); OCT+ again rolls another piece, HOME leaves.",
+  "The 4-track tape recorder and WAV export are in the Web Studio in the browser, not on the FM-1.",
+  "Coming from another custom firmware? Return to official V15 with the web installer first, then install."
+ ],
+ "checked": [
+  "Archive gammawave-1.0-GW.tar.gz (GammaWave-FM1-1.0-GW/), firmware/src/panel.c enum B_FX, B_SCL, B_ENV ...: B_SCL is the SEL button (manual and README call it SCL).",
+  "ui_input.c gw_oct_combo + Shift-Deck block in ui_input_frame: OCT- held first, then ARP (6 macros: P_DTYPE/P_DIST/P_FCUT/P_FRES, ECLIPSE also DUCK/PUNCH), ENV or SCL (MUTATE page, SOUND 2 bars, PATTERN 4 bars, AMOUNT 64), HOME or SAVE (ui.menu = 3 visualizer), PLAY or REC (confirm CF_DICE_ALL + gen_open), SEQ/EDIT/FX/LFO part_dice, GLO undo_do; octave change reverted.",
+  "gen.c gen_open/gen_knob/gen_select/gen_press: GEN screen 3 pages, page 1 KNOB 1 GENRE (RANDOM + 49), KNOB 2 SEED, 3 ENERGY, 4 FORM; OCT+ (confirm CF_DICE_ALL) gen_press, PLAY transport, HOME leaves; gen_tables.c GENRE[] has 49 entries.",
+  "ui_input.c: SELECT alone page_scroll, on HOME opens GEN; held page button + SELECT = dice (EDIT sound, SEQ, LFO, FX), GLO + SELECT = BPM; PRESETS presets_turn; ALGORITHM track_select clamped to trk_live; HOME hold = MENU; OCT-/OCT+ octave -3..+3, both = 0; SEQ + REC = CF_CLEAR_ALL; MUTATE page OCT+ mut_keep, OCT- freeze.",
+  "ui_input.c rec_tap: arms selected track, stopped -> transport starts; on STEP roll stopped -> KEYS WRITE STEPS; act_do: PROJECT G_SAVE needs stop, overwrite dialog, NAME screen; G_LOAD project_load with undo_mark; USER SAVE via NAME.",
+  "ui.c open_family: SAVE from elsewhere enters USER, again = next page (PROJECT, ARRANGE, TOOLS, PRESETS); FX two taps < 350 ms = next FX section; open_global MIXER -> GLOBAL -> SYSTEM.",
+  "ui_layer.c layer_key/layer_knob: GLO black 1-6 mute, white 1-6 solo held, E4 unmute all, F4 tap, G4 (white 9) UNDO, A4 MUTATE freeze, PLAY restart; EDIT F3 INIT / G3 RECALL with dialog; REC F3 CLEAR, G3 CLICK; SAVE white 1-4 section_jump, 5-8 section_store, D5 LOOP/SONG, E5 SONG REC, G5 ARRANGE; LFO KNOB 1-4 macro_v; FX knobs FILTER CRUSH THROW DEPTH (draw_column).",
+  "seq.c perf_key: FX layer white keys 0..14 effects, 15 (G5) clears lane, black 1-6 mutes; params.c PAGES, N_FTYPE LP HP BP COMB VOWEL SCREAM, N_DTYPE SOFT HARD FOLD CRUSH RECT HEARTH BLAST PLASMA FLUX, MUT_DESC.",
+  "main.c: (buttons & 3) == 3 at boot (OCT- + OCT+) -> panel_setup; REC at boot -> mc_off (one core); OCT- + OCT+ held > 5 s -> fm1_enter_uboot."
+ ],
+ "unsure": [
+  "README says GEN genre is on KNOB 2; code: KNOB 1 is GENRE, KNOB 2 SEED. Sheet follows the code.",
+  "README genre list names Synthwave, Outrun, Cyberpunk, Darksynth, Acid Techno, Lo-Fi Hip-Hop: not in gen_tables.c GENRE[] (49 entries, e.g. GAMMAWAVE, WRAITHWAVE, TRAP ATL ... BROKEN). MANUAL ch. 8 DICE ALL text describes an older generator (a few genres, SPACE/FRANTIC) - outdated.",
+  "README says visualizer KNOB 1-4 control Warp/Twist/Orbit/Bloom; ui_menu.c menu_input for menu 3 only reads OCT+/PRESETS/ALGORITHM (modes) and OCT- (to ABOUT); knobs not read. Visualizer left off the sheet.",
+  "README's screen names 1.HOME / 2.WAVES / 2B.FILTER / 4.TAPE / 5.MASTER FX and the 4-track tape are Web Studio/renders; the firmware pages are HOME, EDIT 1, FILTER, FX ... (no TAPE page). README wording 'SEQ > MUTATE' also via [SCL] = the SEL button.",
+  "README table lists both 'OCT- + GLO' and 'GLO + G4' as undo: both exist in code; sheet uses GLO + white key 9 (G4).",
+  "HOME KNOB 1-4 = per-engine 'main controls' taken from MANUAL ch. 4 table, not traced per engine in code. 'tap EDIT, turn SELECT' reaches FILTER only after a few detents (page order depends on engine).",
+  "Not tried on hardware. Left out as too detailed: ARRANGE rows, scenes, SEQ TOOLS, parameter locks, SLICER, MASTER (CLIP/PUNCH/DUCK), MIDI CC map / ROUTE / clock, FM6 operator pages, DRUM-X details."
+ ]
+}

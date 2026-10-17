@@ -1,0 +1,113 @@
+{
+  "id": "hyp1",
+  "name": "HYP-1",
+  "version": "1.5.29",
+  "ref": "cf180da (main, build run 62 = 1.5.29: firmware.yml numbers runs from 33 as 1.5.0)",
+  "manual": "https://rustypawz.github.io/fm1-HYP1/manual/",
+  "intro": "A hypnotic techno and acid groovebox: pad, drone, a generative 303 line, noise and drums. It plays from power-on, so start by changing things, not by building from scratch.",
+  "sections": [
+    { "title": "Getting around",
+      "rows": [
+        { "do": ["turn SELECT"], "what": "Walk through all the pages in order." },
+        { "do": ["turn KNOB 1-4"], "what": "Change the four values at the bottom of the screen." },
+        { "do": ["tap HOME"], "what": "Tempo page: tempo, Evolve, Motion, Drift." },
+        { "do": ["tap ENV"], "what": "Pad. Tap again: Pad env, Pad LFO, Chords." },
+        { "do": ["tap LFO"], "what": "Drone. Tap again: Drone env, Drone LFO." },
+        { "do": ["tap ARP"], "what": "Acid. Tap again: Acid env, Acid line." },
+        { "do": ["tap SEQ"], "what": "Drums. Tap again: Links, Kit, Drum drift." },
+        { "do": ["tap GLO"], "what": "Global: root, theme, tune, MIDI out." }
+      ] },
+    { "title": "Playing",
+      "rows": [
+        { "do": ["tap PLAY"], "what": "Start or stop. It already plays after power-on." },
+        { "do": ["hold HOME", "turn SELECT"], "what": "Set the tempo (70-190) from any page." },
+        { "do": ["tap SAVE"], "what": "Breakdown on the next bar. Again: four-bar build, then the drop." },
+        { "do": ["hold SAVE"], "what": "During a breakdown or build: drop on the next bar." },
+        { "do": ["tap EDIT"], "what": "Next chord, on the next bar." },
+        { "do": ["tap REC"], "what": "Freeze: the chord holds until you tap REC again." },
+        { "do": ["white key 1-16"], "what": "Add or remove that note from the scale (the root stays)." },
+        { "do": ["turn ALGORITHM"], "what": "Pick the mode: Ionian, Dorian, Phrygian and more." },
+        { "do": ["tap OCT+"], "what": "The page's voice an octave up; elsewhere the whole song. OCT- down." },
+        { "do": ["hold SEL", "tap ENV"], "what": "On a voice's pages: play it by hand on the keys. Again: back." }
+      ] },
+    { "title": "Sound",
+      "rows": [
+        { "do": ["hold SEL", "turn ALGORITHM"], "what": "Next sound of the voice on screen; on drum pages, the whole kit." },
+        { "do": ["tap HOME", "turn KNOB 2"], "what": "Evolve: more restless acid and chords. KNOB 3: Motion." },
+        { "do": ["tap LFO", "turn KNOB 3"], "what": "Drone filter cutoff (KNOB 4 sets resonance)." },
+        { "do": ["tap ARP", "turn KNOB 2"], "what": "Acid cutoff (KNOB 3 resonance, KNOB 4 env mod)." },
+        { "do": ["tap ENV", "turn KNOB 2"], "what": "Pad brightness (KNOB 3 picks one of 16 sounds)." },
+        { "do": ["hold SEL", "tap SEQ"], "what": "Links on/off: kicks open the drone, snares flash the pad." },
+        { "do": ["SEQ twice"], "what": "Links page: how hard each drum drives a voice." }
+      ] },
+    { "title": "Sequencer / patterns",
+      "rows": [
+        { "do": ["hold SEQ"], "what": "Open the step sequencer: six drums, sixteen steps." },
+        { "do": ["white key 1-16"], "what": "In the sequencer: turn that step of the drum on or off." },
+        { "do": ["tap OCT+"], "what": "In the sequencer: next drum (kick, snare, clap, hats, perc). OCT- back." },
+        { "do": ["turn KNOB 1-3"], "what": "In the sequencer: the drum's level, tune and decay." },
+        { "do": ["hold SEL", "white key 1-6"], "what": "Play pattern 1-6, from the next bar." },
+        { "do": ["hold SEL", "black key 1-6"], "what": "In the sequencer: copy this pattern to pattern 1-6." },
+        { "do": ["hold SEL", "tap OCT-"], "what": "In the sequencer: clear this drum. SEL + OCT+ restores it." },
+        { "do": ["tap SEQ", "turn KNOB 3"], "what": "Swing (KNOB 2: drive, KNOB 4: pattern)." },
+        { "do": ["tap SEQ"], "what": "In the sequencer: back to the Drums page." }
+      ] },
+    { "title": "Effects",
+      "rows": [
+        { "do": ["tap FX"], "what": "Effects menu on/off: each key is an effect while held." },
+        { "do": ["hold white key 1-6"], "what": "FX: beat repeat 1/2, 1/4, 1/6, 1/8, 1/16, 1/32." },
+        { "do": ["hold white key 7-8"], "what": "FX: reverse, tape stop." },
+        { "do": ["hold white key 9-14"], "what": "FX: mute kick, hats, snare, drone, acid, pad." },
+        { "do": ["hold white key 15-16"], "what": "FX: low-pass, high-pass, closing in." },
+        { "do": ["hold black key 1-5"], "what": "FX: gate 1/16, gate 1/8, echo throw, crush, drum fill." },
+        { "do": ["hold black key 6-11"], "what": "FX: solo kick, hats, snare, drone, acid, pad." },
+        { "do": ["tap FX", "hold SAVE", "white key 1-16"], "what": "Lock that effect on (black keys too); it outlasts the menu." }
+      ] },
+    { "title": "Saving & loading",
+      "rows": [
+        { "do": ["turn PRESETS"], "what": "Switch to piece 01-10 now." },
+        { "do": ["hold SEL", "turn PRESETS"], "what": "While playing: switch piece on the next bar." },
+        { "do": ["tap GLO", "tap SAVE"], "what": "Store this piece: settings, scale, sounds and patterns." },
+        { "do": ["tap GLO", "hold SAVE"], "what": "After 1.5 seconds: this piece back to factory." }
+      ] },
+    { "title": "Recovery",
+      "rows": [
+        { "do": ["hold OCT-", "hold OCT+"], "what": "After 5 seconds: update mode. Let go early to cancel." },
+        { "do": ["hold OCT-", "hold OCT+", "power on"], "what": "Calibrate the buttons and knobs." },
+        { "do": ["tap PLAY"], "what": "In SAFE MODE: try starting HYP-1 normally again." }
+      ] }
+  ],
+  "keys": [
+    { "keys": "white", "label": "Scale notes; sequencer (hold SEQ): steps 1-16; SEL: patterns 1-6; FX: repeats, mutes, filters", "color": "#42f5f5" },
+    { "keys": "black", "label": "Scale notes; FX: gates, throw, crush, fill, solos", "color": "#ff9628" }
+  ],
+  "tips": [
+    "Quick beat of your own: hold SEQ, tap white keys to edit the kick, OCT+ for the next drum.",
+    "Noise and Space (echo, reverb) have no button: reach them with SELECT.",
+    "Changes stay while it's on, but only GLO then SAVE keeps them past power-off.",
+    "Power-on starts a random piece. No sound? Check MASTER and KNOB 1 (each voice's level).",
+    "Hold a button for a second on its own: a card explains it (not PLAY, SEL, SAVE, SEQ, FX).",
+    "MIDI out: pad ch 1, drone ch 3, acid ch 4, drums ch 10, plus clock. MIDI clock in drives the tempo."
+  ],
+  "checked": [
+    "Clone of github.com/RustyPawz/fm1-HYP1 at cf180da (HEAD); GitHub Actions run 62 built that sha, and firmware.yml maps run N>=33 to 1.5.(N-33) = 1.5.29; the site and installer both show 1.5.29.",
+    "Labels: firmware/src/app/panel.c B_NAME/E_NAME, plat.h B_* enum; keys: ui.c WHITE_KEY/BLACK_KEY (index 0 = F3).",
+    "Pages and knobs: ui.c VIEW_NAME, VIEW_KNOB, KNOB_LABEL; GROUP[] (HOME 1, ENV 4, LFO 3, ARP 3, SEQ 4, GLO 1 pages); Noise/Space only on SELECT.",
+    "Buttons: ui.c button() (FX menu, EDIT next chord, PLAY, REC freeze, OCT page voice/song or lane in sequencer, SAVE breakdown/build/drop).",
+    "input(): SEL+ENV by hand (voice_of), SEL+SEQ links, SEL+OCT in sequencer shift_lane, SEQ held 400 ms = sequencer, SEQ tap in sequencer = Drums, HOME+SELECT tempo, SEL+ALGORITHM shift_sound, ALGORITHM set_mode, PRESETS set_piece / SEL+PRESETS on next bar while playing, Global SAVE store / 1.5 s factory, SAVE held 500 ms drop.",
+    "Keys: input() step_toggle in V_SEQ, by_hand en_note, else toggle_note (root stays); shift_key white 1-6 pattern, black 1-6 copy in sequencer.",
+    "FX map: ui.c KEY_FX/FX_LABEL; lock mode (SAVE held in FX), locks outlive the menu.",
+    "Store: project.c project_piece_save/pending; autosave() only writes pending stores and globals.",
+    "Recovery: main_fm1.c OCT-+OCT+ 5 s update mode with cancel, panel_setup at power-on, safe_main PLAY restart.",
+    "MIDI: dsp/amb.c midi(0x90/0x92/0x93/0x99) channels 1/3/4/10, 0xF8 clock; ui.c midi_in() clock in, ch 1 notes toggle scale.",
+    "Help cards: ui.c help_tick() excludes PLAY, SEL, FX, SAVE, SEQ.",
+    "Plays at start: ui.c ui_init/ui_frame en_play(1) after the splash."
+  ],
+  "unsure": [
+    "Manual says 'SAVE held: the drop', but in code holding SAVE in the normal groove triggers a breakdown (button(B_SAVE)); it only drops during a breakdown/build. The sheet follows the code.",
+    "Manual and README are written for 1.5.0; Drum drift (SEQ 4th page) is newer and only partly checked, so it has no row.",
+    "ui.c header comment says SEQ cycles Drums then Links only; the GROUP table has four pages (Drums, Links, Kit, Drum drift). Sheet follows GROUP.",
+    "No MIDI & sync section: GLO KNOB 4 MIDI out and SEL+GLO remote are verified, but too few rows; kept as a tip.",
+    "Calibration check reads raw bits (buttons & 3) at power-on; assumed OCT-/OCT+ per the comment and panel.c."
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "id": "beetle",
+  "name": "BEETLE",
+  "version": "1.04_RC",
+  "ref": "V1.04_RC",
+  "manual": "https://sikkenworks.github.io/BEETLE/",
+  "intro": "A six-lane tracker: time runs top to bottom, one row per step, five synth lanes and a drum lane. Pick a lane, press keys to write notes, press PLAY.",
+  "sections": [
+    { "title": "Getting around",
+      "rows": [
+        { "do": ["turn SELECT"], "what": "Pick the lane: CH1-CH5 synths, CH6 drums." },
+        { "do": ["turn KNOB 1"], "what": "Move up and down the steps (rows)." },
+        { "do": ["turn KNOB 2"], "what": "Move across the columns: NOTE, INST, CHD (chord), FX." },
+        { "do": ["turn KNOB 3"], "what": "Change the value in the highlighted cell." },
+        { "do": ["tap SEQ"], "what": "Back to the tracker from any screen." },
+        { "do": ["tap HOME"], "what": "Projects menu: SAVE, SAVE AS, LOAD, NEW, HELP." },
+        { "do": ["hold HOME"], "what": "After 1.5 s: scale guide (root, scale, key lock)." },
+        { "do": ["tap GLO"], "what": "Mixer: volume, pan, mute, solo, swing per lane." }
+      ] },
+    { "title": "Playing",
+      "rows": [
+        { "do": ["tap PLAY"], "what": "Start or stop. With SONG on, plays the song." },
+        { "do": ["any note key"], "what": "Write that note into the step, then move one row down." },
+        { "do": ["tap OCT-"], "what": "Keyboard an octave down (OCT+ up). Saved notes stay." },
+        { "do": ["hold SEQ", "tap OCT+"], "what": "Stopped: this step's saved note an octave up (OCT- down)." },
+        { "do": ["turn KNOB 4"], "what": "Tempo, 30-300 BPM (starts at 120)." },
+        { "do": ["ARP twice"], "what": "With SONG on: live mixer. Black keys 1-6 mute lanes." }
+      ] },
+    { "title": "Sound",
+      "rows": [
+        { "do": ["tap EDIT"], "what": "The lane's instrument; keys play it. KNOB 1 row, KNOB 3 value." },
+        { "do": ["tap EDIT", "turn KNOB 2"], "what": "Next page: oscillator A, oscillator B, mix." },
+        { "do": ["tap EDIT", "turn KNOB 3"], "what": "On TYPE: 12 sounds, incl. SID and NES styles." },
+        { "do": ["hold OCT-", "tap OCT+"], "what": "On EDIT: switch mono / poly." },
+        { "do": ["hold SEQ", "tap EDIT"], "what": "On EDIT: instrument library with 8 patch slots." },
+        { "do": ["EDIT twice"], "what": "Drum editor: SELECT picks a drum, KNOB 3 changes it." }
+      ] },
+    { "title": "Sequencer / patterns",
+      "rows": [
+        { "do": ["turn ALGORITHM"], "what": "Pick pattern 1-48 (while stopped)." },
+        { "do": ["turn PRESETS"], "what": "This step's note: note, empty (---), stop [STP]." },
+        { "do": ["tap ENV"], "what": "Write a stop [STP]: ends the note still sounding." },
+        { "do": ["tap SEL"], "what": "Clear the whole step." },
+        { "do": ["hold SEQ", "turn KNOB 4"], "what": "Stopped: pattern length, 1-16 steps." },
+        { "do": ["hold SEQ", "black key 1"], "what": "Copy this lane. Black key 2 pastes it." },
+        { "do": ["hold SEQ", "black key 3"], "what": "Copy the whole pattern. Black key 4 pastes it." },
+        { "do": ["hold SEQ", "black key 5"], "what": "Stopped: undo (6 levels). Black key 6 redoes." },
+        { "do": ["tap ARP"], "what": "Song: a chain of patterns with repeats. SEL turns SONG on." },
+        { "do": ["tap ARP", "tap OCT+"], "what": "Song: add a row (OCT- deletes). KNOB 3 sets it." }
+      ] },
+    { "title": "Effects",
+      "rows": [
+        { "do": ["tap FX"], "what": "Step FX: KNOB 1 type or amount, KNOB 3 changes it." },
+        { "do": ["FX twice"], "what": "Punch-In page: white keys 1-8 are live effects." },
+        { "do": ["hold white key 1-8"], "what": "Punch-In: REPEAT, RING MOD, FILTER, TAPE, STUTTER, OCT UP/DOWN, MUTE." },
+        { "do": ["hold white key 1-5", "turn KNOB 1"], "what": "That Punch-In effect's amount (kept after release)." },
+        { "do": ["tap REC", "tap PLAY"], "what": "Record Punch-In: hold white keys 1-8 while it plays." },
+        { "do": ["tap LFO"], "what": "Master: EQ, compressor, reverb. SELECT picks, SEL on/off." },
+        { "do": ["tap LFO", "turn KNOB 1-4"], "what": "The chosen master effect's four values." }
+      ] },
+    { "title": "Saving & loading",
+      "rows": [
+        { "do": ["power on", "turn KNOB 1", "tap SEL"], "what": "Start screen: NEW PROJECT or LOAD PROJECT." },
+        { "do": ["tap SAVE"], "what": "Save. First time: name it (KNOB 2 letter, KNOB 4 slot), SAVE again." },
+        { "do": ["hold SEL", "hold SAVE"], "what": "First save on blank storage: hold 5 s. Erases old data!" },
+        { "do": ["tap HOME", "turn KNOB 1", "tap SEL"], "what": "Projects: SAVE AS, LOAD (12 slots), NEW, HELP." }
+      ] },
+    { "title": "Recovery",
+      "rows": [
+        { "do": ["hold OCT-", "power on"], "what": "Update mode, for installing firmware." },
+        { "do": ["hold REC", "power on"], "what": "Safe mode: silent and read-only." },
+        { "do": ["hold OCT-", "hold OCT+"], "what": "In safe mode or after an audio stop: 5 s to update mode." },
+        { "do": ["hold HOME", "hold PLAY"], "what": "After an audio stop: hold 1 s to restart the sound." }
+      ] }
+  ],
+  "keys": [
+    { "keys": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], "label": "Notes into the step (F3 up); CH6: KIK SNR HHC HHO TM1-3 CRS RDE CLP PC1-3 RIM", "color": "#42f5f5" },
+    { "keys": [14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26], "label": "Notes; on CH6 the same 14 drums again", "color": "#999999" }
+  ],
+  "tips": [
+    "Tracker basics: each row is one step, played top to bottom; each lane is one part.",
+    "Quick beat: SELECT to CH6, KNOB 1 to row 00, press F3 (kick), turn KNOB 1 three rows down, repeat, then PLAY.",
+    "Each key press writes a note and steps down, so you can type a melody row by row.",
+    "INST picks one of four shared synth instruments; CH1-CH4 start on 1-4, CH5 on 1.",
+    "The very first save formats the storage and wipes old ETCH/Felucca data: back up first.",
+    "Hold SEQ and tap ENV (stopped) for groove: microtiming, ratchets and chance per step.",
+    "On-device help: HOME, KNOB 1 down to HELP, SEL."
+  ],
+  "checked": [
+    "Archive beetle-1.04_RC.tar.gz from thefirmwarehub.com/src (catalog mirror), folder BEETLE-1.04_RC; catalog repo SikkenWorks/BEETLE, tag V1.04_RC.",
+    "Button bits from hal/fm1_input.h (0 OCT-, 1 OCT+) and use in track_runtime.h: 2 FX, 3 SEL, 4 ENV, 5 LFO, 6 EDIT, 7 GLO, 8 HOME, 9 SAVE, 10 ARP, 11 SEQ, 12 PLAY, 13 REC (comments at the LFO/ENV/HOME+SAVE lines agree).",
+    "Encoders: track_fm1_poll() fm1_enc_take(0)=SELECT, 1=ALGORITHM, 2-5=K1-K4, 6=PRESET.",
+    "Tracker page 0 in track_fm1_poll(): K1 step, K2 column (track_navigation.h), K3 track_wheel_value(), K4 BPM (track_set_bpm 30-300, track_init 120), SELECT lane, ALGORITHM pattern only when !playing, PRESET note/EMPTY/STP cycle, ENV beetle_stop_focused_note, SEL track_clear_step, keys track_enter_note (advance one row), CH6 key k%14 (track_drum.c names).",
+    "Keyboard pitch beetle_keyboard_octave.h (53+key+12*octave); OCT scan etch_octave_scan, both OCT on EDIT toggles poly; SEQ+OCT step transpose when stopped.",
+    "SEQ chords: black keys idx 1,3,5,8,10,13 = OP1-6 (lane copy/paste, pattern copy/paste, undo/redo stopped); SEQ+K4 beetle_pattern_length_shortcut.h (stopped); SEQ+ENV page 22 groove; SEQ+FX page 21 dynamics; SEQ+SEL page 20 block edit.",
+    "Pages: FX toggles 3 (step FX, K1 cursor, K3) / 4 (Punch-In), EDIT toggles 5 / 16 (drum edit: SELECT component, K1 field, K3), SEQ+EDIT library (BEETLE_LIBRARY_SLOTS 8), LFO 17 master (SELECT focus, SEL enable, K1-K4), ARP 9 song (K1 row, K2 col, K3, OCT+ insert, OCT- delete, SEL enable) / 30 live mixer if song enabled, GLO 6 mixer (track_mixer.c).",
+    "Punch-In: white key idx 0,2,4,6,7,9,11,12 hold-to-play on page 4 or when REC armed; K1 changes the held effect's param (fx 0-4); names from the page-4 screen; REC toggles on release.",
+    "Instrument types: 12 (TRACK_CHIP_TYPES, names at track_runtime.h ~1600). Default INST per lane track_init c&3.",
+    "Save: SAVE button -> name page 2 (K1 pos, K2 char, K4 slot, SAVE confirm) or direct save when named; blank storage -> page 12 'HOLD SELECT + SAVE' 5 s (BEETLE_STORAGE_HOLD_MS) erasing all 12 slots incl. ETCH/Felucca; HOME menu entries SAVE/SAVE AS/LOAD/NEW/HELP/CREDITS/DIAGNOSTICS; boot page 29 NEW/LOAD.",
+    "HOME short release -> projects, hold 1500 ms -> page 7 scale guide (K1 root, K2 scale, K3 lock, SEL reverse search).",
+    "Recovery bringup.c: OCT- held at boot -> fm1_enter_uboot; REC at boot -> safe mode (native_recovery_policy.h); OCT-+OCT+ 5 s check sits after the tracker poll's continue, so only in safe mode / after an audio trip; HOME+PLAY 1 s re-arms audio when tripped.",
+    "build.py: release is the --beetle-storage-lab variant (project storage, Project Manager) — inferred from README/START-HERE, not from the binary."
+  ],
+  "unsure": [
+    "Version naming: hub/tag say 1.04_RC, build.py and START-HERE say 'BEETLE 1.01 RC1.0.4', README header says V1.01d.",
+    "README and on-device HELP say 'PLAY+ALG: QUEUE NEXT PATTERN', but the code only switches patterns with ALGORITHM while stopped; beetle_pattern_queue.h is never called. The sheet says 'while stopped'.",
+    "README says ALGORITHM adjusts a held Punch-In effect in several places; the code (and newer README lines, help) use KNOB 1. Sheet follows code.",
+    "README control table: OCT-/OCT+ on an INST cell changes the instrument number; code always shifts the keyboard octave on the tracker. Left out.",
+    "README 'Current workflow' MASTER: K1 selects the effect, SELECT is parameter 1; code: SELECT selects, K1-K4 are parameters (matches the other README section). Sheet follows code.",
+    "README says 'nine instrument types' in one place, twelve elsewhere; code has 12.",
+    "Song details (SONG LOOP toggle, how K3 edits pattern vs repeats per column) only partly checked; live mixer quantize toggles (OCT-/OCT+) and solo keys (white keys 1,2,3,5,6,8) left off the sheet.",
+    "No MIDI sync/settings section: only read-only MIDI diagnostics were found in the tracker code.",
+    "Whether the hub's .fwsc is the storage-lab build was not checked against the binary; if it were a read-only pilot build, SAVE would show a 'hardware locked' error."
+  ]
+}
