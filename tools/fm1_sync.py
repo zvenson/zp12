@@ -130,6 +130,11 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
               "voice, sync, cross-mod, a 12 / 24 dB filter with a SEM-style morph, an arpeggiator with hold, chorus, "
               "ping-pong delay and a plate reverb. A two-track step sequencer played as sloopDX: live recording on top, "
               "chords, long notes, a click and a count-in."),
+    dict(id="shineon", vintage=True, play="https://thefirmwarehub.com/play/shineon/", added="2026-10-18",
+         kind="synth", name="Shine On", author="zvenson", repo="zvenson/shineon", ident=r"FM-1_96[02-57-9]",
+         src="repo:docs/firmware",   # (FM-1_96Y for X.Y; never 961 / 966: FOMAJAM's, GR!MM's)
+         what="A string ensemble in the spirit of the late-70s machines, grown out of OberVave: divide-down keyers with "
+              "16', 8' and 4' footages, register filters, a three-tap BBD ensemble and a phaser, on two tracks with the sequencer."),
     dict(id="dinghy", added="2026-10-09",
          kind="dev", name="Dinghy", author="zvenson", repo="zvenson/dinghy", ident=r"FM-1_99\d", src="github",
          what="Your base for your own FM-1 firmware: everything under it done and documented (updates, USB rescue, "
