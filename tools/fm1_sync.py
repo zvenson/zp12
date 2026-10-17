@@ -297,20 +297,21 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://konsumer.js.org/fomajam/",
          what="A drum machine in the classic step-grid style: voices after the 909, 808, 707, 606, DMX and more, a "
               "machine per voice, accents and patterns. Play it in the browser first."),
-<<<<<<< HEAD
-=======
-    dict(id="kawa", added="2026-10-17",
-         kind="groove", name="KAWA", author="Omnipotard (Guizmoh)", repo="Guizmoh/Kawa-Tracker-Fm1", ident=r"FM-1_95\d",
-         src="repo:kawa-0.2.fwsc@decda3cb0d9a194dffc31ecf6d18a9c64eb8261f",   # (no releases, no tags: the package in the repo, pinned)
-         what="A pocket tracker for any style: six tracks with an engine each (pulse, 4-bit wave, noise, 6-operator FM, "
-              "drum kit or sample), patterns chained into a song, 32 live effects and tools that write beats for you. "
-              "A beta, not yet tried on a real FM-1 by its maker."),
     dict(id="nmsfm", added="2026-10-18", play="https://hericdk.github.io/nomanskyFM/sim/",
          kind=["groove", "other"], name="No Man Sky FM", author="Hericdk", repo="hericdk/nomanskyFM", ident=r"FM-1_900",
          src="pages:https://hericdk.github.io/nomanskyFM/", site="https://hericdk.github.io/nomanskyFM/",   # (no releases: the package its installer names)
          what="A space adventure while you make music, built on SLOOP 2.7.1: fly between planets with two knobs, land, "
               "mine, fight sentinels and warp between stars, every SLOOP screen floating over the game."),
->>>>>>> 7cba57a (Hub (staging): No Man Sky FM by Hericdk, a space game on SLOOP 2.7.1 that makes music; no releases: the package its installer names)
+    dict(id="fm1quest", added="2026-10-18", play="https://fm1.quest/sim/", editor="https://fm1.quest/editor/",
+         kind=["groove", "other"], name="FM1 Quest", author="Hericdk", repo="hericdk/fm1-quest", ident=r"FM-1_900",
+         src="github", site="https://fm1.quest/en/",   # (its tags are builds: quest-38 is its v0.21)
+         what="A pixel-art RPG while you make music, built on SLOOP: four heroes, one a track, walk through a village "
+              "and fight monsters and bosses as your loop plays, every SLOOP screen redrawn in the game's style."),
+    dict(id="grimm", added="2026-10-18", play="https://grimmbient.github.io/grimm/", editor="https://grimmbient.github.io/grimm/editor.html",
+         kind=["synth", "groove"], name="GR!MM", author="GRiMMBIENT", repo="GRiMMBIENT/grimm", ident=r"FM-1_966",
+         src="github", site="https://grimmbient.github.io/grimm/",
+         what="Dark ambient, dungeon synth and deathdream: four tracks, seven sound sources from VA and 6-op FM to formant "
+              "voices and physical models, tape, granular freeze and reverbs up to infinite, a 64-step sequencer and song mode. Built on Dinghy."),
 ]
 
 
