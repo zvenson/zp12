@@ -66,6 +66,7 @@
              color: var(--fg); font-size: 15px; font-weight: 600; white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
   /* Shop (Amazon.de affiliate links): shown by web/hubapp.js in DE / AT only (/api/cc), beside the Knowledge Base */
   nav .dd[hidden] { display: none; }
+  #shopdd[data-cc="de"] .cc-us, #shopdd[data-cc="us"] .cc-de { display: none !important; }   /* (amazon.de for DE / AT, amazon.com for the US) */
   nav .dd.shopdd { margin-left: clamp(4px, 1.6vw, 22px); }
   .mega .side .ad { font-size: 12.5px; color: var(--dim); }
   nav .kbl:hover { text-decoration: none; box-shadow: inset 0 -2px 0 var(--pink); }
@@ -489,14 +490,20 @@
     <div class="mega" id="shopm"><div class="wrap in">
       <div class="side">
         <p class="k">Shop</p>
-        <p>The machines the hub's firmwares run on, from Amazon.de.</p>
-        <hr><p class="ad">* Affiliate-Link (Anzeige). Als Amazon-Partner verdiene ich an qualifizierten Verkäufen; für dich kostet es nichts extra.</p>
+        <p class="cc-de">The machines the hub's firmwares run on, from Amazon.de.</p>
+        <p class="cc-us">The machines the hub's firmwares run on, from Amazon.com.</p>
+        <hr><p class="ad cc-de">* Affiliate-Link (Anzeige). Als Amazon-Partner verdiene ich an qualifizierten Verkäufen; für dich kostet es nichts extra.</p>
+        <p class="ad cc-us">* Affiliate link (ad). As an Amazon Associate I earn from qualifying purchases; it costs you nothing extra.</p>
       </div>
       <div class="tiles">
-        <a class="tile" href="https://link.amazon/B08QY1yVZ" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
+        <a class="tile cc-de" href="https://link.amazon/B08QY1yVZ" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
           <span><b>Get the M-VAVE FM-1</b><small>auf Amazon.de · Anzeige *</small></span></a>
-        <a class="tile" href="https://link.amazon/B0f2qKAUl" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
+        <a class="tile cc-de" href="https://link.amazon/B0f2qKAUl" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
           <span><b>Get the M-VAVE SMK-37 Pro</b><small>auf Amazon.de · Anzeige *</small></span></a>
+        <a class="tile cc-us" href="https://amzn.to/4yZizIY" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
+          <span><b>Get the M-VAVE FM-1</b><small>on Amazon.com · Ad *</small></span></a>
+        <a class="tile cc-us" href="https://amzn.to/3TYjR7V" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
+          <span><b>Get the M-VAVE SMK-37 Pro</b><small>on Amazon.com · Ad *</small></span></a>
       </div>
     </div></div>
   </div>
@@ -680,9 +687,7 @@ sudo python3 fm1_rescue.py sloop</pre>
   warranty: you install it at your own risk.
   <br><a href="https://designburg.net/">designburg.net</a> · <a href="/impressum/">Impressum</a> · <a href="/impressum/#datenschutz">Datenschutz</a>
   · <a href="https://www.youtube.com/@sonzven?sub_confirmation=1" target="_blank" rel="noopener">▶ YouTube: @sonzven</a>
-  · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a>
-  · <a href="https://link.amazon/B0axzqKZf" target="_blank" rel="sponsored noopener">🎹 Buy the FM-1 on Amazon*</a> (* affiliate link, an ad: as an Amazon Associate we earn from
-  qualifying purchases; Als Amazon-Partner verdienen wir an qualifizierten Verkäufen)<span id="updated"></span>
+  · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a><span id="updated"></span>
 </div></footer>
 
 <script>
@@ -1654,9 +1659,12 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   if ("serviceWorker" in navigator && isSecureContext)
     navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((r) => { reg = r; }).catch(() => {});
 
-  // Shop in the menu (Amazon.de affiliate links): Germany and Austria only, by the country Cloudflare sees (/api/cc, nothing kept)
-  fetch("/api/cc", { cache: "no-store" }).then((r) => r.json())
-    .then((j) => { if (/^(DE|AT)$/.test(j.cc)) document.getElementById("shopdd")?.removeAttribute("hidden"); }).catch(() => {});
+  // Shop in the menu (Amazon affiliate links): amazon.de for Germany and Austria, amazon.com for the US, nobody else;
+  // by the country Cloudflare sees (/api/cc, nothing kept)
+  fetch("/api/cc", { cache: "no-store" }).then((r) => r.json()).then((j) => {
+    const shop = { DE: "de", AT: "de", US: "us" }[j.cc], el = document.getElementById("shopdd");
+    if (shop && el) { el.dataset.cc = shop; el.removeAttribute("hidden"); }
+  }).catch(() => {});
 
   // the app left in the background for a while (a phone keeps it for days): the page anew when it comes back,
   // never while an install writes (fm1.html's `writing`) or a dialog is open
