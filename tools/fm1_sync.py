@@ -291,12 +291,6 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://konsumer.js.org/fomajam/",
          what="A drum machine in the classic step-grid style: voices after the 909, 808, 707, 606, DMX and more, a "
               "machine per voice, accents and patterns. Play it in the browser first."),
-    dict(id="kawa", added="2026-10-17",
-         kind="groove", name="KAWA", author="Omnipotard (Guizmoh)", repo="Guizmoh/Kawa-Tracker-Fm1", ident=r"FM-1_95\d",
-         src="repo:kawa-0.2.fwsc@decda3cb0d9a194dffc31ecf6d18a9c64eb8261f",   # (no releases, no tags: the package in the repo, pinned)
-         what="A pocket tracker for any style: six tracks with an engine each (pulse, 4-bit wave, noise, 6-operator FM, "
-              "drum kit or sample), patterns chained into a song, 32 live effects and tools that write beats for you. "
-              "A beta, not yet tried on a real FM-1 by its maker."),
 ]
 
 
