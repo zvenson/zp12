@@ -313,6 +313,11 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          src="github", site="https://fm1.quest/en/",   # (its tags are builds: quest-38 is its v0.21)
          what="A pixel-art RPG while you make music, built on SLOOP: four heroes, one a track, walk through a village "
               "and fight monsters and bosses as your loop plays, every SLOOP screen redrawn in the game's style."),
+    dict(id="grimm", added="2026-10-18", play="https://grimmbient.github.io/grimm/", editor="https://grimmbient.github.io/grimm/editor.html",
+         kind=["synth", "groove"], name="GR!MM", author="GRiMMBIENT", repo="GRiMMBIENT/grimm", ident=r"FM-1_966",
+         src="github", site="https://grimmbient.github.io/grimm/",
+         what="Dark ambient, dungeon synth and deathdream: four tracks, seven sound sources from VA and 6-op FM to formant "
+              "voices and physical models, tape, granular freeze and reverbs up to infinite, a 64-step sequencer and song mode. Built on Dinghy."),
 ]
 
 
