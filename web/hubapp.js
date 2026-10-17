@@ -19,11 +19,13 @@
   if ("serviceWorker" in navigator && isSecureContext)
     navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((r) => { reg = r; }).catch(() => {});
 
-  // Shop in the menu (Amazon affiliate links): amazon.de for Germany and Austria, amazon.com for the US, nobody else;
-  // by the country Cloudflare sees (/api/cc, nothing kept)
+  // Shop in the menu, by the country Cloudflare sees (/api/cc, nothing kept): Firmwear (the hub's merch on Spreadshop,
+  // made and sent in the EU) for EU visitors, Amazon affiliate links for DE / AT (amazon.de) and the US (amazon.com);
+  // anybody else: no shop
+  const EU = "AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE".split(" ");
   fetch("/api/cc", { cache: "no-store" }).then((r) => r.json()).then((j) => {
-    const shop = { DE: "de", AT: "de", US: "us" }[j.cc], el = document.getElementById("shopdd");
-    if (shop && el) { el.dataset.cc = shop; el.removeAttribute("hidden"); }
+    const cc = j.cc === "DE" || j.cc === "AT" ? "de" : EU.includes(j.cc) ? "eu" : j.cc === "US" ? "us" : "", el = document.getElementById("shopdd");
+    if (cc && el) { el.dataset.cc = cc; el.removeAttribute("hidden"); }
   }).catch(() => {});
   // (a click in the shop: a Matomo event "Shop" / the device / the store, beside the outlink Matomo counts anyway)
   document.addEventListener("click", (e) => {

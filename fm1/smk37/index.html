@@ -58,7 +58,9 @@
              color: var(--fg); font-size: 15px; font-weight: 600; white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
   /* Shop (Amazon.de affiliate links): shown by web/hubapp.js in DE / AT only (/api/cc), beside the Knowledge Base */
   nav .dd[hidden] { display: none; }
-  #shopdd[data-cc="de"] .cc-us, #shopdd[data-cc="us"] .cc-de { display: none !important; }   /* (amazon.de for DE / AT, amazon.com for the US) */
+  /* (data-cc: de = DE / AT: Firmwear + amazon.de; eu = the rest of the EU: Firmwear only; us: amazon.com only) */
+  #shopdd:not([data-cc="de"]) .cc-de, #shopdd:not([data-cc="eu"]) .cc-eu, #shopdd:not([data-cc="us"]) .cc-us,
+  #shopdd[data-cc="us"] .cc-merch, #shopdd[data-cc="eu"] .cc-amz { display: none !important; }
   nav .dd.shopdd { margin-left: clamp(4px, 1.6vw, 22px); }
   .mega .side .ad { font-size: 12.5px; color: var(--dim); }
   nav .kbl:hover { text-decoration: none; box-shadow: inset 0 -2px 0 var(--pink); }
@@ -388,12 +390,15 @@
     <div class="mega" id="shopm"><div class="wrap in">
       <div class="side">
         <p class="k">Shop</p>
-        <p class="cc-de">Die Geräte, auf denen die Firmwares des Hubs laufen, bei Amazon.de.</p>
+        <p class="cc-de">Firmwear, die Shirts und Hoodies des Hubs, bei Spreadshop, und die Geräte, auf denen die Firmwares laufen, bei Amazon.de.</p>
+        <p class="cc-eu">Firmwear: the hub's shirts and hoodies, on Spreadshop.</p>
         <p class="cc-us">The machines the hub's firmwares run on, from Amazon.com.</p>
-        <hr><p class="ad cc-de">* Affiliate-Link (Anzeige). Als Amazon-Partner verdiene ich an qualifizierten Verkäufen; für dich kostet es nichts extra.</p>
+        <hr class="cc-amz"><p class="ad cc-de">* Affiliate-Link (Anzeige). Als Amazon-Partner verdiene ich an qualifizierten Verkäufen; für dich kostet es nichts extra.</p>
         <p class="ad cc-us">* Affiliate link (ad). As an Amazon Associate I earn from qualifying purchases; it costs you nothing extra.</p>
       </div>
       <div class="tiles">
+        <a class="tile cc-merch" href="https://the-firmware-hub.myspreadshop.de/make+firmware+not+war-A32661688835530cb?sellable=rlac1svn88nf-20&amp;appearance=2" data-shop="Firmwear|spreadshop" target="_blank" rel="noopener"><span class="pic"><img src="/img/merch.png?v=5fe2f657" alt=""></span>
+          <span><b>Firmwear</b><small class="cc-de">Make Firmware, Not War. · Hoodie &amp; Shirt bei Spreadshop</small><small class="cc-eu">Make Firmware, Not War. · hoodie &amp; shirt on Spreadshop</small></span></a>
         <a class="tile cc-de" href="https://link.amazon/B08QY1yVZ" data-shop="FM-1|amazon.de" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
           <span><b>M-VAVE FM-1 kaufen</b><small>auf Amazon.de · Anzeige *</small></span></a>
         <a class="tile cc-de" href="https://link.amazon/B0f2qKAUl" data-shop="SMK-37 Pro|amazon.de" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
@@ -831,11 +836,13 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
   if ("serviceWorker" in navigator && isSecureContext)
     navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((r) => { reg = r; }).catch(() => {});
 
-  // Shop in the menu (Amazon affiliate links): amazon.de for Germany and Austria, amazon.com for the US, nobody else;
-  // by the country Cloudflare sees (/api/cc, nothing kept)
+  // Shop in the menu, by the country Cloudflare sees (/api/cc, nothing kept): Firmwear (the hub's merch on Spreadshop,
+  // made and sent in the EU) for EU visitors, Amazon affiliate links for DE / AT (amazon.de) and the US (amazon.com);
+  // anybody else: no shop
+  const EU = "AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE".split(" ");
   fetch("/api/cc", { cache: "no-store" }).then((r) => r.json()).then((j) => {
-    const shop = { DE: "de", AT: "de", US: "us" }[j.cc], el = document.getElementById("shopdd");
-    if (shop && el) { el.dataset.cc = shop; el.removeAttribute("hidden"); }
+    const cc = j.cc === "DE" || j.cc === "AT" ? "de" : EU.includes(j.cc) ? "eu" : j.cc === "US" ? "us" : "", el = document.getElementById("shopdd");
+    if (cc && el) { el.dataset.cc = cc; el.removeAttribute("hidden"); }
   }).catch(() => {});
   // (a click in the shop: a Matomo event "Shop" / the device / the store, beside the outlink Matomo counts anyway)
   document.addEventListener("click", (e) => {

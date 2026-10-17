@@ -7,7 +7,9 @@
              color: var(--fg); font-size: 15px; font-weight: 600; white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
   /* Shop (Amazon.de affiliate links): shown by web/hubapp.js in DE / AT only (/api/cc), beside the Knowledge Base */
   nav .dd[hidden] { display: none; }
-  #shopdd[data-cc="de"] .cc-us, #shopdd[data-cc="us"] .cc-de { display: none !important; }   /* (amazon.de for DE / AT, amazon.com for the US) */
+  /* (data-cc: de = DE / AT: Firmwear + amazon.de; eu = the rest of the EU: Firmwear only; us: amazon.com only) */
+  #shopdd:not([data-cc="de"]) .cc-de, #shopdd:not([data-cc="eu"]) .cc-eu, #shopdd:not([data-cc="us"]) .cc-us,
+  #shopdd[data-cc="us"] .cc-merch, #shopdd[data-cc="eu"] .cc-amz { display: none !important; }
   nav .dd.shopdd { margin-left: clamp(4px, 1.6vw, 22px); }
   .mega .side .ad { font-size: 12.5px; color: var(--dim); }
   nav .kbl:hover { text-decoration: none; box-shadow: inset 0 -2px 0 var(--pink); }
