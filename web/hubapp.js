@@ -6,6 +6,7 @@
   const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);   // (an iPad says "Mac")
   const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
   const touch = matchMedia("(pointer: coarse)").matches;
+  const wanted = !standalone && new URLSearchParams(location.search).has("app");   // (the QR code's /?app=1)
   window.hubApp = {
     ios, standalone,
     // (what the Install / Connect buttons say without Web MIDI: on iOS no other browser helps)
@@ -77,7 +78,8 @@
   }
   addEventListener("beforeinstallprompt", (e) => {      // (Chrome / Edge: installable; their own mini bar replaced by ours)
     e.preventDefault(); prompt = e;
-    if (touch && !quiet() && !bar) show();
+    // (a phone: the bar with Install; one already open without it (the QR code's how-to) gets it now)
+    if (touch && (bar?.isConnected ? !bar.querySelector(".go") : !quiet())) show();
   });
   addEventListener("appinstalled", () => { bar?.remove(); prompt = null; });
   addEventListener("DOMContentLoaded", () => {
@@ -94,7 +96,7 @@
         show(); if (touch) bar?.querySelector(".go")?.click();
       };
     });
-    if (location.hash === "#app") show();                // (the menu's link from a page without this code: VIBE's)
+    if (location.hash === "#app" || wanted) show();      // (the menu's link from VIBE's page; the QR code: came for the app)
     else if (ios && !standalone && !quiet()) setTimeout(show, 1500);   // (Safari has no prompt: the bar a moment after the page)
   });
 })();
