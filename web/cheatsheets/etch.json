@@ -1,0 +1,110 @@
+{
+ "id": "etch",
+ "name": "ETCH",
+ "version": "1.38",
+ "ref": "ETCH-Update",
+ "manual": "https://github.com/SikkenWorks/ETCH/blob/ETCH-Update/USER_MANUAL.md",
+ "intro": "A wavetable synth where you draw the waves yourself: morph wave A into B, let a third wave C bend the result, then add filter, 17 effects, arp with RIFF generator and a sequencer. Play a key and turn KNOB 1 (MORPH) first.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {"do": ["tap HOME"], "what": "PLAY: KNOB 1 MORPH, 2 ETCH depth, 3 CUTOFF, 4 SPACE."},
+    {"do": ["turn SELECT"], "what": "From PLAY: MORPH, FILTER, LIBRARY pages and back."},
+    {"do": ["hold HOME", "turn PRESETS"], "what": "Hold 1.5 s: preset browser; turning loads each preset."},
+    {"do": ["turn PRESETS"], "what": "Outside the preset browser: tempo, 30-240 BPM."},
+    {"do": ["HOME twice"], "what": "From PLAY: PROJECTS browser (4 projects); SEL opens one."},
+    {"do": ["tap GLO"], "what": "GUIDE, FIFTHS (key and scale), SYSTEM; tap for next."}
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {"do": ["tap OCT-"], "what": "Octave down on release (OCT+ up)."},
+    {"do": ["hold OCT-", "tap OCT+"], "what": "Switch POLY (8 voices) / MONO; let go at once."},
+    {"do": ["tap ARP", "turn KNOB 1"], "what": "Arp mode: 0 OFF, 1-6 patterns, 7 RIFF."},
+    {"do": ["tap ARP", "turn KNOB 4"], "what": "Mode 7: a new 16-step riff in key; else tempo."},
+    {"do": ["tap ARP", "tap ARP"], "what": "ARP, ARP EDIT, CLOCK, RIFF LAB; tap for next."},
+    {"do": ["hold SEQ", "power on"], "what": "Silent USB MIDI keyboard (channel 1); power off to leave."}
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {"do": ["tap EDIT"], "what": "DRAW: KNOB 1 position, 2 height, 3 harmonic, 4 its amount."},
+    {"do": ["tap EDIT", "turn SELECT"], "what": "Draw wave A, B or C; a note plays it alone."},
+    {"do": ["tap EDIT", "tap ENV"], "what": "Undo a drawing step (LFO: redo), 16 deep."},
+    {"do": ["turn SELECT", "turn ALGORITHM"], "what": "MORPH page: ETCH depth; KNOB 1/2 pick waves A/B."},
+    {"do": ["tap LFO"], "what": "MOD WAVE: KNOB 1 wave C, 2 DEPTH, 3 RATE, 4 PHASE/MORPH."},
+    {"do": ["tap LFO", "tap LFO"], "what": "WAVE C FX, MOD MATRIX; in MONO also EVOLUTION, LIVING..."},
+    {"do": ["tap ENV"], "what": "Amp envelope: ATTACK, DECAY, SUSTAIN, RELEASE."}
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {"do": ["tap SEQ"], "what": "KNOB 1 LENGTH 8-256, 2 RATE, 3 SWING, 4 GATE."},
+    {"do": ["tap PLAY"], "what": "Start / stop the sequencer."},
+    {"do": ["tap SEQ", "turn SELECT"], "what": "Pick a step; stopped, keys add or remove its notes."},
+    {"do": ["tap SEQ", "tap REC"], "what": "Live recording on / off; starts playback if stopped."},
+    {"do": ["tap SEQ", "turn ALGORITHM"], "what": "More editors: GRID, HOLD, LOCKS, BAKE, CLOCK."},
+    {"do": ["tap ARP", "tap ARP", "tap ARP", "turn KNOB 1"], "what": "CLOCK: follow external MIDI clock on / off."}
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {"do": ["tap FX"], "what": "DRIVE page: drive, filter type, cutoff, resonance."},
+    {"do": ["tap FX", "turn SELECT"], "what": "17 effects: chorus, delay, reverb ... tape, rotary, wah."},
+    {"do": ["tap FX", "tap FX"], "what": "WAVE A FX, then B: two inserts each (RING, BIT, FOLD...)."},
+    {"do": ["tap EDIT", "tap FX"], "what": "WFX 1/2: effects baked into the wave; SAVE twice bakes."}
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {"do": ["tap SAVE", "turn SELECT"], "what": "Save a PROJECT or a PRESET."},
+    {"do": ["tap SAVE", "turn KNOB 1"], "what": "Slot; KNOB 2 letter position, 3 letter, 4 back: delete."},
+    {"do": ["SAVE twice"], "what": "Store it; a used slot asks for one more SAVE."},
+    {"do": ["tap EDIT", "tap SAVE"], "what": "Save the drawn wave in the library (64 slots)."},
+    {"do": ["turn SELECT", "tap REC", "tap REC"], "what": "LIBRARY: load slot (KNOB 1) into wave A/B/C (KNOB 2)."}
+   ]
+  },
+  {
+   "title": "Recovery",
+   "rows": [
+    {"do": ["hold REC", "power on"], "what": "Silent, read-only Safe Mode."},
+    {"do": ["hold OCT-", "power on"], "what": "Update loader for the web installer."},
+    {"do": ["hold HOME", "hold PLAY"], "what": "1 s after AUDIO STOP: restart the sound engine."}
+   ]
+  }
+ ],
+ "tips": [
+  "Holding OCT- and OCT+ together for 5 seconds also jumps to the update loader: tap them together for POLY / MONO and let go.",
+  "Saving a preset does not save a newly drawn wave: save the wave first (EDIT, SAVE), then the preset.",
+  "16 factory waves (SINE, SAW ... SCRATCH) and 32 presets to start from; a save needs a name (KNOB 3 picks letters).",
+  "EVOLUTION, ORGANIC, SPECTRAL, LIVING and PATCH BLEND only appear in MONO: tap OCT- and OCT+ together, then LFO.",
+  "Wave C does nothing at DEPTH 0: raise ETCH (KNOB 2 on PLAY) to hear it.",
+  "Experimental firmware: keep a stock firmware file at hand before installing."
+ ],
+ "checked": [
+  "Hub mirror src/etch-1.38.tar.gz (catalog tag ETCH-Update): firmware/fm1-native/bringup.c main loop; raw button bits derived from code + comments: 0 OCT-, 1 OCT+, 2 FX, 3 SEL, 4 ENV, 5 LFO, 6 EDIT, 7 GLO, 8 HOME, 9 SAVE, 10 ARP, 11 SEQ, 12 PLAY, 13 REC; encoders fm1_enc_take 0 SELECT, 1 ALGORITHM, 2-5 KNOB 1-4, 6 PRESETS.",
+  "bringup.c ~2434 + final else branch: PLAY knobs MORPH / depth / cutoff (forces LP) / reverb (SPACE); native_ui_navigation.h etch_ui_home_turn PLAY->MORPH->FILTER->LIBRARY; glo_next GUIDE->FIFTHS->SYSTEM; lfo_next POLY MOD->C FX->MATRIX, MONO adds EVOLUTION ORGANIC SPECTRAL LIVING PATCH BLEND; arp_next ARP->ARP EDIT->CLOCK->RIFF LAB; seq_next SEQ->NOTES->HARM; seq_inspector via ALGORITHM incl. GRID HOLD LOCKS BAKE CLOCK; fx_select 17 FX editors.",
+  "native_preset_browser.h: HOME hold 1500 ms = PRESETS (not when chorded), short tap = PLAY; bringup.c double HOME within 500 ms from PLAY = PROJECTS; SEL (bit 3) opens/creates project in PROJECTS (native_project_ui.h).",
+  "bringup.c PRESETS encoder = BPM 30-240 outside PRESETS/NAME/PROJECT SAVE; inside PRESETS loads next valid patch.",
+  "native_octave_mode.h: single OCT acts on release, both = POLY/MONO toggle (default mono_mode 0 = POLY); bringup.c ~2427: OCT-+OCT+ held 5000 ms -> fm1_enter_uboot; octave clamp -4..+3.",
+  "bringup.c page 5 (ARP): K1 mode 0-7, K2 rate, K3 octaves, K4 = native_new_riff in mode 7 else tempo; page 13 CLOCK K1 clock_follow, K4 tempo; page 6 SEQ K1 length {8..256}, K2 rate, K3 swing 0-75, K4 gate 5-100, SELECT step, stopped keys etch_seq_toggle; REC on SEQ/NOTES/HARM toggles recording and starts run; PLAY (bit 12) toggles native_seq_run.",
+  "bringup.c DRAW branch: SELECT etch_editor_select A/B/C, K1/K2 move_xy32, K3 harmonic 2-16, K4 add_partial, ENV undo, LFO redo (wave_editor.h history[16]); FX -> WFX1 (14) -> WFX2 (15) -> TOOLS (9); SAVE twice bakes WFX; SAVE in DRAW = native_wave_save_start (64 slots).",
+  "bringup.c page 23 MORPH: K1/K2 load waves A/B, K3 morph, K4 ratio, ALGORITHM depth; page 2 MOD: K1 wave C, K2 depth, K3 rate, K4 target; ENV page K1-K4 A D S R; FX button: non-FX -> DRIVE, FX editor -> WAVE A FX -> WAVE B FX -> DRIVE; native_live_controls_v117.h pre insert types 0-5.",
+  "bringup.c save: SELECT on PROJECT SAVE toggles preset/project, K1 slot, K2 position, K3 char, K4 backspace, SAVE commits (occupied: overwrite arm, second SAVE), empty name refused (native_save_controls.h); LIBRARY K1 slot 0-63, K2 target, REC twice loads (native_encoder_steps.h).",
+  "native_factory.c: 16 named factory waves, 32 patches 'ETCH 00'-'ETCH 31'.",
+  "Boot: bringup.c OCT- (bit 0) -> uboot; native_recovery_policy.h REC (bit 13) -> Safe Mode; native_keyboard_boot.h SEQ (bit 11) -> USB MIDI keyboard; HOME+PLAY 1000 ms after native_tripped restarts audio."
+ ],
+ "unsure": [
+  "Hub lists 1.38 (product FM-1_1038), but the mirrored source identifies as V1.37 / FM-1_1037 (README, RELEASE-MANIFEST, package.json): the 1.38 changes are not in this tarball. Sheet follows the 1.37 code.",
+  "SEL button outside SEQ pages also does the GLO route (same as GLO); in DRAW, SEL jumps to GUIDE and GLO opens wave naming: left out as confusing.",
+  "Manual (USER_MANUAL.md, written for V1.20) says the PRESETS encoder does nothing outside the browser; code since V1.30 makes it BPM. Manual says HOME leaves DRAW; code: HOME and EDIT both leave it.",
+  "Manual says 'PLAY/STOP' and K4 'BPM' on ARP; code: K4 is tempo only when mode != 7. The FILTER page (K1 TYPE, K2 CUTOFF, K3 RESO, K4 DRIVE) and the 17 FX pages' knobs are verified but not given rows.",
+  "Whether SEQ-boot keyboard mode, MONO-only editors etc. behave on hardware: author states all of V1.33-V1.37 is software-tested only."
+ ]
+}

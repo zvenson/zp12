@@ -1,0 +1,337 @@
+{
+ "id": "fimba",
+ "name": "FiMba-1",
+ "version": "0.6.1",
+ "ref": "v0.6.1",
+ "manual": "https://github.com/jadamsowers/fm1-fimba#readme",
+ "intro": "A physically modelled kalimba: the white keys are tines laid out like the real thing (lowest in the middle), the black keys roll the scale's chords; turn SELECT for the metal, ENV for the body, tap ARP for an mbira pattern.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {
+     "do": [
+      "tap HOME"
+     ],
+     "what": "Tine page: Material, Hardness, Decay, Tone; again: Character."
+    },
+    {
+     "do": [
+      "tap EDIT"
+     ],
+     "what": "Step through all eleven pages in turn."
+    },
+    {
+     "do": [
+      "tap SEL"
+     ],
+     "what": "Keys page: Layout, Scale, Key, Black; again: Play (Strum ms)."
+    },
+    {
+     "do": [
+      "tap OCT-"
+     ],
+     "what": "Octave down (OCT+ up), -2 to +2."
+    },
+    {
+     "do": [
+      "tap SAVE"
+     ],
+     "what": "Save now; it also saves itself seconds after a change."
+    }
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {
+     "do": [
+      "white key 1-16"
+     ],
+     "what": "Pluck a tine; the lowest (dim-lit white key 9) sits mid."
+    },
+    {
+     "do": [
+      "black key 1-7"
+     ],
+     "what": "Thumb-roll chord on scale degrees I to vii."
+    },
+    {
+     "do": [
+      "black key 8-11"
+     ],
+     "what": "Seventh chords on I, IV, V and vi."
+    },
+    {
+     "do": [
+      "turn ALGORITHM"
+     ],
+     "what": "Scale: Major, Minor, Penta, ... Hirajoshi, Blues, Mbira, Chromatic."
+    },
+    {
+     "do": [
+      "turn PRESETS"
+     ],
+     "what": "Key C to B (Keyboard layout: transpose)."
+    },
+    {
+     "do": [
+      "tap REC"
+     ],
+     "what": "Palm mute: damp every ringing tine."
+    },
+    {
+     "do": [
+      "tap SEL",
+      "turn KNOB 1"
+     ],
+     "what": "Layout: Tine, Keyboard (keys as printed), Mirror."
+    },
+    {
+     "do": [
+      "tap SEL",
+      "turn KNOB 4"
+     ],
+     "what": "Black keys: Chords, Sharps (second row) or Perform."
+    }
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {
+     "do": [
+      "turn SELECT"
+     ],
+     "what": "Material: Steel, Brass, Bronze, Aluminium, Bamboo, Glass."
+    },
+    {
+     "do": [
+      "tap HOME",
+      "turn KNOB 2"
+     ],
+     "what": "Hardness: soft thumb pad (0) to bright fingernail (100)."
+    },
+    {
+     "do": [
+      "HOME twice"
+     ],
+     "what": "Character: Worn, Glide, Tuning (Equal / Just), Release (Ring / Damp)."
+    },
+    {
+     "do": [
+      "tap ENV"
+     ],
+     "what": "Body page: Body, Buzz (mbira rattle), Wah, Wah rate."
+    },
+    {
+     "do": [
+      "tap ENV",
+      "turn KNOB 1"
+     ],
+     "what": "Body: None, Board, Box, Gourd."
+    },
+    {
+     "do": [
+      "tap ENV",
+      "turn KNOB 3"
+     ],
+     "what": "Cover the sound hole for the wah (Box, Gourd only)."
+    }
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {
+     "do": [
+      "tap ARP"
+     ],
+     "what": "Mbira pattern on / off over the last chord chosen."
+    },
+    {
+     "do": [
+      "tap ARP",
+      "black key 1-11"
+     ],
+     "what": "Pattern running: a chord key gives it a new chord."
+    },
+    {
+     "do": [
+      "hold ARP"
+     ],
+     "what": "Pattern page (same as SEQ), without starting it."
+    },
+    {
+     "do": [
+      "tap SEQ",
+      "turn KNOB 1"
+     ],
+     "what": "Pattern: Thumbs, Cascade, 3 over 2, Interlock."
+    },
+    {
+     "do": [
+      "tap SEQ",
+      "turn KNOB 2"
+     ],
+     "what": "Pattern tempo 40-200 BPM; MIDI clock takes over."
+    }
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {
+     "do": [
+      "tap FX"
+     ],
+     "what": "Space: Reverb, Size, Delay, Time (ping-pong)."
+    },
+    {
+     "do": [
+      "FX twice"
+     ],
+     "what": "Color: Tape, Lo-fi, Chorus, Filter (low-pass left, high-pass right)."
+    },
+    {
+     "do": [
+      "tap LFO"
+     ],
+     "what": "Grain: a granular cloud of what you play; KNOB 1 level."
+    },
+    {
+     "do": [
+      "LFO twice"
+     ],
+     "what": "Spread: Spray, Feedback (echo repeats), Width."
+    },
+    {
+     "do": [
+      "tap PLAY"
+     ],
+     "what": "Freeze the grain cloud as a drone; again to go live."
+    }
+   ]
+  },
+  {
+   "title": "Settings",
+   "rows": [
+    {
+     "do": [
+      "tap GLO"
+     ],
+     "what": "Setup: Tune, MIDI ch, MIDI out, Theme; header shows version."
+    },
+    {
+     "do": [
+      "tap GLO",
+      "turn KNOB 2"
+     ],
+     "what": "MIDI channel: Omni or 1-16."
+    },
+    {
+     "do": [
+      "tap GLO",
+      "turn KNOB 3"
+     ],
+     "what": "MIDI out: send the keys as MIDI notes."
+    },
+    {
+     "do": [
+      "tap GLO",
+      "turn KNOB 4"
+     ],
+     "what": "Theme: Light or Dark screen."
+    }
+   ]
+  },
+  {
+   "title": "Recovery",
+   "rows": [
+    {
+     "do": [
+      "hold SAVE",
+      "tap SAVE"
+     ],
+     "what": "1.5 s: RESET? Then SAVE resets the sound to defaults."
+    },
+    {
+     "do": [
+      "hold OCT-",
+      "hold OCT+"
+     ],
+     "what": "Both for 5 seconds: update mode, for installing firmware."
+    },
+    {
+     "do": [
+      "hold OCT-",
+      "hold OCT+",
+      "power on"
+     ],
+     "what": "Hardware calibration: teach each button and knob."
+    },
+    {
+     "do": [
+      "tap PLAY"
+     ],
+     "what": "On the SAFE MODE screen: try starting again."
+    }
+   ]
+  }
+ ],
+ "keys": [
+  {
+   "keys": "white",
+   "label": "Tines (lowest in the middle)",
+   "color": "#42f5f5"
+  },
+  {
+   "keys": [
+    1,
+    3,
+    5,
+    8,
+    10,
+    13,
+    15
+   ],
+   "label": "Chords I-vii",
+   "color": "#f542a7"
+  },
+  {
+   "keys": [
+    17,
+    20,
+    22,
+    25
+   ],
+   "label": "7th chords I IV V vi",
+   "color": "#e8d8b0"
+  }
+ ],
+ "tips": [
+  "Try it in the browser first: jadamsowers.github.io/fm1-fimba runs the same firmware code.",
+  "Keys don't sense velocity: Hardness sets how firm every pluck is (MIDI velocity does it over MIDI).",
+  "Wah needs a body with a sound hole: on None or Board its knobs show -- and NO HOLE.",
+  "Black keys in Perform: 1 mute, 2 cover the hole, 3 freeze, 4 / 5 octave down / up while held, 6-11 the six materials.",
+  "SELECT, ALGORITHM and PRESETS work on every page; the header shows key and scale.",
+  "A dot in the header means unsaved changes; the reset keeps the Setup page."
+ ],
+ "checked": [
+  "v0.6.1 mirror (VERSION 0.6.1), firmware/src/app/plat.h: B_* enum by printed label (B_SEL = SEL), EN_SELECT/ALGO/PRESET/K1-K4; panel.c B_NAME labels.",
+  "ui.c VIEW_BTN / VIEW_KNOB: HOME Tine+Character, ENV Body, FX Space+Color, LFO Grain+Spread, SEL Keys+Play, SEQ Pattern, GLO Setup; button(): same button again = next page, EDIT = (view+1)%11, PLAY freeze, REC km_damp_all, ARP pattern toggle, OCT -/+ P_OCTAVE, SAVE project_save.",
+  "ui.c input(): ARP held 500 ms -> V_PATTERN without toggle; SAVE held 1500 ms -> reset_ask, SAVE again resets (Setup params kept), other button/key or 5 s keeps; SELECT material, ALGORITHM scale, PRESETS key (Tine) / transpose (Keyboard).",
+  "ui.c black_down: Chords = km_chord_cents roll with Strum delay, pattern on -> pool_set; Sharps = left white key +100 cents; Perform mute/hole/freeze/oct-/oct+/materials. WHITE_K/BLACK_K index tables; center_key WHITE_K[8] = white key 9 (Tine).",
+  "ui.c turn/knob_off: Wah and Wah rate need km_body_hole (Box, Gourd) else 'NO HOLE'. autosave after 4000 ms quiet, not while frozen.",
+  "kalimba.c PARAMS: names, ranges, defaults (Body Box, Pattern Thumbs, Tempo 40-200 96, MIDI ch 0 = Omni, Theme Light); PAT names Thumbs/Cascade/3 over 2/Interlock; BODY None/Board/Box/Gourd; 12 scales.",
+  "kalimba.c km_chord_cents: CH_DEG per black key, k < 7 triad (+ root octave up), k >= 7 four-note seventh; matches README (I-vii, then 7ths on I IV V vi).",
+  "main_fm1.c: OCT- + OCT+ held 5 s -> enter_uboot (countdown from 2 s); both held at power-on -> panel_setup (HARDWARE CALIBRATION); safe_main after two failed boots, PLAY = try again; four failed -> chip update mode. No OCT--alone rescue in this firmware.",
+  "ui.c midi_in: clock F8/FA/FB/FC drives the pattern; notes with pattern on build its chord."
+ ],
+ "unsure": [
+  "Scale names in code are abbreviated on screen (Mixolyd., Harm. m, Alumin.); sheet uses the README's full names.",
+  "In Keyboard layout all 27 keys play their printed note and black keys are not chords; the key zones show the default Tine layout only.",
+  "MIDI CC map (1 wah, 64 sustain, 72/73/74 decay/hardness/tone, 91/93/94 reverb/grains/delay, PC = material) verified in ui.c midi_cc but left out; no MIDI & sync section.",
+  "Not tried on hardware or in the browser emulator."
+ ]
+}

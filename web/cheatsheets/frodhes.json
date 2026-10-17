@@ -1,0 +1,304 @@
+{
+ "id": "frodhes",
+ "name": "Frodhes",
+ "version": "0.9.2",
+ "ref": "v0.9.2",
+ "manual": "https://github.com/leonardoMirabal/frodhes/blob/v0.9.2/docs/MANUAL.md",
+ "intro": "A Rhodes electric piano computed live from hammer, tine and pickup (no samples), with a reface CP-style effects chain: just play, then turn ALGORITHM for the four piano types.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {
+     "do": [
+      "turn SELECT"
+     ],
+     "what": "Next / previous page; KNOB 1-4 turn its four cards."
+    },
+    {
+     "do": [
+      "tap HOME"
+     ],
+     "what": "PERFORM page; again: main page (TYPE, DRIVE, REVERB, KEY VEL)."
+    },
+    {
+     "do": [
+      "tap EDIT"
+     ],
+     "what": "VOICE page: TONE, BARK, BELL, HAMMER."
+    },
+    {
+     "do": [
+      "tap OCT-"
+     ],
+     "what": "Octave down (OCT+ up), range ±2."
+    },
+    {
+     "do": [
+      "turn ALGORITHM"
+     ],
+     "what": "Piano TYPE from any page (not on SEQUENCER)."
+    }
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {
+     "do": [
+      "turn PRESETS"
+     ],
+     "what": "F01-F12 factory, U01-U16 yours; loads when you stop."
+    },
+    {
+     "do": [
+      "tap HOME",
+      "turn KNOB 1"
+     ],
+     "what": "PERFORM: trem/wah, phaser, chorus, delay amount; up = on."
+    },
+    {
+     "do": [
+      "tap HOME",
+      "tap HOME",
+      "turn KNOB 4"
+     ],
+     "what": "KEY VEL: your touch; above ~100 the bark comes in."
+    },
+    {
+     "do": [
+      "hold REC"
+     ],
+     "what": "Sustain pedal; a quick tap latches it, tap again releases."
+    },
+    {
+     "do": [
+      "tap SEQ",
+      "turn KNOB 1"
+     ],
+     "what": "Chord mode: one key plays a whole chord (OFF to stop)."
+    },
+    {
+     "do": [
+      "tap ARP",
+      "tap ARP"
+     ],
+     "what": "Arpeggiator on / off; on its page PLAY latches HOLD."
+    },
+    {
+     "do": [
+      "tap GLO",
+      "turn SELECT",
+      "turn KNOB 1"
+     ],
+     "what": "SCALE: OFF / SNAP / DEGREE (white keys walk the scale)."
+    }
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {
+     "do": [
+      "turn ALGORITHM"
+     ],
+     "what": "STAGE 77, SUITCASE, EARLY FELT, BELL DYNO."
+    },
+    {
+     "do": [
+      "tap EDIT",
+      "turn KNOB 2"
+     ],
+     "what": "BARK: the growl of hard notes (KNOB 3 BELL, 4 HAMMER)."
+    },
+    {
+     "do": [
+      "tap HOME",
+      "tap HOME",
+      "turn KNOB 2"
+     ],
+     "what": "DRIVE: amp drive, clean to growl (KNOB 3 REVERB)."
+    },
+    {
+     "do": [
+      "tap EDIT",
+      "turn SELECT"
+     ],
+     "what": "DECAY page: DECAY, RELEASE, damper NOISE, TUNE."
+    },
+    {
+     "do": [
+      "tap HOME",
+      "turn SELECT"
+     ],
+     "what": "ASSIGN: choose what each PERFORM knob plays."
+    }
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {
+     "do": [
+      "tap SEQ",
+      "tap SEQ"
+     ],
+     "what": "SEQUENCER page: loop recorder, 1-16 bars (KNOB 1)."
+    },
+    {
+     "do": [
+      "tap PLAY"
+     ],
+     "what": "On SEQUENCER: start / stop the loop (stop = back to bar 1)."
+    },
+    {
+     "do": [
+      "tap SEQ"
+     ],
+     "what": "On SEQUENCER: recording on / off; playing it overdubs each pass."
+    },
+    {
+     "do": [
+      "hold SEQ"
+     ],
+     "what": "On SEQUENCER, 1 second: clear the whole pattern."
+    },
+    {
+     "do": [
+      "turn KNOB 4"
+     ],
+     "what": "On SEQUENCER: left UNDO the last pass, right ERASE mode."
+    },
+    {
+     "do": [
+      "turn KNOB 2"
+     ],
+     "what": "On SEQUENCER: QUANT grid, never changes what you recorded."
+    }
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {
+     "do": [
+      "tap FX"
+     ],
+     "what": "All effects off / on (BYP in the header); settings kept."
+    },
+    {
+     "do": [
+      "LFO twice"
+     ],
+     "what": "TREM/WAH on / off; KNOB 1 picks PAN, TREM or WAH."
+    },
+    {
+     "do": [
+      "ENV twice"
+     ],
+     "what": "Phaser on / off."
+    },
+    {
+     "do": [
+      "SEL twice"
+     ],
+     "what": "Delay on / off; KNOB 1 picks DIG or ANA (tape)."
+    },
+    {
+     "do": [
+      "tap ENV",
+      "turn SELECT"
+     ],
+     "what": "One page past PHASER: CHORUS; KNOB 1 switches it on."
+    },
+    {
+     "do": [
+      "tap LFO",
+      "turn SELECT"
+     ],
+     "what": "One page back: COMPRESSOR; THRESH up from OFF turns it on."
+    }
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {
+     "do": [
+      "tap SAVE",
+      "turn PRESETS",
+      "tap SAVE"
+     ],
+     "what": "Save to user slot U01-U16 (KNOB 1 picks too)."
+    },
+    {
+     "do": [
+      "tap SAVE",
+      "tap HOME"
+     ],
+     "what": "Leave save mode without saving."
+    },
+    {
+     "do": [
+      "hold SAVE"
+     ],
+     "what": "Undo the last preset load: your sound comes back."
+    }
+   ]
+  },
+  {
+   "title": "Settings",
+   "rows": [
+    {
+     "do": [
+      "tap PLAY"
+     ],
+     "what": "Tap tempo (3 taps or more); not on ARPEGGIO / SEQUENCER."
+    },
+    {
+     "do": [
+      "tap GLO"
+     ],
+     "what": "TEMPO: BPM and tremolo / phaser / delay sync."
+    },
+    {
+     "do": [
+      "GLO twice"
+     ],
+     "what": "SETUP: delay tone, preset LEVEL, USB VOL knob / fixed."
+    },
+    {
+     "do": [
+      "tap GLO",
+      "tap GLO",
+      "tap GLO"
+     ],
+     "what": "MIDI: CHANNEL, TRS IN, CLOCK (INT / AUTO / USB)."
+    }
+   ]
+  }
+ ],
+ "tips": [
+  "The FM-1's keys have no velocity: KEY VEL (main page, KNOB 4) sets how hard they strike; 96-108 is a good start.",
+  "Try BELL DYNO for glassy ballads, SUITCASE with TREM/WAH on PAN for the classic stereo vibrato.",
+  "Keys play odd notes or keep going? Chord mode (SEQ light), arp HOLD or the sequencer is on.",
+  "With chord mode on, SEQ jumps straight to the SEQUENCER page.",
+  "Effect depths start at 0; switching one on from its button gives it a useful starting depth.",
+  "MASTER is digital: keep it high and turn your speakers down for the least hiss.",
+  "Something wrong after an update? Hold OCT- while powering on: USB rescue screen for reinstalling."
+ ],
+ "checked": [
+  "v0.9.2 hub mirror, firmware/src/ui.c: PG_ order PERFORM ASSIGN FRODHES VOICE DECAY COMP TREM PHA CHO DELAY TEMPO SCALE CHORD SEQ ARP SETUP MIDI; SELECT clamps, no wrap; PAGE_S / PAGE_LAB card labels.",
+  "ui.c ui_input: HOME PERF<->PIANO, EDIT VOICE, ENV ui_fx_button(PG_PHA) / LFO (PG_TREM) / SEL (PG_DELAY): goto, then on the page toggle; FX fx_bypass; SEQ CHORD or SEQ if chord_on, on SEQ press = rec toggle, held 1000 ms = seq_clear; ARP goto then arp_toggle; PLAY: ARP page hold, SEQ page play/stop, else tempo_tap; OCT ±2; ALGORITHM = P_TYPE except on SEQ (cursor).",
+  "ui.c PERF_T default TREM/WAH PHASER CHORUS DELAY depths; perf_wake switches the effect on when turned up; fx_wake starting depths; COMP P_CMP_AMT (THRESH) switches it.",
+  "presets.c presets_poll: SAVE tap opens save mode, PRESETS or K1 picks U slot, SAVE again stores; HOME or OCT- cancels; SAVE held >= 700 ms (outside save mode) = preset_undo; PRESETS loads 400 ms after last detent, F01-F12 / U01-U16.",
+  "frodhes.c sustain_button: REC hold = sustain, tap < 250 ms toggles latch; keys use set.key_vel (default 96, params.c); MIDI channel filter, PC 0-11 / 16-31.",
+  "tempo.c tempo_tap: from 3rd tap, 2 s reset; scale_key_note DEGREE: black keys return 255 (silent). seq.c seq_stop resets to bar 1. platform.c line 366: OCT- at power-on -> recovery_main."
+ ],
+ "unsure": [
+  "frodhes.c header comment says KEY VEL is on SELECT; the code puts it on the main page KNOB 4 (SELECT turns pages). Sheet follows the code.",
+  "Manual says only HOME cancels save mode; presets.c also cancels with OCT-. Not on the sheet.",
+  "Sequencer step recording (stopped + REC: ALGORITHM cursor / LENGTH), SWING, PRESETS bar jumps, chord inversion / voicing / strum, arp rate / octaves / gate and the MIDI CC map: verified or documented but left out as too detailed.",
+  "No key zones: the 27 keys just play (DEGREE silences the black keys). Not tried on hardware."
+ ]
+}

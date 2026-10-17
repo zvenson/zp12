@@ -1,0 +1,374 @@
+{
+ "id": "skiff",
+ "name": "Skiff",
+ "version": "1.3.1",
+ "ref": "v1.3.1",
+ "manual": "https://github.com/illuminus5/skiff#readme",
+ "intro": "A six-track groovebox (14 synth and drum engines, 64-step sequencer, songs, PERFORM with scenes) where every page draws what its knobs do: pick a track with ALGORITHM, turn PRESETS, press PLAY - and hold HOME whenever you are lost.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {
+     "do": [
+      "tap HOME"
+     ],
+     "what": "HOME: all six tracks at a glance; again: the scope."
+    },
+    {
+     "do": [
+      "hold HOME"
+     ],
+     "what": "SHIFT: map of what every control does here; let go: MENU."
+    },
+    {
+     "do": [
+      "turn ALGORITHM"
+     ],
+     "what": "Select track 1-6, on every page."
+    },
+    {
+     "do": [
+      "turn SELECT"
+     ],
+     "what": "Previous / next page of the open family."
+    },
+    {
+     "do": [
+      "hold GLO"
+     ],
+     "what": "Quick layer: keys and knobs become shortcuts (also FX, SEL, EDIT, ARP, SEQ)."
+    },
+    {
+     "do": [
+      "hold HOME",
+      "tap GLO"
+     ],
+     "what": "Lock a layer open; tap its button to close it."
+    },
+    {
+     "do": [
+      "hold SAVE"
+     ],
+     "what": "Undo (8 levels); then OCT- further back, OCT+ redo."
+    },
+    {
+     "do": [
+      "tap OCT-"
+     ],
+     "what": "Octave down (OCT+ up); both together: back to 0."
+    }
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {
+     "do": [
+      "turn PRESETS"
+     ],
+     "what": "Next sound, across all engines; the track's steps stay."
+    },
+    {
+     "do": [
+      "tap SAVE",
+      "turn SELECT",
+      "turn KNOB 4"
+     ],
+     "what": "SAVE > PRESETS: LIST one type (BASS, PAD ...) for PRESETS."
+    },
+    {
+     "do": [
+      "hold EDIT",
+      "white key 1-14"
+     ],
+     "what": "Switch the track to engine 1-14."
+    },
+    {
+     "do": [
+      "tap SEL"
+     ],
+     "what": "SCALE: ROOT, SCALE, QNT (WHITE: scale on white keys), TRN."
+    },
+    {
+     "do": [
+      "hold SEL",
+      "white key 1-16"
+     ],
+     "what": "That key's note becomes the scale's ROOT."
+    },
+    {
+     "do": [
+      "tap ARP",
+      "turn KNOB 1"
+     ],
+     "what": "Arpeggiator mode (14 modes); ARP 2 page: HOLD."
+    },
+    {
+     "do": [
+      "hold LFO",
+      "turn KNOB 1"
+     ],
+     "what": "Momentary tweak: springs back on release (OCT+ keeps it)."
+    }
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {
+     "do": [
+      "turn KNOB 1"
+     ],
+     "what": "On HOME: KNOB 1-4 are the engine's four main controls."
+    },
+    {
+     "do": [
+      "tap EDIT"
+     ],
+     "what": "Engine pages EDIT 1 / 2, VOICE; FM6 OPERATOR, DRUM LANES."
+    },
+    {
+     "do": [
+      "tap ENV"
+     ],
+     "what": "ENV, then ENV DEST, ENV 2; tap for next."
+    },
+    {
+     "do": [
+      "tap LFO"
+     ],
+     "what": "LFO, LFO 2, LFO DEST, MOD (4-slot matrix)."
+    },
+    {
+     "do": [
+      "hold EDIT",
+      "white key 15"
+     ],
+     "what": "INIT: start the sound from scratch (OCT+ confirms)."
+    }
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {
+     "do": [
+      "tap PLAY"
+     ],
+     "what": "Start / stop."
+    },
+    {
+     "do": [
+      "hold GLO",
+      "tap PLAY"
+     ],
+     "what": "Restart from the top without stopping."
+    },
+    {
+     "do": [
+      "tap REC"
+     ],
+     "what": "Arm / disarm this track; stopped, it starts recording."
+    },
+    {
+     "do": [
+      "tap SEQ"
+     ],
+     "what": "STEP tiles; tap for ROLL, CHANCE, PLAY, PATTERN, AUTOMATION, SONG."
+    },
+    {
+     "do": [
+      "tap SEQ",
+      "white key 1-16"
+     ],
+     "what": "Drum track: hit on / off; black keys 1-8 pick the lane."
+    },
+    {
+     "do": [
+      "tap SEQ",
+      "hold white key 1-16",
+      "turn KNOB 1"
+     ],
+     "what": "Drum grid: lock a parameter on that step."
+    },
+    {
+     "do": [
+      "hold SEQ",
+      "white key 1-16"
+     ],
+     "what": "Tools: 1 CLEAR, 2 REVERSE, 5 RANDOM, 6 COOK, 8 EUCLID."
+    },
+    {
+     "do": [
+      "hold HOME",
+      "tap SAVE"
+     ],
+     "what": "TAKE: keep the last loop you played, after the fact."
+    },
+    {
+     "do": [
+      "hold ARP",
+      "white key 1-16"
+     ],
+     "what": "PERFORM: launch entry A-P; black keys 1-6 stage mutes."
+    },
+    {
+     "do": [
+      "hold GLO",
+      "black key 1-6"
+     ],
+     "what": "Mute track 1-6 (white keys 1-6: solo while held)."
+    }
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {
+     "do": [
+      "tap FX"
+     ],
+     "what": "Track sends; tap for DRIVE, INSERT, SLICER, DUCK."
+    },
+    {
+     "do": [
+      "hold FX",
+      "white key 1-14"
+     ],
+     "what": "Effect while held: REPEAT, REVERSE, filters, TAPE STOP, FREEZE ..."
+    },
+    {
+     "do": [
+      "hold FX",
+      "black key 1-6"
+     ],
+     "what": "Cut track 1-6 while held."
+    },
+    {
+     "do": [
+      "hold FX",
+      "turn KNOB 1"
+     ],
+     "what": "Macros: FILTER (KNOB 2 CRUSH, 3 THROW, 4 DEPTH)."
+    },
+    {
+     "do": [
+      "hold ARP",
+      "turn KNOB 1"
+     ],
+     "what": "Throws: CUTOFF (2 REVERB, 3 DELAY, 4 DIST), glide back."
+    },
+    {
+     "do": [
+      "GLO twice"
+     ],
+     "what": "The buses: DELAY, then REVERB, CHORUS, GLOBAL."
+    }
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {
+     "do": [
+      "tap SAVE",
+      "turn KNOB 1",
+      "tap OCT+",
+      "tap OCT+"
+     ],
+     "what": "Save the sound to a USER slot (stopped; keys type a name)."
+    },
+    {
+     "do": [
+      "tap SAVE",
+      "turn SELECT",
+      "turn KNOB 4",
+      "tap OCT+"
+     ],
+     "what": "PROJECT page: SAVE to the slot on KNOB 1 (4 projects)."
+    },
+    {
+     "do": [
+      "tap SAVE",
+      "turn SELECT",
+      "turn KNOB 3",
+      "tap OCT+"
+     ],
+     "what": "PROJECT page: LOAD the project on KNOB 1."
+    },
+    {
+     "do": [
+      "tap SAVE",
+      "turn SELECT",
+      "turn KNOB 3"
+     ],
+     "what": "PRESETS page: right marks a favourite, left unmarks."
+    }
+   ]
+  },
+  {
+   "title": "Settings",
+   "rows": [
+    {
+     "do": [
+      "hold GLO",
+      "turn SELECT"
+     ],
+     "what": "Tempo (white key 9 in the GLO layer: tap tempo)."
+    },
+    {
+     "do": [
+      "tap GLO"
+     ],
+     "what": "MIXER: LEVEL, PAN, REVERB, MUTE of the selected track."
+    },
+    {
+     "do": [
+      "hold HOME",
+      "tap REC"
+     ],
+     "what": "REC layer: white key 1 held clears; CLICK, COUNT-IN, FEEL."
+    },
+    {
+     "do": [
+      "hold GLO",
+      "white key 8"
+     ],
+     "what": "FILL while held (plays the FILL steps)."
+    }
+   ]
+  }
+ ],
+ "tips": [
+  "Nothing to save for the notes: patterns keep themselves, and RESTORE LAST brings the music back at power-on.",
+  "A sound loaded by PRESETS or the EDIT layer can be taken back with SAVE held; the track's steps never change.",
+  "Pages act on the selected track: watch the track number, ALGORITHM changes it everywhere.",
+  "On SAVE > PRESETS: KNOB 2 jumps to the next engine's first sound.",
+  "MENU (hold HOME, let go): ALGORITHM picks the tab, PRESETS the row, any KNOB the value; HOME closes it.",
+  "MENU > MIDI: CLOCK (INT, USB, TRS), a channel per track (1-6 by default), MIDI LEARN for any knob.",
+  "MENU > SYSTEM > CPU 2 CORES (BETA): 12 voices instead of 8, after a restart.",
+  "Hold OCT- and OCT+ for 5 seconds: UPDATE MODE for reinstalling (letting go earlier cancels). Held at power-on instead: HARDWARE CALIBRATION of the buttons and encoders."
+ ],
+ "checked": [
+  "skiff-1.3.1 mirror, firmware/src/panel.c: B_SCL printed 'SEL', encoders SELECT / ALGORITHM / PRESETS / KNOB 1-4.",
+  "ui_input.c ui_input: HOME tap = go_home, on HOME toggles home_scope; HOME held = SHIFT map (ui.shift) and home_long -> MENU on release; SHIFT + SAVE = take_commit; SHIFT + layer button = layer_shift_lock; layer held + HOME = layer_home_lock; SAVE held = undo_step, OCT-/OCT+ in undo window; OCT both = 0, range +-3; ALGORITHM = track_select on every page; SELECT = select_turn (pages), GLO held = BPM; PLAY = play_press (GLO held: layer_play restart).",
+  "ui_input.c rec_tap: REC toggles song.rec on press; stopped and not on ROLL -> transport_req = 1 (starts); presets_turn: preset_step on HOME / most pages.",
+  "ui.c open_family / open_global: same button again = next page; GLO: MIXER then DELAY REVERB CHORUS GLOBAL; SAVE first time opens USER with ui.act = 4 (SAVE ready); home_param = ENGINES[..]->knob[k].",
+  "params.c PAGES: ENV/ENV DEST/ENV 2, LFO/LFO 2/LFO DEST/MOD, FX/DRIVE/INSERT/INSERT 2/SLICER/DUCK, SCALE/CHORD, EDIT 1/2 OPERATOR ALL OPS LANES SOUND SLICES VOICE VOICE 2, MIXER, DELAY REVERB CHORUS GLOBAL, PRESETS USER PATTERNS PROJECT, ARP/ARP 2, STEP ROLL CHANCE PLAY PATTERN AUTOMATION SONG; PROJECT knobs SLOT, -, LOAD, SAVE.",
+  "ui_layer.c LAYERS + layer_key/layer_knob: GLO black 1-6 mute, white 1-6 solo held, 7 unmute all, 8 FILL, 9 TAP; GLO knobs = levels; SCL key = ROOT; EDIT white 1-14 engines, 15 INIT dialog, black 1-8 drum lane mutes; PERF white = entries A-P / scenes, black 1-6 mute_switch staged, KNOB 1-4 throws, SELECT launch point; SEQ white = tools_key; REC layer only via SHIFT + REC.",
+  "ui_tools.c TL_ order F3 CLEAR, G3 REVERSE, A3/B3 SHIFT, C4 RANDOM, D4 COOK, E4 BEAT (drum), F4 EUCLID, ... D5 DOUBLE, E5 HALF.",
+  "perform.c: FX white keys F3..E5 = REPEAT 1/8 1/16 1/32, REVERSE, LPF, HPF, TAPE STOP, FREEZE, OCT UP, OCT DN, GATE, DUB, FLANGE, VINYL; black 1-6 track cut while held.",
+  "ui_input.c grid_keys / lock_held: drum STEP = grid, white keys steps, black 1-8 lane, 9 accent, 10/11 page; held white key + KNOB = lock_turn. mom_down / mom_turn: LFO held = momentary, OCT+ keeps.",
+  "ui_input.c act_do + ui_name.c: USER SAVE -> NAME screen, OCT+ writes, transport must be stopped; edit_param GR_BROWSE: KNOB 2 next engine, KNOB 3 preset_mark, KNOB 4 LIST.",
+  "main.c: OCT- + OCT+ at power-on -> panel_setup (calibration); held 5 s while running -> UPDATE MODE (fm1_enter_uboot), countdown from 2 s, release cancels."
+ ],
+ "unsure": [
+  "SAVE tap opens the page it was left on (USER the first time), so the 'turn SELECT' to PRESETS / PROJECT depends on where SAVE was last; rows assume reaching that page.",
+  "REC from stopped: code starts the transport (count-in if set); on the ROLL page it enters step writing instead. Sheet simplifies to 'starts recording'.",
+  "Hold time is MENU > HOLD (300-600 ms, panel.c HOLD_MS), while the btn_hold comment says 0.7 s; not tried on hardware.",
+  "EDIT layer engine order on tracks 5/6 (no PHYS / GRAIN) shifts keys; INIT key is white 15 (F5) by LY_INIT = NENG_SHOWN. Not checked how eng_vis maps on T5/T6.",
+  "ui_layer.c struct comment says 'D4 held, FILL', but GLO_W maps FILL to white key 8 (F4) as README says; sheet follows GLO_W.",
+  "FX macro names FILTER/CRUSH/THROW/DEPTH and the throw names come from README + code comments (perf_k, throw_id), not from the draw strings."
+ ]
+}

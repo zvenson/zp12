@@ -1,0 +1,527 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only  (C) 2026 Sven Trogus
+     A firmware's cheat sheet (thefirmwarehub.com/cs/<id>/): from web/cheatsheets/<id>.json, checked against the firmware's
+     source at one release; tools/make_fm1.py writes one page per sheet. ?embed: without nav and footer (the hub's pop-up). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sloopDX cheat sheet: the M-VAVE FM-1 firmware's controls – The Firmware Hub</title>
+<meta name="description" content="sloopDX on the M-VAVE FM-1 at a glance: getting around, playing, sound, saving and more, for sloopDX 4.0.">
+<meta name="author" content="zvenson">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thefirmwarehub.com/cs/sloopdx/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Firmware Hub">
+<meta property="og:url" content="https://thefirmwarehub.com/cs/sloopdx/">
+<meta property="og:title" content="sloopDX cheat sheet – The Firmware Hub">
+<meta property="og:description" content="The controls of sloopDX on the M-VAVE FM-1 on one page.">
+<meta property="og:image" content="https://thefirmwarehub.com/og.png">
+<meta name="theme-color" content="#151213">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23151213'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='15' text-anchor='middle' fill='%2342f5f5'%3EFH%3C/text%3E%3C/svg%3E">
+<style>
+  /* the hub's look (web/fm1.html): warm dark, cyan / blue / pink / beige; a group's colour on its cards */
+  :root { --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435; --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9;
+          --cyan: #42f5f5; --blue: #afd9f4; --pink: #f4c0cb; --beige: #e6d1b9; --ok: #5fe3a1; --warn: #f2c46d; --smk: #ff6b5e; }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; scroll-padding-top: 80px; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16.5px/1.7 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--cyan); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { margin: 0 auto; padding: 0 clamp(16px, 4vw, 72px); width: 100%; }
+  nav { border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+  .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; } .mark:hover { text-decoration: none; }
+  .mark b { font-weight: 800; color: var(--cyan); }
+  nav .home { font-size: 14px; color: var(--dim); }
+  /* VIBE FM teaser (thefirmwarehub.com/vibe/, own PHP page): one slim line above the nav on every page (web/vibe-banner.html; tools/make_fm1.py puts it in), the device and its orange */
+  .vibe { display: block; position: relative; background: #0c0a0a; color: var(--text); font-size: 14px; }
+  .vibe::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+                 background: linear-gradient(90deg, #8FD0FF, #9EF0C4, #FFE27A, #FFAA6E, #D7B6FF); opacity: .7; }
+  .vibe .wrap { display: flex; align-items: center; gap: 12px; height: 42px; }
+  .vibe img { width: 84px; height: 30px; object-fit: cover; object-position: 70% 50%; border-radius: 5px; flex: none; display: block; }
+  .vibe b { color: var(--fg); font-weight: 800; white-space: nowrap; } .vibe b em { font-style: normal; color: #ff6a1a; }
+  .vibe .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .vibe .t i { font-style: normal; font-weight: 800; background: linear-gradient(90deg, #8FD0FF, #9EF0C4 30%, #FFE27A 55%, #FFAA6E 80%, #D7B6FF);
+               -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .vibe .offer { margin-left: auto; white-space: nowrap; color: var(--dim); } .vibe .offer strong { color: #ff6a1a; }
+  .vibe .go { background: #ff6a1a; color: #0e0f11; font-weight: 800; font-size: 13px; padding: 6px 12px; border-radius: 7px; white-space: nowrap; }
+  .vibe:hover { text-decoration: none; } .vibe:hover .go { background: #ff8a4a; }
+  @media (max-width: 1100px) { .vibe .offer { display: none; } .vibe .go { margin-left: auto; } }
+  @media (max-width: 640px) { .vibe .wrap { gap: 9px; height: 40px; } .vibe img { width: 52px; height: 26px; } .vibe .t { display: none; } }
+  /* the devices menu (web/devices.html, put into every page by tools/make_fm1.py): a mega menu under "Devices", open on
+     hover (a mouse) or on a tap / Enter (touch, keyboard) */
+  nav { position: relative; z-index: 40; }
+  nav .dd { align-self: stretch; display: flex; align-items: center; margin: 0 0 0 clamp(14px, 3vw, 44px); }
+  /* the Knowledge Base beside it, a plain link in the same type (on the KB itself: marked) */
+  nav .kbl { align-self: stretch; display: flex; align-items: center; margin: 0 auto 0 clamp(4px, 1.6vw, 22px); padding: 8px 2px;
+             color: var(--fg); font-size: 15px; font-weight: 600; white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
+  /* Shop (Amazon.de affiliate links): shown by web/hubapp.js in DE / AT only (/api/cc), beside the Knowledge Base */
+  nav .dd[hidden] { display: none; }
+  /* (data-cc: de = DE / AT: Firmwear + amazon.de; eu = the rest of the EU: Firmwear only; us: amazon.com only) */
+  #shopdd:not([data-cc="de"]) .cc-de, #shopdd:not([data-cc="eu"]) .cc-eu, #shopdd:not([data-cc="us"]) .cc-us,
+  #shopdd[data-cc="us"] .cc-merch, #shopdd[data-cc="eu"] .cc-amz { display: none !important; }
+  nav .dd.shopdd { margin-left: clamp(4px, 1.6vw, 22px); }
+  .mega .side .ad { font-size: 12.5px; color: var(--dim); }
+  nav .kbl:hover { text-decoration: none; box-shadow: inset 0 -2px 0 var(--pink); }
+  nav .kbl[aria-current] { box-shadow: inset 0 -2px 0 var(--cyan); }
+  nav .kbl .sm { display: none; }
+  @media (max-width: 560px) { nav .kbl .lg { display: none; } nav .kbl .sm { display: inline; }     /* (a phone: the name on one line) */
+                              nav .wrap { gap: 10px; } nav .dd { margin-left: 4px; } nav .kbl { margin-left: 0; } nav .ddb .ar { margin-left: 4px; } }
+  @media (max-width: 400px) { nav .mark { font-size: 18px; } }
+  @media (max-width: 350px) { nav .mark { font-size: 16px; } nav .dd { margin-left: 2px; } }   /* (an iPhone SE: Devices and KB beside it) */
+  nav .ddb { background: transparent; color: var(--fg); font: inherit; font-size: 15px; font-weight: 600; padding: 8px 2px; border: 0;
+             border-radius: 0; cursor: pointer; box-shadow: inset 0 -2px 0 transparent; }
+  nav .ddb:hover { filter: none; transform: none; }
+  nav .ddb .ar { display: inline-block; color: var(--dim); font-size: 11px; margin-left: 6px; transition: transform .15s; }
+  nav .dd.open .ddb { box-shadow: inset 0 -2px 0 var(--pink); } nav .dd.open .ddb .ar { transform: rotate(180deg); }
+  .mega { display: none; position: absolute; left: 0; right: 0; top: 100%; background: var(--bg); border-bottom: 1px solid var(--line);
+          box-shadow: 0 30px 60px rgba(0, 0, 0, .55); }
+  nav .dd.open .mega { display: block; }
+  @media (hover: hover) { nav .dd:hover .mega { display: block; } nav .dd:hover .ddb { box-shadow: inset 0 -2px 0 var(--pink); }
+                          nav .dd:hover .ddb .ar { transform: rotate(180deg); } }
+  .mega .in { display: grid; height: auto; grid-template-columns: 250px minmax(0, 1fr); gap: clamp(20px, 3vw, 44px); padding-top: 26px; padding-bottom: 30px; }
+  .mega .side { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; font-size: 14.5px; line-height: 1.55; }
+  .mega .side .k { font-size: 11.5px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); font-weight: 700; margin: 0 0 10px; }
+  .mega .side a { display: block; color: var(--fg); padding: 4px 0; }
+  .mega .side hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+  .mega .side p { margin: 0 0 8px; color: var(--text); }
+  .mega .side a.mail { color: var(--pink); }
+  .mega .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 10px 18px; align-content: start; }
+  .mega .tile { display: flex; align-items: center; gap: 16px; padding: 10px 12px; border-radius: 14px; color: var(--fg); }
+  .mega .tile:hover { text-decoration: none; background: var(--panel2); }
+  .mega .tile[aria-current] { box-shadow: inset 0 0 0 1px var(--cyan); }
+  .mega .pic { flex: none; width: 72px; height: 72px; border-radius: 12px; background: #0e0c0d; border: 1px solid var(--line); overflow: hidden;
+               display: grid; place-items: center; }
+  .mega .pic img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; display: block; }
+  .mega .pic.quad { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1px; background: var(--line); }
+  .mega .tile b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; line-height: 1.3; }
+  .mega .tile small { display: block; color: var(--dim); font-size: 13.5px; margin-top: 2px; }
+  .mega .tile.vibe-t .pic img { object-position: 70% 50%; image-rendering: auto; } .mega .tile.vibe-t b { color: #ff6a1a; }
+  .mega .tile.add .pic { border-style: dashed; background: transparent; color: var(--pink); font-size: 34px; font-weight: 200; }
+  @media (max-width: 760px) { .mega .in { grid-template-columns: 1fr; padding-top: 14px; padding-bottom: 18px; } .mega .side { display: none; }
+                              .mega .pic { width: 56px; height: 56px; } }
+  /* the nav stays on top, the search in its middle (from 1700 px the true middle; a phone: a line of its own). The colours
+     on the nav itself: the same on VIBE's page, which has its own (hubnav/vibe.html) */
+  nav.top { position: sticky; top: 0; background: var(--bg); --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435;
+            --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9; --cyan: #42f5f5; --pink: #f4c0cb; --beige: #e6d1b9; }
+  nav.top .find { position: relative; flex: 0 1 460px; margin: 0 auto; }
+  nav.top .kbl { margin-right: 0; }                    /* (the search takes the free space on both sides: between the links) */
+  @media (min-width: 1700px) { nav.top .wrap { position: relative; } nav.top .home { margin-left: auto; }
+                               nav.top .find { position: absolute; left: 50%; width: 460px; transform: translateX(-50%); } }
+  @media (max-width: 900px) { nav.top .wrap { flex-wrap: wrap; height: auto; min-height: 60px; row-gap: 0; }
+                              nav.top .find { order: 10; flex-basis: 100%; margin: 0 0 10px; } }
+  nav.top .find input { width: 100%; box-sizing: border-box; color: var(--fg); border: 1px solid rgba(239, 232, 225, .3); border-radius: 999px;
+                        padding: 9px 46px 9px 42px; font: inherit; font-size: 15px; background: var(--panel2); margin: 0; }
+  nav.top .find input:hover { border-color: rgba(239, 232, 225, .5); }
+  nav.top .find input:focus { outline: none; border-color: var(--beige); }
+  nav.top .find input::placeholder { color: var(--text); opacity: .8; }
+  nav.top .find .ico { position: absolute; left: 15px; top: 50%; width: 17px; height: 17px; transform: translateY(-50%); fill: none; stroke: var(--text);
+                       stroke-width: 2.2; stroke-linecap: round; pointer-events: none; }
+  nav.top .find .key { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 12px; line-height: 1.5; color: var(--dim);
+                       border: 1px solid var(--line); border-radius: 5px; padding: 0 7px; pointer-events: none; }
+  nav.top .find input:focus + .key, nav.top .find input:not(:placeholder-shown) + .key { display: none; }
+  @media (hover: none) { nav.top .find .key { display: none; } }
+  /* Shop on a phone (after the rules above): Devices, KB, Shop on the name's line; the affiliate notice stays visible */
+  @media (max-width: 560px) { nav .shopdd .ddb .ar { display: none; } nav .dd.shopdd { margin-left: 0; } }
+  @media (max-width: 420px) { nav .ddb .ar { display: none; } }          /* (a phone with Shop: Devices, KB, Shop on the name's line) */
+  @media (max-width: 760px) { #shopm .side { display: block; padding: 12px 16px; } #shopm .side > :not(.ad) { display: none; } }   /* (the notice stays) */
+  /* a narrow phone: name, Devices, Tools and Shop on one line (a little tighter) */
+  @media (max-width: 400px) { nav.top > .wrap { column-gap: 8px; } nav.top .mark { font-size: 17px; } }
+  @media (max-width: 370px) { nav.top > .wrap { column-gap: 6px; } nav.top .mark { font-size: 16px; } nav .dd { margin-left: 2px; } }
+  .strip { display: flex; height: 4px; } .strip i { flex: 1; }
+  .strip i:nth-child(1) { background: var(--cyan); } .strip i:nth-child(2) { background: var(--blue); }
+  .strip i:nth-child(3) { background: var(--pink); } .strip i:nth-child(4) { background: var(--beige); }
+  header { padding: 52px 0 32px;
+           background: radial-gradient(900px 420px at 80% 20%, rgba(66, 245, 245, .10), transparent 70%),
+                       radial-gradient(700px 380px at 5% 100%, rgba(244, 192, 203, .08), transparent 70%); }
+  .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 14px; }
+  h1 { font-size: clamp(38px, 4.6vw, 72px); line-height: 1.05; font-weight: 300; margin: 0 0 18px; letter-spacing: -.5px; }
+  h1 b { font-weight: 800; background: linear-gradient(90deg, var(--cyan), var(--blue) 45%, var(--pink) 75%, var(--beige));
+         -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 18.5px; color: var(--text); max-width: 40em; margin: 0; }
+  .jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 0; }
+  .jump a { padding: 8px 14px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--text); font-weight: 600; font-size: 14px; }
+  .jump a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--beige); color: var(--fg); }
+  main { padding: 8px 0 64px; }
+  /* the embedded view (the hub's pop-up): just the sheet */
+  html.embed a.vibe, html.embed nav.top, html.embed .strip, html.embed footer, html.embed .page-only { display: none !important; }
+  html.embed header { padding: 26px 0 18px; } html.embed main { padding-bottom: 28px; }
+  /* one look for every sheet: the hub's mark top right, the firmware's colour (its card's) as the band, name, frames */
+  header { border-top: 6px solid var(--c); } header > .wrap { position: relative; }
+  .brand { position: absolute; top: -24px; right: clamp(16px, 4vw, 72px); display: flex; align-items: center; gap: 10px;
+           color: var(--fg); font-weight: 700; font-size: 15px; letter-spacing: .2px; }
+  .brand img { width: 38px; height: 38px; filter: brightness(1.45) saturate(1.1); }   /* (the lila signet, lighter on the dark page; as it is in print) */ .brand:hover { text-decoration: none; color: var(--c); }
+  html.embed .brand { top: -6px; }
+  .eyebrow { color: var(--c); }
+  .cshead { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 26px; align-items: center; padding-right: 220px; }
+  .cshead img { width: 132px; height: 132px; border-radius: 16px; border: 2px solid var(--c); background: #000; image-rendering: pixelated; object-fit: contain; }
+  .cshead h1 { font-size: clamp(32px, 3.6vw, 52px); margin: 0 0 8px; }
+  .cshead h1 b { background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--c); }
+  .ver { color: var(--dim); font-size: 14.5px; margin: 0 0 8px; }
+  .ver .old { color: var(--warn); font-weight: 600; }
+  .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .acts a { padding: 8px 14px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--text); font-weight: 600; font-size: 14px; }
+  .acts a.go { background: var(--c); color: #121011; box-shadow: none; }
+  .acts a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--beige); }
+  .acts a.go:hover { filter: brightness(1.08); }
+  .kb { margin: 6px 0 26px; }
+  .kb svg { width: 100%; max-width: 760px; height: auto; display: block; }
+  .kb .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: 14px; color: var(--text); }
+  .kb .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
+  .secs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 18px; }
+  .sec { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 14px; padding: 16px 18px 12px; min-width: 0; }
+  .sec h2 { font-size: 15px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--c); margin: 0 0 10px; }
+  .sec dl { margin: 0; display: grid; grid-template-columns: fit-content(46%) minmax(0, 1fr); gap: 8px 14px; align-items: baseline; }
+  .sec dt { font-size: 13px; line-height: 2.1; } .sec dd { margin: 0; font-size: 15px; line-height: 1.5; color: var(--text); }
+  kbd { display: inline-block; font: 700 12px/1 "Inter", Arial, sans-serif; letter-spacing: .4px; padding: 5px 7px 4px; border-radius: 6px;
+        background: var(--panel2); color: var(--fg); box-shadow: inset 0 0 0 1px #4a4344, 0 2px 0 #0c0a0b; white-space: nowrap; }
+  .sec dt small { color: var(--dim); font-size: 12px; margin-right: 3px; } .sec dt .plus { color: var(--dim); margin: 0 4px; }
+  @media (max-width: 520px) { .sec dl { grid-template-columns: 1fr; gap: 2px; } .sec dd { margin-bottom: 9px; } .sec dt { white-space: normal; } }
+  .tips { margin: 22px 0 0; padding: 16px 20px; border-radius: 14px; background: rgba(66, 245, 245, .05); border: 1px solid var(--line); }
+  .tips h2 { font-size: 15px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--beige); margin: 0 0 6px; }
+  .tips ul { margin: 0; padding-left: 20px; color: var(--text); } .tips li { margin: 4px 0; }
+  .fine { margin: 22px 0 0; color: var(--dim); font-size: 13.5px; max-width: 60em; }
+  @media (max-width: 900px) { .brand { position: static; margin: -20px 0 18px; } html.embed .brand { margin-top: 0; } .cshead { padding-right: 0; } }
+  @media (max-width: 640px) { nav .home { display: none; } .lead { font-size: 17px; } .cshead { align-items: start; } }
+  @media (max-width: 560px) { .cshead { grid-template-columns: 84px minmax(0, 1fr); gap: 16px; } .cshead img { width: 84px; height: 84px; } }
+  @media print { html, body { background: #fff !important; color: #000; } a.vibe, nav, .strip, footer, .acts, .page-only { display: none !important; }
+                 .sec, .tips { background: #fff; border-color: #bbb; break-inside: avoid; } .sec dd, .tips ul { color: #222; } kbd { background: #eee; color: #000; box-shadow: inset 0 0 0 1px #999; }
+                 header { background: none; padding: 0 0 10px; border-top: 6px solid var(--c); } .brand { color: #000; top: 4px; } .brand img { filter: none; }
+                 .cshead h1, .cshead h1 b, .lead, .ver, .kb .legend, .tips li, .fine { color: #111 !important; } .sec h2 { color: #111; }
+                 .sec { border-top: 3px solid var(--c); } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+  /* the footer (web/footer.html, the same on every page: tools/make_fm1.py puts it in, the credits from the catalogues) */
+  footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; line-height: 1.7; padding: 34px 0 54px; text-align: center; }
+  footer .wrap { max-width: 900px; } footer a { color: var(--text); }
+</style>
+<script>if (/[?&]embed\b/.test(location.search) || window.top !== window) document.documentElement.classList.add("embed");</script>
+<link rel="manifest" href="/app/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/app/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Firmware Hub">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style>
+/* web/hubapp.css: the app bar at the bottom (web/hubapp.js), on every device page */
+  .appbar { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 90; margin: 0 auto; max-width: 560px;
+            display: flex; align-items: center; gap: 12px; padding: 12px 44px 12px 12px; box-sizing: border-box;
+            background: #221e1f; color: #efe8e1; border: 1px solid #3a3435; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, .55);
+            font: 14.5px/1.45 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; animation: appbar-in .35s ease-out; }
+  @keyframes appbar-in { from { transform: translateY(24px); opacity: 0; } }
+  .appbar img { flex: none; width: 44px; height: 44px; border-radius: 11px; align-self: flex-start; }
+  .appbar .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .appbar .t > b { font-size: 15.5px; color: #42f5f5; }
+  .appbar .t small { font-size: 12.5px; line-height: 1.45; color: #a39a94; margin-top: 4px; }
+  .appbar svg { width: 17px; height: 17px; vertical-align: -3px; fill: none; stroke: #42f5f5; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .appbar .go { flex: none; font: inherit; font-weight: 700; padding: 9px 18px; border: 0; border-radius: 999px; background: #42f5f5; color: #151213; cursor: pointer; }
+  .appbar .x { position: absolute; top: 6px; right: 6px; width: 34px; height: 34px; border: 0; padding: 0; background: none; color: #a39a94;
+               font: 24px/1 Arial, sans-serif; cursor: pointer; border-radius: 50%; }
+  .appbar .x:hover { color: #efe8e1; background: #2e2a2b; }
+  .appbar.wide { max-width: 640px; align-items: center; gap: 18px; }
+  .appbar .qr { flex: none; width: 132px; height: 132px; border-radius: 10px; align-self: center; }
+  .appbar .pc { margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #d8d0c9; }
+  .appbar .pc .go { padding: 7px 16px; }
+  @media (prefers-reduced-motion: reduce) { .appbar { animation: none; } }
+/* web/deck.css: a card's actions as a tape deck's keys, on every device page (make_fm1 puts it in with the app's style):
+   the FM-1 page's deck() and the SMK-37 page's cards (make_fm1 smk_cards) */
+  /* a card's actions: a tape deck's keys (Play, Edit, Cheat sheet, Build), joined, a symbol each, the name as a tooltip */
+  .fw .deck { display: inline-flex; border-radius: 9px; box-shadow: 0 2px 0 #0a0809, inset 0 0 0 1px var(--line); }
+  .fw .deck .key { position: relative; width: 48px; height: 38px; display: grid; place-items: center; color: var(--fg);
+               background: linear-gradient(#2c2728, #1c1819); box-shadow: inset -1px 0 0 #0e0c0d, inset 0 1px 0 rgba(255, 255, 255, .06); }
+  .fw .deck .key:first-child { border-radius: 9px 0 0 9px; } .fw .deck .key:last-child { border-radius: 0 9px 9px 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); }
+  .fw .deck .key:only-child { border-radius: 9px; }
+  /* each key its colour, the same on every card (a tape deck's coloured caps): the symbol, a thin edge on top, a tint on hover */
+  .fw .deck .k-play { --k: #5fe3a1; } .fw .deck .k-edit { --k: #f4c0cb; } .fw .deck .k-sheet { --k: #a870e8; } .fw .deck .k-build { --k: #afd9f4; } .fw .deck .k-hub { --k: #42f5f5; } .fw .deck .k-pkg { --k: #e6d1b9; }
+  .fw .deck .key { color: var(--k, var(--fg)); }
+  .fw .deck .key::before { content: ""; position: absolute; left: 7px; right: 7px; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--k); opacity: .85; }
+  .fw .deck .key:hover { text-decoration: none; color: var(--k); background: linear-gradient(color-mix(in srgb, var(--k) 22%, #2c2728), color-mix(in srgb, var(--k) 10%, #1c1819)); }
+  .fw .deck .key:active { transform: translateY(1px); background: #161314; box-shadow: inset 0 2px 5px rgba(0, 0, 0, .7); }
+  .fw .deck .key svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .fw .deck .key svg path[d^="M8 5v14"] { fill: currentColor; }
+  .fw .deck .key::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 5;
+                      padding: 5px 9px; border-radius: 6px; background: #000; color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap;
+                      pointer-events: none; opacity: 0; transition: opacity .12s; }
+  .fw .deck .key:hover::after, .fw .deck .key:focus-visible::after { opacity: 1; }
+</style>
+</head>
+<body>
+<!--email_off-->
+<a class="vibe" href="/vibe/?ref=cs"><div class="wrap">
+  <picture><source type="image/webp" srcset="/vibe/assets/img/banner-device.webp"><img src="/vibe/assets/img/banner-device.jpg" alt="" width="84" height="30"></picture>
+  <b>VIBE <em>FM</em> Mk1</b> <span class="t">Open firmware, <i>officially supported.</i></span>
+  <span class="offer"><strong>The first 100</strong> get 10% off</span> <span class="go">Join the list &rarr;</span>
+</div></a>
+<nav class="top"><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
+  <div class="dd" id="dd">
+    <button class="ddb" type="button" aria-expanded="false" aria-controls="mega">Devices<span class="ar" aria-hidden="true">▼</span></button>
+    <div class="mega" id="mega"><div class="wrap in">
+      <div class="side">
+        <p class="k">The Firmware Hub</p>
+        <p>Open-source firmware for small music machines, from their makers, installed in the browser.</p>
+        <a href="/">All FM-1 firmwares</a><a href="/kb/">Knowledge Base</a><a href="/#submit">Submit a firmware</a><a href="/vibe/?ref=menu">VIBE FM Mk1</a>
+        <a id="getapp" href="/#app">Get app</a>
+        <hr><p>Made firmware for another device?</p>
+        <a class="mail" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device">zven@thefirmwarehub.com</a>
+      </div>
+      <div class="tiles">
+        <a class="tile" href="/" data-dev="fm1" aria-current="page"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
+          <span><b>M-VAVE FM-1</b><small><span id="dd-fm1">All</span> firmwares</small></span></a>
+        <a class="tile" href="/smk37/" data-dev="smk37"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
+          <span><b>M-VAVE SMK-37 Pro</b><small>15 firmwares · Pro, Elite, MKE-P37</small></span></a>
+        <a class="tile vibe-t" href="/vibe/?ref=menu" data-dev="vibe"><span class="pic"><img src="/vibe/assets/img/banner-device.jpg" alt=""></span>
+          <span><b>VIBE FM Mk1</b><small>Hardware with open firmware · join the list</small></span></a>
+        <a class="tile add" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device"><span class="pic">+</span>
+          <span><b>Your device</b><small>Firmware for another machine? Tell us.</small></span></a>
+      </div>
+    </div></div>
+  </div>
+  <a class="kbl tll" href="/tools/" title="Tools: emulators, editors, backup and rescue, and the Knowledge Base">Tools</a>
+  <div class="dd shopdd" id="shopdd" hidden>
+    <button class="ddb" type="button" aria-expanded="false" aria-controls="shopm">Shop<span class="ar" aria-hidden="true">▼</span></button>
+    <div class="mega" id="shopm"><div class="wrap in">
+      <div class="side">
+        <p class="k">Shop</p>
+        <p class="cc-de">Firmwear, the hub's shirts and hoodies, on Spreadshop, and the machines the firmwares run on, from Amazon.de.</p>
+        <p class="cc-eu">Firmwear: the hub's shirts and hoodies, on Spreadshop.</p>
+        <p class="cc-us">The machines the hub's firmwares run on, from Amazon.com.</p>
+        <hr class="cc-amz"><p class="ad cc-de">* Affiliate link (ad, Anzeige): as an Amazon Associate I earn from qualifying purchases; it costs you nothing extra. Als Amazon-Partner verdiene ich an qualifizierten Verkäufen.</p>
+        <p class="ad cc-us">* Affiliate link (ad). As an Amazon Associate I earn from qualifying purchases; it costs you nothing extra.</p>
+      </div>
+      <div class="tiles">
+        <a class="tile cc-merch" href="https://the-firmware-hub.myspreadshop.de/make+firmware+not+war-A32661688835530cb?sellable=rlac1svn88nf-20&amp;appearance=2" data-shop="Firmwear|spreadshop" target="_blank" rel="noopener"><span class="pic"><img src="/img/merch.png?v=5fe2f657" alt=""></span>
+          <span><b>Firmwear</b></span></a>
+        <a class="tile cc-de" href="https://link.amazon/B08QY1yVZ" data-shop="FM-1|amazon.de" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
+          <span><b>Get the M-VAVE FM-1</b><small>on Amazon.de · Ad (Anzeige) *</small></span></a>
+        <a class="tile cc-de" href="https://link.amazon/B0f2qKAUl" data-shop="SMK-37 Pro|amazon.de" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
+          <span><b>Get the M-VAVE SMK-37 Pro</b><small>on Amazon.de · Ad (Anzeige) *</small></span></a>
+        <a class="tile cc-us" href="https://amzn.to/4yZizIY" data-shop="FM-1|amazon.com" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
+          <span><b>Get the M-VAVE FM-1</b><small>on Amazon.com · Ad *</small></span></a>
+        <a class="tile cc-us" href="https://amzn.to/3TYjR7V" data-shop="SMK-37 Pro|amazon.com" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
+          <span><b>Get the M-VAVE SMK-37 Pro</b><small>on Amazon.com · Ad *</small></span></a>
+      </div>
+    </div></div>
+  </div>
+  <form class="find" role="search" action="/" method="get"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><input
+    type="search" name="q" id="q" placeholder="Search firmwares: a name, a maker, acid, drums…" aria-label="Search the firmwares" autocomplete="off"
+    spellcheck="false"><span class="key" aria-hidden="true">/</span></form>
+  <script>
+  (() => {                                                 // a tap / Enter opens it, a tap outside or Esc closes it
+    document.querySelectorAll("nav .dd").forEach((dd) => {   // (Devices, and Shop where it is shown)
+      const b = dd.querySelector(".ddb");
+      const set = (o) => { dd.classList.toggle("open", o); b.setAttribute("aria-expanded", String(o)); };
+      dd.close = () => set(false);
+      b.addEventListener("click", (e) => {               // (one open at a time: the other closed)
+        e.stopPropagation(); document.querySelectorAll("nav .dd").forEach((o) => o !== dd && o.close?.()); set(!dd.classList.contains("open"));
+      });
+      document.addEventListener("click", (e) => { if (!dd.contains(e.target)) set(false); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") { set(false); } });
+    });
+    document.addEventListener("keydown", (e) => {          // "/": into the search, on every page
+      const a = document.activeElement;
+      if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(a?.tagName || "") || a?.isContentEditable) return;
+      e.preventDefault(); const q = document.getElementById("q"); q.focus(); q.select();
+    });
+    fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.json())     // (the hub's daily key: one cache)
+      .then((c) => { document.getElementById("dd-fm1").textContent = c.firmwares.length; }).catch(() => {});
+  })();
+  </script>
+  <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
+<div class="strip"><i></i><i></i><i></i><i></i></div>
+
+<header style="--c: #42f5f5"><div class="wrap">
+  <a class="brand" href="https://thefirmwarehub.com/" target="_top" title="The Firmware Hub: every FM-1 firmware, one click"><img src="/img/signet-lila.svg" alt="" width="38" height="38"><span>thefirmwarehub.com</span></a>
+  <div class="cshead"><img src="/img/sloopdx.png?v=12220b88" alt="sloopDX on the FM-1's screen" width="132" height="132">
+  <div><p class="eyebrow page-only">The Firmware Hub · Cheat sheet</p>
+  <h1><b>sloopDX</b> at a glance</h1>
+  <p class="ver" id="ver" data-v="4.0">For sloopDX 4.0 · checked against its source</p>
+  <p class="lead">SLOOP&#x27;s live four-track groovebox with a real DX7 inside: three six-operator FM synths plus FM drums; ALGORITHM picks the track, PRESETS the voice, REC records.</p></div></div>
+  <div class="acts"><a class="go page-only" href="/#fw-sloopdx">Install sloopDX</a><a href="https://github.com/zvenson/dxsloop/blob/main/SLOOP.md" target="_blank" rel="nofollow noopener">The full manual ↗</a><a href="javascript:print()" class="page-only">Print</a></div>
+</div></header>
+
+<main style="--c: #42f5f5"><div class="wrap">
+<div class="kb"><svg viewBox="-2 -2 644 154" role="img" aria-label="The FM-1's 27 note keys, F3 to G5, by what they do"><rect x="0" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="5" y="128" width="30" height="14" rx="4" fill="#42f5f5"/><rect x="40" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="45" y="128" width="30" height="14" rx="4" fill="#42f5f5"/><rect x="80" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="85" y="128" width="30" height="14" rx="4" fill="#f4c0cb"/><rect x="120" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="125" y="128" width="30" height="14" rx="4" fill="#f4c0cb"/><rect x="160" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="165" y="128" width="30" height="14" rx="4" fill="#e6d1b9"/><rect x="200" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="205" y="128" width="30" height="14" rx="4" fill="#e6d1b9"/><rect x="240" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="245" y="128" width="30" height="14" rx="4" fill="#e6d1b9"/><rect x="280" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="285" y="128" width="30" height="14" rx="4" fill="#afd9f4"/><rect x="320" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="325" y="128" width="30" height="14" rx="4" fill="#afd9f4"/><rect x="360" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="365" y="128" width="30" height="14" rx="4" fill="#ff9f43"/><rect x="400" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="405" y="128" width="30" height="14" rx="4" fill="#ff9f43"/><rect x="440" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="445" y="128" width="30" height="14" rx="4" fill="#c9b6ff"/><rect x="480" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="485" y="128" width="30" height="14" rx="4" fill="#c9b6ff"/><rect x="520" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="525" y="128" width="30" height="14" rx="4" fill="#5fe3a1"/><rect x="560" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="565" y="128" width="30" height="14" rx="4" fill="#5fe3a1"/><rect x="600" y="0" width="40" height="150" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/><rect x="605" y="128" width="30" height="14" rx="4" fill="#5fe3a1"/><rect x="28.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="40.0" cy="78" r="7" fill="#8a8a8a"/><rect x="68.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="80.0" cy="78" r="7" fill="#8a8a8a"/><rect x="108.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="120.0" cy="78" r="7" fill="#8a8a8a"/><rect x="188.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="200.0" cy="78" r="7" fill="#8a8a8a"/><rect x="228.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="240.0" cy="78" r="7" fill="#8a8a8a"/><rect x="308.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="320.0" cy="78" r="7" fill="#8a8a8a"/><rect x="348.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="360.0" cy="78" r="7" fill="#8a8a8a"/><rect x="388.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="400.0" cy="78" r="7" fill="#8a8a8a"/><rect x="468.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="480.0" cy="78" r="7" fill="#8a8a8a"/><rect x="508.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="520.0" cy="78" r="7" fill="#8a8a8a"/><rect x="588.0" y="0" width="24" height="92" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/><circle cx="600.0" cy="78" r="7" fill="#8a8a8a"/></svg><div class="legend"><span><i style="background:#42f5f5"></i>Drums: kicks</span><span><i style="background:#f4c0cb"></i>Drums: snare, clap</span><span><i style="background:#e6d1b9"></i>Drums: hats, pedal hat</span><span><i style="background:#afd9f4"></i>Drums: rim, snare 2</span><span><i style="background:#ff9f43"></i>Drums: low tom, high tom</span><span><i style="background:#c9b6ff"></i>Drums: crash, ride</span><span><i style="background:#5fe3a1"></i>Drums: shaker, conga, cowbell</span><span><i style="background:#8a8a8a"></i>Drums: same sound as white key to the left</span></div></div>
+<div class="secs">
+<section class="sec"><h2>Getting around</h2><dl><dt><small>tap</small> <kbd>HOME</kbd></dt><dd>Back to the TRACKS screen.</dd><dt><small>turn</small> <kbd>ALGORITHM</kbd></dt><dd>Pick the track: 1-3 DX7 synths, 4 FM drums.</dd><dt><small>turn</small> <kbd>SELECT</kbd></dt><dd>Tempo, on almost every page (not in the DX7 voice list).</dd><dt><small>tap</small> <kbd>LFO</kbd></dt><dd>LFO pages; tap again for the next page (ENV likewise).</dd><dt><small>hold</small> <kbd>FX</kbd><span class="plus">+</span><small>tap</small> <kbd>HOME</kbd></dt><dd>Lock a held layer open; any other button closes it.</dd><dt><small>hold</small> <kbd>HOME</kbd></dt><dd>Settings menu: SCREEN, LIGHTS, AUDIO, SYSTEM; OCT- closes it.</dd></dl></section>
+<section class="sec"><h2>Playing</h2><dl><dt><small>turn</small> <kbd>PRESETS</kbd></dt><dd>The track&#x27;s sound: DX7 voices, your bank, user presets; drums: kit.</dd><dt><small>tap</small> <kbd>OCT-</kbd></dt><dd>Octave down; both OCT buttons together: back to 0.</dd><dt><small>hold</small> <kbd>OCT-</kbd><span class="plus">+</span><kbd>white key 1-16</kbd></dt><dd>Drum track: ghost hit (OCT+: hard hit).</dd><dt><small>hold</small> <kbd>SEL</kbd><span class="plus">+</span><kbd>white key 1-16</kbd></dt><dd>Set the song&#x27;s key for all synths.</dd><dt><small>hold</small> <kbd>SEL</kbd><span class="plus">+</span><small>turn</small> <kbd>KNOB 1</kbd></dt><dd>One-key chords: TRIAD, 7TH, 9TH, SUS4, POWER.</dd><dt><small>hold</small> <kbd>ARP</kbd><span class="plus">+</span><kbd>white key 1-16</kbd></dt><dd>Note repeat / drum roll; KNOB 1 sets its rate.</dd><dt><small>tap</small> <kbd>ARP</kbd><span class="plus">+</span><small>turn</small> <kbd>KNOB 1</kbd></dt><dd>Arp mode; OMNI makes the keys a chord harp.</dd></dl></section>
+<section class="sec"><h2>Sound</h2><dl><dt><small>tap</small> <kbd>EDIT</kbd></dt><dd>Synth track: the DX7 voice list. Drum track: the drum screen.</dd><dt><small>turn</small> <kbd>SELECT</kbd><span class="plus">+</span><small>turn</small> <kbd>ALGORITHM</kbd></dt><dd>Voice list: SELECT picks a row, ALGORITHM sets its value.</dd><dt><small>turn</small> <kbd>SELECT</kbd><span class="plus">+</span><small>tap</small> <kbd>EDIT</kbd></dt><dd>Voice list: open OP1-OP6, Pitch Env, LFO; HOME goes back.</dd><dt><small>turn</small> <kbd>PRESETS</kbd></dt><dd>Voice list: jump straight to the next / previous operator.</dd><dt><small>turn</small> <kbd>KNOB 1</kbd></dt><dd>Voice list: low-pass CUT (KNOB 2 RESO, 3 REL, 4 FDBK).</dd><dt><small>tap</small> <kbd>SAVE</kbd></dt><dd>Voice list: store your voice edits into the DX7 bank.</dd><dt><small>turn</small> <kbd>KNOB 2</kbd></dt><dd>On TRACKS: level of the selected track (KNOB 4 pan).</dd><dt><small>hold</small> <kbd>GLO</kbd><span class="plus">+</span><small>turn</small> <kbd>KNOB 1</kbd></dt><dd>Level of track 1 (KNOB 2-4: tracks 2-4).</dd></dl></section>
+<section class="sec"><h2>Sequencer / patterns</h2><dl><dt><small>tap</small> <kbd>PLAY</kbd></dt><dd>Start / stop all four tracks.</dd><dt><small>tap</small> <kbd>REC</kbd></dt><dd>Playing: record now, on top. Stopped: arm, first note starts.</dd><dt><small>tap</small> <kbd>REC</kbd></dt><dd>Empty song: play freely, REC on the next 1 closes the loop.</dd><dt><small>hold</small> <kbd>REC</kbd></dt><dd>Hold 2 seconds: clear the selected track.</dd><dt><small>hold</small> <kbd>EDIT</kbd><span class="plus">+</span><small>tap</small> <kbd>OCT-</kbd></dt><dd>Undo (OCT+: redo).</dd><dt><small>hold</small> <kbd>SEQ</kbd><span class="plus">+</span><kbd>white key 1-16</kbd></dt><dd>Set or clear steps 1-16 (drums: the sound on KNOB 1).</dd><dt><small>hold</small> <kbd>SEQ</kbd><span class="plus">+</span><small>turn</small> <kbd>KNOB 4</kbd></dt><dd>Pattern length up to 128 (KNOB 2 step size, KNOB 3 swing).</dd><dt><small>hold</small> <kbd>EDIT</kbd><span class="plus">+</span><kbd>white key 1-16</kbd></dt><dd>Erase that note or drum sound from the loop.</dd><dt><small>hold</small> <kbd>GLO</kbd><span class="plus">+</span><kbd>white key 1-4</kbd></dt><dd>Mute tracks 1-4 (keys 5-8: solo).</dd><dt><small>hold</small> <kbd>GLO</kbd><span class="plus">+</span><kbd>white key 16</kbd></dt><dd>Tap tempo.</dd></dl></section>
+<section class="sec"><h2>Effects</h2><dl><dt><small>hold</small> <kbd>FX</kbd><span class="plus">+</span><kbd>white key 1-16</kbd></dt><dd>Punch-in effect while held (loops, stutter, reverse...).</dd><dt><small>hold</small> <kbd>FX</kbd><span class="plus">+</span><kbd>black key 1-11</kbd></dt><dd>More punch-ins: kills, rewind, freeze, fade out...</dd><dt><small>hold</small> <kbd>FX</kbd><span class="plus">+</span><small>turn</small> <kbd>KNOB 1</kbd></dt><dd>Master DJ filter (KNOB 2 dust, KNOB 3 duck).</dd><dt><small>hold</small> <kbd>FX</kbd><span class="plus">+</span><small>hold</small> <kbd>OCT-</kbd></dt><dd>Reverb throw while held (OCT+: echo throw).</dd><dt><small>tap</small> <kbd>FX</kbd></dt><dd>Track sends; tap again: DIST, CHORUS, DELAY, REVERB, SLICER, INSERT.</dd></dl></section>
+<section class="sec"><h2>Saving &amp; loading</h2><dl><dt><small>hold</small> <kbd>SAVE</kbd><span class="plus">+</span><kbd>white key 5-8</kbd></dt><dd>Save the loop as section A-D (used: press twice).</dd><dt><small>hold</small> <kbd>SAVE</kbd><span class="plus">+</span><kbd>white key 1-4</kbd></dt><dd>Play section A-D (on the next bar if playing).</dd><dt><small>tap</small> <kbd>SAVE</kbd></dt><dd>On TRACKS: song screen; elsewhere: presets and section pages.</dd><dt><small>tap</small> <kbd>SAVE</kbd><span class="plus">+</span><small>tap</small> <kbd>SAVE</kbd></dt><dd>Drum kit or sound page: store your kit as MY KIT.</dd></dl></section>
+<section class="sec"><h2>Recovery</h2><dl><dt><small>hold</small> <kbd>OCT-</kbd><span class="plus">+</span><small>power on</small></dt><dd>USB rescue mode: reinstall from the web installer.</dd><dt><small>hold</small> <kbd>OCT-</kbd><span class="plus">+</span><small>hold</small> <kbd>OCT+</kbd><span class="plus">+</span><small>power on</small></dt><dd>Hardware calibration: teach each button and knob.</dd><dt><small>hold</small> <kbd>OCT-</kbd><span class="plus">+</span><small>hold</small> <kbd>OCT+</kbd></dt><dd>Stopped, 5 seconds: update mode (UBOOT) for the installer.</dd></dl></section>
+</div>
+<div class="tips"><h2>Good to know</h2><ul><li>Every synth track is a real DX7: 6 operators, 32 algorithms, Dexed&#x27;s engine; at CUT 127 a patch sounds as on a DX7.</li><li>PRESETS runs through 20 factory voices (EPIANO, FM BASS, BRASS...), then the 32 voices of your DX7 bank, then user presets.</li><li>Load your own DX7 banks (.syx, 32 voices) in the web editor: 8 banks fit in flash; the voice list&#x27;s Bank row picks one.</li><li>Drums are FM too: kits DX KIT, 808 FM, ELECTRO, METAL and MY KIT. On the drum sound page the key you play picks the sound, KNOB 1-4 = TUNE, DECAY, SWEEP, BRIGHT.</li><li>Every function button is a layer: hold it and the keys and knobs change job; a short tap opens its pages.</li><li>Patterns go up to 128 steps: hold SEQ and tap OCT- / OCT+ for the 16-step pages.</li><li>MIDI: tap GLO and tap again for MIDI, MIDI 2, MIDI 3 (a channel per track, clock); GLO + black key 1 = MIDI LEARN.</li><li>Autosave: stop and leave it 2.5 s; it comes back as you left it at power-on.</li></ul></div>
+<p class="fine">A community cheat sheet by the hub, not by the firmware's makers: when in doubt, their manual is right.</p>
+</div></main>
+
+<footer><div class="wrap">
+  <b>Disclaimer.</b> Every firmware here belongs to its authors, each under its own license (GPL-3.0:
+  <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener">the license</a>); only zp12, sloopDX, OberVave and Dinghy are ours
+  (<a href="https://github.com/zvenson" rel="noopener">zvenson</a>). We do not develop, test or support the others and take no
+  responsibility for them, for what they do on your device or for lost data: questions and bug reports go to each project, linked on
+  its card. The FM-1 firmwares are taken automatically and unchanged from their releases; the FM-1 page only checks that a package is
+  an FM-1 firmware with the update loader before it writes it, and keeps a copy of its source next to it. The SMK-37 firmwares install
+  from their makers' own installers. The pictures on the cards are from each project's repository.
+  FM-1: Hortator by DEADACTIVE; Felucca by Leo Kuroshita (Hügelton Instruments); Felucca [Salt] by Chance Roth (ChanceTheMaker); Jangada by zednaked; GHOULBOX by Jason Persinger; Melodee by keremimo; SLOOP by isod89; Bubba Machine by Erbubar23; SLOOP Floyd FM by René Bohne; SLOOP DX7 Banks by majnikool; X0X, FoMni, AMB-1, CTL-1 and Polly by Charles Vestal; X0X-RMX by Mr-Roboto (Oliver); ChoralRoot and PurpleMonkey by Quixotic7; WaveLoop FM-1 by ELI7VH; FiMba-1 by jadamsowers; JIANT FM by juanjiant-bit; fm1-chord by math0ne; FuMi-1 by cartesive; MAKU by okumurari; Rainbow Mode by joshbartlettband-web; winampFM Synth by Hericdk; MYCELIUM by Mandalars; ETCH by SikkenWorks; FM-106 by PatttF; TRIBE by apiel; DUELL by OSCILL/R; Skiff by illuminus5; Fart Machine One by adamcharleswilsonmusic-code; ORBIT and MC-1 by dspaudio; Felucca 8 Patterns by echoe; PIGEON by The Shrimp Blimp; CS-1 by twochannels; HYP-1 by RedtailWorks; Tonitor by Nuno Zimas; NOIZ DEMONS by SPIKE the Percussionist; CoralFlower by FicusFicusov; Vector37 by genkigenki; BEETLE by Joppe Sikken (SikkenWorks); MIN-1 by Reytian; Pocket GammaWave by ShadowTune (GammaWave Audio); Tuna by delirioux; Frodhes by Leonardo Mirabal; FOMAJAM by konsumer. SMK-37: Felucca SMK by Chance Roth (ChanceTheMaker); Makkuro37, Vector37 and the SMK-37 builds of the FM-1 firmwares by genkigenki. Baud Girl (FM-1+VA) by Madeline is only linked: not open source, not hosted or mirrored
+  here, it installs from baudgirl.com. The update path is Felucca's, as sloopDX carries it. M-VAVE, FM-1 and SMK-37 are trademarks of
+  their owners; not affiliated with M-VAVE. E-mu and SP-1200 are trademarks of their owners. Unofficial firmware, free and without
+  warranty: you install it at your own risk.
+  <br><a href="https://designburg.net/">designburg.net</a> · <a href="/tools/">Tools</a> · <a href="/kb/">Knowledge Base</a> · <a href="/impressum/">Impressum</a> · <a href="/impressum/#datenschutz">Datenschutz</a>
+  · <a href="https://www.youtube.com/@sonzven?sub_confirmation=1" target="_blank" rel="noopener">▶ YouTube: @sonzven</a>
+  · <a href="https://paypal.me/zvenson" rel="noopener">☕ Buy me a coffee</a><span id="updated"></span>
+</div></footer>
+<script>
+// a newer release than the sheet's: say so (the hub's catalogue, the same as the cards')
+fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.json()).then((c) => {
+  const f = c.firmwares.find((x) => x.id === "sloopdx"), v = document.getElementById("ver");
+  if (f && f.version && f.version !== v.dataset.v)
+    v.insertAdjacentHTML("beforeend", ` · <span class="old">${f.name} is now ${f.version.replace(/[<&]/g, "")}: some controls may have changed</span>`);
+}).catch(() => {});
+</script>
+<script>
+// web/hubapp.js: the hub as an app, on every device page (make_fm1 puts it in at /*APP*/; the manifest, icons: fm1/app/,
+// the worker: fm1/sw.js). Android / Chrome / Edge: "Install" (the browser's own prompt); iPhone / iPad: "Add to Home Screen"
+// by hand, and why installing a firmware does not work there (no Web MIDI in any iOS browser).
+(() => {
+  if (window.top !== window) return;                    // (a page inside the hub's pop-up, e.g. a cheat sheet: no bar, no worker)
+  const ua = navigator.userAgent;
+  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);   // (an iPad says "Mac")
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const touch = matchMedia("(pointer: coarse)").matches;
+  const wanted = !standalone && new URLSearchParams(location.search).has("app");   // (the QR code's /?app=1)
+  window.hubApp = {
+    ios, standalone,
+    // (what the Install / Connect buttons say without Web MIDI: on iOS no other browser helps)
+    noMidi: ios ? "Installing doesn't work on iPhone or iPad yet: no browser there has Web MIDI. Use Chrome or Edge on a computer, or Chrome on Android."
+                : "This browser has no Web MIDI: use Chrome or Edge.",
+  };
+
+  // the worker: always the newest page, a copy only offline; asked for a new version each time the app comes back
+  let reg = null;
+  if ("serviceWorker" in navigator && isSecureContext)
+    navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((r) => { reg = r; }).catch(() => {});
+
+  // Shop in the menu, by the country Cloudflare sees (/api/cc, nothing kept): Firmwear (the hub's merch on Spreadshop,
+  // made and sent in the EU) for EU visitors, Amazon affiliate links for DE / AT (amazon.de) and the US (amazon.com);
+  // anybody else: no shop
+  const EU = "AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE".split(" ");
+  fetch("/api/cc", { cache: "no-store" }).then((r) => r.json()).then((j) => {
+    const cc = j.cc === "DE" || j.cc === "AT" ? "de" : EU.includes(j.cc) ? "eu" : j.cc === "US" ? "us" : "", el = document.getElementById("shopdd");
+    if (cc && el) { el.dataset.cc = cc; el.removeAttribute("hidden"); }
+  }).catch(() => {});
+  // (a click in the shop: a Matomo event "Shop" / the device / the store, beside the outlink Matomo counts anyway)
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest?.("#shopm a[data-shop]");
+    if (a) { const [dev, store] = a.dataset.shop.split("|"); try { (window._paq = window._paq || []).push(["trackEvent", "Shop", dev, store]); } catch {} }
+  });
+
+  // the app left in the background for a while (a phone keeps it for days): the page anew when it comes back,
+  // never while an install writes (fm1.html's `writing`) or a dialog is open
+  let away = 0;
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { away = Date.now(); return; }
+    reg?.update().catch(() => {});
+    const busy = (typeof writing !== "undefined" && writing) || document.querySelector("dialog[open]");
+    if (standalone && away && Date.now() - away > 30 * 60e3 && !busy) location.reload();
+  });
+
+  // the bar at the bottom: on a phone, once (closed: 60 days quiet); "Get app" in the Devices menu shows it any time
+  const KEY = "fm1hub.appbar";
+  let prompt = null, bar = null;
+  const quiet = () => { try { return Date.now() < +(localStorage.getItem(KEY) || 0); } catch { return false; } };
+  const hush = () => { try { localStorage.setItem(KEY, String(Date.now() + 60 * 864e5)); } catch {} };
+  // the panel: iPhone / iPad the how-to (no prompt there), a phone the browser's Install, a computer the code to scan
+  // with the phone (and Install for this computer where the browser offers it)
+  function show() {
+    if (standalone) return;
+    bar?.remove();
+    bar = document.createElement("div");
+    bar.className = "appbar";
+    bar.setAttribute("role", "dialog");
+    bar.setAttribute("aria-label", "The Firmware Hub as an app");
+    const icon = '<img src="/app/icon-192.png" alt="" width="44" height="44">';
+    const go = prompt ? '<button class="go" type="button">Install</button>' : "";
+    if (ios) {                                           // (only who came by the QR code: no app offered on iOS, Sven 17.10.)
+      bar.innerHTML = `${icon}<div class="t"><b>The app is for Android</b>
+        <span>On iPhone and iPad just use the hub here in the browser: browse, rate, keep favourites.</span>
+        <small>Installing a firmware needs Web MIDI, which no iPhone browser has yet: use Chrome on Android, or Chrome or Edge on a computer.</small></div>`;
+    } else if (touch) {
+      bar.innerHTML = `${icon}<div class="t"><b>The Firmware Hub as an app</b>` + (prompt
+        ? "<span>On your home screen, always the newest firmwares.</span></div>" + go
+        : "<span>In Chrome: the menu <b>⋮</b>, then <b>Install app</b> or <b>Add to Home screen</b>.</span></div>");
+    } else {
+      bar.classList.add("wide");
+      bar.innerHTML = `<img class="qr" src="/app/qr.svg" alt="QR code: thefirmwarehub.com" width="132" height="132"><div class="t">
+        <b>The Firmware Hub on your Android phone</b>
+        <span>Scan the code with your phone’s camera. The hub opens, then:</span>
+        <span>On <b>Android</b>, tap <b>Install</b> in the bar at the bottom (or <b>📱 Get app</b>).</span>
+        <small>Always the newest firmwares, your favourites and stars on every device. Installing a firmware from the phone: Android with Chrome and a USB-C cable. The app is for Android only: iPhones have no Web MIDI yet.</small>
+        ${prompt ? '<span class="pc">Or as an app on this computer: <button class="go" type="button">Install</button></span>' : ""}</div>`;
+    }
+    bar.querySelector(".go")?.addEventListener("click", async () => {
+      const p = prompt; prompt = null;
+      p.prompt();
+      const { outcome } = await p.userChoice.catch(() => ({}));
+      if (outcome === "accepted") bar.remove(); else hush();
+    });
+    const x = document.createElement("button");
+    x.className = "x"; x.type = "button"; x.setAttribute("aria-label", "Close"); x.textContent = "×";
+    x.onclick = () => { hush(); bar.remove(); };
+    bar.append(x);
+    document.body.append(bar);
+  }
+  addEventListener("beforeinstallprompt", (e) => {      // (Chrome / Edge: installable; their own mini bar replaced by ours)
+    e.preventDefault(); if (ios) return;                // (never an app offer on iOS, whatever the browser says)
+    prompt = e;
+    // (a phone: the bar with Install; one already open without it (the QR code's how-to) gets it now)
+    if (touch && (bar?.isConnected ? !bar.querySelector(".go") : !quiet())) show();
+  });
+  addEventListener("appinstalled", () => { bar?.remove(); prompt = null; });
+  addEventListener("DOMContentLoaded", () => {
+    // the kinds' row on a desktop (one line, see .chips in the page's style): the fade at its edge only while chips are hidden
+    const chips = document.getElementById("chips");
+    if (chips) {
+      const fit = () => chips.classList.toggle("fits", chips.scrollLeft + chips.clientWidth >= chips.scrollWidth - 2);
+      new ResizeObserver(fit).observe(chips);
+      new MutationObserver(fit).observe(chips, { childList: true, subtree: true });
+      chips.addEventListener("scroll", fit, { passive: true });
+    }
+    // visible: "Get app" beside the page's buttons (FM-1, SMK-37), and in the Devices menu; gone inside the app
+    const row = document.querySelector("header .bar");
+    if (row && !standalone && !ios) {
+      const b = Object.assign(document.createElement("a"), { className: "btn ghost getapp", href: "#app", textContent: "📱 Get app" });
+      row.insertBefore(b, row.querySelector(".btn.coffee"));
+    }
+    document.querySelectorAll("#getapp, .getapp").forEach((a) => {
+      if (standalone || ios) return a.remove();          // (inside the app, and on iOS: nothing to install there)
+      a.onclick = (e) => {                               // (on a phone the browser's prompt right away where there is one)
+        e.preventDefault(); document.getElementById("dd")?.classList.remove("open");
+        show(); if (touch) bar?.querySelector(".go")?.click();
+      };
+    });
+    if (location.hash === "#app" || wanted) show();      // (the menu's link from VIBE's page; the QR code: came for the app)
+  });
+})();
+</script>
+<!--/email_off-->
+<!-- Matomo (self-hosted, matomo.designburgapps.com): one site per host (dx7 1, zp12 3, fm1 4, designburgapps.com 5);
+     no cookies, IPs anonymised on the server, Do Not Track respected -->
+<script>
+  var _paq = window._paq = window._paq || [];
+  var _mtmSite = {"zp12.designburgapps.com": "3", "thefirmwarehub.com": "4", "fm1.designburgapps.com": "4", "designburgapps.com": "5",
+                  "www.designburgapps.com": "5"}[location.hostname] || "1";
+  _paq.push(['setDomains', [location.hostname]]);
+  _paq.push(['disableCookies']);
+  _paq.push(['setDoNotTrack', true]);
+  _paq.push(['enableHeartBeatTimer']);
+  _paq.push(['trackPageView']);
+  _paq.push(['enableLinkTracking']);
+  (function() {
+    var u="https://matomo.designburgapps.com/";
+    _paq.push(['setTrackerUrl', u+'matomo.php']);
+    _paq.push(['setSiteId', _mtmSite]);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+  })();
+</script>
+<!-- End Matomo Code -->
+</body>
+</html>

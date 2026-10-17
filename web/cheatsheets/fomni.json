@@ -1,0 +1,104 @@
+{
+  "id": "fomni",
+  "name": "FoMni",
+  "version": "0.4",
+  "ref": "0.4",
+  "manual": "https://charlesvestal.github.io/fm1-fomni/",
+  "intro": "A chord harp after the Suzuki Omnichord: hold a chord on a black key, then swipe a finger across the white keys to strum it.",
+  "sections": [
+    { "title": "Getting around",
+      "rows": [
+        { "do": ["tap HOME"], "what": "Play page: Voice 1, Voice 2, Sustain, Chord." },
+        { "do": ["tap SEQ"], "what": "Rhythm page: rhythm, tempo, drums, auto bass." },
+        { "do": ["tap FX"], "what": "Sound page: reverb, space, width, chord reverb." },
+        { "do": ["tap SEL"], "what": "Chords page: give any black key its own chord." },
+        { "do": ["tap GLO"], "what": "Setup page: tune, MIDI out, lights." },
+        { "do": ["tap EDIT"], "what": "Next page." },
+        { "do": ["turn KNOB 1-4"], "what": "The four values at the bottom of the screen." }
+      ] },
+    { "title": "Playing",
+      "rows": [
+        { "do": ["hold black key 1-11"], "what": "Play that chord with its bass: F C G, Dm Am Em, G7 E7 D7, Bb, A7." },
+        { "do": ["white key 1-16"], "what": "Pluck one string of the chord. Swipe across them to strum." },
+        { "do": ["hold ENV", "black key 1-11"], "what": "That chord as minor." },
+        { "do": ["hold LFO", "black key 1-11"], "what": "That chord as a 7th." },
+        { "do": ["hold ENV", "hold LFO", "black key 1-11"], "what": "That chord as a minor 7th." },
+        { "do": ["tap ARP"], "what": "Chord hold: the chord rings on. Same key again stops it." },
+        { "do": ["tap OCT-"], "what": "Strum plate an octave down. OCT+ goes up (one each way)." },
+        { "do": ["turn PRESETS"], "what": "Transpose everything, -6 to +6 semitones." }
+      ] },
+    { "title": "Sound",
+      "rows": [
+        { "do": ["tap HOME", "turn KNOB 1"], "what": "Voice 1: the shimmering harp." },
+        { "do": ["tap HOME", "turn KNOB 2"], "what": "Voice 2: the plain harp. Mix the two." },
+        { "do": ["tap HOME", "turn KNOB 3"], "what": "Sustain: how long the strings ring." },
+        { "do": ["tap HOME", "turn KNOB 4"], "what": "Chord: level of the held chord and its bass." },
+        { "do": ["tap SEL", "black key 1-11", "turn KNOB 1"], "what": "New root note for that key." },
+        { "do": ["tap SEL", "black key 1-11", "turn KNOB 2"], "what": "Chord type: maj, m, 7, M7, m7, dim, aug, sus4, add9." }
+      ] },
+    { "title": "Sequencer / patterns",
+      "rows": [
+        { "do": ["tap PLAY"], "what": "Rhythm on or off." },
+        { "do": ["turn ALGORITHM"], "what": "Pick the rhythm: Rock 1, Rock 2, Disco ... Swing, Waltz." },
+        { "do": ["turn SELECT"], "what": "Tempo, 60 to 240." },
+        { "do": ["tap REC"], "what": "Sync start: after PLAY, the rhythm waits for your first chord." },
+        { "do": ["tap SEQ", "turn KNOB 3"], "what": "Drums level." },
+        { "do": ["tap SEQ", "turn KNOB 4"], "what": "Auto bass: with the rhythm on, chord and bass play in time." }
+      ] },
+    { "title": "Effects",
+      "rows": [
+        { "do": ["tap FX", "turn KNOB 1"], "what": "Reverb: how much of the strings goes to the plate." },
+        { "do": ["tap FX", "turn KNOB 2"], "what": "Space: the size of the plate reverb." },
+        { "do": ["tap FX", "turn KNOB 3"], "what": "Width: how wide the stereo picture is." },
+        { "do": ["tap FX", "turn KNOB 4"], "what": "Chord rev: reverb on chord and bass. Drums stay dry." }
+      ] },
+    { "title": "Settings",
+      "rows": [
+        { "do": ["tap GLO", "turn KNOB 1"], "what": "Tune, plus or minus 50 cents." },
+        { "do": ["tap GLO", "turn KNOB 2"], "what": "MIDI out on or off." },
+        { "do": ["tap GLO", "turn KNOB 3"], "what": "Lights: On, Keys (key lights only) or Off." },
+        { "do": ["tap SAVE"], "what": "Save everything now." }
+      ] },
+    { "title": "Recovery",
+      "rows": [
+        { "do": ["hold OCT-", "hold OCT+"], "what": "After 5 seconds: update mode. Let go early to cancel." },
+        { "do": ["hold OCT-", "hold OCT+", "power on"], "what": "Calibrate the buttons and knobs." },
+        { "do": ["tap PLAY"], "what": "In SAFE MODE: try starting FoMni normally again." }
+      ] }
+  ],
+  "keys": [
+    { "keys": "white", "label": "Strum plate: 16 strings of the chord, low to high (swipe to strum)", "color": "#42f5f5" },
+    { "keys": "black", "label": "Chord keys F C G | Dm Am Em | G7 E7 D7 | Bb A7 (hold ENV: minor, LFO: 7th)", "color": "#ff9628" }
+  ],
+  "tips": [
+    "First sound: hold black key 2 (C) and run a finger across the white keys.",
+    "The strings keep the last chord, so you can let go of the black key and still strum.",
+    "With the rhythm on and Auto bass on, a held chord is played by the rhythm, not as one long note.",
+    "PRESETS transposes, and the chord names on screen move with it: set your key there.",
+    "FoMni autosaves about 4 seconds after a change, once the rhythm is stopped and all is quiet. A dot in the header means unsaved changes.",
+    "MIDI in: channel 1 notes pluck the nearest string, a chord on channel 2 becomes the chord, MIDI clock sets the tempo (EXT)."
+  ],
+  "checked": [
+    "Archive fomni-0.4.tar.gz from thefirmwarehub.com/src, folder fm1-fomni-0.4.",
+    "Labels: firmware/src/app/panel.c B_NAME/E_NAME.",
+    "Keys: ui.c WHITE_K (16 strings) / BLACK_K (11 pads = indices 1,3,5,8,10,13,15,17,20,22,25); input() strums on white key press, pad_down/pad_up on black keys.",
+    "Modifiers: ui.c pad_down(): ENV = minor, LFO = 7th, both = m7; ENV/LFO alone do nothing (excluded from button() on release).",
+    "Default chords: app/project.c PAD_ROOT/PAD_TYPE = F C G Dm Am Em G7 E7 D7 Bb A7; ui_init() starts on C (pad 2).",
+    "Buttons: ui.c button(): HOME/SEQ/FX/SEL/GLO pages Play/Rhythm/Sound/Chords/Setup, EDIT next page; PLAY on press (sync start arms/cancels); REC toggles sync; ARP chord hold (same pad again releases); OCT-/OCT+ P_OCTAVE -1..+1; SAVE project_save.",
+    "Encoders: ui.c input(): SELECT tempo, ALGORITHM rhythm, PRESETS transpose; VIEW_KNOB per page.",
+    "Param names/ranges/defaults: dsp/omni.c PARAMS[] (Tempo 60-240 def 116, Transpose -6..6, Tune -50..50, Auto bass def on, MIDI out def on); rhythm names dsp/om_data.h OM_RHYTHM (Rock 1 .. Waltz); chord types omni.c OM_TYPE_NAME.",
+    "Auto bass: omni.c C_GATE and step code (gate && par[P_ABC]): with rhythm on, chord/bass are triggered by the rhythm.",
+    "Strum plate voicing: omni.c om_voicing() (root/3rd/5th in F#..F windows, five up, root on top).",
+    "SEL page: pad_down sets pad_sel on V_PADS; KNOB 1 Root, KNOB 2 Type (K_PADROOT/K_PADTYPE).",
+    "Autosave: ui.c autosave() AUTOSAVE_QUIET 4000 ms, not while playing or sounding; dirty dot in draw_header().",
+    "MIDI in: ui.c midi_in() ch1 note-on -> nearest string, ch2 -> kb_chord(), clock/start/stop -> om_clock; EXT in header.",
+    "Recovery: main_fm1.c OCT-+OCT+ 5 s update mode with countdown/cancel, OCT-+OCT+ at power-on panel_setup(), safe_main() 'PLAY: TRY AGAIN'.",
+    "Manual: charlesvestal.github.io/fm1-fomni/ (200; /manual/ is 404), same content as README."
+  ],
+  "unsure": [
+    "Calibration at power-on checks raw input bits 0 and 1 (fm1_in.buttons & 3), assumed to be OCT- and OCT+ as the comment says.",
+    "Holding OCT- + OCT+ for update mode also shifts the octave when each is released (button() on release); harmless, not on the sheet.",
+    "MIDI out channels (strings 1, chord 2, bass 3, drums 10) from the README only, not traced; no MIDI section.",
+    "SEL page KNOB 3/4 (Transpose, Octave) duplicate PRESETS and OCT-/OCT+, so they are left out."
+  ]
+}

@@ -1,20 +1,20 @@
 {
- "day": "2026-10-17",
+ "day": "2026-10-18",
  "stars": {
   "ChanceTheMaker/felucca-smk": 7,
-  "Quixotic7/ChoralRootFM1": 63,
-  "charlesvestal/fm1-amb": 62,
-  "charlesvestal/fm1-fomni": 63,
-  "charlesvestal/fm1-polly": 16,
-  "charlesvestal/fm1-x0x": 179,
-  "dspaudio/orbit": 22,
-  "genkigenki/Makkuro37": 7,
+  "Quixotic7/ChoralRootFM1": 64,
+  "charlesvestal/fm1-amb": 69,
+  "charlesvestal/fm1-fomni": 64,
+  "charlesvestal/fm1-polly": 18,
+  "charlesvestal/fm1-x0x": 181,
+  "dspaudio/orbit": 23,
+  "genkigenki/Makkuro37": 8,
   "hericdk/winampFM": 9,
-  "isod89/sloop-fm1": 526,
-  "jasonpersinger/ghoulbox-fm1-dungeon-synth": 54,
+  "isod89/sloop-fm1": 536,
+  "jasonpersinger/ghoulbox-fm1-dungeon-synth": 57,
   "joshbartlettband-web/felucca-rainbow": 16,
   "okumurari2/maku": 24,
-  "zvenson/obervave": 26,
-  "genkigenki/Vector37": 9
+  "zvenson/obervave": 27,
+  "genkigenki/Vector37": 12
  }
 }
