@@ -97,6 +97,20 @@
   });
   addEventListener("appinstalled", () => { bar?.remove(); prompt = null; });
   addEventListener("DOMContentLoaded", () => {
+    // the deck keys' names (web/deck.css): one tooltip on the page, placed by the key, so no card clips it
+    const tip = Object.assign(document.createElement("div"), { className: "decktip" }); tip.setAttribute("aria-hidden", "true");
+    document.body.append(tip);
+    const showTip = (k) => {
+      tip.textContent = k.dataset.tip; tip.classList.add("on");
+      const r = k.getBoundingClientRect(), h = tip.offsetHeight;
+      tip.style.left = r.left + r.width / 2 + "px";
+      tip.style.top = (r.top - h - 8 >= 4 ? r.top - h - 8 : r.bottom + 8) + "px";
+    };
+    const hideTip = () => tip.classList.remove("on");
+    document.addEventListener("pointerover", (e) => { const k = e.target.closest?.(".deck .key[data-tip]"); k ? showTip(k) : hideTip(); });
+    document.addEventListener("focusin", (e) => { const k = e.target.closest?.(".deck .key[data-tip]"); if (k) showTip(k); });
+    document.addEventListener("focusout", hideTip);
+    addEventListener("scroll", hideTip, { passive: true });
     // the kinds' row on a desktop (one line, see .chips in the page's style): the fade at its edge only while chips are hidden
     const chips = document.getElementById("chips");
     if (chips) {
