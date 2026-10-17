@@ -1,0 +1,92 @@
+{
+ "id": "fm106",
+ "name": "FM-106",
+ "version": "Beta4",
+ "ref": "Beta4 (hub archive fm106-Beta4.tar.gz)",
+ "manual": "https://github.com/PatttF/fm-106#readme",
+ "intro": "A 6-voice Roland Juno-106 (KR-106 port) with its BBD stereo chorus and all 128 factory patches: turn PRESETS, then ALGORITHM for bank B, and play.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {"do": ["tap HOME"], "what": "VCF page: FREQ, RES, ENV, LFO. Also backs out of menus."},
+    {"do": ["tap EDIT"], "what": "Next page: VCF, VCF 2, DCO, DCO 2, ENV, LFO, ARP, FX."},
+    {"do": ["turn SELECT"], "what": "Step through the same 8 pages, both directions."},
+    {"do": ["turn KNOB 1"], "what": "KNOB 1-4 move the four sliders shown on the page."},
+    {"do": ["tap OCT-"], "what": "Octave down (OCT+ up), up to 2; lit when shifted."}
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {"do": ["turn PRESETS"], "what": "Browse the 64 patches of the current bank (A11-A88)."},
+    {"do": ["turn ALGORITHM"], "what": "Bank: FACT A, FACT B, USER A, USER B."},
+    {"do": ["tap ARP", "turn KNOB 1"], "what": "Arpeggiator on / off; ARP lights while on."},
+    {"do": ["tap ARP", "turn KNOB 2"], "what": "Arp MODE UP, U&D, DN; KNOB 3 rate, KNOB 4 octaves."},
+    {"do": ["tap SEL"], "what": "VCA mode ENV / GATE (organ-style on / off)."}
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {"do": ["tap HOME", "turn KNOB 1"], "what": "Filter cutoff; KNOB 2 resonance (self-oscillates)."},
+    {"do": ["tap HOME", "turn KNOB 3"], "what": "Filter envelope amount; KNOB 4 filter LFO amount."},
+    {"do": ["tap HOME", "tap EDIT"], "what": "VCF 2: KBD tracking, INV envelope, bend depths."},
+    {"do": ["tap HOME", "EDIT twice"], "what": "DCO: RNG 16'/8'/4', PULSE, SAW, SUBSW on / off."},
+    {"do": ["tap ENV", "turn SELECT"], "what": "One page left: DCO 2: SUB, NOISE, PWM, DCOLFO."},
+    {"do": ["tap ENV"], "what": "ENV (ADSR): ATK, DEC, SUS, REL."},
+    {"do": ["tap LFO"], "what": "LFO: RATE, DELAY, PWM MD (LFO or MAN)."}
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {"do": ["tap FX"], "what": "FX (CHORUS) page: CHO, HPF, VCA, LEVEL."},
+    {"do": ["tap FX", "turn KNOB 1"], "what": "The Juno chorus: OFF, I, II, I+II; FX lights when on."},
+    {"do": ["tap FX", "turn KNOB 2"], "what": "HPF: BST bass boost, FLT flat, 236 Hz, 754 Hz."},
+    {"do": ["tap FX", "turn KNOB 4"], "what": "Patch output LEVEL."}
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {"do": ["tap SAVE"], "what": "Quick save: factory sound to first empty user slot; user slot overwritten."},
+    {"do": ["hold SAVE"], "what": "Half a second: SAVE PRESET screen; SAVE lights."},
+    {"do": ["hold SAVE", "turn SELECT"], "what": "In it: choose the slot, UA11 to UB88."},
+    {"do": ["hold SAVE", "turn ALGORITHM"], "what": "Move the name cursor; PRESETS changes the letter."},
+    {"do": ["hold SAVE", "tap SAVE"], "what": "Commit the save; HOME leaves without saving."},
+    {"do": ["hold SAVE", "SEL twice"], "what": "Delete the chosen user slot (second press confirms)."}
+   ]
+  },
+  {
+   "title": "MIDI & sync",
+   "rows": [
+    {"do": ["tap GLO"], "what": "OPTIONS menu: MIDI SETUP, ABOUT; GLO again closes."},
+    {"do": ["tap GLO", "tap SEL"], "what": "Open MIDI SETUP; SELECT picks CHANNEL or SYNC."},
+    {"do": ["tap GLO", "tap SEL", "turn ALGORITHM"], "what": "Change the chosen value (channel 1-16, sync)."}
+   ]
+  }
+ ],
+ "tips": [
+  "Edits are lost when you turn PRESETS; tap SAVE first. Factory patches are never overwritten, a quick save goes to a user slot named *Name.",
+  "An empty user slot (USER A / USER B) loads a plain saw init patch: a clean start for your own sound.",
+  "The 106 classic: a saw or pulse pad with chorus II, or I+II for the fast vibrato-like shimmer.",
+  "Over USB MIDI it plays on any channel and takes CCs: 74 cutoff, 71 resonance, 73/75/70/72 attack/decay/sustain/release, 1 DCO LFO, 64 sustain pedal. It is also a USB audio interface.",
+  "Something wrong after an update? Hold OCT- while powering on: USB rescue screen for reinstalling. Holding OCT-, OCT+ and HOME for 5 s also enters UPDATE MODE."
+ ],
+ "checked": [
+  "Beta4 hub archive, src/fm106.c FM1_SLOTS + page titles: 8 pages VCF (FREQ RES ENV LFO), VCF 2 (KBD INV B.DCO B.VCF), DCO (RNG PULSE SAW SUBSW), DCO 2 (SUB NOISE PWM DCOLFO), ENV (ADSR) (ATK DEC SUS REL), LFO (RATE DELAY PWM MD -), ARPEGGIATOR (ARP MODE ARAT ARNG), FX (CHORUS) (CHO HPF VCA LEVEL). Value names N_RNG, N_ARMD, N_CHOR, N_HPF, N_VCA, N_PWMD.",
+  "fm106.c app_main buttons: OCT-/OCT+ -2..+2 with LEDs; GLO toggles OPTIONS menu; FX -> PAGE_FX; HOME -> PAGE_VCF or backs out of SAVE/MIDI/MENU; EDIT next page mod 8; ENV -> PAGE_ENVELOPE; LFO -> PAGE_LFO; ARP -> PAGE_ARP (jump only, arp on/off is KNOB 1); SEL normal = vca_mode toggle, in MENU opens MIDI SETUP, in SAVE delete with confirm.",
+  "fm106.c SAVE: release before 500 ms = fm106_do_short_save (factory -> first blank user slot with '*'+name, 'USER BANKS FULL!' if none; user -> overwrite); held 500 ms -> UI_MODE_SAVE (SELECT slot 0..127 = UA11..UB88, ALGORITHM cursor 0..14, PRESETS char, SAVE commit, HOME back/cancel).",
+  "fm106.c encoders normal mode: PRESETS = fm106_find_next_preset (wraps within bank of 64), ALGORITHM = bank 0..3 keeping slot number, SELECT = page; KNOB1-4 per-page params; LED BTN_FX = chorus on, BTN_ARP = arp_on.",
+  "fm106.c MIDI in: no channel filter; CCs 0/32 bank, 74 71 76 77 78 73 75 70 72 1 79 9 13 80 81 82 7/11 12 93 64 119; program change within bank. fm106_sysex.h fm106_load_user_preset: blank user slot = init saw patch. 128 factory names in fm106_presets.h.",
+  "platform.c line 6/441 + bootguard.h: OCT- alone at power-on = USB rescue; platform.c 353: OCT- + OCT+ + HOME held 5 s = UPDATE MODE."
+ ],
+ "unsure": [
+  "manual.html in the archive describes a sequencer (SEQ/PLAY/REC), TAPE effect, 10 pages, MIDI IN/OUT/LOCAL/PC IN menu and a big CC map; none of this exists in the Beta4 source (no BTN_SEQ/PLAY/REC handling, only CHANNEL + SYNC in MIDI SETUP). Not used; manual link points to the repo README instead.",
+  "README says FX cycles the chorus mode and ARP toggles the arpeggiator; code only jumps to the FX / ARP page (KNOB 1 changes it). Sheet follows the code.",
+  "MIDI SETUP SYNC (OFF/MASTER/SLAVE) is stored but never used anywhere in the code; CHANNEL only sets the channel of sent program/bank changes (panel notes go out on channel 1, input is omni). Kept vague in the sheet.",
+  "CC 93 in code: >80 = chorus II, >40 = I, else OFF (I+II not reachable by CC), differs from manual.html. Not on the sheet.",
+  "Arp rate is free-running (no clock sync) as far as read; arp engine details not deeply checked. DIN MIDI input path not checked, so the tip says USB MIDI only."
+ ]
+}

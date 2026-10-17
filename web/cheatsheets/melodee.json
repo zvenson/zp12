@@ -1,0 +1,357 @@
+{
+ "id": "melodee",
+ "name": "Melodee",
+ "version": "1.4.2-rc.1",
+ "ref": "v1.4.2-rc.1",
+ "manual": "https://keremimo.github.io/melodee/webapp/manual/",
+ "intro": "A four-track synth workstation with Prophet-5, DX7-style FM6, Casio CZ-1 and 808/909/SID drum tracks ready at power-on: turn ALGORITHM for a track, PRESETS for its sound, and play.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {
+     "do": [
+      "tap HOME"
+     ],
+     "what": "Stage: all tracks with their sounds, patterns and levels."
+    },
+    {
+     "do": [
+      "tap HOME",
+      "tap HOME"
+     ],
+     "what": "Second HOME page: chord wheel of what you play."
+    },
+    {
+     "do": [
+      "turn ALGORITHM"
+     ],
+     "what": "Pick track 1-4, on every page."
+    },
+    {
+     "do": [
+      "turn SELECT"
+     ],
+     "what": "Turn the pages of the open section; on HOME: tempo."
+    },
+    {
+     "do": [
+      "tap OCT+"
+     ],
+     "what": "Off HOME: OCT+ enters or confirms, OCT- goes back."
+    },
+    {
+     "do": [
+      "hold HOME"
+     ],
+     "what": "Menu: colours, lights, autosave, USB audio and more."
+    },
+    {
+     "do": [
+      "hold EDIT"
+     ],
+     "what": "Undo the last load, capture or edit; hold again for more."
+    }
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {
+     "do": [
+      "turn PRESETS"
+     ],
+     "what": "Change the selected track's sound."
+    },
+    {
+     "do": [
+      "turn KNOB 1"
+     ],
+     "what": "On HOME: the sound's 4 main knobs (Prophet: cutoff, reso, env, release)."
+    },
+    {
+     "do": [
+      "tap OCT-"
+     ],
+     "what": "On HOME: octave down (OCT+ up); both together: back to 0."
+    },
+    {
+     "do": [
+      "tap ARP",
+      "turn KNOB 1"
+     ],
+     "what": "Arpeggiator mode; OFF switches it off."
+    },
+    {
+     "do": [
+      "tap SEL",
+      "tap SEL",
+      "turn KNOB 1"
+     ],
+     "what": "Chord keys: one finger plays a chord in the key."
+    },
+    {
+     "do": [
+      "tap SEL",
+      "tap SEL",
+      "turn KNOB 3"
+     ],
+     "what": "STRUM: spread each chord over a beat division."
+    },
+    {
+     "do": [
+      "hold SEL",
+      "white key 1-16"
+     ],
+     "what": "The key's note becomes the root (KNOB 2 picks the scale)."
+    },
+    {
+     "do": [
+      "hold GLO",
+      "black key 1-4"
+     ],
+     "what": "Mute track 1-4 (white key 1-4: solo while held)."
+    },
+    {
+     "do": [
+      "hold GLO",
+      "turn KNOB 1"
+     ],
+     "what": "Track 1 level (KNOB 2-4: tracks 2-4)."
+    }
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {
+     "do": [
+      "tap EDIT"
+     ],
+     "what": "All the engine's sound pages; EDIT again: map of sections."
+    },
+    {
+     "do": [
+      "tap ENV"
+     ],
+     "what": "Envelope pages (Prophet: filter, then amp); tap for next."
+    },
+    {
+     "do": [
+      "tap LFO"
+     ],
+     "what": "LFO and modulation pages; tap for next."
+    },
+    {
+     "do": [
+      "hold LFO",
+      "turn KNOB 1"
+     ],
+     "what": "Temporary tweak, undone when LFO is let go (OCT+ keeps it)."
+    },
+    {
+     "do": [
+      "hold OCT+"
+     ],
+     "what": "On HOME: Init sound, Favourite, Sound designer, add/remove track."
+    },
+    {
+     "do": [
+      "tap GLO"
+     ],
+     "what": "MIXER: KNOB 1 level, KNOB 2 pan of the selected track."
+    }
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {
+     "do": [
+      "tap PLAY"
+     ],
+     "what": "Start / stop all tracks."
+    },
+    {
+     "do": [
+      "tap REC"
+     ],
+     "what": "Arm the track; playing, it records from its next loop."
+    },
+    {
+     "do": [
+      "hold REC",
+      "tap PLAY"
+     ],
+     "what": "Arm and start recording in one go."
+    },
+    {
+     "do": [
+      "hold REC"
+     ],
+     "what": "Capture: put what you just played into the pattern."
+    },
+    {
+     "do": [
+      "tap SEQ"
+     ],
+     "what": "NOTES piano roll; tap again for PATTERN, TEMPO and more."
+    },
+    {
+     "do": [
+      "hold SEQ",
+      "white key 1-8"
+     ],
+     "what": "Go to pattern 1-8 (an empty one arms REC)."
+    },
+    {
+     "do": [
+      "hold SEQ",
+      "black key 1-4"
+     ],
+     "what": "Select track 1-4."
+    },
+    {
+     "do": [
+      "hold SEQ"
+     ],
+     "what": "PATTERNS: all tracks' 8 patterns; KNOB 1-4 pick them."
+    },
+    {
+     "do": [
+      "hold GLO",
+      "white key 8"
+     ],
+     "what": "Tap tempo (F4)."
+    }
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {
+     "do": [
+      "tap FX"
+     ],
+     "what": "The track's 3 insert slots plus SHARED; KNOB 2 picks the row."
+    },
+    {
+     "do": [
+      "tap FX",
+      "turn KNOB 1"
+     ],
+     "what": "Row's effect: Phaser, Width, Formant, Tape, Spit, Echo, Room, Reverb, Chorus."
+    },
+    {
+     "do": [
+      "tap FX",
+      "turn KNOB 4"
+     ],
+     "what": "Amount of the row's effect."
+    },
+    {
+     "do": [
+      "tap FX",
+      "tap OCT+"
+     ],
+     "what": "Open the slot: MIX, RATE, character, TONE."
+    }
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {
+     "do": [
+      "hold SAVE"
+     ],
+     "what": "Save the project to its slot (new: pick a slot)."
+    },
+    {
+     "do": [
+      "tap SAVE",
+      "turn KNOB 1",
+      "OCT+ twice"
+     ],
+     "what": "Save the sound to a USER slot; name it, OCT+ writes."
+    },
+    {
+     "do": [
+      "tap SAVE",
+      "tap SAVE"
+     ],
+     "what": "PROJECT: projects A-D, the template, the power-on project."
+    }
+   ]
+  },
+  {
+   "title": "Settings",
+   "rows": [
+    {
+     "do": [
+      "hold HOME",
+      "turn KNOB 2"
+     ],
+     "what": "Menu: KNOB 2 picks the row, KNOB 1 its value."
+    },
+    {
+     "do": [
+      "tap GLO",
+      "tap GLO",
+      "turn KNOB 3"
+     ],
+     "what": "Clock source: INT, USB or TRS MIDI."
+    },
+    {
+     "do": [
+      "tap GLO",
+      "tap GLO",
+      "turn KNOB 1"
+     ],
+     "what": "Concert pitch A4, 400-480 Hz (KNOB 4: fine TUNE)."
+    },
+    {
+     "do": [
+      "tap GLO",
+      "tap GLO",
+      "tap GLO",
+      "turn KNOB 3"
+     ],
+     "what": "ROUT: MIDI channels 1-4 play tracks 1-4; SEL: selected track."
+    }
+   ]
+  }
+ ],
+ "tips": [
+  "Power-on gives four tracks: IT'S A PROPHET 5, FM6 SOLID BASS, CZ-1 SYNTH.LEAD 1 and the 808 kit.",
+  "Projects save themselves after 5 s stopped and untouched once they have a slot; turn AUTOSAVE off in the HOME-held menu.",
+  "Tap GLO or SEL slowly for the next page: two quick taps lock its quick layer open (tap it again to close).",
+  "SEQ > TEMPO holds BPM, swing and QNT: OFF keeps your played timing, a division quantizes the new take.",
+  "Jam to song: switch patterns while playing, then on SEQ > SONG hold REC to turn the jam into the song.",
+  "Holding OCT- and OCT+ for 5 s while running enters update mode; let go during the countdown to cancel.",
+  "Something wrong after an update? Hold OCT- alone while switching on: three key flashes, then reinstall from the web installer."
+ ],
+ "checked": [
+  "v1.4.2-rc.1 hub tarball, firmware/src/panel.c: button enum B_FX B_SCL B_ENV ... in the FM-1 panel order; the second button (printed SEL) is Melodee's SCL. Encoders SELECT, ALGORITHM, PRESETS, KNOB 1-4. Hold OCT- + OCT+ at power-on = HARDWARE CALIBRATION.",
+  "ui_input.c btn_hold: HOME/REC/SAVE/EDIT/SEQ tap on release, hold 0.7 s. ui_input: HOME held = menu (again closes); HOME tapped on Stage toggles home_pg (ui_view.c chord wheel); else go_home. REC tap rec_tap, hold capture_take (SONG: ps_jam); REC held + PLAY rec_play; SAVE hold qsave (project_quick_save: own slot or PROJECT page), tap open_family(FAM_SAVE) = USER page; SAVE + REC quick save; EDIT hold undo_swap / step history, EDIT+OCT-/OCT+ undo/redo; SEQ hold = PATTERNS page, tap FAM_SEQ (NOTES first).",
+  "ui_input.c: ALGORITHM track_select on every page; SELECT page_scroll, on HOME select_turn(home_select()) default HS_BPM; PRESETS on HOME browse_turn (preset_go). OCT on Stage: octave -3..+3, both = 0; OCT+ held on Stage opens SHEET_STAGE (ui_popup.c: Init sound, Save as user, Favourite, Undo last load, Sound designer, Add track, Remove track); off Stage OCT- back / OCT+ enter (oct_nav).",
+  "ui.c stage_page: Prophet KNOB 1-4 = P5_CUTOFF, P5_RESONANCE, P5_ENV_FILTER, P5_RELEASE_AMP; CZ: wave, DCW, fine, vibrato depth; others ENGINES[e]->knob. momentary_take/restore: LFO held + knobs = temporary, OCT+ = KEPT.",
+  "engines.c TRK_DEF + project.c project_boot: power-on (no BOOT project) song.ntrk = 4: Prophet preset 1, FM6 10, CZ 52, DRUM 0 (comment: IT'S A PROPHET 5, FM6 SOLID BASS, CZ-1 SYNTH.LEAD 1, 808 KIT).",
+  "ui_layer.c: GLO layer black keys 1-4 mute T1-T4, white keys 1-4 solo while held, white 5 unmute all, white 8 (F4) tap tempo (INT clock only), KNOB 1-4 track levels, GLO+PLAY restart; SEL layer: any key = ROOT, KNOB 1-4 ROOT SCALE CHRD VOIC; double tap within 300 ms locks (LY_DTAP_MS).",
+  "ui_input.c PAT_KEY {0,2,4,6,7,9,11,12} = white keys 1-8 with SEQ held (empty: arms REC), TRK_KEY {1,3,5,8} = black keys 1-4 select tracks; SEQ held + SELECT chooses pattern.",
+  "params.c PAGES: CHORD = CHRD VOIC STRUM STROKE (N_STRUM OFF 1/8 .. 32T); ARP = MODE (OFF default) RATE OCT GATE; MIXER (tracks_edit) K1 LEVEL K2 PAN K4 MUTE; GLOBAL = A4 BUDGET CLK TUNE; SYSTEM = MIDI DRUM ROUT CPU (N_ROUTE CH1-4 SEL CH5-8 ...); N_FX list. ui_list.c: SCL family SCALES/MPC are list rows, so SEL cycles SCL list -> CHORD.",
+  "ui.c open_global: GLO taps MIXER -> GLOBAL -> SYSTEM -> WEIGHTS ...; open_family: ENV/LFO native pages for Prophet/FM6/CZ (P5 FLT ENV, P5 AMP ENV...), same button = next page; SAVE -> USER. ui_sections.c: EDIT on an EDIT page opens the section map.",
+  "ui_input.c fx_rack_enter / line 1110: FX rack KNOB 2 row, KNOB 1 effect, KNOB 4 amount, OCT+ opens slot page (FX 1 = MIX RATE CHAR TONE), last row SHARED.",
+  "ui_slots.c + ui_name.c: USER slot KNOB 1/2, OCT+ sheet on Save here, Save here -> NAME screen (overwrite asks first), OCT+ writes. PROJECT sheet Load / Save here / Rename / Boot / Erase. project.c autosave after 5 s stopped and untouched; ui_menu.c items incl. AUTOSAVE, USB INPUT, COLOR; menu KNOB 2 row, KNOB 1 value, OCT- closes.",
+  "main.c: OCT- + OCT+ held 5 s while running -> UBOOT countdown (from 2 s), letting go cancels. stub/stub_core.h + docs/RECOVERY.md: OCT- alone at power-on = rescue (retained MIDI update loader, three key flashes)."
+ ],
+ "unsure": [
+  "docs/RECORDING_PERFORMANCE.md says 'Holding REC opens the mixer'; the code (ui_input.c) runs Capture on a REC hold (SONG: jam to song). Sheet follows the code.",
+  "README says a new song starts with one track; the rc release notes and project.c power-on use four tracks. Sheet follows the code; the NEW song wizard (SAVE > PROJECT > NEW) roles were not described.",
+  "README says 'Hold SAVE to return to the sound before browsing'; in code SAVE held is the project quick save and OCT- in the browser goes back. Left out.",
+  "README's FX text says KNOB 1 picks the type on a slot page; code: type is KNOB 1 on the rack page, slot pages are MIX RATE CHAR TONE. Sheet follows the code.",
+  "REC + PLAY: if REC is held past 0.7 s before PLAY, Capture fires first. Not tried on hardware; nothing on this sheet was tried on hardware.",
+  "Manual link is the stable (1.4.1) illustrated manual; the nightly guide (https://keremimo.github.io/melodee/webapp/manual/nightly/) may describe the rc's strum and halve/double better.",
+  "Left out as too detailed: NOTES editor knobs, pattern dialog (hold pattern key: delete / copy / halve C# / double D#), SONG and MOTION pages, PRESETS browser page (KNOB 1 list, KNOB 3 fav, KNOB 4 engine), bulk presets, SysEx import, WEIGHTS, DRUM channel, hardware calibration (OCT- + OCT+ at power-on)."
+ ]
+}
