@@ -103,8 +103,9 @@ FIRMWARES = [  # (the page orders them: zp12, sloopDX, then the others by their 
          kind="groove", name="X0X", author="Charles Vestal", repo="charlesvestal/fm1-x0x", ident=r"FM-1_90\d{5}",
          src="github",
          what="A groovebox: 909 and 808 drums, two 303s with TB-3PO, a breakbeat generator and song mode."),
+    # (1.0.0 kept X0X's FM-1_90NNNNN; from 1.0.1 its own FM-1_987NNNNNN: Oliver, 17.10.)
     dict(id="x0xrmx", vintage=True, added="2026-10-17", play="https://mr-roboto.github.io/fm1-x0x-rmx/emu/",
-         kind="groove", name="X0X-RMX", author="Mr-Roboto (Oliver)", repo="Mr-Roboto/fm1-x0x-rmx", ident=r"FM-1_90\d{5}",
+         kind="groove", name="X0X-RMX", author="Mr-Roboto (Oliver)", repo="Mr-Roboto/fm1-x0x-rmx", ident=r"FM-1_90\d{5}|FM-1_987\d{6}",
          src="github", site="https://mr-roboto.github.io/fm1-x0x-rmx/",
          what="X0X remixed after The Orb: banks and patterns reordered live per voice, Grids MAP and EUCLID drum "
               "generation, an extended TB-3PO with 22 scales and a morphing 303 waveform. Built on X0X."),
