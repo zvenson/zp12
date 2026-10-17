@@ -846,7 +846,6 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
   let prompt = null, bar = null;
   const quiet = () => { try { return Date.now() < +(localStorage.getItem(KEY) || 0); } catch { return false; } };
   const hush = () => { try { localStorage.setItem(KEY, String(Date.now() + 60 * 864e5)); } catch {} };
-  const SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M6 11H5v10h14V11h-1"/></svg>';
   // the panel: iPhone / iPad the how-to (no prompt there), a phone the browser's Install, a computer the code to scan
   // with the phone (and Install for this computer where the browser offers it)
   function show() {
@@ -858,10 +857,10 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
     bar.setAttribute("aria-label", "The Firmware Hub as an app");
     const icon = '<img src="/app/icon-192.png" alt="" width="44" height="44">';
     const go = prompt ? '<button class="go" type="button">Install</button>' : "";
-    if (ios) {
-      bar.innerHTML = `${icon}<div class="t"><b>The hub on your Home Screen</b>
-        <span>Tap Share ${SHARE} then <b>Add to Home Screen</b>.</span>
-        <small>Browse, rate, keep favourites. Installing a firmware needs Chrome or Edge on a computer, or Chrome on Android: iPhone and iPad have no Web MIDI yet.</small></div>`;
+    if (ios) {                                           // (only who came by the QR code: no app offered on iOS, Sven 17.10.)
+      bar.innerHTML = `${icon}<div class="t"><b>The app is for Android</b>
+        <span>On iPhone and iPad just use the hub here in the browser: browse, rate, keep favourites.</span>
+        <small>Installing a firmware needs Web MIDI, which no iPhone browser has yet: use Chrome on Android, or Chrome or Edge on a computer.</small></div>`;
     } else if (touch) {
       bar.innerHTML = `${icon}<div class="t"><b>The Firmware Hub as an app</b>` + (prompt
         ? "<span>On your home screen, always the newest firmwares.</span></div>" + go
@@ -869,11 +868,10 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
     } else {
       bar.classList.add("wide");
       bar.innerHTML = `<img class="qr" src="/app/qr.svg" alt="QR code: thefirmwarehub.com" width="132" height="132"><div class="t">
-        <b>The Firmware Hub on your phone</b>
+        <b>The Firmware Hub on your Android phone</b>
         <span>Scan the code with your phone’s camera. The hub opens, then:</span>
-        <span><b>Android:</b> tap <b>Install</b> in the bar at the bottom (or <b>📱 Get the app</b>).</span>
-        <span><b>iPhone:</b> tap Share ${SHARE} then <b>Add to Home Screen</b>.</span>
-        <small>Always the newest firmwares, your favourites and stars on every device. Installing a firmware from the phone: Android with Chrome and a USB-C cable (iPhone: no Web MIDI yet).</small>
+        <span>On <b>Android</b>, tap <b>Install</b> in the bar at the bottom (or <b>📱 Get the app</b>).</span>
+        <small>Always the newest firmwares, your favourites and stars on every device. Installing a firmware from the phone: Android with Chrome and a USB-C cable. The app is for Android only: iPhones have no Web MIDI yet.</small>
         ${prompt ? '<span class="pc">Or as an app on this computer: <button class="go" type="button">Install</button></span>' : ""}</div>`;
     }
     bar.querySelector(".go")?.addEventListener("click", async () => {
@@ -889,7 +887,8 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
     document.body.append(bar);
   }
   addEventListener("beforeinstallprompt", (e) => {      // (Chrome / Edge: installable; their own mini bar replaced by ours)
-    e.preventDefault(); prompt = e;
+    e.preventDefault(); if (ios) return;                // (never an app offer on iOS, whatever the browser says)
+    prompt = e;
     // (a phone: the bar with Install; one already open without it (the QR code's how-to) gets it now)
     if (touch && (bar?.isConnected ? !bar.querySelector(".go") : !quiet())) show();
   });
@@ -897,19 +896,18 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
   addEventListener("DOMContentLoaded", () => {
     // visible: "Get the app" beside the page's buttons (FM-1, SMK-37), and in the Devices menu; gone inside the app
     const row = document.querySelector("header .bar");
-    if (row && !standalone) {
+    if (row && !standalone && !ios) {
       const b = Object.assign(document.createElement("a"), { className: "btn ghost getapp", href: "#app", textContent: "📱 Get the app" });
       row.insertBefore(b, row.querySelector(".btn.coffee"));
     }
     document.querySelectorAll("#getapp, .getapp").forEach((a) => {
-      if (standalone) return a.remove();
+      if (standalone || ios) return a.remove();          // (inside the app, and on iOS: nothing to install there)
       a.onclick = (e) => {                               // (on a phone the browser's prompt right away where there is one)
         e.preventDefault(); document.getElementById("dd")?.classList.remove("open");
         show(); if (touch) bar?.querySelector(".go")?.click();
       };
     });
     if (location.hash === "#app" || wanted) show();      // (the menu's link from VIBE's page; the QR code: came for the app)
-    else if (ios && !standalone && !quiet()) setTimeout(show, 1500);   // (Safari has no prompt: the bar a moment after the page)
   });
 })();
 </script>
