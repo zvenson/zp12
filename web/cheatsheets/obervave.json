@@ -1,0 +1,106 @@
+{
+ "id": "obervave",
+ "name": "OberVave",
+ "version": "1.5",
+ "ref": "v1.5",
+ "manual": "https://github.com/zvenson/obervave#readme",
+ "intro": "One deep 8-voice analog-style polysynth in the spirit of the 1979-84 classics, with arp, chorus, delay, plate reverb and a two-track sequencer: turn PRESETS and play.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {"do": ["tap HOME"], "what": "PERFORM page: CUTOFF, RESO, ENV AMT, RELEASE."},
+    {"do": ["turn SELECT"], "what": "Tempo, on every screen."},
+    {"do": ["turn ALGORITHM"], "what": "Pick track A or B."},
+    {"do": ["tap OCT-"], "what": "Octave down (OCT+ up); both together: back to 0."},
+    {"do": ["hold FX", "tap HOME"], "what": "Lock a held layer open; its button lets it go."}
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {"do": ["turn PRESETS"], "what": "Pick one of 99 programs (1-64 factory sounds)."},
+    {"do": ["tap ARP", "turn KNOB 1"], "what": "Arpeggiator mode; OFF switches it off."},
+    {"do": ["tap ARP", "tap ARP"], "what": "On the ARP page: HOLD latches the arp."},
+    {"do": ["hold SAVE", "tap SEL"], "what": "A new random sound, within useful ranges."}
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {"do": ["tap EDIT"], "what": "OSC 1, OSC 2, OSC MOD, FILTER, FILTER +; tap for next."},
+    {"do": ["tap ENV"], "what": "FILTER ENV; tap again for AMP ENV."},
+    {"do": ["tap LFO"], "what": "LFO, LFO DEST, LFO + pages; tap for next."},
+    {"do": ["GLO twice"], "what": "VOICE page: POLY / DUAL / UNISON / MONO, glide."},
+    {"do": ["tap GLO", "tap GLO", "tap GLO"], "what": "OUTPUT page: VINTAGE voice drift, SPREAD, BEND, VOLUME."}
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {"do": ["tap SEQ"], "what": "Full-screen sequencer; tap again for its next view."},
+    {"do": ["tap PLAY"], "what": "Start / stop the sequencer."},
+    {"do": ["tap REC"], "what": "Playing: record on top. Stopped: armed, first note starts."},
+    {"do": ["hold REC"], "what": "2 seconds: clear the chosen track."},
+    {"do": ["hold SEQ", "white key 1-16"], "what": "Set a step with the last note or chord; again clears."},
+    {"do": ["hold EDIT", "tap OCT-"], "what": "Undo the last sequencer change (OCT+: redo)."},
+    {"do": ["tap SEQ", "turn ALGORITHM", "turn KNOB 1"], "what": "Switch track B on (16 steps)."},
+    {"do": ["hold GLO", "white key 1"], "what": "Mute track A (key 2: B; keys 5 / 6: solo)."},
+    {"do": ["hold SAVE", "white key 1-8"], "what": "Go to pattern 1-8 (playing: at the loop's end)."}
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {"do": ["tap FX"], "what": "CHORUS, DELAY, REVERB pages; tap for next."},
+    {"do": ["hold FX", "turn KNOB 1"], "what": "Chorus mix (KNOB 2 delay, 3 reverb, 4 delay time)."},
+    {"do": ["tap SEQ", "turn KNOB 4"], "what": "TRACKS: track B's own sound's FX SEND."}
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {"do": ["SAVE twice"], "what": "Save the sound in its program slot."},
+    {"do": ["tap SAVE", "turn PRESETS", "tap SAVE"], "what": "Save the sound into another slot."},
+    {"do": ["tap SEQ", "tap SAVE"], "what": "In the sequencer: save the pattern now."},
+    {"do": ["hold SAVE", "black key 1-8"], "what": "Copy this pattern to slot 1-8 (used slot: press twice)."}
+   ]
+  },
+  {
+   "title": "Settings",
+   "rows": [
+    {"do": ["tap GLO"], "what": "GLOBAL: TEMPO, CLICK, MIDI CH, TUNE."},
+    {"do": ["tap GLO", "turn KNOB 2"], "what": "Click: OFF, REC, ON, COUNT-IN."},
+    {"do": ["tap GLO", "turn KNOB 3"], "what": "MIDI channel or OMNI; the next channel plays B's sound."},
+    {"do": ["hold GLO", "white key 16"], "what": "Tap tempo (G5)."}
+   ]
+  }
+ ],
+ "tips": [
+  "An edited sound shows * after its name; turn PRESETS before saving and the edit is gone.",
+  "SAVE arms for 3 seconds (the page shows SAVE?); tap it again in time.",
+  "Track B can play sound A or its own program: choose B with ALGORITHM, then turn PRESETS. The panel then edits B's sound (orange B in the header).",
+  "Patterns save themselves 3 s after a change once the sequencer is stopped.",
+  "Effect mixes belong to each program; the INIT sound starts dry.",
+  "Something wrong after an update? Hold OCT- while powering on: USB rescue screen for reinstalling."
+ ],
+ "checked": [
+  "v1.5 archive, firmware/src/platform.c: FM-1 button / encoder enums (BTN_SEL = the SEL button; on SMK-37 SCALE).",
+  "obervave.c app_main: layer buttons SEQ EDIT GLO SAVE FX (tap < 600 ms untouched = pages, hold = layer); HOME = PERFORM, with a held layer = lock, again = unlock; ENV cycle_page(PG_FENV,2), LFO cycle_page(PG_LFO,3), EDIT cycle_page(PG_OSC1,5), FX cycle_page(PG_CHORUS,3), GLO GLOBAL -> VOICE -> OUTPUT.",
+  "obv_params.h PAGE table: PERFORM CUTOFF RESO ENV AMT RELEASE(amp); VOICE MODE VOICES DETUNE GLIDE; OUTPUT VINTAGE SPREAD BEND VOLUME; ARP K1 = ARP mode (OFF default); NPROG 99, NFACT 64; FX mix defaults 0.",
+  "obervave.c: ARP on PG_ARP toggles hold bit; OCT range -2..+2, both = 0; SELECT = tempo 40-240 always; ALGORITHM = seq_trk A/B; PRESETS = program, save slot when save_armed, B's sound when track B chosen, pattern in sequencer except TRACKS view.",
+  "obervave.c: PLAY start/stop; REC acts on release < 700 ms (playing -> REC_ON, stopped -> REC_READY), held > 2000 ms clears seq_trk; EDIT + OCT-/OCT+ swaps undo_pat (pattern only).",
+  "obervave.c keys_in / seq_key_down / seq_key_up: SEQ layer white keys = steps (empty -> set with pen chord, set + released untouched -> cleared); EDIT layer erase_note; GLO glo_key KEY_STEP 0/1 mute, 4/5 solo, 15 (G5) tap tempo; SAVE layer white 1-8 pat_go, black 1-8 pat_copy (used slot: again within 3 s).",
+  "obervave.c SAVE tap: in sequencer pat_save_to; else save_armed (3 s, PRESETS picks slot, header SAVE?) then prog_put; SAVE held + BTN_SEL = randomize().",
+  "obervave.c seq_view_turn: a track with length 0 gets 16 steps from KNOB 1 on any view; TRACKS K2 LEVEL, K3 CUTOFF, K4 FX SEND (B_DRY, only with B's own sound). FX layer knobs P_CHO_MIX, P_DLY_MIX, P_REV_MIX, P_DLY_TIME.",
+  "obervave.c GLOBAL page knobs: TEMPO, CLICK (OFF REC ON COUNT-IN), MIDI CH (0 = OMNI), TUNE; midi_in: channel+1 = track B's own sound.",
+  "obervave.c line ~1903: pattern autosave 3 s after edit while stopped; load_program overwrites live (edits lost).",
+  "platform.c 451 + bootguard.h bootguard_manual: OCT- alone at power-on -> recovery_main (USB RESCUE screen, audio off)."
+ ],
+ "unsure": [
+  "README says 'SAVE held + SELECT pressed' for the random sound; the code reads BTN_SEL, which on the FM-1 is the SEL button (platform.c enum), so the sheet says SEL. Not tried on hardware.",
+  "README program table still says 32 programs; code at v1.5 has 99 (64 factory). Sheet follows the code.",
+  "Step views (STEPS / STEP+ / TRACK / PATTERNS knobs), SEQ black keys = step pages, held-step knobs, long notes, EDIT layer SHIFT / LENGTH / TRANSPOSE: verified but left out as too detailed.",
+  "MIDI CC map (74 cutoff, 71 reso, from CC 20 up in table order) and MIDI clock follow: from README/params table, not given a section."
+ ]
+}

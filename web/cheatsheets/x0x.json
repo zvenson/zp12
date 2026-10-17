@@ -1,0 +1,96 @@
+{
+  "id": "x0x",
+  "name": "X0X",
+  "version": "1.1.0",
+  "ref": "v1.1.0",
+  "manual": "https://charlesvestal.github.io/fm1-x0x/manual/",
+  "intro": "A groovebox with a 909, an 808, two 303s and a break player. It starts with empty patterns, so add some steps before you press PLAY.",
+  "sections": [
+    { "title": "Getting around",
+      "rows": [
+        { "do": ["turn ALGORITHM"], "what": "Pick the part: 909, 808, 303A, 303B or BREAK." },
+        { "do": ["tap EDIT"], "what": "The part's sound. Tap again for the next page." },
+        { "do": ["tap SEQ"], "what": "The part's steps: length, rate and more." },
+        { "do": ["tap HOME"], "what": "Patterns and mutes for all five parts. Tap again for the song." },
+        { "do": ["turn SELECT"], "what": "Previous or next page. In a list, moves up and down." },
+        { "do": ["tap SEL"], "what": "This screen as a list, including the extra settings." },
+        { "do": ["hold HOME", "tap REC"], "what": "Undo. Use HOME + PLAY to redo." }
+      ] },
+    { "title": "Playing",
+      "rows": [
+        { "do": ["tap PLAY"], "what": "Start or stop." },
+        { "do": ["black key 1-11"], "what": "909/808: pick a drum track (you hear it while stopped)." },
+        { "do": ["white key 1-16"], "what": "Turn the selected track's step on or off." },
+        { "do": ["hold ENV", "white key 1-16"], "what": "Accent that step." },
+        { "do": ["tap OCT+"], "what": "Next 16 steps (up to 64). OCT- goes back." },
+        { "do": ["hold HOME", "black key 1-11"], "what": "909/808: mute or unmute that drum track." },
+        { "do": ["tap REC"], "what": "Record drum hits and knob moves live. On a 303, the keys become a keyboard." },
+        { "do": ["hold black key 1-8"], "what": "BREAK: play that slice yourself." },
+        { "do": ["hold black key 9-11"], "what": "BREAK: reverse, half speed, stutter." }
+      ] },
+    { "title": "Sound",
+      "rows": [
+        { "do": ["turn KNOB 1-4"], "what": "Change the four values shown at the bottom of the screen." },
+        { "do": ["hold ENV", "turn KNOB 1-4"], "what": "Set that knob back to its default." },
+        { "do": ["tap ARP", "tap OCT+"], "what": "303: TB-3PO writes a new line. OCT- mutates it." },
+        { "do": ["tap EDIT", "turn KNOB 1"], "what": "303: filter cutoff (KNOB 2 sets resonance)." },
+        { "do": ["tap LFO"], "what": "Mixer: PARTS, 909 MIX, 808 MIX, MASTER (tap again for next)." },
+        { "do": ["tap FX"], "what": "Reverb and delay. Tap again for the next page." },
+        { "do": ["hold white key 1-16", "turn KNOB 1-4"], "what": "On EDIT: that step gets its own value (p-lock)." },
+        { "do": ["hold white key 1-16", "turn SELECT"], "what": "The chance that step plays." }
+      ] },
+    { "title": "Sequencer / patterns",
+      "rows": [
+        { "do": ["white key 1-16"], "what": "On HOME: pick a pattern for all five parts (at bar end)." },
+        { "do": ["hold HOME", "white key 1-16"], "what": "Pick a pattern from any screen." },
+        { "do": ["turn PRESETS"], "what": "Next pattern: this part only, or all five on HOME." },
+        { "do": ["black key 1-5"], "what": "On HOME: mute or unmute a whole part." },
+        { "do": ["hold HOME", "turn SELECT"], "what": "Set the tempo." },
+        { "do": ["hold SAVE", "white key 1-16"], "what": "Copy the current pattern onto that one." },
+        { "do": ["hold SAVE", "tap REC"], "what": "Clear the selected part in this pattern (asks first)." },
+        { "do": ["HOME twice", "white key 1-16"], "what": "Song: put that pattern in the next bar." }
+      ] },
+    { "title": "Saving & loading",
+      "rows": [
+        { "do": ["tap SAVE"], "what": "Save everything. While playing, it saves when you stop." },
+        { "do": ["hold SAVE", "turn KNOB 1-4"], "what": "Delete that knob's recorded motion." },
+        { "do": ["tap GLO"], "what": "Settings: autosave, clear pattern, factory reset, MIDI." }
+      ] },
+    { "title": "Recovery",
+      "rows": [
+        { "do": ["hold OCT-", "hold OCT+"], "what": "After 5 seconds: update mode. Let go early to cancel." },
+        { "do": ["hold OCT-", "hold OCT+", "power on"], "what": "Calibrate the buttons and knobs." },
+        { "do": ["tap PLAY"], "what": "In SAFE MODE: try starting X0X normally again." }
+      ] }
+  ],
+  "keys": [
+    { "keys": "white", "label": "Steps 1-16 (OCT+ for 17-64); HOME: patterns", "color": "#42f5f5" },
+    { "keys": "black", "label": "Drum tracks BD SD LT MT HT RS CP CH OH CR RD; HOME: mute parts 1-5", "color": "#ff9628" }
+  ],
+  "tips": [
+    "Quick beat: black key 1 (kick), then white keys 1, 5, 9, 13, then PLAY.",
+    "Hold any button for a second on its own: a card explains what it does here.",
+    "With the pattern stopped, X0X autosaves 4 seconds after your last change.",
+    "The factory mix pumps hard. For a clean mix, set COMP and PUMP to 0 on LFO > MASTER.",
+    "While a pattern plays, picking a drum is silent so you don't add stray hits."
+  ],
+  "checked": [
+    "Archive x0x-1.1.0.tar.gz from thefirmwarehub.com/src (catalog mirror), folder fm1-x0x-1.1.0.",
+    "Button/encoder labels: firmware/src/app/panel.c B_NAME/E_NAME, plat.h enums.",
+    "Key layout: ui.c KEY_WHITE/KEY_BLACK (16 white, 11 black, index 0 = F3).",
+    "Button taps: ui.c button_tap() (EDIT/SEQ/ARP/FX/LFO cycle pages; HOME toggles HOME/SONG; HOME+REC undo, HOME+PLAY redo; SAVE+REC clear part; SAVE+OCT copy bank; OCT on steps/HOME/TB-3PO/keyboard).",
+    "Encoders: ui.c input(): SELECT pages / list / HOME+SELECT tempo / held step = probability (prob_turn); ALGORITHM part; PRESETS part or all five; knobs: p-lock on held step, SAVE+knob forget motion, ENV+knob default.",
+    "Keys: ui.c key_event(), drum_key() (silent while playing unless KEY SOUND or REC), drum_step() (ENV+white = accent), bass_kbd(), bass_step_key(); HOME white = pattern/chain, black 1-5 = mute part; HOME+black on drum screen = mute track; SAVE+white = paste.",
+    "Break live keys: dsp/breaks.c perf_sync(): keys 0-7 slices, 8 reverse, 9 half, 10 stutter.",
+    "303 TONE page = CUTOFF, RESO, ENVMOD, DECAY: ui.c build_pages(); mixer pages PARTS, 909 MIX, 808 MIX, MASTER (DRIVE, COMP, PUMP, FILTER).",
+    "Start state: ui_init() view V_PART part 909; project.c project_defaults() + seq/pattern.c pattern_init(): all patterns empty, break steps off, 125 BPM.",
+    "Save: ui.c save_project() (SAVES WHEN STOPPED), autosave() 4000 ms quiet, stopped only.",
+    "Recovery: main_fm1.c OCT-+OCT+ 5 s update mode with countdown/cancel, OCT-+OCT+ at power-on panel_setup(), safe_main() PLAY restarts.",
+    "Help cards: ui.c help_tick()/help_lines() (hold a single button)."
+  ],
+  "unsure": [
+    "README says it should make noise the moment you press PLAY, but the code starts with every pattern empty (pattern_init). The sheet follows the code and the manual.",
+    "SONG screen's SEL list (LENGTH, INSERT BAR, DELETE BAR, CLEAR SONG) and song recording (REC + PLAY on SONG) are only partly checked, so they are left out.",
+    "MIDI default channels (909 ch10, 808 ch11, 303A ch2, 303B ch3, break ch4) and USB audio were not checked in code, so there is no MIDI section."
+  ]
+}

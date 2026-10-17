@@ -1,0 +1,397 @@
+{
+ "id": "sloop",
+ "name": "SLOOP",
+ "version": "2.7.1",
+ "ref": "v2.7.1",
+ "manual": "https://github.com/isod89/sloop-fm1/blob/main/GUIDE.md",
+ "intro": "A live four-track groovebox (three synths and drums): ALGORITHM picks the track, the keys play it, REC records it.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {
+     "do": [
+      "tap HOME"
+     ],
+     "what": "Back to the TRACKS screen."
+    },
+    {
+     "do": [
+      "turn ALGORITHM"
+     ],
+     "what": "Pick the track: 1-3 synths, 4 drums."
+    },
+    {
+     "do": [
+      "turn SELECT"
+     ],
+     "what": "Tempo on TRACKS; on other screens, the next page."
+    },
+    {
+     "do": [
+      "tap LFO"
+     ],
+     "what": "LFO pages; tap again for the next page."
+    },
+    {
+     "do": [
+      "hold FX",
+      "tap HOME"
+     ],
+     "what": "Lock a held layer open; any other button closes it."
+    },
+    {
+     "do": [
+      "hold HOME"
+     ],
+     "what": "Settings menu; OCT- closes it."
+    },
+    {
+     "do": [
+      "tap HOME",
+      "tap HOME"
+     ],
+     "what": "On TRACKS: full-screen visualiser; HOME again closes it."
+    }
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {
+     "do": [
+      "turn PRESETS"
+     ],
+     "what": "Change the track's sound, or the drum kit on track 4."
+    },
+    {
+     "do": [
+      "tap OCT-"
+     ],
+     "what": "Octave down; both OCT buttons together: back to 0."
+    },
+    {
+     "do": [
+      "hold OCT-",
+      "white key 1-16"
+     ],
+     "what": "Drum track: ghost hit (OCT+: hard hit)."
+    },
+    {
+     "do": [
+      "hold SEL",
+      "white key 1-16"
+     ],
+     "what": "Set the song's key for all synths."
+    },
+    {
+     "do": [
+      "hold SEL",
+      "turn KNOB 1"
+     ],
+     "what": "One-key chords: TRIAD, 7TH, 9TH, SUS4, POWER."
+    },
+    {
+     "do": [
+      "hold ARP",
+      "white key 1-16"
+     ],
+     "what": "Note repeat / drum roll; KNOB 1 sets its rate."
+    },
+    {
+     "do": [
+      "tap ARP",
+      "turn KNOB 1"
+     ],
+     "what": "Arpeggiator mode (OFF turns it off)."
+    }
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {
+     "do": [
+      "tap PLAY"
+     ],
+     "what": "Start / stop all four tracks."
+    },
+    {
+     "do": [
+      "tap REC"
+     ],
+     "what": "Playing: record now, on top. Stopped: arm, first note starts."
+    },
+    {
+     "do": [
+      "tap REC"
+     ],
+     "what": "Empty song: play freely, REC on the next 1 closes the loop."
+    },
+    {
+     "do": [
+      "hold REC"
+     ],
+     "what": "Hold 2 seconds: clear the selected track."
+    },
+    {
+     "do": [
+      "hold EDIT",
+      "tap OCT-"
+     ],
+     "what": "Undo (OCT+: redo)."
+    },
+    {
+     "do": [
+      "hold SEQ",
+      "white key 1-16"
+     ],
+     "what": "Set or clear steps 1-16."
+    },
+    {
+     "do": [
+      "hold SEQ",
+      "turn KNOB 4"
+     ],
+     "what": "Pattern length (KNOB 2 step size, KNOB 3 swing)."
+    },
+    {
+     "do": [
+      "hold EDIT",
+      "white key 1-16"
+     ],
+     "what": "Erase that note or drum sound from the loop."
+    },
+    {
+     "do": [
+      "hold GLO",
+      "white key 1-4"
+     ],
+     "what": "Mute tracks 1-4 (keys 5-8: solo)."
+    },
+    {
+     "do": [
+      "hold GLO",
+      "white key 16"
+     ],
+     "what": "Tap tempo."
+    }
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {
+     "do": [
+      "turn KNOB 2"
+     ],
+     "what": "On TRACKS: level of the selected track."
+    },
+    {
+     "do": [
+      "turn KNOB 1"
+     ],
+     "what": "On TRACKS: swing (KNOB 3 length, KNOB 4 pan)."
+    },
+    {
+     "do": [
+      "tap EDIT"
+     ],
+     "what": "Synth track: the engine's sound pages."
+    },
+    {
+     "do": [
+      "tap ENV"
+     ],
+     "what": "Envelope: attack, decay, sustain, release on KNOB 1-4."
+    },
+    {
+     "do": [
+      "hold GLO",
+      "turn KNOB 1"
+     ],
+     "what": "Level of track 1 (KNOB 2-4: tracks 2-4)."
+    }
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {
+     "do": [
+      "hold FX",
+      "white key 1-16"
+     ],
+     "what": "Punch-in effect while held (loops, stutter, reverse...)."
+    },
+    {
+     "do": [
+      "hold FX",
+      "black key 1-11"
+     ],
+     "what": "More punch-ins: kills, rewind, freeze, fade out..."
+    },
+    {
+     "do": [
+      "hold FX",
+      "turn KNOB 1"
+     ],
+     "what": "Master DJ filter (KNOB 2 dust, KNOB 3 duck)."
+    },
+    {
+     "do": [
+      "hold FX",
+      "turn KNOB 4"
+     ],
+     "what": "Filter of the selected track."
+    },
+    {
+     "do": [
+      "tap FX"
+     ],
+     "what": "Track sends: drive, chorus, delay, reverb."
+    }
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {
+     "do": [
+      "hold SAVE",
+      "white key 5-8"
+     ],
+     "what": "Save the loop as section A-D (used: press twice)."
+    },
+    {
+     "do": [
+      "hold SAVE",
+      "white key 1-4"
+     ],
+     "what": "Play section A-D (on the next bar if playing)."
+    },
+    {
+     "do": [
+      "tap SAVE"
+     ],
+     "what": "On TRACKS: song screen; elsewhere: presets and section pages."
+    }
+   ]
+  },
+  {
+   "title": "Recovery",
+   "rows": [
+    {
+     "do": [
+      "hold OCT-",
+      "power on"
+     ],
+     "what": "USB rescue mode: reinstall from the web installer."
+    },
+    {
+     "do": [
+      "hold OCT-",
+      "hold OCT+",
+      "power on"
+     ],
+     "what": "Hardware calibration: teach each button and knob."
+    }
+   ]
+  }
+ ],
+ "keys": [
+  {
+   "keys": [
+    0,
+    2
+   ],
+   "label": "Drums: kicks",
+   "color": "#ff8a3d"
+  },
+  {
+   "keys": [
+    4,
+    6
+   ],
+   "label": "Drums: snare, clap",
+   "color": "#ffb13d"
+  },
+  {
+   "keys": [
+    7,
+    9,
+    11
+   ],
+   "label": "Drums: hats, pedal hat",
+   "color": "#ffd23d"
+  },
+  {
+   "keys": [
+    12,
+    14
+   ],
+   "label": "Drums: rim, snare 2",
+   "color": "#ffb13d"
+  },
+  {
+   "keys": [
+    16,
+    17
+   ],
+   "label": "Drums: toms",
+   "color": "#ff8a3d"
+  },
+  {
+   "keys": [
+    19,
+    21
+   ],
+   "label": "Drums: crash, ride",
+   "color": "#ffd23d"
+  },
+  {
+   "keys": [
+    23,
+    24,
+    26
+   ],
+   "label": "Drums: shaker, conga, cowbell",
+   "color": "#ff8a3d"
+  },
+  {
+   "keys": "black",
+   "label": "Drums: same sound as white key to the left",
+   "color": "#8a8a8a"
+  }
+ ],
+ "tips": [
+  "Keys play notes on tracks 1-3; on track 4 (drums) the white keys are 16 drum sounds.",
+  "Every function button is a layer: hold it and the keys and knobs change job.",
+  "Autosave: stop and leave it 2.5 s; it comes back as you left it at power-on.",
+  "A short tap of FX, SEL, EDIT, GLO, ARP, SEQ or SAVE opens its pages instead.",
+  "The REC screen (REC while stopped): KNOB 1 free / tempo, KNOB 2 bars, KNOB 3 count-in.",
+  "Everything is played live: there are no factory patterns."
+ ],
+ "checked": [
+  "panel.c: printed labels FX SEL ENV LFO EDIT GLO HOME SAVE ARP SEQ PLAY REC OCT- OCT+, encoders SELECT ALGORITHM PRESETS KNOB 1-4.",
+  "main.c: OCT- + OCT+ held at power-on -> panel_setup (HARDWARE CALIBRATION); bootguard.h bootguard_manual: OCT- alone -> recovery.c SLOOP USB RESCUE.",
+  "ui_input.c ui_input: HOME tap -> go_home (TRACKS, FELUCCA_ARRANGER=1 in felucca.c) or visualiser when already on TRACKS; HOME hold 0.7 s -> menu; ALGORITHM -> track_select; PRESETS -> preset / drum kit on TRACKS and PRESETS page; SELECT -> page_walk else BPM; OCT-/OCT+ octave -3..+3, both = 0, not on drum track; PLAY transport; ENV/LFO open_family.",
+  "ui_input.c tracks_edit: TRACKS KNOB 1 SWING, 2 LEVEL, 3 LEN, 4 PAN.",
+  "ui_input.c holds_input: REC press = rec_toggle, hold 0.7 s + HOLD_CLEAR_MS 1.3 s (ui_layers.c) clears the selected track.",
+  "seq.c rec comment block: playing = record at once/overdub; stopped = arm, first note starts; empty project = free take closed by REC on the downbeat.",
+  "ui_input.c layers_input: layer held + HOME tap = lock, other buttons unlock; EDIT + OCT-/OCT+ undo/redo; tap (<450 ms, untouched) -> layer_tap pages; SAVE tap on TRACKS -> SONG screen.",
+  "ui_layers.c layer_key: SEQ white keys toggle steps (step_down/step_up); SEL key -> P_ROOT of all synth parts; GLO keys 1-4 mute, 5-8 solo, 9 fill, 10 fill next bar, 16 tap_tempo; SAVE keys 1-4 play/load A-D, 5-8 store (again within 3 s if used).",
+  "ui_layers.c layer_knobs: FX K1 G_FILT, K2 DUST, K3 DUCK, K4 track filter; ARP K1 roll rate; SEQ K2 DIV, K3 SWING, K4 LEN; SEL K1 CHORD (N_CHORD OFF TRIAD 7TH 9TH SUS4 POWER); GLO K1-4 track levels.",
+  "seq.c key_down: FX layer -> punch_fx_of_key (white 0-15, black 16-26, PUNCH_NAME in punch.c), released on key_up; EDIT layer -> erase; ARP layer -> roll_start; drum track lane_of_key (drums.c: black = white key to its left), key_lvl OCT- ghost / OCT+ hard.",
+  "drums.c LANE_NAME order KICK, KICK 2, SNARE, CLAP, HAT, OPEN HAT, PEDAL, RIM, SNARE 2, LOW TOM, HI TOM, CRASH, RIDE, SHAKER, CONGA, COWBELL -> key indices of white keys.",
+  "params.c PAGES: ENV = ATK DEC SUS REL; FX = DIST CHOR DLY REV; ARP K1 = P_AMODE (N_AMODE starts with OFF).",
+  "project.c AUTOSAVE_IDLE 2500 ms, only when audio quiet; autosave_resume at power-on (main.c).",
+  "ui_menu.c menu_input: OCT- closes the menu."
+ ],
+ "unsure": [
+  "Which drum kit loads by default: drums.c says DRUM_DEFAULT_KIT DRUM_SAMPLED with comment '808' - not resolved, so not named.",
+  "Menu item list (COLOR, LIGHTS, USB AUDIO, 2ND CORE...) taken from README only, not listed in a row.",
+  "SEQ + black keys 1-4 = step pages 1-4 and SEQ + held step knobs (locks, nudge, ratchet, fill conditions): verified in code but left out as too advanced.",
+  "MIDI (channels 1-3 synths, 10 drums, GLO MIDI pages) not verified in detail; no MIDI section."
+ ]
+}

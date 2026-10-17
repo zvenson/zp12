@@ -1,0 +1,135 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only  (C) 2026 Sven Trogus
+     A firmware's cheat sheet (thefirmwarehub.com/cs/<id>/): from web/cheatsheets/<id>.json, checked against the firmware's
+     source at one release; tools/make_fm1.py writes one page per sheet. ?embed: without nav and footer (the hub's pop-up). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__NAME__ cheat sheet: the M-VAVE FM-1 firmware's controls – The Firmware Hub</title>
+<meta name="description" content="__NAME__ on the M-VAVE FM-1 at a glance: getting around, playing, sound, saving and more, for __NAME__ __VERSION__.">
+<meta name="author" content="zvenson">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thefirmwarehub.com/cs/__ID__/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Firmware Hub">
+<meta property="og:url" content="https://thefirmwarehub.com/cs/__ID__/">
+<meta property="og:title" content="__NAME__ cheat sheet – The Firmware Hub">
+<meta property="og:description" content="The controls of __NAME__ on the M-VAVE FM-1 on one page.">
+<meta property="og:image" content="https://thefirmwarehub.com/og.png">
+<meta name="theme-color" content="#151213">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23151213'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='15' text-anchor='middle' fill='%2342f5f5'%3EFH%3C/text%3E%3C/svg%3E">
+<style>
+  /* the hub's look (web/fm1.html): warm dark, cyan / blue / pink / beige; a group's colour on its cards */
+  :root { --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435; --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9;
+          --cyan: #42f5f5; --blue: #afd9f4; --pink: #f4c0cb; --beige: #e6d1b9; --ok: #5fe3a1; --warn: #f2c46d; --smk: #ff6b5e; }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; scroll-padding-top: 80px; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16.5px/1.7 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--cyan); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { margin: 0 auto; padding: 0 clamp(16px, 4vw, 72px); width: 100%; }
+  nav { border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+  .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; } .mark:hover { text-decoration: none; }
+  .mark b { font-weight: 800; color: var(--cyan); }
+  nav .home { font-size: 14px; color: var(--dim); }
+/*VIBEBAR*/
+/*DEVICES*/
+  .strip { display: flex; height: 4px; } .strip i { flex: 1; }
+  .strip i:nth-child(1) { background: var(--cyan); } .strip i:nth-child(2) { background: var(--blue); }
+  .strip i:nth-child(3) { background: var(--pink); } .strip i:nth-child(4) { background: var(--beige); }
+  header { padding: 52px 0 32px;
+           background: radial-gradient(900px 420px at 80% 20%, rgba(66, 245, 245, .10), transparent 70%),
+                       radial-gradient(700px 380px at 5% 100%, rgba(244, 192, 203, .08), transparent 70%); }
+  .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 14px; }
+  h1 { font-size: clamp(38px, 4.6vw, 72px); line-height: 1.05; font-weight: 300; margin: 0 0 18px; letter-spacing: -.5px; }
+  h1 b { font-weight: 800; background: linear-gradient(90deg, var(--cyan), var(--blue) 45%, var(--pink) 75%, var(--beige));
+         -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 18.5px; color: var(--text); max-width: 40em; margin: 0; }
+  .jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 0; }
+  .jump a { padding: 8px 14px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--text); font-weight: 600; font-size: 14px; }
+  .jump a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--beige); color: var(--fg); }
+  main { padding: 8px 0 64px; }
+  /* the embedded view (the hub's pop-up): just the sheet */
+  html.embed a.vibe, html.embed nav.top, html.embed .strip, html.embed footer, html.embed .page-only { display: none !important; }
+  html.embed header { padding: 26px 0 18px; } html.embed main { padding-bottom: 28px; }
+  /* one look for every sheet: the hub's mark top right, the firmware's colour (its card's) as the band, name, frames */
+  header { border-top: 6px solid var(--c); } header > .wrap { position: relative; }
+  .brand { position: absolute; top: -24px; right: clamp(16px, 4vw, 72px); display: flex; align-items: center; gap: 10px;
+           color: var(--fg); font-weight: 700; font-size: 15px; letter-spacing: .2px; }
+  .brand img { width: 38px; height: 38px; filter: brightness(1.45) saturate(1.1); }   /* (the lila signet, lighter on the dark page; as it is in print) */ .brand:hover { text-decoration: none; color: var(--c); }
+  html.embed .brand { top: -6px; }
+  .eyebrow { color: var(--c); }
+  .cshead { display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 26px; align-items: center; padding-right: 220px; }
+  .cshead img { width: 132px; height: 132px; border-radius: 16px; border: 2px solid var(--c); background: #000; image-rendering: pixelated; object-fit: contain; }
+  .cshead h1 { font-size: clamp(32px, 3.6vw, 52px); margin: 0 0 8px; }
+  .cshead h1 b { background: none; -webkit-background-clip: initial; background-clip: initial; color: var(--c); }
+  .ver { color: var(--dim); font-size: 14.5px; margin: 0 0 8px; }
+  .ver .old { color: var(--warn); font-weight: 600; }
+  .acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .acts a { padding: 8px 14px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--text); font-weight: 600; font-size: 14px; }
+  .acts a.go { background: var(--c); color: #121011; box-shadow: none; }
+  .acts a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--beige); }
+  .acts a.go:hover { filter: brightness(1.08); }
+  .kb { margin: 6px 0 26px; }
+  .kb svg { width: 100%; max-width: 760px; height: auto; display: block; }
+  .kb .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 10px; font-size: 14px; color: var(--text); }
+  .kb .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 7px; vertical-align: -1px; }
+  .secs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 18px; }
+  .sec { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 14px; padding: 16px 18px 12px; min-width: 0; }
+  .sec h2 { font-size: 15px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--c); margin: 0 0 10px; }
+  .sec dl { margin: 0; display: grid; grid-template-columns: fit-content(46%) minmax(0, 1fr); gap: 8px 14px; align-items: baseline; }
+  .sec dt { font-size: 13px; line-height: 2.1; } .sec dd { margin: 0; font-size: 15px; line-height: 1.5; color: var(--text); }
+  kbd { display: inline-block; font: 700 12px/1 "Inter", Arial, sans-serif; letter-spacing: .4px; padding: 5px 7px 4px; border-radius: 6px;
+        background: var(--panel2); color: var(--fg); box-shadow: inset 0 0 0 1px #4a4344, 0 2px 0 #0c0a0b; white-space: nowrap; }
+  .sec dt small { color: var(--dim); font-size: 12px; margin-right: 3px; } .sec dt .plus { color: var(--dim); margin: 0 4px; }
+  @media (max-width: 520px) { .sec dl { grid-template-columns: 1fr; gap: 2px; } .sec dd { margin-bottom: 9px; } .sec dt { white-space: normal; } }
+  .tips { margin: 22px 0 0; padding: 16px 20px; border-radius: 14px; background: rgba(66, 245, 245, .05); border: 1px solid var(--line); }
+  .tips h2 { font-size: 15px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--beige); margin: 0 0 6px; }
+  .tips ul { margin: 0; padding-left: 20px; color: var(--text); } .tips li { margin: 4px 0; }
+  .fine { margin: 22px 0 0; color: var(--dim); font-size: 13.5px; max-width: 60em; }
+  @media (max-width: 900px) { .brand { position: static; margin: -20px 0 18px; } html.embed .brand { margin-top: 0; } .cshead { padding-right: 0; } }
+  @media (max-width: 640px) { nav .home { display: none; } .lead { font-size: 17px; } .cshead { align-items: start; } }
+  @media (max-width: 560px) { .cshead { grid-template-columns: 84px minmax(0, 1fr); gap: 16px; } .cshead img { width: 84px; height: 84px; } }
+  @media print { html, body { background: #fff !important; color: #000; } a.vibe, nav, .strip, footer, .acts, .page-only { display: none !important; }
+                 .sec, .tips { background: #fff; border-color: #bbb; break-inside: avoid; } .sec dd, .tips ul { color: #222; } kbd { background: #eee; color: #000; box-shadow: inset 0 0 0 1px #999; }
+                 header { background: none; padding: 0 0 10px; border-top: 6px solid var(--c); } .brand { color: #000; top: 4px; } .brand img { filter: none; }
+                 .cshead h1, .cshead h1 b, .lead, .ver, .kb .legend, .tips li, .fine { color: #111 !important; } .sec h2 { color: #111; }
+                 .sec { border-top: 3px solid var(--c); } * { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+/*FOOTER*/
+</style>
+<script>if (/[?&]embed\b/.test(location.search) || window.top !== window) document.documentElement.classList.add("embed");</script>
+</head>
+<body>
+<!--VIBEBAR-->
+<nav><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
+<!--DEVICES-->
+  <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
+<div class="strip"><i></i><i></i><i></i><i></i></div>
+
+<header style="--c: __COLOR__"><div class="wrap">
+  <a class="brand" href="https://thefirmwarehub.com/" target="_top" title="The Firmware Hub: every FM-1 firmware, one click"><img src="/img/signet-lila.svg" alt="" width="38" height="38"><span>thefirmwarehub.com</span></a>
+  <div class="cshead"><img src="/img/__ID__.png" alt="__NAME__ on the FM-1's screen" width="132" height="132">
+  <div><p class="eyebrow page-only">The Firmware Hub · Cheat sheet</p>
+  <h1><b>__NAME__</b> at a glance</h1>
+  <p class="ver" id="ver" data-v="__VERSION__">For __NAME__ __VERSION__ · checked against its source</p>
+  <p class="lead">__INTRO__</p></div></div>
+  <div class="acts"><a class="go page-only" href="/#fw-__ID__">Install __NAME__</a><a href="__MANUAL__" target="_blank" rel="nofollow noopener">The full manual ↗</a><a href="javascript:print()" class="page-only">Print</a></div>
+</div></header>
+
+<main style="--c: __COLOR__"><div class="wrap">
+<!--CS-BODY-->
+<p class="fine">A community cheat sheet by the hub, not by the firmware's makers: when in doubt, their manual is right.</p>
+</div></main>
+
+<!--FOOTER-->
+<script>
+// a newer release than the sheet's: say so (the hub's catalogue, the same as the cards')
+fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.json()).then((c) => {
+  const f = c.firmwares.find((x) => x.id === "__ID__"), v = document.getElementById("ver");
+  if (f && f.version && f.version !== v.dataset.v)
+    v.insertAdjacentHTML("beforeend", ` · <span class="old">${f.name} is now ${f.version.replace(/[<&]/g, "")}: some controls may have changed</span>`);
+}).catch(() => {});
+</script>
+</body>
+</html>

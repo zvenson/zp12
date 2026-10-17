@@ -293,6 +293,17 @@
     .lineup { --t: 68px; gap: 6px; } .lineup .lt { gap: 6px; } .lineup img { border-radius: 8px; } .fw .shot { margin: 0 -22px 8px; --h: 220px; }
     .faq .qas { grid-template-columns: 1fr; } .status { font-size: 13px; } .warn { padding: 16px 18px; font-size: 14.5px; }
     .eyebrow, h2.sec { letter-spacing: 1.5px; font-size: 12px; } nav .home { display: none; } }
+  /* a firmware's cheat sheet in a pop-up (its page /cs/<id>/ in a frame) */
+  dialog.csdlg { width: min(1120px, calc(100vw - 24px)); height: min(90vh, 960px); padding: 0; border: 1px solid var(--line); border-radius: 16px;
+                 background: var(--bg); color: var(--fg); overflow: hidden; display: none; flex-direction: column; }
+  dialog.csdlg[open] { display: flex; }
+  dialog.csdlg::backdrop { background: rgba(0, 0, 0, .7); backdrop-filter: blur(3px); }
+  dialog.csdlg .bar { display: flex; align-items: center; justify-content: flex-end; gap: 14px; padding: 6px 8px 6px 16px; border-bottom: 1px solid var(--line); }
+  dialog.csdlg .full { font-size: 14px; color: var(--dim); } dialog.csdlg form { margin: 0; }
+  dialog.csdlg .x { width: 38px; height: 38px; padding: 0; border-radius: 50%; background: transparent; color: var(--dim); font: 26px/1 Arial, sans-serif; box-shadow: none; }
+  dialog.csdlg .x:hover { color: var(--fg); background: var(--panel2); transform: none; }
+  dialog.csdlg iframe { flex: 1; width: 100%; border: 0; background: var(--bg); }
+  @media (max-width: 560px) { dialog.csdlg { width: 100vw; height: 100dvh; max-width: none; max-height: none; border-radius: 0; border: 0; } }
 </style>
 </head>
 <body>
@@ -590,6 +601,26 @@ function opts() {
 const applyView = () => $("grid").classList.toggle("list", view === "list");
 // each card picture's fingerprint (tools/make_fm1.py): a new picture gets a new address, so no cache shows the old one
 const IMGV = /*IMGV*/{}, iv = (id) => IMGV[id] ? "?v=" + IMGV[id] : "";
+// the cheat sheets (web/cheatsheets/<id>.json -> /cs/<id>/, make_fm1 puts in {id: version}): a card's "⌨ Cheat sheet" opens
+// its page in a pop-up (?embed: without nav and footer); a click with a modifier key opens the page itself
+const CS = /*CS*/{};
+document.addEventListener("click", (e) => {
+  const a = e.target.closest?.("a.csl");
+  if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.button) return;
+  e.preventDefault();
+  let d = document.getElementById("csdlg");
+  if (!d) {
+    document.body.insertAdjacentHTML("beforeend", '<dialog class="csdlg" id="csdlg" aria-label="Cheat sheet"><div class="bar"><a class="full" target="_blank" rel="noopener">Open as a page ↗</a>'
+      + '<form method="dialog"><button class="x" aria-label="Close">×</button></form></div><iframe title="Cheat sheet"></iframe></dialog>');
+    d = document.getElementById("csdlg");
+    d.addEventListener("click", (ev) => { if (ev.target === d) d.close(); });          // (a click on the backdrop)
+    d.addEventListener("close", () => { d.querySelector("iframe").src = "about:blank"; });
+  }
+  d.querySelector("iframe").src = a.getAttribute("href") + "?embed";
+  d.querySelector(".full").href = a.getAttribute("href");
+  d.showModal();
+  const f = cat.find((x) => x.id === a.dataset.cs); ev("Cheat sheet", f ? f.name : a.dataset.cs);
+});
 const WIDE = new Set(["felucca", "salt", "melodee", "hortator", "ghoulbox", "waveloop", "skiff", "duell", "felucca8", "obervave"]);                  // (a landscape picture, not a square screen)   // (designburgapps.com's palette)
 const LOGO = { sloop: "img/sloop-icon.png", dinghy: "img/dinghy-icon.png" };
 // Baud Girl: a link card, not in the catalogue (not open source, no stars to sort by): in the second row all the same
@@ -641,7 +672,7 @@ function render() {
       <div class="meta">${f.installs ? `<span class="inst" title="Installed from this page only: installs from the author's own installer or from GitHub are not counted, nor visitors who opt out of statistics">↓ ${f.installs.toLocaleString("en")} installs via the hub</span> · ` : ""}${f.added ? `<span class="added" title="On the hub since ${esc(f.added)}">added ${day(f.added)}</span> · ` : ""}<span title="Released ${esc(f.date)}">released ${day(f.date)}</span> · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
         <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}${buildInMeta(f) ? ` · <a href="${build(f)}" target="_blank" rel="noopener">build on it ↗</a>` : ""}</div>
-      <div class="links">${tryIt(f)}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${build(f) && !buildInMeta(f) ? `<a href="${build(f)}" target="_blank" rel="noopener">⚓ Build on it</a>` : ""}</div>
+      <div class="links">${tryIt(f)}${CS[f.id] ? `<a href="/cs/${esc(f.id)}/" class="csl" data-cs="${esc(f.id)}">⌨ Cheat sheet</a>` : ""}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${build(f) && !buildInMeta(f) ? `<a href="${build(f)}" target="_blank" rel="noopener">⚓ Build on it</a>` : ""}</div>
       <progress max="100" value="0"></progress>
       <button class="go">${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button>
       <div class="msg"></div>`;

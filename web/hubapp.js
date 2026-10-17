@@ -2,6 +2,7 @@
 // the worker: fm1/sw.js). Android / Chrome / Edge: "Install" (the browser's own prompt); iPhone / iPad: "Add to Home Screen"
 // by hand, and why installing a firmware does not work there (no Web MIDI in any iOS browser).
 (() => {
+  if (window.top !== window) return;                    // (a page inside the hub's pop-up, e.g. a cheat sheet: no bar, no worker)
   const ua = navigator.userAgent;
   const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);   // (an iPad says "Mac")
   const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;

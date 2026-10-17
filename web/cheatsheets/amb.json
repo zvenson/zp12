@@ -1,0 +1,292 @@
+{
+  "id": "amb",
+  "name": "AMB-1",
+  "version": "1.3",
+  "ref": "v1.3",
+  "manual": "https://charlesvestal.github.io/fm1-amb/manual/",
+  "intro": "A generative ambient machine after Eno's Music for Airports: it plays itself from power-on. You don't perform it, you tend it: turn PRESETS for another piece, and press keys to change the scale.",
+  "sections": [
+    {
+      "title": "Getting around",
+      "rows": [
+        {
+          "do": [
+            "turn SELECT"
+          ],
+          "what": "Previous or next page (seven pages)."
+        },
+        {
+          "do": [
+            "turn KNOB 1-4"
+          ],
+          "what": "The four values at the bottom of the screen."
+        },
+        {
+          "do": [
+            "tap HOME"
+          ],
+          "what": "Garden page: tempo, evolve, motion, drift."
+        }
+      ]
+    },
+    {
+      "title": "Playing",
+      "rows": [
+        {
+          "do": [
+            "tap PLAY"
+          ],
+          "what": "Grow or rest. Resting, the sound fades out slowly."
+        },
+        {
+          "do": [
+            "F3 .. G5"
+          ],
+          "what": "Any key: add that note to the scale, or take it out."
+        },
+        {
+          "do": [
+            "turn ALGORITHM"
+          ],
+          "what": "Mode: Ionian, Dorian ... pentatonic major and minor."
+        },
+        {
+          "do": [
+            "tap EDIT"
+          ],
+          "what": "Next chord, at the start of the next bar."
+        },
+        {
+          "do": [
+            "tap REC"
+          ],
+          "what": "Freeze: the chord holds, the reverb rings on. Again: thaw."
+        },
+        {
+          "do": [
+            "tap OCT-"
+          ],
+          "what": "Bells an octave down. OCT+ goes up (two each way)."
+        },
+        {
+          "do": [
+            "hold HOME",
+            "turn SELECT"
+          ],
+          "what": "Set the tempo (30-120), from any page."
+        }
+      ]
+    },
+    {
+      "title": "Sound",
+      "rows": [
+        {
+          "do": [
+            "tap ENV"
+          ],
+          "what": "Pad: level, swell, bright, colour."
+        },
+        {
+          "do": [
+            "tap ENV",
+            "turn KNOB 4"
+          ],
+          "what": "Pad colour: Rhodes or sung voices."
+        },
+        {
+          "do": [
+            "tap ARP"
+          ],
+          "what": "Bells: level, density, tone, octave."
+        },
+        {
+          "do": [
+            "tap LFO"
+          ],
+          "what": "Bass: level, octave, glide, fifth."
+        },
+        {
+          "do": [
+            "tap SEQ"
+          ],
+          "what": "Pulse: level, hits, swing, hats. Hits at 0: no pulse."
+        },
+        {
+          "do": [
+            "tap HOME",
+            "turn KNOB 2"
+          ],
+          "what": "Evolve: how restless. At 0 the loops repeat exactly."
+        },
+        {
+          "do": [
+            "tap HOME",
+            "turn KNOB 3"
+          ],
+          "what": "Motion: how far the slow tide and the echo wander."
+        },
+        {
+          "do": [
+            "tap HOME",
+            "turn KNOB 4"
+          ],
+          "what": "Drift: how long a chord lasts, 20 s to 5 min."
+        }
+      ]
+    },
+    {
+      "title": "Effects",
+      "rows": [
+        {
+          "do": [
+            "tap FX",
+            "turn KNOB 1"
+          ],
+          "what": "Echo: how much goes to the tape echo."
+        },
+        {
+          "do": [
+            "tap FX",
+            "turn KNOB 2"
+          ],
+          "what": "Echo time: dotted quarter up to 4 bars."
+        },
+        {
+          "do": [
+            "tap FX",
+            "turn KNOB 3"
+          ],
+          "what": "Reverb: how much goes to the plate."
+        },
+        {
+          "do": [
+            "tap FX",
+            "turn KNOB 4"
+          ],
+          "what": "Size: room to long hall, and more echo repeats."
+        }
+      ]
+    },
+    {
+      "title": "Saving & loading",
+      "rows": [
+        {
+          "do": [
+            "turn PRESETS"
+          ],
+          "what": "Load another of the eight pieces, as you left it."
+        },
+        {
+          "do": [
+            "tap SAVE"
+          ],
+          "what": "Save all eight pieces now, even while playing."
+        },
+        {
+          "do": [
+            "hold SAVE"
+          ],
+          "what": "After 1.5 s: this piece back to its recipe (not saved yet)."
+        }
+      ]
+    },
+    {
+      "title": "Settings",
+      "rows": [
+        {
+          "do": [
+            "tap GLO",
+            "turn KNOB 1"
+          ],
+          "what": "Root note of the key; the scale moves with it."
+        },
+        {
+          "do": [
+            "tap GLO",
+            "turn KNOB 2"
+          ],
+          "what": "Fine tune, plus or minus 50 cents."
+        },
+        {
+          "do": [
+            "tap GLO",
+            "turn KNOB 3"
+          ],
+          "what": "MIDI out on or off."
+        },
+        {
+          "do": [
+            "tap GLO",
+            "turn KNOB 4"
+          ],
+          "what": "Lights: On, Keys (key lights only) or Off."
+        }
+      ]
+    }
+  ],
+  "keys": [
+    {
+      "keys": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "label": "The scale: lit keys are in it; press to add or remove that note (every octave)",
+      "color": "#42f5f5"
+    }
+  ],
+  "tips": [
+    "Eight pieces, each its own key, tempo and sound: Garden, Departures, Voices, Afternoon, Night Bus, Shoreline, Glass, Tides.",
+    "Hold any button (but PLAY) for a second: a card explains what it does.",
+    "The root note always stays, and the scale keeps at least three notes.",
+    "Editing the scale with the keys turns the mode into Custom; ALGORITHM loads a full mode again.",
+    "It autosaves a few seconds after a change, but only while resting (PLAY off). A dot on screen means unsaved changes.",
+    "While frozen (REC), EDIT's chord change waits until you thaw.",
+    "Notes on MIDI channel 1 add or remove scale notes like the keys; MIDI clock sets the tempo (EXT).",
+    "Hold OCT- and OCT+ for 5 seconds for update mode; let go early to cancel."
+  ],
+  "checked": [
+    "Archive amb-1.3.tar.gz from thefirmwarehub.com/src, folder fm1-amb-1.3 (base/ submodule is empty in the archive).",
+    "Pages and knobs: app/ui.c VIEW_BTN (HOME ENV ARP LFO SEQ FX GLO = Garden Pad Bells Bass Pulse Space Setup), VIEW_KNOB, KNOB_LABEL.",
+    "Buttons: ui.c button(): EDIT en_next (dsp/amb.c C_NEXT: on the bar while playing, at once at rest), PLAY en_play on press, REC en_freeze toggle, OCT-/OCT+ P_BOCT -2..+2, SAVE project_save.",
+    "Buttons act on release except PLAY (input()); SAVE held > RESET_HOLD 1500 ms: project_piece_reset + mark_dirty (not saved).",
+    "Encoders: input(): SELECT pages without wrap, HOME+SELECT tempo (P_TEMPO 30-120); ALGORITHM set_mode (8 modes, wraps); PRESETS set_piece (8 pieces, dsp/amb.c PIECES[]).",
+    "Keys: input() toggle_note((5+i)%12), key 0 = F3; root stays ('THE ROOT STAYS'), min 3 notes ('3 NOTES AT LEAST'); mode_name() shows Custom when pool differs.",
+    "Help cards: help_tick()/help_lines(), HELP_HOLD 900 ms, none for PLAY and SEL; OCT cards mention OCT-+OCT+ 5 s update mode.",
+    "Autosave: autosave() AUTOSAVE_QUIET 4000 ms, only when !en_playing and pad faded; header dot for dirty (manual).",
+    "Freeze: dsp/amb.c line 916 chord change waits while frozen; reverb input muted and decay held (pl_decay 0.9995).",
+    "Param ranges/text: dsp/amb.c PARAMS[], en_param_text() (Drift 20 s..5 min, Echo time 1/4. .. 4 bars, Tune -50..50, Lights Off/On/Keys in ui.c knob_text).",
+    "MIDI in: ui.c midi_in(): status 0x90 only (channel 1) toggles scale notes; clock/start/continue/stop to en_clock.",
+    "Starts growing at power-on: ui_init() en_play(1); project_load() at app_init."
+  ],
+  "unsure": [
+    "MIDI out channels (pad 1, bells 2, bass 3, pulse 10) from the manual only, not traced in the engine; left out.",
+    "Calibration (OCT- + OCT+ at power-on), CRASH screen and SAFE MODE (PLAY to retry) live in fm1-base, which the archive does not contain; only update mode is confirmed (help card text), so there is no Recovery section.",
+    "Whether Lights is per piece or shared: manual says shared (proj.leds sits outside the piece slots), not deeply traced.",
+    "MIDI over the TRS jack in (manual) not traced in fm1-base."
+  ]
+}
