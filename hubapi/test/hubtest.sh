@@ -15,6 +15,8 @@ chk() { if echo "$2" | grep -q -- "$3"; then ok=$((ok+1)); echo "ok   $1"; else 
 J='Content-Type: application/json'
 P() { curl -s -b $D/jar -c $D/jar -H "$J" -H 'X-Hub: 1' -d "$2" $B/api/$1; }
 chk "me as guest" "$(curl -s $B/api/me)" '"user":null'
+chk "country" "$(curl -s -H 'CF-IPCountry: de' $B/api/cc)" '"cc":"DE"'
+chk "no country" "$(curl -s -H 'CF-IPCountry: XX' $B/api/cc)" '"cc":""'
 chk "POST without X-Hub" "$(curl -s -H "$J" -d '{"email":"a@b.de"}' $B/api/login)" 'X-Hub'
 chk "foreign origin" "$(curl -s -H "$J" -H 'X-Hub: 1' -H 'Origin: https://evil.example' -d '{"email":"a@b.de"}' $B/api/login)" 'wrong origin'
 chk "bad address" "$(P login '{"email":"nope"}')" 'check the address'

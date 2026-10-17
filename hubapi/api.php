@@ -417,6 +417,10 @@ $route = preg_replace('~^.*/api/~', '', (string)parse_url($_SERVER['REQUEST_URI'
 $ip = client_ip();
 
 switch ($route) {
+    case 'cc':                                          // the visitor's country (Cloudflare's CF-IPCountry), nothing kept:
+        $c = strtoupper((string)($_SERVER['HTTP_CF_IPCOUNTRY'] ?? ''));   // the pages show the shop in DE / AT only
+        out(['ok' => true, 'cc' => preg_match('/^[A-Z]{2}$/', $c) && $c !== 'XX' && $c !== 'T1' ? $c : '']);
+
     case 'me':                                          // who is signed in on this device (null: nobody) + all ratings
         $u = user();
         out(['ok' => true, 'user' => $u ? mine($u) : null, 'ratings' => (object)all_ratings()]);

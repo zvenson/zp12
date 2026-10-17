@@ -22,16 +22,37 @@
     </div></div>
   </div>
   <a class="kbl" href="/kb/" title="Knowledge Base: how a firmware gets onto the FM-1"><span class="lg">Knowledge Base</span><span class="sm">KB</span></a>
+  <div class="dd shopdd" id="shopdd" hidden>
+    <button class="ddb" type="button" aria-expanded="false" aria-controls="shopm">Shop<span class="ar" aria-hidden="true">▼</span></button>
+    <div class="mega" id="shopm"><div class="wrap in">
+      <div class="side">
+        <p class="k">Shop</p>
+        <p>The machines the hub's firmwares run on, from Amazon.de.</p>
+        <hr><p class="ad">* Affiliate-Link (Anzeige). Als Amazon-Partner verdiene ich an qualifizierten Verkäufen; für dich kostet es nichts extra.</p>
+      </div>
+      <div class="tiles">
+        <a class="tile" href="https://link.amazon/B0fMEn1TF" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png" alt=""><img src="/img/sloop.png" alt=""><img src="/img/x0x.png" alt=""><img src="/img/winampfm.png" alt=""></span>
+          <span><b>Get the M-VAVE FM-1</b><small>auf Amazon.de · Anzeige *</small></span></a>
+        <a class="tile" href="https://link.amazon/B077ubA5M" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png" alt=""></span>
+          <span><b>Get the M-VAVE SMK-37 Pro</b><small>auf Amazon.de · Anzeige *</small></span></a>
+      </div>
+    </div></div>
+  </div>
   <form class="find" role="search" action="/" method="get"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><input
     type="search" name="q" id="q" placeholder="Search firmwares: a name, a maker, acid, drums…" aria-label="Search the firmwares" autocomplete="off"
     spellcheck="false"><span class="key" aria-hidden="true">/</span></form>
   <script>
   (() => {                                                 // a tap / Enter opens it, a tap outside or Esc closes it
-    const dd = document.getElementById("dd"), b = dd.querySelector(".ddb");
-    const set = (o) => { dd.classList.toggle("open", o); b.setAttribute("aria-expanded", String(o)); };
-    b.addEventListener("click", (e) => { e.stopPropagation(); set(!dd.classList.contains("open")); });
-    document.addEventListener("click", (e) => { if (!dd.contains(e.target)) set(false); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") { set(false); } });
+    document.querySelectorAll("nav .dd").forEach((dd) => {   // (Devices, and Shop where it is shown)
+      const b = dd.querySelector(".ddb");
+      const set = (o) => { dd.classList.toggle("open", o); b.setAttribute("aria-expanded", String(o)); };
+      dd.close = () => set(false);
+      b.addEventListener("click", (e) => {               // (one open at a time: the other closed)
+        e.stopPropagation(); document.querySelectorAll("nav .dd").forEach((o) => o !== dd && o.close?.()); set(!dd.classList.contains("open"));
+      });
+      document.addEventListener("click", (e) => { if (!dd.contains(e.target)) set(false); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") { set(false); } });
+    });
     document.addEventListener("keydown", (e) => {          // "/": into the search, on every page
       const a = document.activeElement;
       if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(a?.tagName || "") || a?.isContentEditable) return;

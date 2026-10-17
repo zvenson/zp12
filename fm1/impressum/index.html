@@ -47,6 +47,10 @@
   /* the Knowledge Base beside it, a plain link in the same type (on the KB itself: marked) */
   nav .kbl { align-self: stretch; display: flex; align-items: center; margin: 0 auto 0 clamp(4px, 1.6vw, 22px); padding: 8px 2px;
              color: var(--fg); font-size: 15px; font-weight: 600; white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
+  /* Shop (Amazon.de affiliate links): shown by web/hubapp.js in DE / AT only (/api/cc), beside the Knowledge Base */
+  nav .dd[hidden] { display: none; }
+  nav .dd.shopdd { margin-left: clamp(4px, 1.6vw, 22px); }
+  .mega .side .ad { font-size: 12.5px; color: var(--dim); }
   nav .kbl:hover { text-decoration: none; box-shadow: inset 0 -2px 0 var(--pink); }
   nav .kbl[aria-current] { box-shadow: inset 0 -2px 0 var(--cyan); }
   nav .kbl .sm { display: none; }
@@ -106,6 +110,10 @@
                        border: 1px solid var(--line); border-radius: 5px; padding: 0 7px; pointer-events: none; }
   nav.top .find input:focus + .key, nav.top .find input:not(:placeholder-shown) + .key { display: none; }
   @media (hover: none) { nav.top .find .key { display: none; } }
+  /* Shop on a phone (after the rules above): Devices, KB, Shop on the name's line; the affiliate notice stays visible */
+  @media (max-width: 560px) { nav .shopdd .ddb .ar { display: none; } nav .dd.shopdd { margin-left: 0; } }
+  @media (max-width: 420px) { nav .ddb .ar { display: none; } }          /* (a phone with Shop: Devices, KB, Shop on the name's line) */
+  @media (max-width: 760px) { #shopm .side { display: block; padding: 12px 16px; } #shopm .side > :not(.ad) { display: none; } }   /* (the notice stays) */
   /* the footer (web/footer.html, the same on every page: tools/make_fm1.py puts it in, the credits from the catalogues) */
   footer { border-top: 1px solid var(--line); color: var(--dim); font-size: 13.5px; line-height: 1.7; padding: 34px 0 54px; text-align: center; }
   footer .wrap { max-width: 900px; } footer a { color: var(--text); }
@@ -186,16 +194,37 @@
     </div></div>
   </div>
   <a class="kbl" href="/kb/" title="Knowledge Base: how a firmware gets onto the FM-1"><span class="lg">Knowledge Base</span><span class="sm">KB</span></a>
+  <div class="dd shopdd" id="shopdd" hidden>
+    <button class="ddb" type="button" aria-expanded="false" aria-controls="shopm">Shop<span class="ar" aria-hidden="true">▼</span></button>
+    <div class="mega" id="shopm"><div class="wrap in">
+      <div class="side">
+        <p class="k">Shop</p>
+        <p>The machines the hub's firmwares run on, from Amazon.de.</p>
+        <hr><p class="ad">* Affiliate-Link (Anzeige). Als Amazon-Partner verdiene ich an qualifizierten Verkäufen; für dich kostet es nichts extra.</p>
+      </div>
+      <div class="tiles">
+        <a class="tile" href="https://link.amazon/B0fMEn1TF" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
+          <span><b>Get the M-VAVE FM-1</b><small>auf Amazon.de · Anzeige *</small></span></a>
+        <a class="tile" href="https://link.amazon/B077ubA5M" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
+          <span><b>Get the M-VAVE SMK-37 Pro</b><small>auf Amazon.de · Anzeige *</small></span></a>
+      </div>
+    </div></div>
+  </div>
   <form class="find" role="search" action="/" method="get"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/></svg><input
     type="search" name="q" id="q" placeholder="Search firmwares: a name, a maker, acid, drums…" aria-label="Search the firmwares" autocomplete="off"
     spellcheck="false"><span class="key" aria-hidden="true">/</span></form>
   <script>
   (() => {                                                 // a tap / Enter opens it, a tap outside or Esc closes it
-    const dd = document.getElementById("dd"), b = dd.querySelector(".ddb");
-    const set = (o) => { dd.classList.toggle("open", o); b.setAttribute("aria-expanded", String(o)); };
-    b.addEventListener("click", (e) => { e.stopPropagation(); set(!dd.classList.contains("open")); });
-    document.addEventListener("click", (e) => { if (!dd.contains(e.target)) set(false); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") { set(false); } });
+    document.querySelectorAll("nav .dd").forEach((dd) => {   // (Devices, and Shop where it is shown)
+      const b = dd.querySelector(".ddb");
+      const set = (o) => { dd.classList.toggle("open", o); b.setAttribute("aria-expanded", String(o)); };
+      dd.close = () => set(false);
+      b.addEventListener("click", (e) => {               // (one open at a time: the other closed)
+        e.stopPropagation(); document.querySelectorAll("nav .dd").forEach((o) => o !== dd && o.close?.()); set(!dd.classList.contains("open"));
+      });
+      document.addEventListener("click", (e) => { if (!dd.contains(e.target)) set(false); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") { set(false); } });
+    });
     document.addEventListener("keydown", (e) => {          // "/": into the search, on every page
       const a = document.activeElement;
       if (e.key !== "/" || e.ctrlKey || e.metaKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(a?.tagName || "") || a?.isContentEditable) return;
@@ -278,6 +307,11 @@
       keine Gerätedaten an den Server gesendet. Die Seite speichert im lokalen Speicher deines Browsers (localStorage) nur, welche
       Firmware-Versionen du zuletzt gesehen hast (um neue als „UPDATE“ zu markieren) sowie die gewählte Sortierung und Ansicht (Karten oder Liste) und – ohne Konto – deine Favoriten. Diese Angaben
       verlassen deinen Browser nie und lassen sich jederzeit über die Browser-Einstellungen (Websitedaten löschen) entfernen.</p>
+    <h3>Der Hub als App</h3>
+    <p>Du kannst den Hub als App auf den Startbildschirm legen („Get the app“). Die App ist dieselbe Website: Sie lädt jede Seite
+      neu vom Server und legt nur eine Kopie der Seiten, des Katalogs und der Bilder im Speicher deines Browsers ab, damit sie auch
+      ohne Netz etwas anzeigt. Anmeldung, Firmware-Pakete und VIBE werden dort nie gespeichert. Die Kopie verlässt dein Gerät nicht
+      und verschwindet mit dem Löschen der App bzw. der Websitedaten.</p>
     <h3>Konto für Favoriten und Bewertungen</h3>
     <p>Favoriten (♡) kannst du ohne Konto setzen: Sie liegen dann nur im lokalen Speicher deines Browsers. Wer Firmwares bewerten oder
       seine Favoriten auf mehreren Geräten nutzen will, meldet sich per E-Mail an – ohne Passwort, mit einem Link oder Code per Mail.
@@ -295,6 +329,13 @@
     <h3>VIBE FM Mk1</h3>
     <p>Für die Anmeldung zur VIBE-FM-Liste unter <a href="/vibe/">/vibe/</a> gilt deren eigene
       <a href="/vibe/legal.php">Datenschutzerklärung</a> (E-Mail-Adresse, Double-Opt-in).</p>
+    <h3>Amazon-Partnerlinks (Shop)</h3>
+    <p>Besucherinnen und Besucher aus Deutschland und Österreich sehen im Menü „Shop“ Links zum M-VAVE FM-1 und SMK-37 Pro auf
+      Amazon.de. Das sind Affiliate-Links (Werbung, mit * gekennzeichnet): Als Amazon-Partner verdiene ich an qualifizierten
+      Verkäufen, für dich ändert sich der Preis nicht. Ob der Shop angezeigt wird, entscheidet das Land, das Cloudflare aus deiner
+      IP-Adresse ableitet; der Server gibt nur dieses Länderkürzel an die Seite zurück und speichert nichts davon. Erst wenn du
+      einen Link anklickst, verarbeitet Amazon (Amazon Europe Core S.à r.l., Luxemburg) Daten nach seiner eigenen
+      Datenschutzerklärung, auch per Cookie, um den Kauf dem Link zuzuordnen.</p>
     <h3>Externe Seiten</h3>
     <p>Links zu GitHub, YouTube, PayPal, Amazon und den Installern anderer Autoren (z. B. für das SMK-37) führen auf deren Seiten;
       erst beim Klick werden dort Daten nach deren eigenen Datenschutzbestimmungen verarbeitet.</p>
@@ -344,6 +385,10 @@
   let reg = null;
   if ("serviceWorker" in navigator && isSecureContext)
     navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((r) => { reg = r; }).catch(() => {});
+
+  // Shop in the menu (Amazon.de affiliate links): Germany and Austria only, by the country Cloudflare sees (/api/cc, nothing kept)
+  fetch("/api/cc", { cache: "no-store" }).then((r) => r.json())
+    .then((j) => { if (/^(DE|AT)$/.test(j.cc)) document.getElementById("shopdd")?.removeAttribute("hidden"); }).catch(() => {});
 
   // the app left in the background for a while (a phone keeps it for days): the page anew when it comes back,
   // never while an install writes (fm1.html's `writing`) or a dialog is open

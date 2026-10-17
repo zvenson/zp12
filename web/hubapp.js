@@ -19,6 +19,10 @@
   if ("serviceWorker" in navigator && isSecureContext)
     navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((r) => { reg = r; }).catch(() => {});
 
+  // Shop in the menu (Amazon.de affiliate links): Germany and Austria only, by the country Cloudflare sees (/api/cc, nothing kept)
+  fetch("/api/cc", { cache: "no-store" }).then((r) => r.json())
+    .then((j) => { if (/^(DE|AT)$/.test(j.cc)) document.getElementById("shopdd")?.removeAttribute("hidden"); }).catch(() => {});
+
   // the app left in the background for a while (a phone keeps it for days): the page anew when it comes back,
   // never while an install writes (fm1.html's `writing`) or a dialog is open
   let away = 0;
