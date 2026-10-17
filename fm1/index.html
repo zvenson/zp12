@@ -333,6 +333,12 @@
   #rescue .go { white-space: normal; }               /* (its steps are sentences) */
   .fw .links a { font-size: 13.5px; font-weight: 600; color: var(--fg); padding: 7px 12px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); }
   .fw .links a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--c); }
+  /* cards: the links fill their row; the cheat sheet in the firmware's colour, an icon of its own */
+  .fws:not(.list) > .fw .links a { flex: 1 1 auto; text-align: center; white-space: nowrap; }   /* (they fill the row: flush, never cut) */
+  .fw .links a.csl { display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+                     background: color-mix(in srgb, var(--c) 14%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 60%, transparent); }
+  .fw .links a.csl:hover { background: color-mix(in srgb, var(--c) 24%, transparent); box-shadow: inset 0 0 0 1px var(--c); }
+  .fw .links a.csl svg { flex: none; width: 15px; height: 15px; fill: none; stroke: var(--c); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
   .fw .msg { font-size: 14px; color: var(--dim); min-height: 1.2em; }
   /* after a successful install: the moment to mention VIBE FM (thefirmwarehub.com/vibe/, ref hub-install) */
   .fw .vibe-after { display: flex; gap: 12px; align-items: center; margin-top: 10px; padding: 10px 12px; border-radius: 10px;
@@ -1237,7 +1243,7 @@ function render() {
       <div class="meta">${f.installs ? `<span class="inst" title="Installed from this page only: installs from the author's own installer or from GitHub are not counted, nor visitors who opt out of statistics">↓ ${f.installs.toLocaleString("en")} installs via the hub</span> · ` : ""}${f.added ? `<span class="added" title="On the hub since ${esc(f.added)}">added ${day(f.added)}</span> · ` : ""}<span title="Released ${esc(f.date)}">released ${day(f.date)}</span> · ${Math.round(f.size / 1024)} KB · GPL-3.0 ·
         <a href="${esc(f.site)}" target="_blank" rel="noopener">project</a> · <a href="${esc(f.release || f.site)}" target="_blank" rel="noopener">release</a> ·
         <a href="${esc(f.source)}" target="_blank" rel="noopener">source</a>${f.mirror ? ` (<a href="${esc(f.mirror)}">copy</a>)` : ""}${buildInMeta(f) ? ` · <a href="${build(f)}" target="_blank" rel="noopener">build on it ↗</a>` : ""}</div>
-      <div class="links">${tryIt(f)}${CS[f.id] ? `<a href="/cs/${esc(f.id)}/" class="csl" data-cs="${esc(f.id)}">⌨ Cheat sheet</a>` : ""}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${build(f) && !buildInMeta(f) ? `<a href="${build(f)}" target="_blank" rel="noopener">⚓ Build on it</a>` : ""}</div>
+      <div class="links">${tryIt(f)}${CS[f.id] ? `<a href="/cs/${esc(f.id)}/" class="csl" data-cs="${esc(f.id)}" title="${esc(f.name)}: the controls at a glance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>Cheat sheet</a>` : ""}${f.editor ? `<a href="${esc(f.editor)}" target="_blank" rel="noopener">✎ Editor</a>` : ""}${build(f) && !buildInMeta(f) ? `<a href="${build(f)}" target="_blank" rel="noopener">⚓ Build on it</a>` : ""}</div>
       <progress max="100" value="0"></progress>
       <button class="go">${isNow && w.exact ? "Install again" : "Install " + esc(f.name)}</button>
       <div class="msg"></div>`;
