@@ -1,0 +1,120 @@
+{
+ "id": "coralflower",
+ "name": "CoralFlower",
+ "version": "0.2",
+ "ref": "v0.2",
+ "manual": "https://github.com/FicusFicusov/CoralFlower#readme",
+ "intro": "A chord instrument with a bass part and a growing pixel flower: tap a black key to pick a chord type, then each white key plays a whole chord on a degree of your scale.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {"do": ["tap HOME"], "what": "Play screen: chord name, flower, QUANTIZE, KEY, SCALE, GLIDE."},
+    {"do": ["ENV twice"], "what": "Any screen's own button again: back to HOME."},
+    {"do": ["turn ALGORITHM"], "what": "Key layout: Top Lock (default), Top, Side Lock, Side."},
+    {"do": ["tap OCT-"], "what": "Octave down (OCT+ up, -3 to +3)."},
+    {"do": ["hold OCT-", "tap OCT+"], "what": "Both together: octave 0 and all notes off."},
+    {"do": ["tap GLO", "turn SELECT"], "what": "Multi-page screens (GLO, ARP, ENV, EDIT, SAVE): SELECT turns pages."}
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {"do": ["tap black key 1-10"], "what": "Pick the chord type; it stays latched (Lock layouts)."},
+    {"do": ["white key 1-16"], "what": "Play that scale degree as a chord, with a bass note."},
+    {"do": ["hold black key 7", "tap black key 8"], "what": "Combine buttons: m7 + m9 latch together as m9."},
+    {"do": ["tap black key 11"], "what": "Off: white keys play single notes, several at once."},
+    {"do": ["black key 1-10 twice"], "what": "Tap the latched button again: unlatched, single notes."},
+    {"do": ["turn KNOB 1"], "what": "On HOME: QUANTIZE Off / On / Full (chords stay in key)."},
+    {"do": ["turn KNOB 2"], "what": "On HOME: the key (tonic); KNOB 3 the scale (27)."},
+    {"do": ["turn KNOB 4"], "what": "On HOME: glide between chords, Off to 2000 ms."},
+    {"do": ["tap ARP", "turn KNOB 1"], "what": "Arpeggiator on / off; KNOB 2 mode, 3 octaves, 4 rate."},
+    {"do": ["tap ARP", "turn SELECT", "turn KNOB 4"], "what": "Feel page: LATCH keeps the arp going after you let go."}
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {"do": ["turn PRESETS"], "what": "Chord sound."},
+    {"do": ["turn SELECT"], "what": "On HOME: bass sound."},
+    {"do": ["tap LFO"], "what": "BASS page: bass on / off, level, octave, octaver."},
+    {"do": ["tap ENV"], "what": "Attack, decay, sustain, release; SELECT: chord + bass, chord, bass."},
+    {"do": ["tap EDIT"], "what": "Sound editor; black keys pick the section, SELECT the page."},
+    {"do": ["tap EDIT", "black key 9"], "what": "Edit the chord sound (black key 10: the bass sound)."},
+    {"do": ["tap SEL", "black key 1-10"], "what": "Edit that chord button: type, added notes, inversion, bass tone."}
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {"do": ["tap REC"], "what": "Looper: arm a take, the first chord starts it; again ends it."},
+    {"do": ["tap PLAY"], "what": "Play / stop the loop; with no loop, the metronome."},
+    {"do": ["hold REC"], "what": "1 second: undo the last layer (the last one clears the loop)."},
+    {"do": ["hold PLAY"], "what": "LOOPER page: LENGTH, MODE New / Overdub, QUANTIZE, COUNT-IN."},
+    {"do": ["tap SEQ"], "what": "Metronome: LEVEL, SOUND, TEMPO, TIME SIG; clicks while open."}
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {"do": ["tap FX", "turn SELECT"], "what": "Pick an effect: filter, drive, chorus, phaser, delay, reverb."},
+    {"do": ["tap FX", "turn KNOB 1"], "what": "Selected effect on / off; KNOB 2-4 its values."},
+    {"do": ["tap FX", "turn ALGORITHM"], "what": "Move the selected effect along the chain."}
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {"do": ["tap SAVE"], "what": "SAVE page; SELECT: chord sound, bass sound or loop."},
+    {"do": ["tap SAVE", "turn KNOB 1"], "what": "Replace the sound or save it as new."},
+    {"do": ["tap SAVE", "turn KNOB 2", "turn KNOB 3"], "what": "Name: KNOB 2 picks the letter, KNOB 3 changes it."},
+    {"do": ["tap SAVE", "hold SAVE"], "what": "1 second: save (KNOB 4 Delete: delete your own sound)."}
+   ]
+  },
+  {
+   "title": "Settings",
+   "rows": [
+    {"do": ["tap GLO"], "what": "Display: COLOR theme, BACKDROP, BOOT SND."},
+    {"do": ["tap GLO", "turn SELECT"], "what": "MIDI: MIDI OUT, CHORD CH, BASS CH, CLOCK IN."},
+    {"do": ["tap GLO", "turn SELECT", "turn KNOB 1"], "what": "Play page: VELOCITY (keys have none), GLIDE, LIGHTS, RETRIG."}
+   ]
+  }
+ ],
+ "keys": [
+  {"keys": [1, 3, 5], "label": "M6 M7 M9", "color": "#42f5f5"},
+  {"keys": [8, 10], "label": "s2 s4 (sus)", "color": "#f542a7"},
+  {"keys": [13, 15, 17], "label": "m6 m7 m9", "color": "#f5deb3"},
+  {"keys": [20, 22], "label": "M m (major, minor)", "color": "#4287f5"},
+  {"keys": [25], "label": "Off: single notes", "color": "#f5a142"},
+  {"keys": "white", "label": "Scale degrees: white key 5 = I (the key)", "color": "#c9a0f5"}
+ ],
+ "tips": [
+  "A new FM-1 starts in Top Lock with no chord latched, so the white keys play single notes: tap a black key first.",
+  "Default: key C major, Quantize On. With On, M/m/s buttons keep their type on every degree; with Full every chord tone snaps to the scale (diatonic chords).",
+  "Without Lock (Top, Side) a chord only plays while you hold its black key.",
+  "Octave 0 sounds an octave below the keys' printed notes.",
+  "Settings save themselves a moment after a change, once nothing sounds; sounds and the loop need SAVE.",
+  "Install went wrong? Hold OCT- while powering on: update mode (black screen), then press Install again on the site."
+ ],
+ "checked": [
+  "Release coralflower-0.2.tar.gz (CoralFlower-0.2), firmware/src/coralflower.c is the build unit; panel.c enum B_FX, B_SCL(=SEL), B_ENV, B_LFO, B_EDIT, B_GLO, B_HOME ... and encoder roles SELECT/ALGORITHM/PRESETS/K1-K4.",
+  "cf_ui.c ui_button: HOME, SEL->SCR_SEL, ENV, LFO->SCR_BASS, EDIT, GLO, FX, ARP, SEQ open screens; ui_open: same button again -> HOME; OCT-/OCT+ -3..3, both -> 0 + CFE_PANIC.",
+  "cf_ui.c ui_select / ui_presets / ui_algo: SELECT = bass sound (else pages; FX: effect; ENV: chord+bass/chord/bass target; SEL: button); PRESETS = chord sound; ALGORITHM order Top Lock, Top, Side Lock, Side (FX: cfx_move).",
+  "cf_ui.c ui_knob_info/turn: HOME QUANTIZE Off/On/Full, KEY, SCALE (disabled when Off), GLIDE 0-2000 ms; SEL TYPE ADD INV(Auto..3rd) BASS; BASS page BASS LEVEL OCTAVE OCTAVER; ARP page 0 ON/OFF MODE OCTAVE(1-4) RATE, page 1 TEMPO GATE SWING LATCH; SEQ LEVEL SOUND TEMPO TIME SIG; GLO Display/MIDI/Play pages; SAVE SAVE AS, LETTER, CHAR, ACTION.",
+  "cf_chord.c cf_key_role: Top = black (upper) keys are chord buttons, white keys roots; cf_chord_defaults TOP = M6 M7 M9 | s2 s4 | m6 m7 m9 | M m | Off, algo TOP_LOCK, Quantize On, tonic C, Major; cf_key_root_note: tonic on white key 5 (idx-4), one scale step per key, CF_OCT_BASE -1.",
+  "cf_chord.c cfc_button: Lock = buttons pressed in one gesture latch together; a lone tap on the latched button unlatches (toggle); cfc_resolve: no button or Off -> single notes, several at once; cf_merge_forms: adds combine, major/minor clash -> most held wins.",
+  "cf_chord.c cfc_resolve: Quantize Full snaps the chord mask to the scale (cf_mask_snap); On snaps only typeless forms.",
+  "cf_ui.c cf_loop_poll: PLAY tap -> CFE_LOOP 1 (cf_loop.c: play/stop loop, metronome alone with no loop), PLAY held 600 ms -> LOOPER; REC tap -> record action + LOOPER screen, REC held 1000 ms -> undo last layer / clear. SCR_LOOP knobs LENGTH (Free,1,2,4,8), MODE New/Overdub, QUANTIZE, COUNT-IN.",
+  "cf_ui.c cf_save_open / cf_save_poll: SAVE opens SAVE (page = part edited, LOOPER -> loop); on SAVE, held 1 s saves/deletes, tap -> HOME. cf_settings.c: settings record written 1.5 s after a change once quiet for 1 s.",
+  "cf_fxui.c: FX SELECT picks effect along chain, K1 ON/OFF, K2-4 values, ALGORITHM moves it; cf_fx.c CFX_DEFAULT order filter, dist, chorus, phaser, delay, reverb.",
+  "cf_ui.c ui_note_key: EDIT screen upper keys 1-8 sections (OP1-6 PIT GLO / VA OS1-4 FLT ENV LFO MOD), upper 9/10 = CHD/BAS part. SEL screen: a chord button pressed is picked for editing.",
+  "firmware/stub/stub_core.h: rescue key = OCT- alone held at power-on -> staged loader or ROM USB boot; site index.html: black screen = update mode, press Install again."
+ ],
+ "unsure": [
+  "SPEC.md says PRESETS pages the FX screen; the code (ui_presets) always changes the chord sound. Sheet leaves PRESETS-on-FX out.",
+  "Side layout details (black keys 1-3 M m d, white keys 1-4 s2 s4 7 9, rest a piano of roots, coral instead of flower) verified in cf_key_role/cf_chord_defaults but left out of the rows.",
+  "Exact meaning of the M7 button: CF_A_7 = major seventh (11 semitones), so M7 = maj7; m7 uses CF_A_b7. Labels on screen come from cf_form_label (not read in full).",
+  "OCT- + OCT+ at power-on runs panel calibration (main.c comment) and OCT- + OCT+ + HOME held 5 s = update mode (cr_update_poll, if CR_A_STRIPES is set in this unit): not verified for the CoralFlower build, left out.",
+  "Default sounds: FM ORGAN (chord) and DEEP SUB (bass) on a new unit, from cf_ui_init; not shown."
+ ]
+}
