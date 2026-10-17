@@ -544,6 +544,42 @@ def installs(old):
     return n
 
 
+
+def dead_links(cat):
+    """the links the pages send people to, checked each run: the Tools page's (web/tools.json) and the firmwares' play /
+    editor / site; a dead one (4xx / 5xx / no answer) a problem for the VIBE admin's task page. Our own pages left out."""
+    from concurrent.futures import ThreadPoolExecutor
+    urls = {}
+    try:
+        d = json.loads((Path(__file__).resolve().parents[1] / "web" / "tools.json").read_text(encoding="utf-8"))
+        for t in [x for g in d["groups"] for x in g["tools"]] + [d["official"]]:
+            for n, u in list(t["links"]) + [("source", t["source"])] + [(n, u) for n, u in t["by"]]:
+                if u and u.startswith("http"):
+                    urls.setdefault(u, ("tools:" + t["id"], "Tools: " + t["name"]))
+    except (OSError, ValueError, KeyError):
+        pass
+    for f in cat:
+        for k in ("play", "editor", "site"):
+            if f.get(k) and f[k].startswith("http"):
+                urls.setdefault(f[k], (f["id"], f"{f['name']} ({k})"))
+    urls = {u: v for u, v in urls.items() if "thefirmwarehub.com" not in u}
+    def check(u):
+        for method in ("HEAD", "GET"):                     # (some hosts refuse HEAD: then a GET)
+            try:
+                req = urllib.request.Request(u, method=method, headers={"User-Agent": "Mozilla/5.0 (thefirmwarehub.com link check)"})
+                with urllib.request.urlopen(req, timeout=20) as r:
+                    return None if r.status < 400 else f"HTTP {r.status}"
+            except urllib.error.HTTPError as e:
+                if method == "GET" or e.code not in (403, 405, 429, 501):
+                    return None if e.code in (403, 429) else f"HTTP {e.code}"   # (403 / 429: a bot wall or a limit, not dead)
+            except Exception as e:
+                if method == "GET":
+                    return str(e)[:120]
+        return None
+    with ThreadPoolExecutor(8) as ex:
+        res = dict(zip(urls, ex.map(check, urls)))
+    return [{"id": urls[u][0], "name": urls[u][1], "repo": "", "error": f"dead link {u}: {err}"} for u, err in res.items() if err]
+
 def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
     (out / "fw").mkdir(parents=True, exist_ok=True)
     try:
@@ -603,6 +639,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx"), out=OUT, purge=False):
         old_smk = {}
     smk, smk_problems = smk37(old_smk)
     problems += smk_problems
+    problems += dead_links(cat)
     (out / "problems.json").write_text(json.dumps({"at": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
                                                    "problems": problems}, indent=1, ensure_ascii=False) + "\n")
     inst = installs(old)
