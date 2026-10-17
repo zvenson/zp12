@@ -10,6 +10,25 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parents[1]
 
 
+# the deck's keys (web/deck.css; the FM-1 page's ICONS in web/fm1.html are the same drawings)
+DECK_ICONS = {
+    "play": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
+    "edit": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16M12 4v16M18 4v16"/><path d="M4 8h4M10 15h4M16 10h4"/></svg>',
+    "sheet": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>',
+    "hub": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+    "pkg": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>',
+    "build": '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 13a7 7 0 0 0 14 0M8 10h8"/></svg>',
+}
+DECK_ORDER = ["play", "edit", "sheet", "hub", "pkg", "build"]
+
+
+def deck_kind(label):
+    """a link's key by its label: a simulator / player is Play, a studio / editor Edit, packages a box, else the hub's link"""
+    l = label.lower()
+    return ("play" if "simulator" in l or "play" in l else "edit" if "studio" in l or "editor" in l
+            else "pkg" if "package" in l else "sheet" if "cheat" in l else "hub")
+
+
 def smk_stars(repos):
     """the repos' GitHub stars, fetched once a day (web/smk37-stars.json keeps them: a build without the network or over
     the API's limit takes the last counts)"""
@@ -55,10 +74,12 @@ def smk_cards():
             f'<span class="tag model">{e(f["models"])}</span>'
         by = (f'{e(f["orig"])} by {out("https://github.com/" + f["orig_repo"], e(f["by"]))}, SMK-37 build by '
               f'{out("https://github.com/genkigenki", "genkigenki")}' if port else f'by {e(f["by"])}')
-        links = out(f["install"], f.get("install_label", "Install on its installer ↗"), ' class="go"')
-        if port:
-            links += f'<a href="/#fw-{e(f["fm1"])}">On the FM-1 hub</a>'
-        links += "".join(f'<a href="{e(u)}">{e(t)}</a>' if u.startswith("/") else out(u, f"{e(t)} ↗") for t, u in f.get("links", []))
+        # (its actions as the deck's keys, as on the FM-1 page (web/deck.css); the install its own button)
+        keys = ([("hub", f'/#fw-{f["fm1"]}', "On the FM-1 hub")] if port else []) + [(deck_kind(t), u, t.lstrip("▶✎ ").strip()) for t, u in f.get("links", [])]
+        keys.sort(key=lambda k: DECK_ORDER.index(k[0]))
+        deck = "".join(f'<a class="key k-{k}" href="{e(u)}" data-tip="{e(t)}" aria-label="{e(t)}"'
+                       + ("" if u.startswith("/") else ' target="_blank" rel="noopener"') + f">{DECK_ICONS[k]}</a>" for k, u, t in keys)
+        links = (f'<div class="deck">{deck}</div>' if deck else "") + out(f["install"], f.get("install_label", "Install on its installer ↗"), ' class="go"')
         n = stars.get(home(f))                          # (data-stars, data-name: the page's Sort; .head: the list view's name column)
         c = colour(f)
         return (f'<article class="fw" id="fw-{e(f["id"])}"{f' style="--c: {c}"' if c else ""} data-kind="{" ".join(kind + ["vintage"] * old)}" data-stars="{-1 if n is None else n}" data-repo="{e(home(f))}" '
@@ -224,7 +245,7 @@ def devices(text, dev, ref="hub"):
     #  not VIBE's nav, a page of its own)
     if "</head>" in text:
         app = (HERE / "web" / "hubapp-head.html").read_text(encoding="utf-8") + \
-            "<style>\n" + (HERE / "web" / "hubapp.css").read_text(encoding="utf-8") + "</style>\n"
+            "<style>\n" + (HERE / "web" / "hubapp.css").read_text(encoding="utf-8") + (HERE / "web" / "deck.css").read_text(encoding="utf-8") + "</style>\n"
         text = text.replace("</head>", app + "</head>", 1)
         text = text.replace("</body>", "<script>\n" + (HERE / "web" / "hubapp.js").read_text(encoding="utf-8") + "</script>\n</body>", 1)
     # (Cloudflare's email obfuscation off for our pages: the addresses stay plain text and links, also without JavaScript;

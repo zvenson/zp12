@@ -333,24 +333,6 @@
   #rescue .go { white-space: normal; }               /* (its steps are sentences) */
   .fw .links a { font-size: 13.5px; font-weight: 600; color: var(--fg); padding: 7px 12px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line); }
   .fw .links a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--c); }
-  /* a card's actions: a tape deck's keys (Play, Edit, Cheat sheet, Build), joined, a symbol each, the name as a tooltip */
-  .fw .deck { display: inline-flex; border-radius: 9px; box-shadow: 0 2px 0 #0a0809, inset 0 0 0 1px var(--line); }
-  .fw .deck .key { position: relative; width: 48px; height: 38px; display: grid; place-items: center; color: var(--fg);
-               background: linear-gradient(#2c2728, #1c1819); box-shadow: inset -1px 0 0 #0e0c0d, inset 0 1px 0 rgba(255, 255, 255, .06); }
-  .fw .deck .key:first-child { border-radius: 9px 0 0 9px; } .fw .deck .key:last-child { border-radius: 0 9px 9px 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); }
-  .fw .deck .key:only-child { border-radius: 9px; }
-  /* each key its colour, the same on every card (a tape deck's coloured caps): the symbol, a thin edge on top, a tint on hover */
-  .fw .deck .k-play { --k: #5fe3a1; } .fw .deck .k-edit { --k: #f4c0cb; } .fw .deck .k-sheet { --k: #a870e8; } .fw .deck .k-build { --k: #afd9f4; }
-  .fw .deck .key { color: var(--k, var(--fg)); }
-  .fw .deck .key::before { content: ""; position: absolute; left: 7px; right: 7px; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--k); opacity: .85; }
-  .fw .deck .key:hover { text-decoration: none; color: var(--k); background: linear-gradient(color-mix(in srgb, var(--k) 22%, #2c2728), color-mix(in srgb, var(--k) 10%, #1c1819)); }
-  .fw .deck .key:active { transform: translateY(1px); background: #161314; box-shadow: inset 0 2px 5px rgba(0, 0, 0, .7); }
-  .fw .deck .key svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-  .fw .deck .key svg path[d^="M8 5v14"] { fill: currentColor; }
-  .fw .deck .key::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 5;
-                      padding: 5px 9px; border-radius: 6px; background: #000; color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap;
-                      pointer-events: none; opacity: 0; transition: opacity .12s; }
-  .fw .deck .key:hover::after, .fw .deck .key:focus-visible::after { opacity: 1; }
   .fw .msg { font-size: 14px; color: var(--dim); min-height: 1.2em; }
   /* after a successful install: the moment to mention VIBE FM (thefirmwarehub.com/vibe/, ref hub-install) */
   .fw .vibe-after { display: flex; gap: 12px; align-items: center; margin-top: 10px; padding: 10px 12px; border-radius: 10px;
@@ -492,6 +474,26 @@
   .appbar .pc { margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #d8d0c9; }
   .appbar .pc .go { padding: 7px 16px; }
   @media (prefers-reduced-motion: reduce) { .appbar { animation: none; } }
+/* web/deck.css: a card's actions as a tape deck's keys, on every device page (make_fm1 puts it in with the app's style):
+   the FM-1 page's deck() and the SMK-37 page's cards (make_fm1 smk_cards) */
+  /* a card's actions: a tape deck's keys (Play, Edit, Cheat sheet, Build), joined, a symbol each, the name as a tooltip */
+  .fw .deck { display: inline-flex; border-radius: 9px; box-shadow: 0 2px 0 #0a0809, inset 0 0 0 1px var(--line); }
+  .fw .deck .key { position: relative; width: 48px; height: 38px; display: grid; place-items: center; color: var(--fg);
+               background: linear-gradient(#2c2728, #1c1819); box-shadow: inset -1px 0 0 #0e0c0d, inset 0 1px 0 rgba(255, 255, 255, .06); }
+  .fw .deck .key:first-child { border-radius: 9px 0 0 9px; } .fw .deck .key:last-child { border-radius: 0 9px 9px 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); }
+  .fw .deck .key:only-child { border-radius: 9px; }
+  /* each key its colour, the same on every card (a tape deck's coloured caps): the symbol, a thin edge on top, a tint on hover */
+  .fw .deck .k-play { --k: #5fe3a1; } .fw .deck .k-edit { --k: #f4c0cb; } .fw .deck .k-sheet { --k: #a870e8; } .fw .deck .k-build { --k: #afd9f4; } .fw .deck .k-hub { --k: #42f5f5; } .fw .deck .k-pkg { --k: #e6d1b9; }
+  .fw .deck .key { color: var(--k, var(--fg)); }
+  .fw .deck .key::before { content: ""; position: absolute; left: 7px; right: 7px; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--k); opacity: .85; }
+  .fw .deck .key:hover { text-decoration: none; color: var(--k); background: linear-gradient(color-mix(in srgb, var(--k) 22%, #2c2728), color-mix(in srgb, var(--k) 10%, #1c1819)); }
+  .fw .deck .key:active { transform: translateY(1px); background: #161314; box-shadow: inset 0 2px 5px rgba(0, 0, 0, .7); }
+  .fw .deck .key svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .fw .deck .key svg path[d^="M8 5v14"] { fill: currentColor; }
+  .fw .deck .key::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 5;
+                      padding: 5px 9px; border-radius: 6px; background: #000; color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap;
+                      pointer-events: none; opacity: 0; transition: opacity .12s; }
+  .fw .deck .key:hover::after, .fw .deck .key:focus-visible::after { opacity: 1; }
 </style>
 </head>
 <body>
