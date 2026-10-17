@@ -1,0 +1,371 @@
+{
+  "id": "ghoulbox",
+  "name": "GHOULBOX",
+  "version": "2.3.1",
+  "ref": "ghoulbox-v2.3.1",
+  "manual": "https://github.com/jasonpersinger/ghoulbox-fm1-dungeon-synth/releases/download/ghoulbox-v2.3.1/GHOULBOX-User-Guide-2.3.pdf",
+  "intro": "Dungeon-synth firmware built on Felucca: four tracks, hurdy-gurdy, choirs, hall reverb. Press PLAY first: a D-minor scene is ready.",
+  "sections": [
+    {
+      "title": "Getting around",
+      "rows": [
+        {
+          "do": [
+            "turn ALGORITHM"
+          ],
+          "what": "Pick the track (T1-T4) the keys and pages work on."
+        },
+        {
+          "do": [
+            "tap HOME"
+          ],
+          "what": "Back to HOME; on HOME again: MIXER, CLOCK, KEYS, DREAM."
+        },
+        {
+          "do": [
+            "hold HOME"
+          ],
+          "what": "Open the menu: ALGORITHM picks the tab, PRESETS the row."
+        },
+        {
+          "do": [
+            "tap OCT+"
+          ],
+          "what": "In dialogs and action pages: yes / do it."
+        },
+        {
+          "do": [
+            "tap OCT-"
+          ],
+          "what": "In dialogs and action pages: no / back."
+        },
+        {
+          "do": [
+            "GLO twice"
+          ],
+          "what": "Double-tap a layer button: its key map stays open hands-free."
+        }
+      ]
+    },
+    {
+      "title": "Playing",
+      "rows": [
+        {
+          "do": [
+            "tap PLAY"
+          ],
+          "what": "Start / stop the four tracks."
+        },
+        {
+          "do": [
+            "turn SELECT"
+          ],
+          "what": "Tempo."
+        },
+        {
+          "do": [
+            "turn PRESETS"
+          ],
+          "what": "Change the selected track's sound; its notes stay."
+        },
+        {
+          "do": [
+            "tap OCT-"
+          ],
+          "what": "Keyboard an octave down (OCT+ up)."
+        },
+        {
+          "do": [
+            "hold GLO",
+            "black key 1-4"
+          ],
+          "what": "Mute / unmute tracks 1-4."
+        },
+        {
+          "do": [
+            "hold GLO",
+            "white key 1-4"
+          ],
+          "what": "Solo tracks 1-4 while held; white key 5 unmutes all."
+        },
+        {
+          "do": [
+            "hold GLO",
+            "turn KNOB 1"
+          ],
+          "what": "KNOB 1-4 set the levels of tracks 1-4."
+        },
+        {
+          "do": [
+            "hold GLO",
+            "black key 6-9"
+          ],
+          "what": "Latch a drone on track 1-4: your chord keeps sounding."
+        },
+        {
+          "do": [
+            "hold SEL",
+            "note key"
+          ],
+          "what": "Make that note the track's key (ROOT)."
+        },
+        {
+          "do": [
+            "tap HOME",
+            "tap HOME",
+            "tap HOME",
+            "tap HOME",
+            "note key"
+          ],
+          "what": "On HOME: DREAM page; a key composes a slow piece in it."
+        }
+      ]
+    },
+    {
+      "title": "Sound",
+      "rows": [
+        {
+          "do": [
+            "turn KNOB 1"
+          ],
+          "what": "On HOME, KNOB 1-4 are the engine's four main controls."
+        },
+        {
+          "do": [
+            "tap EDIT"
+          ],
+          "what": "All eight engine controls; more taps: VOICE pages (mono, glide)."
+        },
+        {
+          "do": [
+            "hold EDIT",
+            "white key 1-13"
+          ],
+          "what": "Switch the track to another engine (white key 14: INIT)."
+        },
+        {
+          "do": [
+            "tap ENV"
+          ],
+          "what": "Envelope: attack, decay, sustain, release."
+        },
+        {
+          "do": [
+            "tap LFO"
+          ],
+          "what": "LFO; more taps: LFO 2, LFO DEST, MOD matrix."
+        },
+        {
+          "do": [
+            "tap SEL"
+          ],
+          "what": "Scale: ROOT, SCL, QNT (WHITE = white keys stay in scale)."
+        },
+        {
+          "do": [
+            "tap ARP"
+          ],
+          "what": "Arpeggiator: MODE, RATE, OCT, GATE; tap again for HOLD."
+        },
+        {
+          "do": [
+            "hold LFO",
+            "turn KNOB 1"
+          ],
+          "what": "Temporary tweak: snaps back when LFO is let go (OCT+ keeps)."
+        }
+      ]
+    },
+    {
+      "title": "Effects",
+      "rows": [
+        {
+          "do": [
+            "tap FX"
+          ],
+          "what": "Track's sends, KNOB 1-4: distortion, chorus, delay, reverb."
+        },
+        {
+          "do": [
+            "tap FX",
+            "tap FX"
+          ],
+          "what": "Next pages: SLICER, DLY, REVERB, CHORUS, TAPE."
+        },
+        {
+          "do": [
+            "tap FX"
+          ],
+          "what": "REVERB page: TYPE (ROOM, SPRING, HALL), SIZE, DAMP."
+        },
+        {
+          "do": [
+            "tap FX"
+          ],
+          "what": "TAPE page: tape wobble, CRSH, AMB cave wind, CRKL torch crackle."
+        },
+        {
+          "do": [
+            "hold FX",
+            "white key"
+          ],
+          "what": "Performance effect while held; the map is on screen."
+        }
+      ]
+    },
+    {
+      "title": "Sequencer / patterns",
+      "rows": [
+        {
+          "do": [
+            "tap REC"
+          ],
+          "what": "Arm the track and record live (starts play); again to stop."
+        },
+        {
+          "do": [
+            "hold REC",
+            "white key 1"
+          ],
+          "what": "Clear the track's steps at once (hold SAVE undoes)."
+        },
+        {
+          "do": [
+            "SAVE twice"
+          ],
+          "what": "PHRASES: pick a pattern with KNOB 1, OCT+ loads it."
+        },
+        {
+          "do": [
+            "hold SEQ",
+            "turn KNOB 1"
+          ],
+          "what": "KNOB 1-4: length, step division, swing, gate."
+        },
+        {
+          "do": [
+            "hold SEQ",
+            "white key 1-6"
+          ],
+          "what": "Tools: clear, reverse, shift left/right, random, cook."
+        },
+        {
+          "do": [
+            "tap SEQ",
+            "tap REC",
+            "note key"
+          ],
+          "what": "STEP page: write the key into the cursor step."
+        },
+        {
+          "do": [
+            "tap EDIT"
+          ],
+          "what": "On STEP: empty the step (a rest) and move on."
+        },
+        {
+          "do": [
+            "tap GLO"
+          ],
+          "what": "SONG page: chain projects 1-4 (A-D) into a song."
+        }
+      ]
+    },
+    {
+      "title": "Saving & loading",
+      "rows": [
+        {
+          "do": [
+            "hold SAVE"
+          ],
+          "what": "Undo the last sound load, pattern load or clear."
+        },
+        {
+          "do": [
+            "tap SAVE",
+            "turn KNOB 1",
+            "tap OCT+"
+          ],
+          "what": "Save the sound to a user slot; name it, OCT+ again."
+        },
+        {
+          "do": [
+            "tap SAVE",
+            "tap SAVE",
+            "tap SAVE",
+            "turn KNOB 4",
+            "tap OCT+"
+          ],
+          "what": "PROJECT: save everything to the slot on KNOB 1."
+        },
+        {
+          "do": [
+            "tap SAVE",
+            "tap SAVE",
+            "tap SAVE",
+            "turn KNOB 3",
+            "tap OCT+"
+          ],
+          "what": "PROJECT: load the project in the slot on KNOB 1."
+        }
+      ]
+    },
+    {
+      "title": "Recovery",
+      "rows": [
+        {
+          "do": [
+            "hold OCT-",
+            "power on"
+          ],
+          "what": "USB rescue (no sound): the web installer can reinstall."
+        },
+        {
+          "do": [
+            "hold OCT-",
+            "hold OCT+"
+          ],
+          "what": "Held 5 s: update mode for the installer; let go cancels."
+        },
+        {
+          "do": [
+            "hold HOME"
+          ],
+          "what": "SYSTEM > RESTORE LAST OFF: power on to the chosen SCENE."
+        }
+      ]
+    }
+  ],
+  "tips": [
+    "Saving only works while stopped (STOP TO SAVE).",
+    "The FM-1 wakes up with your last session: stop for about 10 seconds before switching off.",
+    "Hold SAVE is your friend: it undoes a sound or pattern load, a clear or a SEQ tool.",
+    "Other power-on scenes (CRYPT, TAVERN, CHAPEL, BLANK): hold HOME, SYSTEM > SCENE.",
+    "Hurdy-gurdy crank: on a GURDY sound set COUP to CRANK, then turn SELECT to bow; tempo is then hold GLO + turn SELECT.",
+    "Try it in the browser first: ghoulbox.messy.quest."
+  ],
+  "checked": [
+    "Button labels: firmware/src/panel.c B_NAME order FX SCL ENV ... = printed FX SEL ENV ...; firmware calls SEL 'SCL'.",
+    "Encoders: ui_input.c ui_input(): ALGORITHM = track_select on every page, PRESETS = presets_turn (preset_step on HOME), SELECT = tempo unless BPM LOCK / crank.",
+    "HOME tap/hold: ui_input.c btn_hold (0.7 s) -> menu; ui.c home_tap cycles FAM_TRK pages; params.c PAGES: MIXER, CLOCK, KEYS, DREAM.",
+    "Page families and order: params.c PAGES; ui.c open_family (SAVE enters USER first, ui.act = 4 so OCT+ saves).",
+    "Layers: ui_layer.c LAYERS table + layer_key/layer_knob: GLO black places 0-3 mute, white 0-3 solo, white 4 unmute all, white 7 tap tempo, black 5-8 latch (GLO_LT 5); KNOB 1-4 levels. SCL any key = ROOT. EDIT white keys = engines (NENG_SHOWN 13), next = INIT. SEQ white keys = ui_tools.c TL_CLEAR..TL_COOK. REC white 0 = rec_clear.",
+    "Double-tap lock: ui_layer.c header comment and layer_lock (#83).",
+    "Hold LFO momentary tweaks: ui_input.c mom_down/mom_turn, OCT+ keeps.",
+    "REC tap: ui_input.c rec_tap (stopped -> transport starts, except on STEP where it arms step entry; seq_entry).",
+    "EDIT on STEP clears step: ui_input.c page button handler (GR_ROLL).",
+    "PROJECT page: params.c {G_SLOT, -, G_LOAD, G_SAVE}; act_do / act_name; STOP TO SAVE in project.c and ui_name.c.",
+    "Hold SAVE = undo_swap (ui.c undo comment).",
+    "OCT- alone at power-on = rescue: rescue.c rescue_key + bootguard.h bootguard_manual; OCT-+OCT+ held 5 s = UBOOT countdown in main.c; both tapped together resets octave (ui_input.c).",
+    "Scenes and defaults: engines.c GB_SCENES (DUNGEON 72 BPM), params.c G_RTYPE default HALL, N_QUANT includes WHITE, FX TAPE page G_TAPE G_CRSH G_AMB G_CRKL.",
+    "DREAM: dream.c dream_keys (key composes, confirm if steps exist), ui_input.c song.grid == 4.",
+    "Manual URL: GitHub release ghoulbox-v2.3.1 asset GHOULBOX-User-Guide-2.3.pdf (also docs/guide in the tree); catalogue site redirects to ghoulbox.messy.quest web emulator."
+  ],
+  "unsure": [
+    "FX layer default key-to-effect map (perform.c) and whether black keys mute tracks there: not traced, so only 'performance effect while held' is shown.",
+    "HOME KNOB 1-4 names differ per engine (ANALOG: CUT RES ATK REL per guide); not listed per engine.",
+    "panel.c comment says hold OCT- and OCT+ while powering on opens HARDWARE CALIBRATION; not traced in the boot path, left out (also in MENU > SYSTEM).",
+    "Crank tip (COUP CRANK, SELECT as crank) taken from README/guide; only crank_select() gating SELECT was seen in ui_input.c.",
+    "RESTORE LAST ~10 s autosave delay taken from the guide, not timed in project.c."
+  ]
+}

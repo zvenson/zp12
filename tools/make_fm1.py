@@ -98,6 +98,78 @@ def tools_cards():
     return jump, out
 
 
+CONTROL = re.compile(r"\b(OCT[-+\u2212]|KNOB [1-4](?:[-\u2013][1-4])?|SELECT|ALGORITHM|PRESETS|FX|SEL|ENV|LFO|EDIT|GLO|HOME|SAVE|ARP|SEQ|PLAY|REC"
+                     r"|(?:white|black|note) keys?(?: \d+(?:[-\u2013]\d+)?)?|[A-G]#?[3-5])(?![\w#-])")
+
+
+def cs_do(items):
+    """a row's controls as key caps: "hold ENV" -> <small>hold</small> <kbd>ENV</kbd>, joined with +"""
+    def one(it):
+        out, at = [], 0
+        for m in CONTROL.finditer(it):
+            if it[at:m.start()].strip():
+                out.append(f'<small>{html.escape(it[at:m.start()].strip())}</small>')
+            out.append(f"<kbd>{html.escape(m.group(1))}</kbd>")
+            at = m.end()
+        if it[at:].strip():
+            out.append(f'<small>{html.escape(it[at:].strip())}</small>')
+        return " ".join(out)
+    return '<span class="plus">+</span>'.join(one(i) for i in items)
+
+
+def cs_keys(zones):
+    """the 27 note keys (F3..G5) as a drawing, each zone's keys marked in its colour, and the legend"""
+    if not zones:
+        return ""
+    black = lambda i: (5 + i) % 12 in (1, 3, 6, 8, 10)      # (index 0 = F3)
+    col = {}
+    for z in zones:
+        ks = z["keys"]
+        idx = [i for i in range(27) if (ks == "white" and not black(i)) or (ks == "black" and black(i)) or (isinstance(ks, list) and i in ks)]
+        for i in idx:
+            col[i] = z["color"]
+    W, H, BW, BH = 40, 150, 24, 92
+    whites, blacks, wi = [], [], -1
+    for i in range(27):
+        if black(i):
+            x = (wi + 1) * W - BW / 2
+            c = col.get(i)
+            blacks.append(f'<rect x="{x}" y="0" width="{BW}" height="{BH}" rx="3" fill="#2e2a2b" stroke="#0c0a0b" stroke-width="2"/>'
+                          + (f'<circle cx="{x + BW / 2}" cy="{BH - 14}" r="7" fill="{c}"/>' if c else ""))
+        else:
+            wi += 1
+            c = col.get(i)
+            whites.append(f'<rect x="{wi * W}" y="0" width="{W}" height="{H}" rx="4" fill="#efe8e1" stroke="#151213" stroke-width="2"/>'
+                          + (f'<rect x="{wi * W + 5}" y="{H - 22}" width="{W - 10}" height="14" rx="4" fill="{c}"/>' if c else ""))
+    svg = (f'<svg viewBox="-2 -2 {(wi + 1) * W + 4} {H + 4}" role="img" aria-label="The FM-1\'s 27 note keys, F3 to G5, by what they do">'
+           + "".join(whites) + "".join(blacks) + "</svg>")
+    legend = "".join(f'<span><i style="background:{html.escape(z["color"])}"></i>{html.escape(z["label"])}</span>' for z in zones)
+    return f'<div class="kb">{svg}<div class="legend">{legend}</div></div>\n'
+
+
+def cheat_sheets(look):
+    """web/cheatsheets/<id>.json -> fm1/cs/<id>/index.html (web/cs-sheet.html around it); returns {id: version} for the cards"""
+    tpl = (HERE / "web" / "cs-sheet.html").read_text(encoding="utf-8")
+    e = lambda x: html.escape(str(x), quote=True)
+    out = {}
+    for f in sorted((HERE / "web" / "cheatsheets").glob("*.json")):
+        d = json.loads(f.read_text(encoding="utf-8"))
+        body = cs_keys(d.get("keys")) + '<div class="secs">\n' + "".join(
+            f'<section class="sec"><h2>{e(sec["title"])}</h2><dl>'
+            + "".join(f'<dt>{cs_do(r["do"])}</dt><dd>{e(r["what"])}</dd>' for r in sec["rows"]) + "</dl></section>\n"
+            for sec in d["sections"]) + "</div>\n"
+        if d.get("tips"):
+            body += '<div class="tips"><h2>Good to know</h2><ul>' + "".join(f"<li>{e(t)}</li>" for t in d["tips"]) + "</ul></div>\n"
+        page = (tpl.replace("<!--CS-BODY-->\n", body).replace("__INTRO__", e(d["intro"])).replace("__MANUAL__", e(d["manual"]))
+                .replace("__COLOR__", e(look.get(d["id"], "#42f5f5"))).replace("__VERSION__", e(d["version"]))
+                .replace("__NAME__", e(d["name"])).replace("__ID__", e(d["id"])))
+        dst = HERE / "fm1" / "cs" / d["id"]
+        dst.mkdir(parents=True, exist_ok=True)
+        (dst / "index.html").write_text(devices(page, "fm1", "cs"), encoding="utf-8")
+        out[d["id"]] = d["version"]
+    return out
+
+
 def credits():
     """the footer's credits, from the catalogues: ours (zvenson's), the FM-1's others by author, the SMK-37's"""
     sys.path.insert(0, str(HERE / "tools"))
@@ -186,7 +258,11 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
         make_site.strip_module((web / "fm1ota.js").read_text(encoding="utf-8"))
     out = HERE / "fm1" / "index.html"
     imgv = {p.stem: hashlib.sha256(p.read_bytes()).hexdigest()[:8] for p in sorted((HERE / "fm1" / "img").glob("*.png"))}
+    page = (HERE / "web" / "fm1.html").read_text(encoding="utf-8")
+    look = dict(re.findall(r'(\w+): "(#[0-9a-f]{6})"', page[page.index("const LOOK"):page.index("};", page.index("const LOOK"))]))
+    sheets = cheat_sheets(look)                          # (the firmwares' cheat sheets: fm1/cs/<id>/, the cards link them)
     out.write_text(devices((HERE / "web" / "fm1.html").read_text(encoding="utf-8").replace("/*LIB*/", lib)
+                           .replace("/*CS*/{}", json.dumps(sheets, separators=(",", ":")))
                            .replace("/*IMGV*/{}", json.dumps(imgv, separators=(",", ":"))), "fm1"), encoding="utf-8")
     (HERE / "fm1" / "robots.txt").write_text("User-agent: *\nAllow: /\nDisallow: /fw/\nDisallow: /src/\n"
                                             "Sitemap: https://thefirmwarehub.com/sitemap.xml\n")
@@ -200,7 +276,10 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
                                              f'<url><loc>https://thefirmwarehub.com/smk37/</loc><lastmod>{date.today()}</lastmod>'
                                              '<changefreq>weekly</changefreq><priority>0.7</priority></url>\n'
                                              f'<url><loc>https://thefirmwarehub.com/tools/</loc><lastmod>{date.today()}</lastmod>'
-                                             '<changefreq>weekly</changefreq><priority>0.6</priority></url>\n</urlset>\n')
+                                             '<changefreq>weekly</changefreq><priority>0.6</priority></url>\n'
+                                             + "".join(f'<url><loc>https://thefirmwarehub.com/cs/{i}/</loc><lastmod>{date.today()}</lastmod>'
+                                                       '<changefreq>monthly</changefreq><priority>0.5</priority></url>\n' for i in sheets)
+                                             + '</urlset>\n')
     kb = HERE / "fm1" / "kb"                            # the knowledge base: no menu link yet (the user's wish, 2026-10-13)
     kb.mkdir(exist_ok=True)
     (kb / "index.html").write_text(devices((HERE / "web" / "fm1kb.html").read_text(encoding="utf-8"), "fm1", "kb"), encoding="utf-8")
@@ -236,7 +315,8 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
     snip = Path(sloopdx) / "tools" / "matomo_snippet.py"
     if snip.exists():
         plays = sorted((HERE / "fm1" / "play").glob("*/index.html"))     # (the simulators: counted as the hub's pages)
-        for page in (out, kb / "index.html", smk / "index.html", tools / "index.html", imp / "index.html", *plays):
+        sheets_html = sorted((HERE / "fm1" / "cs").glob("*/index.html"))  # (the cheat sheets: the hub's pages too)
+        for page in (out, kb / "index.html", smk / "index.html", tools / "index.html", imp / "index.html", *plays, *sheets_html):
             subprocess.run([sys.executable, str(snip), str(page)], check=True, capture_output=True)
     (HERE / "fm1" / "rescue").mkdir(exist_ok=True)       # the rescue script, served next to the page (#rescue)
     (HERE / "fm1" / "rescue" / "fm1_rescue.py").write_text((HERE / "tools" / "fm1_rescue.py").read_text(encoding="utf-8"), encoding="utf-8")

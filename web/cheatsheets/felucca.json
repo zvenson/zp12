@@ -1,0 +1,106 @@
+{
+  "id": "felucca",
+  "name": "Felucca",
+  "version": "1.6.1",
+  "ref": "v1.6.1",
+  "manual": "https://github.com/hugelton/Felucca/wiki",
+  "intro": "A four-track groovebox with 13 synth engines: ALGORITHM picks the track, PRESETS its sound, PLAY starts the sequencer.",
+  "sections": [
+    { "title": "Getting around",
+      "rows": [
+        { "do": ["tap HOME"], "what": "Home screen; tap again for MIXER, then CLOCK." },
+        { "do": ["hold HOME"], "what": "Open the menu; HOME closes it again." },
+        { "do": ["turn ALGORITHM"], "what": "Select track 1-4 (works on every page)." },
+        { "do": ["tap ENV"], "what": "A page button opens its page; tap again for the next." },
+        { "do": ["hold GLO"], "what": "FX, GLO, SEL, EDIT, SEQ, REC held: a shortcut map appears." },
+        { "do": ["GLO twice"], "what": "Keep that shortcut layer open hands-free; tap once to close." },
+        { "do": ["turn PRESETS", "tap OCT+"], "what": "In the menu: pick a row, change its value (OCT- back)." }
+      ] },
+    { "title": "Playing",
+      "rows": [
+        { "do": ["tap PLAY"], "what": "Start or stop the sequencer." },
+        { "do": ["turn PRESETS"], "what": "Next or previous sound for the selected track." },
+        { "do": ["tap OCT+"], "what": "Keys an octave up (OCT- down, both together: reset)." },
+        { "do": ["turn SELECT"], "what": "Tempo (BPM)." },
+        { "do": ["hold FX", "hold white key 1-14"], "what": "Hold an effect: repeat, reverse, tape stop, freeze, filter..." },
+        { "do": ["hold FX", "turn KNOB 1"], "what": "Performance macros: KNOB 1-4 filter, crush, throw, depth." },
+        { "do": ["hold GLO", "tap black key 1-4"], "what": "Mute or unmute tracks 1-4." },
+        { "do": ["hold GLO", "hold white key 1-4"], "what": "Solo tracks 1-4 while held; KNOB 1-4 set track levels." },
+        { "do": ["hold GLO", "tap PLAY"], "what": "Restart from the top without stopping." }
+      ] },
+    { "title": "Sound",
+      "rows": [
+        { "do": ["turn KNOB 1"], "what": "On HOME: KNOB 1-4 are the engine's four main controls." },
+        { "do": ["hold EDIT", "tap white key 1-13"], "what": "Pick the engine: ANALOG, FM6, ... DRUM." },
+        { "do": ["tap EDIT"], "what": "Engine pages: EDIT 1, EDIT 2, then VOICE (poly, glide)." },
+        { "do": ["tap ENV"], "what": "Envelope: KNOB 1-4 attack, decay, sustain, release." },
+        { "do": ["tap LFO"], "what": "LFO; tap on for LFO 2, LFO DEST, MOD matrix." },
+        { "do": ["hold LFO", "turn KNOB 1"], "what": "Temporary tweak: snaps back on release (OCT+ keeps it)." },
+        { "do": ["tap FX"], "what": "Track sends: distortion, chorus, delay, reverb; tap on for more." },
+        { "do": ["tap SEL"], "what": "Scale page: root, scale, quantize, transpose; again: CHORD." },
+        { "do": ["hold SEL", "tap any key"], "what": "Set the track's root note to that key." },
+        { "do": ["tap ARP"], "what": "Arpeggiator: KNOB 1 mode (OFF = off), rate, octaves, gate." }
+      ] },
+    { "title": "Sequencer / patterns",
+      "rows": [
+        { "do": ["tap SEQ"], "what": "STEP page: piano roll, or drum grid on a DRUM track." },
+        { "do": ["tap REC"], "what": "On STEP while stopped: keys write steps at the cursor." },
+        { "do": ["tap REC"], "what": "Elsewhere: arm the track and record live (tap again: disarm)." },
+        { "do": ["turn KNOB 1"], "what": "On STEP: move the cursor; KNOB 2 note, KNOB 3 length." },
+        { "do": ["tap EDIT"], "what": "On STEP: clear the step at the cursor." },
+        { "do": ["tap white key 1-16"], "what": "Drum grid: toggle steps 1-16; black keys 1-8 pick the drum." },
+        { "do": ["hold SEQ", "tap white key"], "what": "SEQ TOOLS: clear, reverse, shift, random, cook, euclid..." },
+        { "do": ["hold SEQ", "turn KNOB 1"], "what": "Pattern length; KNOB 2-4 division, swing, gate." },
+        { "do": ["hold SEQ", "tap OCT-"], "what": "Undo every tool change made since SEQ was held." }
+      ] },
+    { "title": "Saving & loading",
+      "rows": [
+        { "do": ["tap SAVE", "turn KNOB 1", "tap OCT+", "tap OCT+"], "what": "Save the sound to a user slot (stop first)." },
+        { "do": ["hold SAVE"], "what": "Undo the last sound load or sequence tool." },
+        { "do": ["tap SAVE", "tap SAVE"], "what": "PRESETS browser: KNOB 2 engine, KNOB 3 favourite, KNOB 4 list." },
+        { "do": ["tap SAVE", "tap SAVE", "tap SAVE", "turn KNOB 1", "tap OCT+"], "what": "PHRASES: load a ready-made pattern." },
+        { "do": ["tap SAVE", "tap SAVE", "tap SAVE", "tap SAVE"], "what": "PROJECT: KNOB 1 slot, KNOB 3 load, KNOB 4 save, OCT+." }
+      ] },
+    { "title": "MIDI & sync",
+      "rows": [
+        { "do": ["tap HOME", "tap HOME", "turn KNOB 3"], "what": "From HOME: CLOCK page, clock source INT, USB or TRS." },
+        { "do": ["hold GLO", "tap white key 8"], "what": "Tap tempo." },
+        { "do": ["hold GLO", "tap white key 6"], "what": "MIDI LEARN on or off." },
+        { "do": ["hold HOME", "turn ALGORITHM"], "what": "Menu tabs; MIDI tab sets MIDI IN and track channels." }
+      ] },
+    { "title": "Recovery",
+      "rows": [
+        { "do": ["hold OCT-", "hold OCT+", "power on"], "what": "Panel calibration: press each control it names." },
+        { "do": ["hold OCT-", "hold OCT+"], "what": "5 seconds: update (boot) mode; let go earlier to cancel." },
+        { "do": ["hold HOME", "turn ALGORITHM"], "what": "Menu SYSTEM tab: RESTORE LAST OFF starts empty, no autosave." }
+      ] }
+  ],
+  "tips": [
+    "Default tracks: 1 ANALOG acid, 2 FM6 pad, 3 LOFI lead, 4 DRUM kit.",
+    "Your music is autosaved when stopped and idle, and comes back at power-on.",
+    "MIDI IN by default: channels 1-4 play tracks 1-4.",
+    "Turn on MENU > SYSTEM > HELP for key hints on every page.",
+    "Back to the stock firmware: the web installer's Return to official V15, or M-VAVE's updater."
+  ],
+  "checked": [
+    "Archive src/felucca-1.6.1.tar.gz from thefirmwarehub.com (catalog mirror), Felucca-1.6.1.",
+    "panel.c: button enum B_SCL is the printed SEL button; encoder roles SELECT/ALGORITHM/PRESETS/KNOB 1-4.",
+    "ui_input.c ui_input(): PLAY start/stop (GLO held: restart via layer_play), ALGORITHM = track_select on every page, SELECT = BPM unless MENU SELECT mode/BPM LOCK, OCT-/OCT+ octave -3..+3 and both = 0, HOME hold 0.7 s = menu, SAVE hold = undo_swap, SAVE tap = USER page, REC tap = rec_tap.",
+    "ui_input.c presets_turn: PRESETS = preset_step on HOME and sound pages, cursor on SEQ pages, KNOB 1 on USER/PHRASES/PROJECT/SONG.",
+    "ui.c home_tap (HOME -> MIXER -> CLOCK -> HOME), home_param (HOME KNOB 1-4 = engine knob[0..3]), open_family (tap again = next page), ui.act=4 on USER so OCT+ saves.",
+    "ui_input.c act_do/edit_param: USER slot KNOB 1, OCT+ -> NAME (or overwrite dialog), NAME OCT+ writes; PROJECT KNOB 1 slot, KNOB 3 LOAD, KNOB 4 SAVE; STOP TO SAVE while playing.",
+    "params.c PAGES: ENV A D S R, LFO/LFO 2/LFO DEST/MOD, FX DST CHO DLY REV, SCL ROOT SCL QNT TRN, CHORD, ARP MODE RATE OCT GATE (MODE default OFF), CLOCK BPM SWING CLK (INT USB TRS), SAVE family USER PRESETS PHRASES PROJECT TOOLS.",
+    "ui_layer.c LAYERS + layer_key/layer_knob: FX hold (perform.c PF_DEF white keys 1-14, black 1-4 mute while held, KNOB 1-4 macros), GLO (black 1-4 mute toggle, white 1-4 solo held, white 5 unmute all, 6 MIDI LEARN, 7 FILL, 8 TAP, KNOB 1-4 levels), SEL any key = ROOT, EDIT white keys = ENGINE_ORDER (engines.c: ANALOG FM6 PHASE LOFI SAMPLE VOICE TRIO WHEEL GRAIN PHYS NOISE SLICE DRUM), SEQ TOOLS (ui_tools.c) KNOB 1-4 LEN DIV SWING GATE; double tap locks a layer; OCT- in SET layer puts back.",
+    "ui_input.c step_edit/seq_entry/page_tap: STEP KNOB 1 cursor, 2 note, 3 length/time, 4 flag; armed+stopped keys write at cursor; EDIT clears step. grid_keys + seq.c GK_*: drum grid white keys = steps, black 1-8 lanes, 9 ACC, 10/11 page.",
+    "ui_input.c mom_turn: LFO held + KNOB = momentary, OCT+ keeps.",
+    "engines.c TRK_DEF: ANALOG ACID, FM6 PAD, LOFI PULSE LD, DRUM KIT. project.c autosave (10 s idle stopped, RESTORE LAST ON default). params.c G_ROUTE default CH1-4.",
+    "main.c: OCT- + OCT+ at power-on = panel_setup (calibration); OCT- + OCT+ held 5 s = UBOOT with countdown, release cancels; two failed boots enter UBOOT. ui_help.c hints; menu_items.c tabs DISPLAY CONTROL AUDIO MIDI SYSTEM; ui_menu.c PRESETS rows, ALGORITHM tabs, OCT+/- values."
+  ],
+  "unsure": [
+    "PHRASES content (which ready-made patterns exist per engine) not inspected; only the KNOB 1 + OCT+ load path verified.",
+    "Panel calibration screen wording ('press each control it names') inferred from panel.c comment and setup_show, not read in full.",
+    "Whether the UBOOT (update) mode is useful to a user without the web installer not verified; troubleshooting wiki only covers WL80UBOOT recovery.",
+    "FX layer white keys 15-16 have no effect by default; user remapping (hold FX + key + PRESETS) not listed.",
+    "STEP KNOB 4 (accent/slide) and DETAIL/AUTOMATION pages left out for brevity."
+  ]
+}

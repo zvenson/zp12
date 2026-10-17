@@ -1,0 +1,103 @@
+{
+  "id": "jiant",
+  "name": "JIANT FM",
+  "version": "0.8.5-c524e3c",
+  "ref": "c524e3c",
+  "manual": "https://github.com/juanjiant-bit/JIANT/blob/main/docs/MANUAL.md",
+  "intro": "A six-track groovebox (T4 is drums); it starts empty and nothing is kept at power-off unless you save it into a section.",
+  "sections": [
+    { "title": "Getting around",
+      "rows": [
+        { "do": ["tap HOME"], "what": "Back to HOME: one creature per track." },
+        { "do": ["turn ALGORITHM"], "what": "Pick the track (T1-T4; T5-T6 need TRACKS 6)." },
+        { "do": ["turn SELECT"], "what": "Scroll the pages of the section you are in." },
+        { "do": ["hold SEQ", "turn PRESETS"], "what": "Jump through any page button's pages." },
+        { "do": ["tap OCT+"], "what": "In dialogs and action pages: YES / do it." },
+        { "do": ["tap OCT-"], "what": "In dialogs and action pages: NO / back." },
+        { "do": ["hold HOME"], "what": "Open the MENU; tap HOME closes it." }
+      ] },
+    { "title": "Playing",
+      "rows": [
+        { "do": ["turn PRESETS"], "what": "Browse sounds of every engine, then your user presets." },
+        { "do": ["turn KNOB 1"], "what": "KNOB 1-4 on HOME: the sound's four main controls." },
+        { "do": ["tap OCT-"], "what": "Keyboard octave down / up (-3 to +3)." },
+        { "do": ["hold OCT-", "tap OCT+"], "what": "Both together: octave back to 0." },
+        { "do": ["tap PLAY"], "what": "Start / stop." },
+        { "do": ["hold GLO", "tap PLAY"], "what": "Restart from the top without stopping." },
+        { "do": ["hold GLO", "turn SELECT"], "what": "Change the tempo (GLO + F4: tap tempo)." },
+        { "do": ["hold GLO", "tap F#3"], "what": "Mute T1 (black keys 1-6 = T1-T6)." },
+        { "do": ["hold GLO", "tap F3"], "what": "Solo T1 while held (F3-D4 = T1-T6)." },
+        { "do": ["hold GLO", "tap E4"], "what": "Unmute everything." }
+      ] },
+    { "title": "Sound",
+      "rows": [
+        { "do": ["hold EDIT", "turn SELECT"], "what": "Roll a new variation; OCT+ keeps it, OCT- reverts." },
+        { "do": ["tap EDIT"], "what": "The engine's own pages (tap again: next page)." },
+        { "do": ["hold EDIT", "tap F3"], "what": "INIT: back to the engine's factory sound." },
+        { "do": ["hold EDIT", "tap G3"], "what": "RECALL: the sound as the section stored it." },
+        { "do": ["tap ENV"], "what": "Envelope pages." },
+        { "do": ["hold LFO", "turn KNOB 1"], "what": "Macros M1-M4 on KNOB 1-4; tap LFO to unlatch." },
+        { "do": ["hold SEL", "tap C4"], "what": "Make C the song's root (any key works)." }
+      ] },
+    { "title": "Sequencer / patterns",
+      "rows": [
+        { "do": ["tap HOME", "turn SELECT"], "what": "GEN song generator: KNOB 1 genre, OCT+ makes a song." },
+        { "do": ["tap SEQ"], "what": "Sequencer; tap again for the next set of knobs." },
+        { "do": ["tap SEQ", "turn SELECT"], "what": "Zoom PATTERN / BAR / STEP." },
+        { "do": ["tap REC"], "what": "Arm the track and record live (overdub)." },
+        { "do": ["hold SEQ", "turn SELECT"], "what": "Dice the sequence; OCT+ keeps, OCT- reverts." },
+        { "do": ["hold REC", "tap F3"], "what": "Clear the selected track's steps, no dialog." },
+        { "do": ["hold REC", "tap G3"], "what": "Metronome click: OFF / REC / ON." },
+        { "do": ["hold SEQ", "tap REC"], "what": "Clear all sequences (asks first)." }
+      ] },
+    { "title": "Effects",
+      "rows": [
+        { "do": ["hold FX", "tap F3"], "what": "Punch-in effects while held (white keys F3-F5)." },
+        { "do": ["hold FX", "turn KNOB 1"], "what": "FILTER; KNOB 2 CRUSH, 3 THROW, 4 DEPTH." },
+        { "do": ["hold FX", "tap F#3"], "what": "Mute T1 while held (black keys 1-6)." },
+        { "do": ["hold FX"], "what": "Let go untouched: FX layer stays open; tap FX to close." },
+        { "do": ["hold FX", "turn SELECT"], "what": "Dice the effects; OCT+ keeps, OCT- reverts." },
+        { "do": ["tap FX"], "what": "FX pages; SELECT zooms TRACK / BUSES / EFFECT." }
+      ] },
+    { "title": "Saving & loading",
+      "rows": [
+        { "do": ["tap SAVE", "tap OCT+", "tap OCT+"], "what": "Stopped: save the sound as a user preset." },
+        { "do": ["tap SAVE", "turn SELECT"], "what": "Left one detent: PROJECT, the four sections A-D." },
+        { "do": ["turn KNOB 1", "turn KNOB 4", "tap OCT+"], "what": "On PROJECT, stopped: pick section, arm SAVE, then name and OCT+." },
+        { "do": ["turn KNOB 3", "tap OCT+"], "what": "On PROJECT: LOAD the picked section." },
+        { "do": ["hold SAVE", "tap F3"], "what": "Play section A on the next bar (F3-B3 = A-D)." },
+        { "do": ["hold SAVE", "tap C4"], "what": "Store into section A while playing (C4-F4 = A-D)." },
+        { "do": ["hold HOME"], "what": "MENU > SYSTEM > RESTORE LAST ON: reopen last session." }
+      ] },
+    { "title": "Recovery",
+      "rows": [
+        { "do": ["hold GLO", "tap G4"], "what": "UNDO the last big change (again: redo)." },
+        { "do": ["hold OCT-", "hold OCT+", "power on"], "what": "HARDWARE CALIBRATION: teach each button and knob." },
+        { "do": ["hold OCT-", "hold OCT+"], "what": "5 seconds: update mode (let go to cancel)." }
+      ] }
+  ],
+  "tips": [
+    "Power-on starts at zero: T1 ANALOG, T2 FM6, T3 LOFI, T4 DRUM, empty sequences.",
+    "Saving and loading need the transport stopped (STOP TO SAVE).",
+    "SAVE-layer stores go to flash only when you stop: stop before switching off.",
+    "On a DRUM track OCT changes how keys play: up = ratchets, down = short / ghost / flam.",
+    "Only T1-T4 play by default; GLO > SYSTEM > TRACKS 6 wakes T5 and T6."
+  ],
+  "checked": [
+    "Button labels: panel.c B_NAME (SCL is the printed SEL, same position) and E_NAME.",
+    "ui_input.c main input pass: ALGORITHM track_select (trk_live), PRESETS presets_turn (preset_step on HOME), SELECT page_scroll / HOME opens GEN (confirm CF_DICE_ALL, gen_open), button+SELECT dice (EDIT/SEQ/LFO/FX) and page_jump with PRESETS, GLO+SELECT tempo, PLAY transport, SEQ+REC CF_CLEAR_ALL, OCT- / OCT+ octave -3..+3 and both = 0, HOME tap go_home / hold menu, dice OK/CANCEL via OCT+/OCT-.",
+    "ui_input.c rec_tap: REC arms the selected track and starts transport (step recording on STEP when stopped).",
+    "ui_layer.c layer_key: GLO black 1-6 mute, white F3-D4 solo, E4 unmute all, F4 tap, G4 undo; EDIT F3 INIT, G3 RECALL; SCL key = root; REC F3 clear, G3 click; SAVE song_key F3-B3 play A-D, C4-F4 store A-D; layer_oct SAVE+OCT+/OCT- store/recall; layer_play GLO+PLAY restart; FX lock (fx_lock) and FX knobs FILTER CRUSH THROW DEPTH.",
+    "seq.c perf_key: FX white keys F3..F5 effects, G5 clears lane, black 1-6 mutes; perform.c enum of effects.",
+    "ui.c open_family FAM_SAVE: SAVE from elsewhere opens SOUND/USER with SAVE armed; SV_SET levels LIBRARY/PROJECT/SOUND; params.c PROJECT page knobs {-, SLOT, LOAD, SAVE}.",
+    "ui.c PREF_RESTORE_ON (RESTORE LAST OFF by default), project.c autosave only with RESTORE LAST ON; main.c power-on init (TRK_DEF engines in engines.c, empty sequencers), panel_setup with OCT-+OCT+ at power-on, UBOOT countdown OCT-+OCT+ 5 s.",
+    "ui.c home_param: HOME KNOB 1-4 = engine knob[0..3]; ui.c trk_live default 4; gen.c GEN_LBL GENRE on KNOB 1.",
+    "docs/MANUAL.md and docs/cheatsheet-controls.png at c524e3c read for orientation."
+  ],
+  "unsure": [
+    "Whether the printed SEL button label matches JIANT's SCL exactly on every FM-1 batch (firmware calls it SCL; position matches SEL).",
+    "MIDI details (ROUTE CH1-6, CLOCK INT/USB/TRS, MIDI OUT KEYS default) seen in params.c / menu_items.c but left out to keep the sheet short.",
+    "GEN's exact page-2 controls (DRUMS/BASS/CHORDS/ARP) not exercised beyond the label table.",
+    "The author notes the firmware is little tested on real FM-1 hardware (beta)."
+  ]
+}
