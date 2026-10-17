@@ -24,9 +24,12 @@ self.addEventListener("fetch", (e) => {
                                                                                          () => fromKeep(r).then((k) => k || offline(r))));
 });
 
-// (no-cache: the browser asks the server each time, as the server's Cache-Control says; ok answers kept for offline)
+// (no-cache: the browser asks the server each time, past its own copy of up to 10 minutes (Cloudflare's browser TTL);
+//  a page under its own path ("/", "/smk37/") so, one that may redirect ("/smk37") as the browser asked for it)
 function fromNet(r, e) {
-  return fetch(r.mode === "navigate" ? r : new Request(r, { cache: "no-cache" })).then((res) => {
+  const nav = r.mode === "navigate";
+  return fetch(!nav ? new Request(r, { cache: "no-cache" }) : new URL(r.url).pathname.endsWith("/")
+               ? new Request(r.url, { cache: "no-cache", credentials: "same-origin" }) : r).then((res) => {
     if (res.ok && res.type === "basic") { const c = res.clone(); e.waitUntil(caches.open(KEEP).then((k) => k.put(key(r), c))); }
     return res;
   });
