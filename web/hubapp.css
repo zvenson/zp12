@@ -13,4 +13,8 @@
   .appbar .x { position: absolute; top: 6px; right: 6px; width: 34px; height: 34px; border: 0; padding: 0; background: none; color: #a39a94;
                font: 24px/1 Arial, sans-serif; cursor: pointer; border-radius: 50%; }
   .appbar .x:hover { color: #efe8e1; background: #2e2a2b; }
+  .appbar.wide { max-width: 640px; align-items: center; gap: 18px; }
+  .appbar .qr { flex: none; width: 132px; height: 132px; border-radius: 10px; align-self: center; }
+  .appbar .pc { margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #d8d0c9; }
+  .appbar .pc .go { padding: 7px 16px; }
   @media (prefers-reduced-motion: reduce) { .appbar { animation: none; } }

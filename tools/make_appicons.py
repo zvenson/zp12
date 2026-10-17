@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """The hub's app icons (fm1/app/: the web app's manifest, web/hubapp.js): "FW HUB" on the page's dark, its four colours
-under it. Square and full bleed (Android and iOS round them themselves); the maskable one with its contents in the inner 80 %.
+under it, and the QR code to the live hub (segno). Square and full bleed (Android and iOS round them themselves); the maskable one with its contents in the inner 80 %.
   tools/make_appicons.py"""
 from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
@@ -8,6 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = Path(__file__).resolve().parents[1]
 FONTS = Path("/run/host/fonts/rsms-inter-fonts")
 BG, FG, CYAN = "#151213", "#efe8e1", "#42f5f5"
+URL = "https://thefirmwarehub.com/"
 STRIP = ["#42f5f5", "#afd9f4", "#f4c0cb", "#e6d1b9"]
 
 
@@ -38,6 +39,11 @@ def main():
     icon(512, .92).save(out / "icon-512.png", optimize=True)
     icon(512, .72).save(out / "icon-maskable-512.png", optimize=True)
     icon(180, .86).save(out / "apple-touch-icon.png", optimize=True)
+    try:                                                   # (the code a computer shows to scan with the phone: the live hub's)
+        import segno
+        segno.make(f"{URL}?app=1", error="m").save(str(out / "qr.svg"), scale=4, border=2, dark=BG, light=FG, xmldecl=False)
+    except ImportError:
+        print("make_appicons: no segno (pip install segno), qr.svg kept")
     print(f"make_appicons: {out}")
 
 

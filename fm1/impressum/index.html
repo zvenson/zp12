@@ -147,6 +147,10 @@
   .appbar .x { position: absolute; top: 6px; right: 6px; width: 34px; height: 34px; border: 0; padding: 0; background: none; color: #a39a94;
                font: 24px/1 Arial, sans-serif; cursor: pointer; border-radius: 50%; }
   .appbar .x:hover { color: #efe8e1; background: #2e2a2b; }
+  .appbar.wide { max-width: 640px; align-items: center; gap: 18px; }
+  .appbar .qr { flex: none; width: 132px; height: 132px; border-radius: 10px; align-self: center; }
+  .appbar .pc { margin-top: 8px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: #d8d0c9; }
+  .appbar .pc .go { padding: 7px 16px; }
   @media (prefers-reduced-motion: reduce) { .appbar { animation: none; } }
 </style>
 </head>
@@ -356,6 +360,8 @@
   const quiet = () => { try { return Date.now() < +(localStorage.getItem(KEY) || 0); } catch { return false; } };
   const hush = () => { try { localStorage.setItem(KEY, String(Date.now() + 60 * 864e5)); } catch {} };
   const SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M6 11H5v10h14V11h-1"/></svg>';
+  // the panel: iPhone / iPad the how-to (no prompt there), a phone the browser's Install, a computer the code to scan
+  // with the phone (and Install for this computer where the browser offers it)
   function show() {
     if (standalone) return;
     bar?.remove();
@@ -364,23 +370,29 @@
     bar.setAttribute("role", "dialog");
     bar.setAttribute("aria-label", "The Firmware Hub as an app");
     const icon = '<img src="/app/icon-192.png" alt="" width="44" height="44">';
+    const go = prompt ? '<button class="go" type="button">Install</button>' : "";
     if (ios) {
       bar.innerHTML = `${icon}<div class="t"><b>The hub on your Home Screen</b>
         <span>Tap Share ${SHARE} then <b>Add to Home Screen</b>.</span>
         <small>Browse, rate, keep favourites. Installing a firmware needs Chrome or Edge on a computer, or Chrome on Android: iPhone and iPad have no Web MIDI yet.</small></div>`;
-    } else if (prompt) {
-      bar.innerHTML = `${icon}<div class="t"><b>The Firmware Hub as an app</b><span>On your home screen, always the newest firmwares.</span></div>
-        <button class="go" type="button">Install</button>`;
-      bar.querySelector(".go").onclick = async () => {
-        const p = prompt; prompt = null;
-        p.prompt();
-        const { outcome } = await p.userChoice.catch(() => ({}));
-        if (outcome === "accepted") bar.remove(); else hush();
-      };
+    } else if (touch) {
+      bar.innerHTML = `${icon}<div class="t"><b>The Firmware Hub as an app</b>` + (prompt
+        ? "<span>On your home screen, always the newest firmwares.</span></div>" + go
+        : "<span>In Chrome: the menu <b>⋮</b>, then <b>Install app</b> or <b>Add to Home screen</b>.</span></div>");
     } else {
-      bar.innerHTML = `${icon}<div class="t"><b>The Firmware Hub as an app</b>
-        <span>In Chrome or Edge: the menu <b>⋮</b>, then <b>Install app</b> or <b>Add to Home screen</b>.</span></div>`;
+      bar.classList.add("wide");
+      bar.innerHTML = `<img class="qr" src="/app/qr.svg" alt="QR code: thefirmwarehub.com" width="132" height="132"><div class="t">
+        <b>The Firmware Hub on your phone</b>
+        <span>Scan the code, then <b>Install</b> (Android, Chrome) or Share ${SHARE} <b>Add to Home Screen</b> (iPhone).</span>
+        <small>Always the newest firmwares, your favourites and stars on every device. Installing a firmware from the phone: Android with Chrome and a USB-C cable (iPhone: no Web MIDI yet).</small>
+        ${prompt ? '<span class="pc">Or as an app on this computer: <button class="go" type="button">Install</button></span>' : ""}</div>`;
     }
+    bar.querySelector(".go")?.addEventListener("click", async () => {
+      const p = prompt; prompt = null;
+      p.prompt();
+      const { outcome } = await p.userChoice.catch(() => ({}));
+      if (outcome === "accepted") bar.remove(); else hush();
+    });
     const x = document.createElement("button");
     x.className = "x"; x.type = "button"; x.setAttribute("aria-label", "Close"); x.textContent = "×";
     x.onclick = () => { hush(); bar.remove(); };
@@ -393,14 +405,19 @@
   });
   addEventListener("appinstalled", () => { bar?.remove(); prompt = null; });
   addEventListener("DOMContentLoaded", () => {
-    const a = document.getElementById("getapp");
-    if (a) {
-      if (standalone) a.remove();
-      else a.onclick = (e) => {                           // (the browser's prompt right away where there is one, else the how-to)
-        e.preventDefault(); document.getElementById("dd")?.classList.remove("open");
-        show(); bar?.querySelector(".go")?.click();
-      };
+    // visible: "Get the app" beside the page's buttons (FM-1, SMK-37), and in the Devices menu; gone inside the app
+    const row = document.querySelector("header .bar");
+    if (row && !standalone) {
+      const b = Object.assign(document.createElement("a"), { className: "btn ghost getapp", href: "#app", textContent: "📱 Get the app" });
+      row.insertBefore(b, row.querySelector(".btn.coffee"));
     }
+    document.querySelectorAll("#getapp, .getapp").forEach((a) => {
+      if (standalone) return a.remove();
+      a.onclick = (e) => {                               // (on a phone the browser's prompt right away where there is one)
+        e.preventDefault(); document.getElementById("dd")?.classList.remove("open");
+        show(); if (touch) bar?.querySelector(".go")?.click();
+      };
+    });
     if (location.hash === "#app") show();                // (the menu's link from a page without this code: VIBE's)
     else if (ios && !standalone && !quiet()) setTimeout(show, 1500);   // (Safari has no prompt: the bar a moment after the page)
   });
