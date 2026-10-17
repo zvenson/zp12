@@ -85,7 +85,10 @@ def rule():
     mine = {"ref": RULE_REF, "description": f"{SITE['label']}: static, cached at the edge (tools/cf_cache.py)",
             "expression": expr, "action": "set_cache_settings",
             "action_parameters": {"cache": True, "edge_ttl": {"mode": "override_origin", "default": EDGE_TTL},
-                                  "browser_ttl": {"mode": "override_origin", "default": BROWSER_TTL}}}
+                                  "browser_ttl": {"mode": "override_origin", "default": BROWSER_TTL},
+                                  # (a page with ?sort= / ?q= / ?app= / ?ref=: the same page, read in the browser; one
+                                  #  copy at the edge, so a deploy's purge of the page reaches every variant)
+                                  "cache_key": {"custom_key": {"query_string": {"exclude": {"all": True}}}}}}
     files = {"ref": RULE_REF + "-files", "description": f"{SITE['label']}: pictures, videos, packages, 30 days at the edge",
              "expression": expr[:-1] + " and http.request.uri.path.extension ne \"\" and not http.request.uri.path.extension in {"
                            + " ".join(f'"{e}"' for e in PAGES) + "})",
@@ -134,6 +137,12 @@ def purge():
     print(f"cf_cache: {len(u)} of {len(now)} URLs purged (changed)")
 
 
+def purge_all():
+    """everything at the edge, once (e.g. after the cache key changed); the pages and files are fetched again"""
+    call("POST", f"/zones/{zone_id()}/purge_cache", {"purge_everything": True})
+    print(f"cf_cache: everything purged ({ZONE})")
+
+
 def purge_url():
     """just these; URLs of another zone are left out (fm1_sync.py names both hosts of the catalogue)"""
     u = [x for x in sys.argv[2:] if (urllib.parse.urlsplit(x).hostname or "").endswith(ZONE)][:30]
@@ -151,4 +160,4 @@ def check():
 
 
 if __name__ == "__main__":
-    {"rule": rule, "purge": purge, "purge-url": purge_url, "check": check}.get(sys.argv[1] if len(sys.argv) > 1 else "", lambda: sys.exit(__doc__))()
+    {"rule": rule, "purge": purge, "purge-all": purge_all, "purge-url": purge_url, "check": check}.get(sys.argv[1] if len(sys.argv) > 1 else "", lambda: sys.exit(__doc__))()
