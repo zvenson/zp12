@@ -1046,7 +1046,7 @@ const $ = (id) => document.getElementById(id);
 const KEY = (kind, href, tip, svg, own = "") => `<a class="key k-${kind}${own ? " csl" : ""}" href="${href}" data-tip="${tip}" aria-label="${tip}"`
   + (own ? ` data-cs="${own}">` : ' target="_blank" rel="noopener">') + `${svg}</a>`;
 const ICONS = { play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
-                edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16M12 4v16M18 4v16"/><path d="M4 8h4M10 15h4M16 10h4"/></svg>',
+                edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 12l4-4M12 4v2M4 12h2M18 12h2"/></svg>',
                 sheet: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>',
                 build: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 13a7 7 0 0 0 14 0M8 10h8"/></svg>' };
 const deck = (f) => { const k = (f.play ? KEY("play", esc(f.play), "Play in browser", ICONS.play) : "")
