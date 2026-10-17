@@ -1,0 +1,105 @@
+{
+ "id": "shineon",
+ "name": "Shine On",
+ "version": "1.2",
+ "ref": "v1.2",
+ "manual": "https://github.com/zvenson/shineon#readme",
+ "intro": "A 16-voice string ensemble in the spirit of the seventies string machines: footages, register filters, a three-line ensemble and a phaser, on OberVave's panel with its two-track sequencer. Turn PRESETS and hold a chord.",
+ "sections": [
+  {
+   "title": "Getting around",
+   "rows": [
+    {"do": ["tap HOME"], "what": "PERFORM page: TONE, ATTACK, RELEASE, ensemble DEPTH."},
+    {"do": ["turn SELECT"], "what": "Tempo, on every screen."},
+    {"do": ["turn ALGORITHM"], "what": "Pick track A or B."},
+    {"do": ["tap OCT-"], "what": "Octave down (OCT+ up); both together: back to 0."},
+    {"do": ["hold FX", "tap HOME"], "what": "Lock a held layer open; its button lets it go."}
+   ]
+  },
+  {
+   "title": "Playing",
+   "rows": [
+    {"do": ["turn PRESETS"], "what": "Pick one of 99 programs (1-32 factory sounds)."},
+    {"do": ["tap ARP", "turn KNOB 1"], "what": "Arpeggiator mode; OFF switches it off."},
+    {"do": ["tap ARP", "tap ARP"], "what": "On the ARP page: HOLD latches the arp."},
+    {"do": ["hold SAVE", "tap SEL"], "what": "A new random string sound."}
+   ]
+  },
+  {
+   "title": "Sound",
+   "rows": [
+    {"do": ["tap EDIT"], "what": "STRINGS: C.BASS, CELLO, VIOLA, VIOLIN register levels."},
+    {"do": ["EDIT twice"], "what": "BRASS + SPLIT: TRUMPET, HORN, the bass-section split point, TONE."},
+    {"do": ["tap EDIT", "tap EDIT", "tap EDIT"], "what": "TONE page: TONE, WARMTH, BRIGHT, VELOCITY."},
+    {"do": ["tap ENV"], "what": "KEYER: ATTACK (crescendo), RELEASE, VELOCITY, GLIDE."},
+    {"do": ["tap LFO"], "what": "VIBRATO: RATE, depth, DELAY, mod-wheel depth."},
+    {"do": ["GLO twice"], "what": "OUTPUT: VINTAGE drift, OCTAVE (16' down / 4' up), BEND, VOLUME."}
+   ]
+  },
+  {
+   "title": "Sequencer / patterns",
+   "rows": [
+    {"do": ["tap SEQ"], "what": "Full-screen sequencer; tap again for its next view."},
+    {"do": ["tap PLAY"], "what": "Start / stop the sequencer."},
+    {"do": ["tap REC"], "what": "Playing: record on top. Stopped: armed, first note starts."},
+    {"do": ["hold REC"], "what": "2 seconds: clear the chosen track."},
+    {"do": ["hold SEQ", "white key 1-16"], "what": "Set a step with the last note or chord; again clears."},
+    {"do": ["hold EDIT", "tap OCT-"], "what": "Undo the last sequencer change (OCT+: redo)."},
+    {"do": ["tap SEQ", "turn ALGORITHM", "turn KNOB 1"], "what": "Switch track B on (16 steps)."},
+    {"do": ["tap SEQ", "turn ALGORITHM", "turn PRESETS"], "what": "Give track B its own sound, e.g. bass under strings."},
+    {"do": ["hold GLO", "white key 1"], "what": "Mute track A (key 2: B; keys 5 / 6: solo)."},
+    {"do": ["hold SAVE", "white key 1-8"], "what": "Go to pattern 1-8 (playing: at the loop's end)."}
+   ]
+  },
+  {
+   "title": "Effects",
+   "rows": [
+    {"do": ["tap FX"], "what": "ENSEMBLE, PHASER, DELAY, REVERB pages; tap for next."},
+    {"do": ["tap FX", "turn KNOB 1"], "what": "Ensemble: OFF, MONO (as the originals), STEREO, WIDE."},
+    {"do": ["hold FX", "turn KNOB 1"], "what": "Ensemble mix (KNOB 2 phaser, 3 delay, 4 reverb)."},
+    {"do": ["FX twice"], "what": "PHASER: RATE, DEPTH, FEEDBK, MIX (off by default)."},
+    {"do": ["tap SEQ", "turn KNOB 4"], "what": "TRACKS: track B's own sound's FX SEND."}
+   ]
+  },
+  {
+   "title": "Saving & loading",
+   "rows": [
+    {"do": ["SAVE twice"], "what": "Save the sound in its program slot."},
+    {"do": ["tap SAVE", "turn PRESETS", "tap SAVE"], "what": "Save the sound into another slot."},
+    {"do": ["tap SEQ", "tap SAVE"], "what": "In the sequencer: save the pattern now."},
+    {"do": ["hold SAVE", "black key 1-8"], "what": "Copy this pattern to slot 1-8 (used slot: press twice)."}
+   ]
+  },
+  {
+   "title": "Settings",
+   "rows": [
+    {"do": ["tap GLO"], "what": "GLOBAL: TEMPO, CLICK, MIDI CH, TUNE."},
+    {"do": ["tap GLO", "turn KNOB 2"], "what": "Click: OFF, REC, ON, COUNT-IN."},
+    {"do": ["tap GLO", "turn KNOB 3"], "what": "MIDI channel or OMNI; the next channel plays B's sound."},
+    {"do": ["hold GLO", "white key 16"], "what": "Tap tempo (G5)."}
+   ]
+  }
+ ],
+ "tips": [
+  "Start with 01 ENSEMBLE (the classic 8' + 4' strings), 03 SHINE PAD (wide, phased, big plate) and 12 PHASED STR.",
+  "The ensemble is the sound: on PERFORM, KNOB 4 (DEPTH) takes it from still to swirling; FX page 1 KNOB 1 picks MONO, STEREO or WIDE.",
+  "Registers mix like drawbars: turn VIOLA and VIOLIN down, CELLO up, and the same keys play cellos. SPLIT puts the bass section under the low keys.",
+  "An edited sound shows * after its name; turn PRESETS before saving and the edit is gone. SAVE arms for 3 seconds (SAVE?).",
+  "Track B can play sound A or its own program; with B chosen and its own sound, the panel edits B (orange B in the header). The effects are sound A's.",
+  "Something wrong after an update? Hold OCT- while powering on: USB rescue screen for reinstalling."
+ ],
+ "checked": [
+  "v1.2 archive (git archive v1.2), firmware/src/platform.c: FM-1 button enums (BTN_SEL = SEL); line ~451 recovery_key/bootguard_manual: OCT- alone at power-on -> recovery_main.",
+  "shn_params.h PAGE table: PERFORM TONE ATTACK RELEASE ENS DEPTH; STRINGS C.BASS CELLO VIOLA VIOLIN; BRASS + SPLIT TRUMPET HORN SPLIT TONE; TONE TONE WARMTH BRIGHT VELOCITY; KEYER ATTACK RELEASE VELOCITY GLIDE; VIBRATO RATE VIBRATO DELAY MOD DPT; OUTPUT VINTAGE OCTAVE BEND VOLUME; ARP; ENSEMBLE MODE DEPTH RATE MIX; PHASER RATE DEPTH FEEDBK MIX (MIX def 0); DELAY; REVERB. NPROG 99, NFACT 32; ENS_NAME OFF MONO STEREO WIDE (def STEREO); OCTAVE -1/0/+1.",
+  "shineon.c ~1489-1515: layer buttons SEQ EDIT GLO SAVE FX, tap < 600 ms = pages: EDIT cycle_page(PG_REG1,3), FX cycle_page(PG_ENS,4), GLO GLOBAL <-> OUTPUT (no VOICE page); ENV -> PG_ENV, LFO -> PG_VIB, ARP -> PG_ARP / on it toggles hold; HOME -> PERFORM, with held layer = lock.",
+  "shineon.c ~1683: FX layer knobs FXP = ENS_MIX, PHA_MIX, DLY_MIX, REV_MIX. GLOBAL knobs tempo, click, midi_ch (0 OMNI), tune; midi_in ch+1 = track B's sound.",
+  "shineon.c: OCT -2..+2, both = 0; EDIT + OCT-/+ undo/redo; PLAY/REC (700 ms tap, 2 s clear); SAVE held + BTN_SEL randomize(); save_armed 3 s, PRESETS picks slot; SAVE tap in sequencer pat_save_to; keys_in: SAVE white 1-8 pat_go, black pat_copy (3 s re-press on used); glo_key 0/1 mute, 4/5 solo, 15 tap tempo; seq_view_turn: track off + KNOB 1 -> 16 steps, TRACKS KNOB 4 B_DRY (FX SEND, B's own sound only); PRESETS with seq_trk = B -> b_set.",
+  "shn_patches.h: 32 names; 01 ENSEMBLE, 03 SHINE PAD (WIDE, phaser 70, reverb), 12 PHASED STR (phaser mix 100); shn_engine.h NV 16."
+ ],
+ "unsure": [
+  "Not tried on an FM-1 (CLAUDE.md: 1.2 host/OTA/loader-tested only). SEL vs SELECT for the random sound: README says SELECT, code reads BTN_SEL (the SEL button), as on OberVave.",
+  "README 'The panel' table and bullets are OberVave's leftovers: HOME = CUTOFF/RESO/ENV AMT/RELEASE, EDIT = OSC/FILTER, GLO = GLOBAL/VOICE/OUTPUT, FX layer = CHORUS/DELAY/REVERB/DELAY TIME. Code: HOME = TONE/ATTACK/RELEASE/DEPTH, EDIT = STRINGS/BRASS+SPLIT/TONE, GLO = GLOBAL/OUTPUT, FX layer = ENSEMBLE/PHASER/DELAY/REVERB mix. Sheet follows the code.",
+  "README TRACKS view says KNOB 3 = CUTOFF; code sets P_TONE (label 'TONE'). README says both sounds share 'eight voices' and MONO/UNISON keep four; code has NV 16 and POLY only. README 'any of the 32' for B's sound; PRESETS reaches all 99 slots.",
+  "Sequencer step views (STEPS / STEP+ / TRACK / PATTERNS), SEQ black keys = step pages, EDIT layer SHIFT / LENGTH / TRANSPOSE, MIDI CC map (74 tone, 73/72 attack/release): left out as too detailed."
+ ]
+}
