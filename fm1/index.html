@@ -66,7 +66,9 @@
              color: var(--fg); font-size: 15px; font-weight: 600; white-space: nowrap; box-shadow: inset 0 -2px 0 transparent; }
   /* Shop (Amazon.de affiliate links): shown by web/hubapp.js in DE / AT only (/api/cc), beside the Knowledge Base */
   nav .dd[hidden] { display: none; }
-  #shopdd[data-cc="de"] .cc-us, #shopdd[data-cc="us"] .cc-de { display: none !important; }   /* (amazon.de for DE / AT, amazon.com for the US) */
+  /* (data-cc: de = DE / AT: Firmwear + amazon.de; eu = the rest of the EU: Firmwear only; us: amazon.com only) */
+  #shopdd:not([data-cc="de"]) .cc-de, #shopdd:not([data-cc="eu"]) .cc-eu, #shopdd:not([data-cc="us"]) .cc-us,
+  #shopdd[data-cc="us"] .cc-merch, #shopdd[data-cc="eu"] .cc-amz { display: none !important; }
   nav .dd.shopdd { margin-left: clamp(4px, 1.6vw, 22px); }
   .mega .side .ad { font-size: 12.5px; color: var(--dim); }
   nav .kbl:hover { text-decoration: none; box-shadow: inset 0 -2px 0 var(--pink); }
@@ -497,12 +499,15 @@
     <div class="mega" id="shopm"><div class="wrap in">
       <div class="side">
         <p class="k">Shop</p>
-        <p class="cc-de">Die Geräte, auf denen die Firmwares des Hubs laufen, bei Amazon.de.</p>
+        <p class="cc-de">Firmwear, die Shirts und Hoodies des Hubs, bei Spreadshop, und die Geräte, auf denen die Firmwares laufen, bei Amazon.de.</p>
+        <p class="cc-eu">Firmwear: the hub's shirts and hoodies, on Spreadshop.</p>
         <p class="cc-us">The machines the hub's firmwares run on, from Amazon.com.</p>
-        <hr><p class="ad cc-de">* Affiliate-Link (Anzeige). Als Amazon-Partner verdiene ich an qualifizierten Verkäufen; für dich kostet es nichts extra.</p>
+        <hr class="cc-amz"><p class="ad cc-de">* Affiliate-Link (Anzeige). Als Amazon-Partner verdiene ich an qualifizierten Verkäufen; für dich kostet es nichts extra.</p>
         <p class="ad cc-us">* Affiliate link (ad). As an Amazon Associate I earn from qualifying purchases; it costs you nothing extra.</p>
       </div>
       <div class="tiles">
+        <a class="tile cc-merch" href="https://the-firmware-hub.myspreadshop.de/make+firmware+not+war-A32661688835530cb?sellable=rlac1svn88nf-20&amp;appearance=2" data-shop="Firmwear|spreadshop" target="_blank" rel="noopener"><span class="pic"><img src="/img/merch.png?v=5fe2f657" alt=""></span>
+          <span><b>Firmwear</b><small class="cc-de">Make Firmware, Not War. · Hoodie &amp; Shirt bei Spreadshop</small><small class="cc-eu">Make Firmware, Not War. · hoodie &amp; shirt on Spreadshop</small></span></a>
         <a class="tile cc-de" href="https://link.amazon/B08QY1yVZ" data-shop="FM-1|amazon.de" target="_blank" rel="sponsored noopener"><span class="pic quad"><img src="/img/zp12.png?v=1f052566" alt=""><img src="/img/sloop.png?v=06c1512a" alt=""><img src="/img/x0x.png?v=20a9c76f" alt=""><img src="/img/winampfm.png?v=85a944e1" alt=""></span>
           <span><b>M-VAVE FM-1 kaufen</b><small>auf Amazon.de · Anzeige *</small></span></a>
         <a class="tile cc-de" href="https://link.amazon/B0f2qKAUl" data-shop="SMK-37 Pro|amazon.de" target="_blank" rel="sponsored noopener"><span class="pic"><img src="/smk37/img/smk-mix.png?v=4414a12e" alt=""></span>
@@ -1147,7 +1152,7 @@ function opts() {
 }
 const applyView = () => $("grid").classList.toggle("list", view === "list");
 // each card picture's fingerprint (tools/make_fm1.py): a new picture gets a new address, so no cache shows the old one
-const IMGV = {"amb":"230a4c6a","beetle":"d60c0ebe","bubba":"ecb9d1c0","choralroot":"f243c2d9","chord":"a7f6facd","coralflower":"cee93732","cs1":"63351510","ctl":"56962cfd","dinghy-icon":"43bc2e6a","dinghy":"490a7e3a","duell":"ee674c5f","etch":"44fb891e","fart":"6871a118","felucca":"04c26b6f","felucca8":"04c26b6f","fimba":"009469ec","floyd":"2e710e88","fm106":"0241ba91","fomajam":"8505df84","fomni":"9ae12ea0","frodhes":"2f90e0e7","fumi":"0bec300d","gammawave":"cd056c45","ghoulbox":"de7a6284","hortator":"c1f0f06b","hyp1":"0934bcae","jangada":"f173b4ff","jiant":"c8cde928","kawa":"0bd8166a","maku":"3b6825ee","mc1":"3d82057a","melodee":"dfff7f85","min1":"7a14679d","mycelium":"3621bb0e","noizdemons":"a25e7085","obervave":"1f74347c","orbit":"44f73023","pigeon":"85c82e0a","polly":"6fac8cf6","purplemonkey":"1261169e","rainbow":"08fc1aab","salt":"af523ec4","skiff":"8ffb2761","sloop-icon":"a223c061","sloop":"06c1512a","sloopbanks":"13cbb4e1","sloopdx":"12220b88","tonitor":"2bbe9b72","tribe":"feee3397","tuna":"1b825593","vector37":"1b959672","waveloop":"04c26b6f","winampfm":"85a944e1","x0x":"20a9c76f","x0xrmx":"1c37b325","zp12":"1f052566"}, iv = (id) => IMGV[id] ? "?v=" + IMGV[id] : "";
+const IMGV = {"amb":"230a4c6a","beetle":"d60c0ebe","bubba":"ecb9d1c0","choralroot":"f243c2d9","chord":"a7f6facd","coralflower":"cee93732","cs1":"63351510","ctl":"56962cfd","dinghy-icon":"43bc2e6a","dinghy":"490a7e3a","duell":"ee674c5f","etch":"44fb891e","fart":"6871a118","felucca":"04c26b6f","felucca8":"04c26b6f","fimba":"009469ec","floyd":"2e710e88","fm106":"0241ba91","fomajam":"8505df84","fomni":"9ae12ea0","frodhes":"2f90e0e7","fumi":"0bec300d","gammawave":"cd056c45","ghoulbox":"de7a6284","hortator":"c1f0f06b","hyp1":"0934bcae","jangada":"f173b4ff","jiant":"c8cde928","kawa":"0bd8166a","maku":"3b6825ee","mc1":"3d82057a","melodee":"dfff7f85","merch":"5fe2f657","min1":"7a14679d","mycelium":"3621bb0e","noizdemons":"a25e7085","obervave":"1f74347c","orbit":"44f73023","pigeon":"85c82e0a","polly":"6fac8cf6","purplemonkey":"1261169e","rainbow":"08fc1aab","salt":"af523ec4","skiff":"8ffb2761","sloop-icon":"a223c061","sloop":"06c1512a","sloopbanks":"13cbb4e1","sloopdx":"12220b88","tonitor":"2bbe9b72","tribe":"feee3397","tuna":"1b825593","vector37":"1b959672","waveloop":"04c26b6f","winampfm":"85a944e1","x0x":"20a9c76f","x0xrmx":"1c37b325","zp12":"1f052566"}, iv = (id) => IMGV[id] ? "?v=" + IMGV[id] : "";
 const WIDE = new Set(["felucca", "salt", "melodee", "hortator", "ghoulbox", "waveloop", "skiff", "duell", "felucca8", "obervave"]);                  // (a landscape picture, not a square screen)   // (designburgapps.com's palette)
 const LOGO = { sloop: "img/sloop-icon.png", dinghy: "img/dinghy-icon.png" };
 // Baud Girl: a link card, not in the catalogue (not open source, no stars to sort by): in the second row all the same
@@ -1666,11 +1671,13 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
   if ("serviceWorker" in navigator && isSecureContext)
     navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((r) => { reg = r; }).catch(() => {});
 
-  // Shop in the menu (Amazon affiliate links): amazon.de for Germany and Austria, amazon.com for the US, nobody else;
-  // by the country Cloudflare sees (/api/cc, nothing kept)
+  // Shop in the menu, by the country Cloudflare sees (/api/cc, nothing kept): Firmwear (the hub's merch on Spreadshop,
+  // made and sent in the EU) for EU visitors, Amazon affiliate links for DE / AT (amazon.de) and the US (amazon.com);
+  // anybody else: no shop
+  const EU = "AT BE BG HR CY CZ DK EE FI FR DE GR HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE".split(" ");
   fetch("/api/cc", { cache: "no-store" }).then((r) => r.json()).then((j) => {
-    const shop = { DE: "de", AT: "de", US: "us" }[j.cc], el = document.getElementById("shopdd");
-    if (shop && el) { el.dataset.cc = shop; el.removeAttribute("hidden"); }
+    const cc = j.cc === "DE" || j.cc === "AT" ? "de" : EU.includes(j.cc) ? "eu" : j.cc === "US" ? "us" : "", el = document.getElementById("shopdd");
+    if (cc && el) { el.dataset.cc = cc; el.removeAttribute("hidden"); }
   }).catch(() => {});
   // (a click in the shop: a Matomo event "Shop" / the device / the store, beside the outlink Matomo counts anyway)
   document.addEventListener("click", (e) => {
