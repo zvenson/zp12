@@ -223,10 +223,10 @@
   .fw .deck .key:active { transform: translateY(1px); background: #161314; box-shadow: inset 0 2px 5px rgba(0, 0, 0, .7); }
   .fw .deck .key svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
   .fw .deck .key svg path[d^="M8 5v14"] { fill: currentColor; }
-  .fw .deck .key::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); z-index: 5;
-                      padding: 5px 9px; border-radius: 6px; background: #000; color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap;
-                      pointer-events: none; opacity: 0; transition: opacity .12s; }
-  .fw .deck .key:hover::after, .fw .deck .key:focus-visible::after { opacity: 1; }
+  /* the key's name: one floating tooltip on the page (web/hubapp.js), never clipped by a card; above the key, below when no room */
+  .decktip { position: fixed; z-index: 100; padding: 5px 9px; border-radius: 6px; background: #000; color: #fff; font: 600 12px/1.2 "Inter", Arial, sans-serif;
+             white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .12s; transform: translateX(-50%); }
+  .decktip.on { opacity: 1; }
 </style>
 </head>
 <body>
@@ -502,6 +502,20 @@
   });
   addEventListener("appinstalled", () => { bar?.remove(); prompt = null; });
   addEventListener("DOMContentLoaded", () => {
+    // the deck keys' names (web/deck.css): one tooltip on the page, placed by the key, so no card clips it
+    const tip = Object.assign(document.createElement("div"), { className: "decktip" }); tip.setAttribute("aria-hidden", "true");
+    document.body.append(tip);
+    const showTip = (k) => {
+      tip.textContent = k.dataset.tip; tip.classList.add("on");
+      const r = k.getBoundingClientRect(), h = tip.offsetHeight;
+      tip.style.left = r.left + r.width / 2 + "px";
+      tip.style.top = (r.top - h - 8 >= 4 ? r.top - h - 8 : r.bottom + 8) + "px";
+    };
+    const hideTip = () => tip.classList.remove("on");
+    document.addEventListener("pointerover", (e) => { const k = e.target.closest?.(".deck .key[data-tip]"); k ? showTip(k) : hideTip(); });
+    document.addEventListener("focusin", (e) => { const k = e.target.closest?.(".deck .key[data-tip]"); if (k) showTip(k); });
+    document.addEventListener("focusout", hideTip);
+    addEventListener("scroll", hideTip, { passive: true });
     // the kinds' row on a desktop (one line, see .chips in the page's style): the fade at its edge only while chips are hidden
     const chips = document.getElementById("chips");
     if (chips) {
