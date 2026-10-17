@@ -183,6 +183,13 @@
   @media (min-width: 561px) { .fw { scroll-margin-top: calc(var(--navh, 60px) + var(--toolsh, 70px) + 16px); } }
   .tools-r { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 22px; margin-left: auto; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  /* a desktop: the toolbar on one line, kinds left, sort / view / account right; chips that do not fit then scroll
+     sideways (faded at the edge) instead of pushing the right part onto a second line */
+  @media (min-width: 1400px) { .tools { flex-wrap: nowrap; gap: 12px 18px; } .tools-r { flex: none; flex-wrap: nowrap; gap: 8px 16px; }
+                               .chips { flex: 0 1 auto; min-width: 0; flex-wrap: nowrap; gap: 6px; overflow-x: auto; scrollbar-width: none;
+                                        mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); }
+                               .chips.fits { mask-image: none; } .chips::-webkit-scrollbar { display: none; }
+                               .chips button { flex: none; padding: 9px 12px; } }
   .tools button { font: inherit; font-weight: 700; line-height: 1; border: 0; border-radius: 10px; cursor: pointer; }
   .chips button { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); padding: 9px 14px; font-size: 14px; }
   .chips button:hover { box-shadow: inset 0 0 0 1px var(--beige); }
@@ -511,7 +518,7 @@
 // the toolbar as on the FM-1 page: the chips (a kind with its count; #groove links straight to one kind), the sort and the view.
 // The choices are the FM-1 page's too (localStorage, the same keys, nothing sent anywhere): what you picked there stays here, and back
 const $ = (id) => document.getElementById(id);
-const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chord instruments"], ["dev", "For developers"], ["other", "Other"], ["vintage", "Vintage"]];
+const KINDS = [["all", "All"], ["synth", "Synths"], ["groove", "Grooveboxes"], ["drums", "Drums & samplers"], ["chords", "Chords"], ["dev", "For devs"], ["other", "Other"], ["vintage", "Vintage"]];
 const SORTS = [["rating", "Top rated"], ["name", "A–Z"]];   // (the hub's own ratings; no installs here: the makers' installers install)
 const KIND_KEY = "fm1hub.kind", SORT_KEY = "fm1hub.sort", VIEW_KEY = "fm1hub.view";
 const get = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -894,6 +901,14 @@ fetch("/catalog.json?" + new Date().toISOString().slice(0, 10)).then((r) => r.js
   });
   addEventListener("appinstalled", () => { bar?.remove(); prompt = null; });
   addEventListener("DOMContentLoaded", () => {
+    // the kinds' row on a desktop (one line, see .chips in the page's style): the fade at its edge only while chips are hidden
+    const chips = document.getElementById("chips");
+    if (chips) {
+      const fit = () => chips.classList.toggle("fits", chips.scrollLeft + chips.clientWidth >= chips.scrollWidth - 2);
+      new ResizeObserver(fit).observe(chips);
+      new MutationObserver(fit).observe(chips, { childList: true, subtree: true });
+      chips.addEventListener("scroll", fit, { passive: true });
+    }
     // visible: "Get the app" beside the page's buttons (FM-1, SMK-37), and in the Devices menu; gone inside the app
     const row = document.querySelector("header .bar");
     if (row && !standalone && !ios) {
