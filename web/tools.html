@@ -1,0 +1,113 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: GPL-3.0-only  (C) 2026 Sven Trogus
+     The Firmware Hub's tools (thefirmwarehub.com/tools/): emulators, editors, backup and rescue, building your own, from
+     their makers, only linked. The cards from web/tools.json; tools/make_fm1.py writes it as fm1/tools/index.html. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tools for the M-VAVE FM-1 and SMK-37 – The Firmware Hub</title>
+<meta name="description" content="Open-source tools for the M-VAVE FM-1 and SMK-37: emulators to try firmwares without a device, DX7 editors and librarians, backup and rescue, and how to build your own firmware.">
+<meta name="author" content="zvenson">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://thefirmwarehub.com/tools/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Firmware Hub">
+<meta property="og:url" content="https://thefirmwarehub.com/tools/">
+<meta property="og:title" content="Tools for the M-VAVE FM-1 and SMK-37 – The Firmware Hub">
+<meta property="og:description" content="Emulators, editors, backup and rescue, building your own: open source, from their makers.">
+<meta property="og:image" content="https://thefirmwarehub.com/og.png">
+<meta name="theme-color" content="#151213">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23151213'/%3E%3Ctext x='16' y='22' font-family='Arial' font-weight='900' font-size='15' text-anchor='middle' fill='%2342f5f5'%3EFH%3C/text%3E%3C/svg%3E">
+<style>
+  /* the hub's look (web/fm1.html): warm dark, cyan / blue / pink / beige; a group's colour on its cards */
+  :root { --bg: #151213; --panel: #221e1f; --panel2: #2e2a2b; --line: #3a3435; --fg: #efe8e1; --dim: #a39a94; --text: #d8d0c9;
+          --cyan: #42f5f5; --blue: #afd9f4; --pink: #f4c0cb; --beige: #e6d1b9; --ok: #5fe3a1; --warn: #f2c46d; --smk: #ff6b5e; }
+  * { box-sizing: border-box; }
+  html { color-scheme: dark; scroll-padding-top: 80px; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16.5px/1.7 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--cyan); text-decoration: none; } a:hover { text-decoration: underline; }
+  .wrap { margin: 0 auto; padding: 0 clamp(16px, 4vw, 72px); width: 100%; }
+  nav { border-bottom: 1px solid var(--line); }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+  .mark { font-size: 21px; font-weight: 300; color: var(--fg); letter-spacing: -.2px; } .mark:hover { text-decoration: none; }
+  .mark b { font-weight: 800; color: var(--cyan); }
+  nav .home { font-size: 14px; color: var(--dim); }
+/*VIBEBAR*/
+/*DEVICES*/
+  .strip { display: flex; height: 4px; } .strip i { flex: 1; }
+  .strip i:nth-child(1) { background: var(--cyan); } .strip i:nth-child(2) { background: var(--blue); }
+  .strip i:nth-child(3) { background: var(--pink); } .strip i:nth-child(4) { background: var(--beige); }
+  header { padding: 52px 0 32px;
+           background: radial-gradient(900px 420px at 80% 20%, rgba(66, 245, 245, .10), transparent 70%),
+                       radial-gradient(700px 380px at 5% 100%, rgba(244, 192, 203, .08), transparent 70%); }
+  .eyebrow { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--beige); margin: 0 0 14px; }
+  h1 { font-size: clamp(38px, 4.6vw, 72px); line-height: 1.05; font-weight: 300; margin: 0 0 18px; letter-spacing: -.5px; }
+  h1 b { font-weight: 800; background: linear-gradient(90deg, var(--cyan), var(--blue) 45%, var(--pink) 75%, var(--beige));
+         -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { font-size: 18.5px; color: var(--text); max-width: 40em; margin: 0; }
+  .jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 0; }
+  .jump a { padding: 8px 14px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--text); font-weight: 600; font-size: 14px; }
+  .jump a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--beige); color: var(--fg); }
+  main { padding: 12px 0 72px; }
+  .grp { padding: 28px 0 8px; }
+  .grp h2 { font-size: 28px; font-weight: 700; margin: 0 0 4px; letter-spacing: -.2px; }
+  .grp .sub { color: var(--dim); margin: 0 0 20px; font-size: 15.5px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 330px), 1fr)); gap: 20px; }
+  .tool { --c: var(--cyan); background: var(--panel); border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 14px;
+          padding: 20px 22px 18px; display: flex; flex-direction: column; gap: 10px; min-width: 0; transition: border-color .15s, background .15s; }
+  .tool:hover { border-color: var(--c); background: var(--panel2); }
+  #try .tool { --c: var(--cyan); } #sounds .tool { --c: var(--pink); } #rescue .tool { --c: var(--beige); } #dev .tool { --c: var(--blue); }
+  .tool h3 { margin: 0; font-size: 22px; font-weight: 800; letter-spacing: -.2px; line-height: 1.15; color: var(--c); }
+  .by { color: var(--dim); font-size: 14px; line-height: 1.5; } .by a { color: var(--text); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; }
+  .tag.fm1 { background: rgba(66, 245, 245, .10); color: var(--cyan); }
+  .tag.smk { background: rgba(255, 107, 94, .10); color: var(--smk); }
+  .what { margin: 0; color: var(--text); font-size: 15px; line-height: 1.6; }
+  .note { margin: 0; font-size: 14px; line-height: 1.55; color: var(--text); background: rgba(242, 196, 109, .08); border-left: 3px solid var(--warn);
+          border-radius: 8px; padding: 8px 12px; }
+  .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 4px; }
+  .links a { padding: 7px 13px; border-radius: 10px; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); font-weight: 600; font-size: 14px; }
+  .links a:hover { text-decoration: none; box-shadow: inset 0 0 0 1px var(--c); }
+  .links a.go { background: var(--c); color: #121011; box-shadow: none; } .links a.go:hover { filter: brightness(1.08); }
+  .lic { font-size: 12.5px; color: var(--dim); }
+  /* the official one, apart: M-VAVE's, not open source */
+  .official { margin: 40px 0 0; border: 1px dashed var(--line); border-radius: 18px; padding: 24px clamp(16px, 2.4vw, 32px) 26px; background: rgba(239, 232, 225, .02); }
+  .official h2 { font-size: 13px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--dim); margin: 0 0 6px; font-weight: 700; }
+  .official .sub { color: var(--dim); margin: 0 0 18px; font-size: 15px; }
+  .official .tool { --c: var(--dim); max-width: 640px; }
+  .official .tool h3 { color: var(--fg); }
+  .tell { margin: 44px 0 0; text-align: center; color: var(--text); font-size: 16px; }
+  .tell a { color: var(--pink); font-weight: 600; }
+  .fine { margin: 10px auto 0; text-align: center; color: var(--dim); font-size: 13.5px; max-width: 46em; }
+/*FOOTER*/
+  @media (max-width: 640px) { .grp h2 { font-size: 24px; } .lead { font-size: 17.5px; } nav .home { display: none; }
+    .eyebrow { letter-spacing: 1.5px; font-size: 12px; } .tool { padding: 18px 18px 16px; } }
+</style>
+</head>
+<body>
+<!--VIBEBAR-->
+<nav><div class="wrap"><a class="mark" href="https://thefirmwarehub.com/">FM-1 <b>Firmware Hub</b></a>
+<!--DEVICES-->
+  <a class="home" href="https://designburg.net/">designburg.net</a></div></nav>
+<div class="strip"><i></i><i></i><i></i><i></i></div>
+
+<header><div class="wrap">
+  <p class="eyebrow">The Firmware Hub · Tools</p>
+  <h1>Tools for the <b>FM-1</b> and the <b>SMK-37</b>.</h1>
+  <p class="lead">Everything around the firmwares: emulators, editors, backup and rescue, building your own. Open source,
+    from their makers; we only link.</p>
+  <div class="jump"><!--TOOLS-JUMP--></div>
+</div></header>
+
+<main><div class="wrap">
+<!--TOOLS-->
+<p class="tell">Made a tool? Tell us: <a href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20a%20tool">zven@thefirmwarehub.com</a></p>
+<p class="fine">Each tool belongs to its makers, under its own licence. We do not develop, test or support the others' tools:
+  questions and bug reports go to each project. Back up before you write anything to a device.</p>
+</div></main>
+
+<!--FOOTER-->
+</body>
+</html>

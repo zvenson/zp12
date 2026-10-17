@@ -3,7 +3,7 @@
 // the sources (/src/), VIBE and its admin (/vibe), the simulators (/play/), other hosts (Matomo, GitHub).
 const KEEP = "hub-v1";
 const PASS = /^\/(api|fw|src|vibe|play)(\/|$)|\.php$/;
-const PAGES = ["/", "/smk37/", "/kb/", "/impressum/"];
+const PAGES = ["/", "/smk37/", "/kb/", "/tools/", "/impressum/"];
 
 self.addEventListener("install", (e) => {
   self.skipWaiting();

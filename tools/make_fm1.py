@@ -71,6 +71,33 @@ def smk_cards():
     return "".join(card(f, False) for f in d["own"]), "".join(card(f, True) for f in d["ports"]), str(len(d["own"]) + len(d["ports"]))
 
 
+def tools_cards():
+    """the Tools page's sections from web/tools.json: a group per section, a card per tool, static for the search engines;
+    M-VAVE's own (not open source) in a box apart. Returns (the jump links, the sections)"""
+    d = json.loads((HERE / "web" / "tools.json").read_text(encoding="utf-8"))
+    e = lambda x: html.escape(str(x), quote=True)
+    def a(u, t, c=""):                                  # (our own pages in the same tab, the others' in a new one)
+        return f'<a{c} href="{e(u)}">{t}</a>' if u.startswith("/") else f'<a{c} href="{e(u)}" target="_blank" rel="noopener">{t} ↗</a>'
+    def card(t):
+        by = " and ".join(a(u, e(n)).replace(" ↗", "") for n, u in t["by"])
+        tags = "".join(f'<span class="tag {"smk" if d_ == "SMK-37" else "fm1"}">{e(d_)}</span>' for d_ in t["devices"])
+        links = [(n, u) for n, u in t["links"]] + ([("Source", t["source"])] if t["source"] else [])
+        if not t["links"] and t["source"]:
+            links = [("Source on GitHub" if "github.com" in t["source"] else "Source", t["source"])]
+        ls = "".join(a(u, e(n), ' class="go"' if i == 0 else "") for i, (n, u) in enumerate(links))
+        return (f'<article class="tool" id="t-{e(t["id"])}"><h3>{e(t["name"])}</h3>\n  <div class="by">by {by}</div>'
+                f'<div class="tags">{tags}</div>\n  <p class="what">{e(t["what"])}</p>'
+                + (f'<p class="note">{e(t["note"])}</p>' if t.get("note") else "")
+                + f'<div class="links">{ls}</div><div class="lic">Licence: {e(t["licence"])}</div></article>\n')
+    jump = "".join(f'<a href="#{e(g["id"])}">{e(g["title"])}</a>' for g in d["groups"]) + '<a href="#official">Official</a>'
+    out = "".join(f'<section class="grp" id="{e(g["id"])}"><h2>{e(g["title"])}</h2><p class="sub">{e(g["sub"])}</p>\n<div class="grid">\n'
+                  + "".join(card(t) for t in g["tools"]) + '</div></section>\n' for g in d["groups"])
+    out += ('<section class="official" id="official"><h2>Official, not open source</h2>'
+            '<p class="sub">From M-VAVE itself, for comparison: not one of the open projects above.</p>\n'
+            + card(d["official"]) + '</section>\n')
+    return jump, out
+
+
 def credits():
     """the footer's credits, from the catalogues: ours (zvenson's), the FM-1's others by author, the SMK-37's"""
     sys.path.insert(0, str(HERE / "tools"))
@@ -171,10 +198,17 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
                                              f'<url><loc>https://thefirmwarehub.com/vibe/</loc><lastmod>{date.today()}</lastmod>'
                                              '<changefreq>weekly</changefreq><priority>0.7</priority></url>\n'
                                              f'<url><loc>https://thefirmwarehub.com/smk37/</loc><lastmod>{date.today()}</lastmod>'
-                                             '<changefreq>weekly</changefreq><priority>0.7</priority></url>\n</urlset>\n')
+                                             '<changefreq>weekly</changefreq><priority>0.7</priority></url>\n'
+                                             f'<url><loc>https://thefirmwarehub.com/tools/</loc><lastmod>{date.today()}</lastmod>'
+                                             '<changefreq>weekly</changefreq><priority>0.6</priority></url>\n</urlset>\n')
     kb = HERE / "fm1" / "kb"                            # the knowledge base: no menu link yet (the user's wish, 2026-10-13)
     kb.mkdir(exist_ok=True)
     (kb / "index.html").write_text(devices((HERE / "web" / "fm1kb.html").read_text(encoding="utf-8"), "fm1", "kb"), encoding="utf-8")
+    tools = HERE / "fm1" / "tools"                      # the tools around the firmwares (web/tools.json), only linked
+    tools.mkdir(exist_ok=True)
+    jump, cards = tools_cards()
+    (tools / "index.html").write_text(devices((HERE / "web" / "tools.html").read_text(encoding="utf-8")
+                                              .replace("<!--TOOLS-JUMP-->", jump).replace("<!--TOOLS-->\n", cards), "tools", "tools"), encoding="utf-8")
     smk = HERE / "fm1" / "smk37"                        # the SMK-37 Pro's hub: its firmwares (one so far), installed from their own pages
     (smk / "img").mkdir(parents=True, exist_ok=True)
     (smk / "index.html").write_text(devices((HERE / "web" / "smk37.html").read_text(encoding="utf-8"), "smk37", "smk37"), encoding="utf-8")
@@ -202,7 +236,7 @@ def main(sloopdx=str(HERE.parent / "sloopdx")):
     snip = Path(sloopdx) / "tools" / "matomo_snippet.py"
     if snip.exists():
         plays = sorted((HERE / "fm1" / "play").glob("*/index.html"))     # (the simulators: counted as the hub's pages)
-        for page in (out, kb / "index.html", smk / "index.html", imp / "index.html", *plays):
+        for page in (out, kb / "index.html", smk / "index.html", tools / "index.html", imp / "index.html", *plays):
             subprocess.run([sys.executable, str(snip), str(page)], check=True, capture_output=True)
     (HERE / "fm1" / "rescue").mkdir(exist_ok=True)       # the rescue script, served next to the page (#rescue)
     (HERE / "fm1" / "rescue" / "fm1_rescue.py").write_text((HERE / "tools" / "fm1_rescue.py").read_text(encoding="utf-8"), encoding="utf-8")

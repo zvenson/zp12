@@ -47,6 +47,7 @@
   .mega .tile b { display: block; font-size: 15px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; line-height: 1.3; }
   .mega .tile small { display: block; color: var(--dim); font-size: 13.5px; margin-top: 2px; }
   .mega .tile.vibe-t .pic img { object-position: 70% 50%; image-rendering: auto; } .mega .tile.vibe-t b { color: #ff6a1a; }
+  .mega .tile.tools-t .pic svg { width: 36px; height: 36px; fill: none; stroke: var(--cyan); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
   .mega .tile.add .pic { border-style: dashed; background: transparent; color: var(--pink); font-size: 34px; font-weight: 200; }
   @media (max-width: 760px) { .mega .in { grid-template-columns: 1fr; padding-top: 14px; padding-bottom: 18px; } .mega .side { display: none; }
                               .mega .pic { width: 56px; height: 56px; } }
