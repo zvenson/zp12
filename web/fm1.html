@@ -247,7 +247,7 @@
   .fw .deck .key:first-child { border-radius: 9px 0 0 9px; } .fw .deck .key:last-child { border-radius: 0 9px 9px 0; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06); }
   .fw .deck .key:only-child { border-radius: 9px; }
   /* each key its colour, the same on every card (a tape deck's coloured caps): the symbol, a thin edge on top, a tint on hover */
-  .fw .deck .k-play { --k: #5fe3a1; } .fw .deck .k-edit { --k: #f4c0cb; } .fw .deck .k-sheet { --k: #f2c46d; } .fw .deck .k-build { --k: #afd9f4; }
+  .fw .deck .k-play { --k: #5fe3a1; } .fw .deck .k-edit { --k: #f4c0cb; } .fw .deck .k-sheet { --k: #a870e8; } .fw .deck .k-build { --k: #afd9f4; }
   .fw .deck .key { color: var(--k, var(--fg)); }
   .fw .deck .key::before { content: ""; position: absolute; left: 7px; right: 7px; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: var(--k); opacity: .85; }
   .fw .deck .key:hover { text-decoration: none; color: var(--k); background: linear-gradient(color-mix(in srgb, var(--k) 22%, #2c2728), color-mix(in srgb, var(--k) 10%, #1c1819)); }
@@ -481,7 +481,7 @@ const $ = (id) => document.getElementById(id);
 const KEY = (kind, href, tip, svg, own = "") => `<a class="key k-${kind}${own ? " csl" : ""}" href="${href}" data-tip="${tip}" aria-label="${tip}"`
   + (own ? ` data-cs="${own}">` : ' target="_blank" rel="noopener">') + `${svg}</a>`;
 const ICONS = { play: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>',
-                edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>',
+                edit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16M12 4v16M18 4v16"/><path d="M4 8h4M10 15h4M16 10h4"/></svg>',
                 sheet: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg>',
                 build: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="2"/><path d="M12 7v14M5 13a7 7 0 0 0 14 0M8 10h8"/></svg>' };
 const deck = (f) => { const k = (f.play ? KEY("play", esc(f.play), "Play in browser", ICONS.play) : "")
