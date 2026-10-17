@@ -33,3 +33,11 @@ Control names: use exactly the FM-1's printed labels.
 
 Sections: 4-7 of: Getting around · Playing · Sound · Sequencer / patterns · Effects · Saving & loading ·
 MIDI & sync · Settings · Recovery. Rows: 3-10 per section. Only what the firmware really does.
+
+## One format for all (make_fm1 enforces it, whatever the JSON says)
+- Sections always in this order: Getting around, Playing, Sound, Sequencer / patterns, Effects, Saving & loading,
+  MIDI & sync, Settings, Recovery (other titles go last). Use exactly these titles.
+- Key zones get the hub's colours in their order (cyan, pink, beige, blue, orange, lilac, green, yellow); a zone whose
+  label says "same" is grey. The "color" in the JSON is ignored.
+- Every sheet: the hub's mark + "thefirmwarehub.com" top right, the firmware's colour from its card (LOOK in web/fm1.html)
+  as the band, name, frames and the Install button; template web/cs-sheet.html (not web/cheatsheet.html: zp12's own sheet).

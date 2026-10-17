@@ -147,6 +147,11 @@ def cs_keys(zones):
     return f'<div class="kb">{svg}<div class="legend">{legend}</div></div>\n'
 
 
+CS_ORDER = ["Getting around", "Playing", "Sound", "Sequencer / patterns", "Effects", "Saving & loading", "MIDI & sync",
+            "Settings", "Recovery"]
+CS_ZONES = ["#42f5f5", "#f4c0cb", "#e6d1b9", "#afd9f4", "#ff9f43", "#c9b6ff", "#5fe3a1", "#f2c46d"]
+
+
 def cheat_sheets(look):
     """web/cheatsheets/<id>.json -> fm1/cs/<id>/index.html (web/cs-sheet.html around it); returns {id: version} for the cards"""
     tpl = (HERE / "web" / "cs-sheet.html").read_text(encoding="utf-8")
@@ -154,6 +159,14 @@ def cheat_sheets(look):
     out = {}
     for f in sorted((HERE / "web" / "cheatsheets").glob("*.json")):
         d = json.loads(f.read_text(encoding="utf-8"))
+        # (one format for all: the sections in one order, the key zones in the hub's colours in order; a "same as" zone grey)
+        d["sections"].sort(key=lambda sec: CS_ORDER.index(sec["title"]) if sec["title"] in CS_ORDER else len(CS_ORDER))
+        n = 0
+        for z in d.get("keys") or []:
+            if "same" in z["label"].lower():
+                z["color"] = "#8a8a8a"
+            else:
+                z["color"] = CS_ZONES[n % len(CS_ZONES)]; n += 1
         body = cs_keys(d.get("keys")) + '<div class="secs">\n' + "".join(
             f'<section class="sec"><h2>{e(sec["title"])}</h2><dl>'
             + "".join(f'<dt>{cs_do(r["do"])}</dt><dd>{e(r["what"])}</dd>' for r in sec["rows"]) + "</dl></section>\n"
