@@ -305,7 +305,7 @@ function lineup() {
 const MODEL = [[/elite/i, "SMK-37 Elite"], [/mke|p37/i, "MKE-P37"], [/starry/i, "Starrykey 37 Play (pick the Pro)"], [/smk|m-?vave/i, "SMK-37 Pro"]];
 $("connect").onclick = async () => {
   const now = $("now");
-  if (!navigator.requestMIDIAccess) { now.textContent = "No Web MIDI here: Chrome or Edge"; return; }
+  if (!navigator.requestMIDIAccess) { now.textContent = window.hubApp?.ios ? hubApp.noMidi : "No Web MIDI here: Chrome or Edge"; return; }
   try {
     const m = await navigator.requestMIDIAccess(), names = [];
     m.inputs.forEach((p) => names.push(p.name || "")); m.outputs.forEach((p) => names.push(p.name || ""));

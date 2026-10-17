@@ -1,0 +1,23 @@
+{
+  "id": "/",
+  "name": "The Firmware Hub",
+  "short_name": "Firmware Hub",
+  "description": "Open-source firmware for the M-VAVE FM-1 and SMK-37: browse, rate, keep your favourites, install with one click (Chrome or Edge, Android or a computer).",
+  "start_url": "/?app=1",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#151213",
+  "theme_color": "#151213",
+  "categories": ["music", "utilities"],
+  "icons": [
+    { "src": "/app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/app/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "FM-1 firmwares", "url": "/?app=1", "icons": [{ "src": "/app/icon-192.png", "sizes": "192x192" }] },
+    { "name": "SMK-37 firmwares", "url": "/smk37/?app=1", "icons": [{ "src": "/app/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Knowledge Base", "url": "/kb/?app=1", "icons": [{ "src": "/app/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

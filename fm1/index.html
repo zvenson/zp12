@@ -415,6 +415,30 @@
     .faq .qas { grid-template-columns: 1fr; } .status { font-size: 13px; } .warn { padding: 16px 18px; font-size: 14.5px; }
     .eyebrow, h2.sec { letter-spacing: 1.5px; font-size: 12px; } nav .home { display: none; } }
 </style>
+<link rel="manifest" href="/app/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/app/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Firmware Hub">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<style>
+/* web/hubapp.css: the app bar at the bottom (web/hubapp.js), on every device page */
+  .appbar { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 90; margin: 0 auto; max-width: 560px;
+            display: flex; align-items: center; gap: 12px; padding: 12px 44px 12px 12px; box-sizing: border-box;
+            background: #221e1f; color: #efe8e1; border: 1px solid #3a3435; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, .55);
+            font: 14.5px/1.45 "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; animation: appbar-in .35s ease-out; }
+  @keyframes appbar-in { from { transform: translateY(24px); opacity: 0; } }
+  .appbar img { flex: none; width: 44px; height: 44px; border-radius: 11px; align-self: flex-start; }
+  .appbar .t { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .appbar .t > b { font-size: 15.5px; color: #42f5f5; }
+  .appbar .t small { font-size: 12.5px; line-height: 1.45; color: #a39a94; margin-top: 4px; }
+  .appbar svg { width: 17px; height: 17px; vertical-align: -3px; fill: none; stroke: #42f5f5; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .appbar .go { flex: none; font: inherit; font-weight: 700; padding: 9px 18px; border: 0; border-radius: 999px; background: #42f5f5; color: #151213; cursor: pointer; }
+  .appbar .x { position: absolute; top: 6px; right: 6px; width: 34px; height: 34px; border: 0; padding: 0; background: none; color: #a39a94;
+               font: 24px/1 Arial, sans-serif; cursor: pointer; border-radius: 50%; }
+  .appbar .x:hover { color: #efe8e1; background: #2e2a2b; }
+  @media (prefers-reduced-motion: reduce) { .appbar { animation: none; } }
+</style>
 </head>
 <body>
 <!--email_off-->
@@ -431,6 +455,7 @@
         <p class="k">The Firmware Hub</p>
         <p>Open-source firmware for small music machines, from their makers, installed in the browser.</p>
         <a href="/">All FM-1 firmwares</a><a href="/kb/">Knowledge Base</a><a href="/#submit">Submit a firmware</a><a href="/vibe/?ref=menu">VIBE FM Mk1</a>
+        <a id="getapp" href="/#app">Get the app</a>
         <hr><p>Made firmware for another device?</p>
         <a class="mail" href="mailto:zven@thefirmwarehub.com?subject=The%20Firmware%20Hub%3A%20my%20device">zven@thefirmwarehub.com</a>
       </div>
@@ -1391,7 +1416,7 @@ function recent() {
 }
 
 async function midi() {
-  if (!navigator.requestMIDIAccess) throw Object.assign(new Error("This browser has no Web MIDI: use Chrome or Edge."), { code: "nomidi" });
+  if (!navigator.requestMIDIAccess) throw Object.assign(new Error(window.hubApp ? hubApp.noMidi : "This browser has no Web MIDI: use Chrome or Edge."), { code: "nomidi" });
   try { return await navigator.requestMIDIAccess({ sysex: true }); }
   catch (e) { throw Object.assign(new Error("MIDI access with SysEx was not allowed."), { code: "nosysex" }); }
 }
@@ -1573,6 +1598,93 @@ fetch("catalog.json?" + new Date().toISOString().slice(0, 10), { cache: "no-stor
     vibeAfter($("grid").querySelector(`.fw[data-id="${f.id}"]`));
   }
 }).catch((e) => { $("grid").innerHTML = `<p class="meta">The catalogue could not be loaded: ${esc(e.message)}</p>`; });
+</script>
+<script>
+// web/hubapp.js: the hub as an app, on every device page (make_fm1 puts it in at /*APP*/; the manifest, icons: fm1/app/,
+// the worker: fm1/sw.js). Android / Chrome / Edge: "Install" (the browser's own prompt); iPhone / iPad: "Add to Home Screen"
+// by hand, and why installing a firmware does not work there (no Web MIDI in any iOS browser).
+(() => {
+  const ua = navigator.userAgent;
+  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);   // (an iPad says "Mac")
+  const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const touch = matchMedia("(pointer: coarse)").matches;
+  window.hubApp = {
+    ios, standalone,
+    // (what the Install / Connect buttons say without Web MIDI: on iOS no other browser helps)
+    noMidi: ios ? "Installing doesn't work on iPhone or iPad yet: no browser there has Web MIDI. Use Chrome or Edge on a computer, or Chrome on Android."
+                : "This browser has no Web MIDI: use Chrome or Edge.",
+  };
+
+  // the worker: always the newest page, a copy only offline; asked for a new version each time the app comes back
+  let reg = null;
+  if ("serviceWorker" in navigator && isSecureContext)
+    navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }).then((r) => { reg = r; }).catch(() => {});
+
+  // the app left in the background for a while (a phone keeps it for days): the page anew when it comes back,
+  // never while an install writes (fm1.html's `writing`) or a dialog is open
+  let away = 0;
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) { away = Date.now(); return; }
+    reg?.update().catch(() => {});
+    const busy = (typeof writing !== "undefined" && writing) || document.querySelector("dialog[open]");
+    if (standalone && away && Date.now() - away > 30 * 60e3 && !busy) location.reload();
+  });
+
+  // the bar at the bottom: on a phone, once (closed: 60 days quiet); "Get the app" in the Devices menu shows it any time
+  const KEY = "fm1hub.appbar";
+  let prompt = null, bar = null;
+  const quiet = () => { try { return Date.now() < +(localStorage.getItem(KEY) || 0); } catch { return false; } };
+  const hush = () => { try { localStorage.setItem(KEY, String(Date.now() + 60 * 864e5)); } catch {} };
+  const SHARE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M6 11H5v10h14V11h-1"/></svg>';
+  function show() {
+    if (standalone) return;
+    bar?.remove();
+    bar = document.createElement("div");
+    bar.className = "appbar";
+    bar.setAttribute("role", "dialog");
+    bar.setAttribute("aria-label", "The Firmware Hub as an app");
+    const icon = '<img src="/app/icon-192.png" alt="" width="44" height="44">';
+    if (ios) {
+      bar.innerHTML = `${icon}<div class="t"><b>The hub on your Home Screen</b>
+        <span>Tap Share ${SHARE} then <b>Add to Home Screen</b>.</span>
+        <small>Browse, rate, keep favourites. Installing a firmware needs Chrome or Edge on a computer, or Chrome on Android: iPhone and iPad have no Web MIDI yet.</small></div>`;
+    } else if (prompt) {
+      bar.innerHTML = `${icon}<div class="t"><b>The Firmware Hub as an app</b><span>On your home screen, always the newest firmwares.</span></div>
+        <button class="go" type="button">Install</button>`;
+      bar.querySelector(".go").onclick = async () => {
+        const p = prompt; prompt = null;
+        p.prompt();
+        const { outcome } = await p.userChoice.catch(() => ({}));
+        if (outcome === "accepted") bar.remove(); else hush();
+      };
+    } else {
+      bar.innerHTML = `${icon}<div class="t"><b>The Firmware Hub as an app</b>
+        <span>In Chrome or Edge: the menu <b>⋮</b>, then <b>Install app</b> or <b>Add to Home screen</b>.</span></div>`;
+    }
+    const x = document.createElement("button");
+    x.className = "x"; x.type = "button"; x.setAttribute("aria-label", "Close"); x.textContent = "×";
+    x.onclick = () => { hush(); bar.remove(); };
+    bar.append(x);
+    document.body.append(bar);
+  }
+  addEventListener("beforeinstallprompt", (e) => {      // (Chrome / Edge: installable; their own mini bar replaced by ours)
+    e.preventDefault(); prompt = e;
+    if (touch && !quiet() && !bar) show();
+  });
+  addEventListener("appinstalled", () => { bar?.remove(); prompt = null; });
+  addEventListener("DOMContentLoaded", () => {
+    const a = document.getElementById("getapp");
+    if (a) {
+      if (standalone) a.remove();
+      else a.onclick = (e) => {                           // (the browser's prompt right away where there is one, else the how-to)
+        e.preventDefault(); document.getElementById("dd")?.classList.remove("open");
+        show(); bar?.querySelector(".go")?.click();
+      };
+    }
+    if (location.hash === "#app") show();                // (the menu's link from a page without this code: VIBE's)
+    else if (ios && !standalone && !quiet()) setTimeout(show, 1500);   // (Safari has no prompt: the bar a moment after the page)
+  });
+})();
 </script>
 <!--/email_off-->
 <!-- Matomo (self-hosted, matomo.designburgapps.com): one site per host (dx7 1, zp12 3, fm1 4, designburgapps.com 5);

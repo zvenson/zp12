@@ -731,7 +731,7 @@ function recent() {
 }
 
 async function midi() {
-  if (!navigator.requestMIDIAccess) throw Object.assign(new Error("This browser has no Web MIDI: use Chrome or Edge."), { code: "nomidi" });
+  if (!navigator.requestMIDIAccess) throw Object.assign(new Error(window.hubApp ? hubApp.noMidi : "This browser has no Web MIDI: use Chrome or Edge."), { code: "nomidi" });
   try { return await navigator.requestMIDIAccess({ sysex: true }); }
   catch (e) { throw Object.assign(new Error("MIDI access with SysEx was not allowed."), { code: "nosysex" }); }
 }

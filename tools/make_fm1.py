@@ -108,6 +108,13 @@ def devices(text, dev, ref="hub"):
     # (the favourites, ratings and the account: one code, one style for every device page, web/hubaccount.*)
     text = (text.replace("/*ACCOUNTCSS*/\n", (HERE / "web" / "hubaccount.css").read_text(encoding="utf-8"))
                 .replace("/*ACCOUNT*/\n", (HERE / "web" / "hubaccount.js").read_text(encoding="utf-8")))
+    # (the hub as an app: the manifest and icons in the head, the bar and the worker's registration at the end, web/hubapp.*;
+    #  not VIBE's nav, a page of its own)
+    if "</head>" in text:
+        app = (HERE / "web" / "hubapp-head.html").read_text(encoding="utf-8") + \
+            "<style>\n" + (HERE / "web" / "hubapp.css").read_text(encoding="utf-8") + "</style>\n"
+        text = text.replace("</head>", app + "</head>", 1)
+        text = text.replace("</body>", "<script>\n" + (HERE / "web" / "hubapp.js").read_text(encoding="utf-8") + "</script>\n</body>", 1)
     # (Cloudflare's email obfuscation off for our pages: the addresses stay plain text and links, also without JavaScript;
     #  the legal notice needs its address readable)
     text = text.replace("<body>\n", "<body>\n<!--email_off-->\n", 1).replace("</body>", "<!--/email_off-->\n</body>", 1)
