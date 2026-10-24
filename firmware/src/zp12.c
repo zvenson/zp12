@@ -27,6 +27,7 @@ static volatile uint32_t fm1_ms;
 #define FELUCCA_OTA 1
 #define FELUCCA_CDC 0
 #define FELUCCA_UAC 0
+#define FELUCCA_UAI 1                          /* the FM-1 as the computer's speaker: sampling on the machine (sp_sampler.c) */
 #define FELUCCA_UART 1                         /* the TRS MIDI IN jack (midi_uart.c, sloopDX's) */
 #ifndef FELUCCA_ID
 #define FELUCCA_ID "FM-1_970"                   /* package identity: 97N = zp12 build N */
@@ -120,6 +121,7 @@ static void ota_commit(const uint8_t *parm)
 #include "sp_ui.c"
 #include "sp_store.c"
 #include "sp_samples.c"
+#include "sp_sampler.c"
 #include "sp_link.c"
 
 /* ---- the timer: 10 kHz key scan, milliseconds, USB at 2 kHz */
@@ -164,6 +166,7 @@ void fm1_alnk0_irq(void)                       /* via isr_alnk0 (hal/fm1_isr.S) 
             sp_render(o + 2u * b);
         }
         sp_punch(o, HALF_FRAMES);                           /* FX held + white key 1-4: roll, reverse, tape stop */
+        smp_monitor(o, HALF_FRAMES);                        /* the USB input heard (SAMPLE > MON) */
         for (i = 0; i < HALF_WORDS; i++) {
             o[i] = sp_out((o[i] * master_q12) >> 12) << 8;   /* (-6 dB, a soft knee: sp_core.c) */
         }
@@ -255,6 +258,7 @@ static void zp12_main(void)
     for (;;) {
         uint32_t n = fm1_in.notes, down = n & ~prev_notes, rel, b;
         fm1_service();
+        smp_service();                                  /* a take: its erase, its input, its pages */
         prev_notes = n;
         {   /* SEL held: the faders 5-8; LFO held: ERASE (the pads held lose their hits as the playhead passes) */
             uint32_t bt = fm1_in.buttons, er = 0, k;
@@ -287,6 +291,12 @@ static void zp12_main(void)
         }
         if (rel & (1u << B_FX) && !ui.fx_used)
             button(B_FX);
+        if (b & (1u << B_LFO)) {                        /* LFO down: ERASE with the pads held; tapped, the SAMPLE page */
+            ui.lfo_used = 0;
+            b &= ~(1u << B_LFO);
+        }
+        if (rel & (1u << B_LFO) && !ui.lfo_used)
+            button(B_LFO);
         if (b & (1u << B_GLO)) {                        /* GLO down: mute / solo on the white keys while held; tapped, the GLO pages */
             ui.glo_used = 0;
             b &= ~(1u << B_GLO);
@@ -380,7 +390,7 @@ static void zp12_main(void)
             ui_say("FACTORY RESET");
         }
         {   /* saving: SAVE, or by itself when stopped, silent and nothing changed for 3 s (an erase stops the audio) */
-            uint32_t k, quiet = !sq.playing && !zl_busy();   /* (not while a backup is read or restored) */
+            uint32_t k, quiet = !sq.playing && !zl_busy() && smp.state == SM_IDLE;   /* (not while a backup is read or restored, nor a take runs) */
             for (k = 0; k < SP_NCH; k++) quiet &= !sp_ch[k].on;
             if (fm1_ms - t_sig >= 500u) {
                 uint32_t sg = zs_sig();

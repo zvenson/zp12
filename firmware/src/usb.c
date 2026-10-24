@@ -13,13 +13,22 @@
  * endpoint (EP4), so a computer can record the FM-1 over the cable. audio.c
  * fills a ring (uac_render_start, uac_tap); uac_service sends one packet per
  * USB frame from the TIMER5 ISR, nested in the render too (main.c). The
- * update loader leaves both off: MIDI only. */
+ * update loader leaves both off: MIDI only.
+ * FELUCCA_UAI=1 (zpc60, not with UAC) is the other way: a USB audio output of the computer (UAC1, a speaker):
+ * 16-bit stereo at 44.1 kHz on an isochronous adaptive OUT endpoint (EP2) into a ring (uai_ring) that the
+ * sampler (sp_sampler.c) and the monitor in the audio ISR read: the computer, or a phone, plays into the FM-1. */
 #include "../hal/fm1_usb.h"   /* registers; relative, so the loader and the host tests find it too */
 #ifndef FELUCCA_CDC
 #define FELUCCA_CDC 0
 #endif
 #ifndef FELUCCA_UAC
 #define FELUCCA_UAC 0
+#endif
+#ifndef FELUCCA_UAI
+#define FELUCCA_UAI 0
+#endif
+#if FELUCCA_UAI && (FELUCCA_UAC || FELUCCA_CDC)
+#error "FELUCCA_UAI is the audio streaming interface 2 and uses EP2: not with UAC or CDC"
 #endif
 enum { S_FADDR = 0, S_POWER = 1, S_INTRTX1 = 2, S_INTRTX2 = 3, S_INTRRX1 = 4, S_INTRRX2 = 5, S_INTRUSB = 6,
        S_INTRTX1E = 7, S_INTRTX2E = 8, S_INTRRX1E = 9, S_INTRRX2E = 10, S_INTRUSBE = 11, S_FRAME1 = 12,
@@ -28,6 +37,22 @@ enum { S_FADDR = 0, S_POWER = 1, S_INTRTX1 = 2, S_INTRTX2 = 3, S_INTRRX1 = 4, S_
        S_COUNT0 = 22, S_RXCOUNT1 = 22, S_RXCOUNT2 = 23 };
 
 static uint8_t ep0buf[64 + 4] __attribute__((aligned(4)));
+#if FELUCCA_UAI
+#define UAI_AS_IF 2
+#define UAI_RATE 44100u
+#define UAI_MAXP 192u            /* 48 stereo frames: the 44 / 45 a millisecond, and a margin */
+#define UAI_N 4096u              /* ring, frames (16-bit L | R << 16); a power of two: 93 ms */
+static uint8_t ep2rx[UAI_MAXP + 4] __attribute__((aligned(4)));
+static uint32_t uai_ring[UAI_N];
+static volatile uint32_t uai_w;                  /* written by usb_poll; the readers keep their own index */
+static struct {
+    volatile uint8_t alt;                        /* streaming interface setting: 1 = the host plays */
+    uint8_t e0_rx;                               /* SET_CUR sampling frequency: data stage pending */
+    volatile uint32_t pkts;                      /* packets taken (the sampler writes flash just after one) */
+    volatile uint32_t peak;                      /* the loudest |sample| since the sampler last looked */
+    volatile uint32_t polls;                     /* 2 kHz: the sampler's clock for "the host stopped playing" */
+} uai;
+#endif
 static uint8_t ep1tx[64] __attribute__((aligned(4)));
 static uint8_t ep1rx[64 + 4] __attribute__((aligned(4)));
 #if FELUCCA_CDC
@@ -137,8 +162,8 @@ static void midi_out_event(uint32_t pkt)            /* from the audio ISR */
  * bcdDevice: 3.00 MIDI, +0.01 CDC, +0.10 the audio input (hosts cache descriptors per version) */
 #define CDC_IF (2 + FELUCCA_UAC)
 #define UAC_AS_IF 2u
-#define CFG_LEN (101 + 74 * FELUCCA_CDC + 74 * FELUCCA_UAC)
-#define USB_NIF (2 + FELUCCA_UAC + 2 * FELUCCA_CDC)
+#define CFG_LEN (101 + 74 * FELUCCA_CDC + 74 * FELUCCA_UAC + 74 * FELUCCA_UAI)
+#define USB_NIF (2 + FELUCCA_UAC + FELUCCA_UAI + 2 * FELUCCA_CDC)
 #if FELUCCA_CDC
 static const uint8_t DEV_DESC[18] = {18, 1, 0x00, 0x02, 0xEF, 0x02, 0x01, 64, 0x09, 0x12, 0x01, 0x00,
                                      0x01 + 0x10 * FELUCCA_UAC, 0x03, 1, 2, 0, 1};   /* misc/IAD */
@@ -150,7 +175,7 @@ static const uint8_t CFG_DESC[] = {
 #define FELUCCA_USB_PID 0x0001   /* the update loader is 0x0002 */
 #endif
 static const uint8_t DEV_DESC[18] = {18, 1, 0x10, 0x01, 0, 0, 0, 64, 0x09, 0x12, FELUCCA_USB_PID & 0xFF,
-                                     FELUCCA_USB_PID >> 8, 0x00 + 0x10 * FELUCCA_UAC, 0x03,
+                                     FELUCCA_USB_PID >> 8, 0x00 + 0x10 * FELUCCA_UAC + 0x20 * FELUCCA_UAI, 0x03,
                                      1, 2, 0, 1};
 static const uint8_t CFG_DESC[] = {
     9, 2, CFG_LEN & 0xFF, CFG_LEN >> 8, USB_NIF, 1, 0, 0x80, 50,
@@ -160,6 +185,10 @@ static const uint8_t CFG_DESC[] = {
     10, 0x24, 1, 0x00, 0x01, 31, 0, 2, 1, UAC_AS_IF,    /* AC header 1.00: MIDI + audio streaming */
     12, 0x24, 2, 1, 0x03, 0x06, 0, 2, 0x03, 0x00, 0, 0, /* input terminal 1: line, 2 ch (L R) */
     9, 0x24, 3, 2, 0x01, 0x01, 0, 1, 0,                 /* output terminal 2: USB streaming, from 1 */
+#elif FELUCCA_UAI
+    10, 0x24, 1, 0x00, 0x01, 31, 0, 2, 1, UAI_AS_IF,    /* AC header 1.00: MIDI + audio streaming */
+    12, 0x24, 2, 1, 0x01, 0x01, 0, 2, 0x03, 0x00, 0, 0, /* input terminal 1: USB streaming, 2 ch (L R) */
+    9, 0x24, 3, 2, 0x01, 0x03, 0, 1, 0,                 /* output terminal 2: a speaker, from 1 */
 #else
     9, 0x24, 1, 0x00, 0x01, 9, 0, 1, 1,
 #endif
@@ -180,6 +209,15 @@ static const uint8_t CFG_DESC[] = {
     11, 0x24, 2, 1, 2, 2, 16, 1, UAC_RATE & 0xFF, (UAC_RATE >> 8) & 0xFF, UAC_RATE >> 16,
                                                         /* type I: 2 ch, 16 bit, one rate */
     9, 5, 0x84, 0x05, UAC_MAXP & 0xFF, UAC_MAXP >> 8, 1, 0, 0,   /* EP4 IN isochronous async, 1 ms */
+    7, 0x25, 1, 0x01, 0, 0, 0,                          /* CS endpoint: sampling frequency control */
+#endif
+#if FELUCCA_UAI
+    9, 4, UAI_AS_IF, 0, 0, 1, 2, 0, 0,                  /* IF2 audio streaming, alt 0: no bandwidth */
+    9, 4, UAI_AS_IF, 1, 1, 1, 2, 0, 0,                  /* alt 1: the stream */
+    7, 0x24, 1, 1, 1, 0x01, 0x00,                       /* AS general: terminal 1, delay 1, PCM */
+    11, 0x24, 2, 1, 2, 2, 16, 1, UAI_RATE & 0xFF, (UAI_RATE >> 8) & 0xFF, UAI_RATE >> 16,
+                                                        /* type I: 2 ch, 16 bit, one rate */
+    9, 5, 0x02, 0x09, UAI_MAXP & 0xFF, UAI_MAXP >> 8, 1, 0, 0,   /* EP2 OUT isochronous adaptive, 1 ms */
     7, 0x25, 1, 0x01, 0, 0, 0,                          /* CS endpoint: sampling frequency control */
 #endif
 #if FELUCCA_CDC
@@ -309,8 +347,17 @@ static void ep1_config(void)
     sie_wr(S_RXMAXP, 0xFF);
     sie_wr(S_RXCSR1, 0x90);
     sie_wr(S_RXCSR2, 0);
-    sie_wr(S_INTRRX1E, 0x02);
+    sie_wr(S_INTRRX1E, 0x02 | 0x04 * FELUCCA_UAI);
     fm1_usb_ep_enable(1u << 1);
+#if FELUCCA_UAI
+    fm1_usb_ep_rxbuf(2, ep2rx);
+    sie_wr(S_INDEX, 2);
+    sie_wr(S_RXMAXP, 0xFF);
+    sie_wr(S_RXCSR1, 0x90);                             /* ClrDataTog + FlushFIFO */
+    sie_wr(S_RXCSR2, 0x40);                             /* ISO */
+    fm1_usb_ep_enable(1u << 2);
+    uai.alt = 0;
+#endif
 #if FELUCCA_CDC
     fm1_usb_ep_txbuf(2, ep2tx);
     sie_wr(S_INDEX, 2);
@@ -392,6 +439,9 @@ static void ep0_service(void)
 #if FELUCCA_UAC
         uac.e0_rx = 0;
 #endif
+#if FELUCCA_UAI
+        uai.e0_rx = 0;
+#endif
         return;
     }
     if (csr & 0x10u) {                                  /* SetupEnd: the host abandoned the transfer */
@@ -402,6 +452,9 @@ static void ep0_service(void)
 #endif
 #if FELUCCA_UAC
         uac.e0_rx = 0;
+#endif
+#if FELUCCA_UAI
+        uai.e0_rx = 0;
 #endif
     }
     if (usb.e0_tx) {
@@ -418,6 +471,12 @@ static void ep0_service(void)
         for (i = 0; i < 7u && i < n; i++)
             cdc.line[i] = ep0buf[i];
         cdc.e0_rx = 0;
+        goto ack;
+    }
+#endif
+#if FELUCCA_UAI
+    if (uai.e0_rx) {                                    /* SET_CUR sampling frequency: 44100 it is */
+        uai.e0_rx = 0;
         goto ack;
     }
 #endif
@@ -460,6 +519,10 @@ static void ep0_service(void)
         if (usb.config != 1u)
             uac_stream(0);
 #endif
+#if FELUCCA_UAI
+        if (usb.config != 1u)
+            uai.alt = 0;
+#endif
         goto ack;
     case 0x8008:
         e0_send(&usb.config, 1, wlength);
@@ -477,10 +540,27 @@ static void ep0_service(void)
             goto ack;
         }
 #endif
+#if FELUCCA_UAI
+        if (s[4] == UAI_AS_IF && wvalue <= 1u && usb.config) {
+            sie_wr(S_INDEX, 2);
+            sie_wr(S_RXCSR1, 0x90);                     /* a new stream: nothing stale in the FIFO */
+            sie_wr(S_RXCSR2, 0x40);
+            uai.alt = (uint8_t)wvalue;
+            goto ack;
+        }
+#endif
         if (wvalue == 0)
             goto ack;
         goto stall;
     case 0x810A:
+#if FELUCCA_UAI
+        if (s[4] == UAI_AS_IF) {
+            static uint8_t alt;
+            alt = uai.alt;
+            e0_send(&alt, 1, wlength);
+            return;
+        }
+#endif
 #if FELUCCA_UAC
         if (s[4] == UAC_AS_IF) {
             static uint8_t alt;
@@ -500,6 +580,10 @@ static void ep0_service(void)
 #if FELUCCA_UAC
         if (wvalue == 0 && s[4] == 0x84u)
             goto ack;                                   /* isochronous: no halt, no toggle */
+#endif
+#if FELUCCA_UAI
+        if (wvalue == 0 && s[4] == 0x02u)
+            goto ack;
 #endif
         if (wvalue != 0 || ep > last)
             goto stall;                                 /* not an endpoint we have */
@@ -546,6 +630,27 @@ static void ep0_service(void)
     case 0xA283: {
         static const uint8_t RATE[3] = {UAC_RATE & 0xFF, (UAC_RATE >> 8) & 0xFF, UAC_RATE >> 16};
         if (s[4] != 0x84u || s[3] != 1u)
+            goto stall;
+        e0_send(RATE, 3, wlength);
+        return;
+    }
+#endif
+#if FELUCCA_UAI
+    case 0x2201:                                        /* SET_CUR, endpoint: sampling frequency */
+        if (s[4] != 0x02u || s[3] != 1u)
+            goto stall;
+        if (wlength) {
+            uai.e0_rx = 1;
+            sie_wr(S_INDEX, 0);
+            sie_wr(S_CSR0, 0x40);                       /* the 3 bytes follow */
+            return;
+        }
+        goto ack;
+    case 0xA281:                                        /* GET_CUR / MIN / MAX: the one rate */
+    case 0xA282:
+    case 0xA283: {
+        static const uint8_t RATE[3] = {UAI_RATE & 0xFF, (UAI_RATE >> 8) & 0xFF, UAI_RATE >> 16};
+        if (s[4] != 0x02u || s[3] != 1u)
             goto stall;
         e0_send(RATE, 3, wlength);
         return;
@@ -697,6 +802,38 @@ static void ep1_rx(void)                                /* leaves the packet (NA
     sie_wr(S_RXCSR1, csr & 0xFFu);
     sie_wr(S_RXCSR2, csr >> 8);
 }
+
+#if FELUCCA_UAI
+static void uai_rx(void)                                /* an isochronous packet: its frames into the ring */
+{
+    uint32_t csr, n, i, w = uai_w, pk = uai.peak;
+    const int16_t *b = (const int16_t *)ep2rx;
+    sie_wr(S_INDEX, 2);
+    csr = sie_rd(S_RXCSR1) | (sie_rd(S_RXCSR2) << 8);
+    if (!(csr & 1u))
+        return;
+    n = sie_rd(S_RXCOUNT1) | (sie_rd(S_RXCOUNT2) << 8);
+    if (n > UAI_MAXP)
+        n = UAI_MAXP;
+    fm1_usb_rx_sync();
+    if (uai.alt)
+        for (i = 0; i + 3u < n; i += 4u) {
+            int32_t l = b[i / 2u], r = b[i / 2u + 1u];
+            uint32_t al = (uint32_t)(l < 0 ? -l : l), ar = (uint32_t)(r < 0 ? -r : r);
+            if (al > pk) pk = al;
+            if (ar > pk) pk = ar;
+            uai_ring[w % UAI_N] = (uint32_t)(uint16_t)l | (uint32_t)(uint16_t)r << 16;
+            w++;
+        }
+    uai.peak = pk;
+    RING_PUBLISH();
+    uai_w = w;
+    uai.pkts++;
+    csr = (csr & ~0x164u) | 0x10u;                      /* (as EP1: RxPktRdy cleared, the ISO bit kept) */
+    sie_wr(S_RXCSR1, csr & 0xFFu);
+    sie_wr(S_RXCSR2, csr >> 8);
+}
+#endif
 
 #if FELUCCA_OTA
 /* ---- SysEx frames for the main loop (ota.c / editor.c hooks; felucca.c and the
@@ -1056,6 +1193,10 @@ static void usb_poll(void)                              /* TIMER5 ISR, 2 kHz */
         uac.e0_rx = 0;
         uac_stream(0);
 #endif
+#if FELUCCA_UAI
+        uai.e0_rx = 0;
+        uai.alt = 0;
+#endif
         fm1_usb_ep0_buf(ep0buf);
         sie_wr(S_INTRUSBE, 0x07);
         sie_wr(S_INTRTX1E, 0x01);
@@ -1081,6 +1222,11 @@ static void usb_poll(void)                              /* TIMER5 ISR, 2 kHz */
 #endif
 #if FELUCCA_UAC
     uac_service();
+#endif
+#if FELUCCA_UAI
+    uai.polls++;
+    if (usb.config && (ir & 0x04u || uai.alt))         /* (streaming: looked at every poll, the flag reads once) */
+        uai_rx();
 #endif
 }
 

@@ -20,6 +20,7 @@ static void lcd_fill(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint16_t c)
     for (j = 0; j < h; j++) for (i = 0; i < w; i++) if (x + i < 240u && y + j < 240u) fb[(y + j) * 240u + x + i] = s;
 }
 #define __attribute__(x)
+#define CV_MAX (232u * 80u)                     /* as on the device (zp12.c): a region taller than 80 rows is drawn in parts */
 #include "gfx.c"
 #define SP_WITH_FX 1
 #include "sp_core.c"
