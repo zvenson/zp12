@@ -1,7 +1,7 @@
 <p align="center"><a href="https://zp12.designburgapps.com/"><img src="web/img/zp12-logo.svg" width="560" alt="zp12 sampling drums"></a></p>
 
 <p align="center">
-  <a href="https://zp12.designburgapps.com/install/"><img src="https://img.shields.io/badge/firmware-2.4.4-c82e32" alt="firmware 2.4.4"></a>
+  <a href="https://zp12.designburgapps.com/install/"><img src="https://img.shields.io/badge/firmware-2.5-c82e32" alt="firmware 2.5"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-263e70" alt="GPL-3.0"></a>
   <img src="https://img.shields.io/badge/device-M--VAVE%20FM--1-1e3060" alt="M-VAVE FM-1">
   <img src="https://img.shields.io/badge/install-Chrome%20%2F%20Edge%2C%20USB-56627e" alt="Chrome / Edge over USB">
@@ -9,7 +9,7 @@
 
 <p align="center">
   <b><a href="https://zp12.designburgapps.com/">Website</a></b> ·
-  <b><a href="https://zp12.designburgapps.com/install/">Install 2.4.4</a></b> ·
+  <b><a href="https://zp12.designburgapps.com/install/">Install 2.5</a></b> ·
   <a href="https://zp12.designburgapps.com/editor/">Sample editor (sample + drop)</a> ·
   <a href="https://zp12.designburgapps.com/backup/">Backup</a> ·
   <a href="https://zp12.designburgapps.com/#cheatsheet">Cheat sheet</a> (<a href="https://zp12.designburgapps.com/zp12-cheat-sheet.pdf">PDF</a>) ·
@@ -32,7 +32,7 @@ A 12-bit sampling drum machine for the **M-VAVE FM-1**: 32 sounds at 26.04 kHz (
 without interpolation, eight output channels with their filters, a panel-style screen. Inspired by the
 12-bit samplers of the 80s; their names are trademarks of their owners, no affiliation.
 
-> **Status: 2.4.4** (2026-10-19). Install: **https://zp12.designburgapps.com/install/** · Sample editor (now with
+> **Status: 2.5** (2026-10-24). Install: **https://zp12.designburgapps.com/install/** · Sample editor (now with
 > sampling in the browser): **https://zp12.designburgapps.com/editor/** · Backup: **https://zp12.designburgapps.com/backup/** ·
 > Cheat sheet: **https://zp12.designburgapps.com/#cheatsheet** ([PDF](https://zp12.designburgapps.com/zp12-cheat-sheet.pdf)).
 >
@@ -40,6 +40,19 @@ without interpolation, eight output channels with their filters, a panel-style s
 > scratches), eleven loops on the black keys, the sequencer (loops of 1–32 bars or AUTO, song, real-time recording with count-in and AUTO CORRECT, step editing, swing, erase, tap tempo), sloopDX's
 > chorus, delay and reverb, saved in flash (0xC4000.., a room sloopDX leaves free; stock SLOOP keeps its own samples there: back them up first), own samples from the web editor.
 > Plan: [CONCEPT.md](CONCEPT.md), open work: [TODO.md](TODO.md).
+
+## New in 2.5
+
+- **Sampling on the machine, over USB**: the FM-1 is the computer's speaker ("zp12 FM-1"; on Linux it may show as
+  "pid.codes Test PID"). Play anything into it (a DAW, YouTube, a phone with USB-C), tap **LFO** (or GLO → SAMPLE):
+  KNOB 1 RATE (26K, 27K, 20K), KNOB 2 TIME, KNOB 3 THRESH (OFF: at once; else it waits for the sound), KNOB 4 MON
+  (hear the input on the FM-1; the computer's volume slider sets it, the take always gets the whole signal).
+  **REC**: ERASE % (the sound stutters while the flash erases), then REC 1.2S; it ends after TIME or with REC again
+  and lands on the selected pad as SMP01..SMP24. A pad with its own sample gets the new take in its place.
+  The room is the editor's: ~1.8 s at 26 kHz free (more with sloopDX's bank room, allowed in the editor).
+- **EDIT → WAVE → DELETE** (KNOB 4, turn twice): the pad's own sample deleted, its room free again, its pads back to
+  their factory sound.
+- The USB name is **zp12 FM-1**; the step grid shows all eight rows (7–8 were cut off on the device).
 
 ## New in 2.4
 

@@ -60,7 +60,7 @@
 <!--cs--><div class="cs"><div class="sheet">
 <header>
   <span class="mark">zp12</span><span class="sub">sampling drums</span><span class="rule"></span>
-  <span class="ver">firmware 2.4.3 for the M-VAVE FM-1 · zp12.designburgapps.com · 1 / 2</span>
+  <span class="ver">firmware 2.5 for the M-VAVE FM-1 · zp12.designburgapps.com · 1 / 2</span>
 </header>
 
 <div class="grid">
@@ -110,7 +110,7 @@
 
   <div class="box" style="margin-top:6px"><h2>Pages · KNOB 1 · 2 · 3 · 4</h2><div class="in">
     <table>
-      <tr><td><span class="k">EDIT</span> WAVE</td><td>the pad's sample · COPY> pad · COPY (turn twice) · –</td></tr>
+      <tr><td><span class="k">EDIT</span> WAVE</td><td>the pad's sample · COPY> pad · COPY (turn twice) · DELETE its own sample (turn twice)</td></tr>
       <tr><td>SOUND</td><td>TUNE (semitones) · FINE · DECAY · LEVEL</td></tr>
       <tr><td>TRUNC</td><td>START · END · DIR (fwd / rev) · SPEED (45 / 33)</td></tr>
       <tr><td>OUT</td><td>CHOP group (--, 1–8: its pads cut each other, wherever they are; hold pads while turning: they all join; the label shows the channel = the pad's position) · PAN · CUT · RESO (only pads 1–2 filter: on 3–8 they show --)</td></tr>
@@ -122,7 +122,7 @@
       <tr><td><span class="k">SEQ</span> LOOP</td><td>LOOP · BARS (AUTO, 1–32) · QUANT (AUTO CORRECT) · SWING 50–71 %</td></tr>
       <tr><td>LOOP TOOLS</td><td>CLEAR (turn twice) · COPY> loop · COPY (turn twice)</td></tr>
       <tr><td>SONG</td><td>STEP · SEG (its loop) · REPEAT (0: the song ends here) · SONG OFF / 1–4 (stopped)</td></tr>
-      <tr><td><span class="k">GLO</span> SETUP</td><td>TEMPO · BACK · – · RESET (<b>factory: all loops gone</b>, turn twice); tap: <b>CLICK</b>: CLICK · <b>COUNT</b> · <b>DUB</b> (NOW / BAR); tap: OUTPUT: SMOOTH</td></tr>
+      <tr><td><span class="k">GLO</span> SETUP</td><td>TEMPO · BACK · – · RESET (<b>factory: all loops gone</b>, turn twice); tap: <b>CLICK</b>: CLICK · <b>COUNT</b> · <b>DUB</b> (NOW / BAR); tap: OUTPUT: SMOOTH; tap: <b>SAMPLE</b>: RATE · TIME · THRESH · MON</td></tr>
     </table>
   </div></div>
 </div>
@@ -148,7 +148,7 @@
       <tr><td><span class="k">GLO</span> held + white</td><td>1–8 <b>mute</b>, 9–16 <b>solo</b> ch 1–8 (lit while heard; M / S under the faders)</td></tr>
       <tr><td><span class="k">EDIT</span> held + <span class="k">OCT−</span></td><td><b>undo</b> the last clear / erase / copy (again: redo)</td></tr>
       <tr><td><span class="k">FX</span> held + white 1–4</td><td><b>punch-in</b> while held: 1 roll 1/8 · 2 roll 1/16 · 3 reverse · 4 tape stop; <span class="k">OCT−</span> / <span class="k">OCT+</span>: <b>reverb / echo throw</b> (FX tapped: the FX pages)</td></tr>
-      <tr><td><span class="k">LFO</span> + pad</td><td><b>erase</b> its hits as the playhead passes (stopped: all)</td></tr>
+      <tr><td><span class="k">LFO</span> + pad</td><td><b>erase</b> its hits as the playhead passes (stopped: all); <span class="k">LFO</span> tapped: <b>SAMPLE</b></td></tr>
       <tr><td><span class="k">ENV</span></td><td>tap tempo (it blinks on the beat)</td></tr>
       <tr><td><span class="k">SAVE</span></td><td>save now (playing: at the stop; also by itself); <b>held + a black key</b>: the loop into that loop</td></tr>
       <tr><td><span class="k">HOME</span></td><td>the faders</td></tr>
@@ -172,7 +172,7 @@
 <div class="sheet p2">
 <header>
   <span class="mark">zp12</span><span class="sub">in detail</span><span class="rule"></span>
-  <span class="ver">firmware 2.4.3 · 2 / 2</span>
+  <span class="ver">firmware 2.5 · 2 / 2</span>
 </header>
 
 <div class="grid">
@@ -204,6 +204,15 @@
       <tr><td>Red dot</td><td>in the step grid: a hit with its own TUNE / FINE / DECAY / CUT</td></tr>
       <tr><td>Version</td><td>on the GLO pages and at the start (any key skips the start)</td></tr>
     </table>
+  </div></div>
+
+  <div class="box" style="margin-top:6px"><h2>Sampling over USB (2.5)</h2><div class="in">
+    <ol>
+      <li>On the computer (or a phone with USB-C) choose <b>zp12 FM-1</b> as the sound output (Linux may call it "pid.codes Test PID"), volume up, play the sound.</li>
+      <li>Hit the pad it should go on. <span class="k">LFO</span> tapped: <b>SAMPLE</b>, the meter moves.</li>
+      <li>RATE · TIME · THRESH (OFF: at once) · MON (hear it). <span class="k red">REC</span>: ERASE %, then REC; REC again or TIME ends it.</li>
+    </ol>
+    <p class="dim" style="margin:3px 0 0">On the pad as SMP01–24; again on that pad: replaced. EDIT → WAVE → DELETE frees it. Room ~1.8 s at 26 kHz (more with the bank room, the editor allows it).</p>
   </div></div>
 </div>
 
