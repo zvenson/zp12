@@ -167,13 +167,50 @@ static void smp_end_take(void)                    /* the take's last pair and pa
     smp.state = SM_DONE;
 }
 
-static int smp_dir_write(uint32_t n)              /* the take into the directory (a new generation, the older copy) */
+/* a slot set (z) or emptied (z == 0): the directory's next generation, into its older copy */
+static int smp_dir_put(uint32_t slot, const zu_slot_t *z)
 {
     static zu_dir_t d;
     uint32_t a, took;
     if (zu_dir.magic == ZU_MAGIC) d = zu_dir;
     else { memset(&d, 0, sizeof d); d.magic = ZU_MAGIC; }
     d.gen++;
+    if (z) d.s[slot] = *z;
+    else memset(&d.s[slot], 0, sizeof d.s[slot]);
+    d.crc = zs_crc((const uint8_t *)d.s, sizeof d.s);
+    a = ZU_DIR0 + (d.gen & 1u) * 0x1000u;
+    if (fl_erase4k_quiet(a, &took)) return -1;
+    return fl_write(a, (const uint8_t *)&d, sizeof d);
+}
+
+/* EDIT > WAVE > DELETE: the pad's own sample gone from the directory (its room free again); the pads that played
+ * it get their factory sound back */
+static void smp_delete_pad(uint32_t pad)
+{
+    uint32_t w = sp_sound[pad % SP_NSOUND].wave, k;
+    char m[24], *p;
+    if (smp.state != SM_IDLE) return;
+    if (w < KIT_NWAVE || w >= KIT_NWAVE + SP_NUSER || zu_dir.magic != ZU_MAGIC || !zu_dir.s[w - KIT_NWAVE].off) {
+        ui_say("NOT AN OWN SAMPLE");
+        return;
+    }
+    p = cat(m, ui_uname[w - KIT_NWAVE]);
+    for (k = 0; k < SP_NCH; k++)
+        if (sp_ch[k].w == &sp_wave[w]) sp_ch[k].on = 0;
+    if (smp_dir_put(w - KIT_NWAVE, 0)) { ui_say("DIR ERROR"); return; }
+    zu_load();
+    for (k = 0; k < SP_NSOUND; k++)
+        if (sp_sound[k].wave == w) sp_sound[k].wave = KIT_PADS[k].wave;
+    cat(p, " DELETED");
+    ui_say(m);
+    ui.save_req = 1;
+}
+
+static int smp_dir_write(uint32_t n)              /* the take into the directory (a new generation, the older copy) */
+{
+    static zu_dir_t d;
+    if (zu_dir.magic == ZU_MAGIC) d = zu_dir;
+    else { memset(&d, 0, sizeof d); d.magic = ZU_MAGIC; }
     d.s[smp.slot].off = smp.off;
     d.s[smp.slot].n = n;
     d.s[smp.slot].rate = SMP_RATE[smp.rate % 3u];
@@ -182,10 +219,7 @@ static int smp_dir_write(uint32_t n)              /* the take into the directory
     memset(d.s[smp.slot].name, 0, 8);
     d.s[smp.slot].name[0] = 'S'; d.s[smp.slot].name[1] = 'M'; d.s[smp.slot].name[2] = 'P';
     d.s[smp.slot].name[3] = (char)('0' + (smp.slot + 1u) / 10u); d.s[smp.slot].name[4] = (char)('0' + (smp.slot + 1u) % 10u);
-    d.crc = zs_crc((const uint8_t *)d.s, sizeof d.s);
-    a = ZU_DIR0 + (d.gen & 1u) * 0x1000u;
-    if (fl_erase4k_quiet(a, &took)) return -1;
-    return fl_write(a, (const uint8_t *)&d, sizeof d);
+    return smp_dir_put(smp.slot, &d.s[smp.slot]);
 }
 
 /* main loop: one step of the take (an erase, or up to ~20 ms of input and pages) */

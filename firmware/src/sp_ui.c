@@ -57,6 +57,7 @@ static struct {
 } smp = {0, 0, 0, 80, 0, 10, 0, 0, 0, 0, 0, 0};
 static void smp_press(void);
 static uint32_t smp_room_samples(void);
+static void smp_delete_pad(uint32_t pad);
 #endif
 /* buttons: the printed labels' matrix ids (as SLOOP's PANEL_DEFAULT); SEL is SLOOP's SCL */
 enum { B_OCTDN = 0, B_OCTUP = 1, B_FX = 2, B_SEL = 3, B_ENV = 4, B_LFO = 5, B_EDIT = 6, B_GLO = 7, B_HOME = 8,
@@ -174,6 +175,9 @@ static void page_cols(char lab[4][8], char val[4][12])   /* (val: an own sample'
         COL(0, "WAVE", cat(val[0], wave_name(s->wave)));
         COL(1, "COPY>", pad_label(val[1], ui.copy_pad));
         COL(2, "COPY", cat(val[2], ui.arm == PG_WAVE + 1u ? "AGAIN" : "-->"));
+#if FELUCCA_UAI
+        COL(3, "DELETE", cat(val[3], s->wave < KIT_NWAVE ? "--" : ui.arm == PG_WAVE + 2u ? "AGAIN" : "-->"));
+#endif
         break;
     case PG_SOUND:
         COL(0, "TUNE", num(val[0], s->tune, 2, 1)); COL(1, "FINE", num(val[1], s->fine, 2, 1));
@@ -821,6 +825,10 @@ static void knob(uint32_t n, int32_t d)
         if (n == 0u)
             wave_step(one);
         if (n == 1u) ui.copy_pad = (uint8_t)((ui.copy_pad + SP_NSOUND + (one > 0 ? 1u : SP_NSOUND - 1u)) % SP_NSOUND);
+#if FELUCCA_UAI
+        if (n == 3u && d > 0 && s->wave >= KIT_NWAVE && again(PG_WAVE + 2u))   /* the pad's own sample deleted (turn twice) */
+            smp_delete_pad(ui.sel);
+#endif
         if (n == 2u && d > 0 && again(PG_WAVE + 1u) && ui.copy_pad != ui.sel) {
             sp_sound[ui.copy_pad] = *s;
             ui_say("SOUND COPIED");

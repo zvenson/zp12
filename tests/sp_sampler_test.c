@@ -45,6 +45,7 @@ static sp_wave_t sp_wave[64];
 static struct { const sp_wave_t *w; uint8_t on; } sp_ch[SP_NCH];
 typedef struct { uint8_t wave; int8_t tune, fine; uint8_t flags; uint16_t start, end; } sp_sound_t;
 static sp_sound_t sp_sound[SP_NSOUND];
+static const sp_sound_t KIT_PADS[SP_NSOUND] = {{3}, {3}, {7}};   /* (A03's factory sound: wave 7) */
 static char ui_uname[SP_NUSER][9];
 static uint8_t ui_uflags[SP_NUSER];
 static struct { uint8_t force, sel, save_req; } ui;
@@ -217,6 +218,19 @@ int main(void)
         for (guard = 0; smp.state != SM_IDLE && guard < 20000u; guard++) { if (smp.state != SM_ERASE) packet(0.5); smp_service(); }
         check(smp.state == SM_IDLE && !bad_write && zu_dir.gen > gen && zu_dir.s[1].off == off0 && sp_sound[2].wave == KIT_NWAVE + 1u,
               "replaced: same slot, same place, written into erased flash");
+    }
+    /* DELETE: A03's SMP02 gone, its room free again, A03 back to its factory sound */
+    {
+        uint32_t gen = zu_dir.gen, before;
+        ui.sel = 0;                                       /* (a pad with a kit sound: A03's sample is not room yet) */
+        sp_sound[0].wave = 0;
+        before = smp_room_samples();
+        smp_delete_pad(2);
+        check(!zu_dir.s[1].off && zu_dir.gen == gen + 1u && sp_sound[2].wave == 7u && !strcmp(said, "SMP02 DELETED"),
+              "DELETE on A03: SMP02 out of the directory, A03 its factory sound again");
+        check(smp_room_samples() > before, "... and its room free for the next take");
+        smp_delete_pad(0);
+        check(!strcmp(said, "NOT AN OWN SAMPLE"), "DELETE on a kit sound: refused");
     }
     printf(bad ? "SAMPLER TEST FAILED\n" : "sampler test passed\n");
     return bad != 0;
