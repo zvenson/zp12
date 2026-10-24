@@ -60,7 +60,8 @@ static uint32_t hits;
 #define UAI_N 4096u
 static uint32_t uai_ring[UAI_N];
 static volatile uint32_t uai_w;
-static struct { uint8_t alt, e0_rx; uint32_t pkts, peak, polls; } uai;
+static struct { uint8_t alt, e0_rx; uint32_t pkts, peak, polls, last_poll; int16_t vol; uint8_t mute; } uai;
+#define UAI_LIVE() (uai.alt || (uint32_t)(uai.polls - uai.last_poll) < 3000u)
 /* sp_ui.c's side of it */
 static const uint16_t SMP_RATE[3] = {40000, 26040, 20000};
 static const int32_t SMP_LP[3] = {29786, 25854, 22872};
@@ -84,6 +85,7 @@ static void packet(double amp)                           /* one millisecond of t
         frames_in++;
     }
     uai.pkts++;
+    uai.last_poll = uai.polls;
 }
 
 static int32_t s12(const uint8_t *p, uint32_t i)        /* sample i of a packed take */
@@ -96,6 +98,7 @@ static int32_t s12(const uint8_t *p, uint32_t i)        /* sample i of a packed 
 int main(void)
 {
     uint32_t off, end, i, guard;
+    uai.polls = 100000u;                                 /* (long after any packet: no stream yet) */
     memset(flash, 0xFF, sizeof flash);
     zu_load();
     smp_find(&off, &end);
@@ -125,7 +128,7 @@ int main(void)
     /* no stream: refused */
     uai.alt = 0;
     smp_press();
-    check(smp.state == SM_IDLE && !strcmp(said, "NO USB AUDIO"), "REC without USB audio: NO USB AUDIO");
+    check(smp.state == SM_IDLE && !strcmp(said, "PLAY INTO USB"), "REC without USB audio: PLAY INTO USB");
 
     /* a take: 0.5 s at 40 kHz of a 1 kHz sine at half scale, onto pad A03 */
     uai.alt = 1;
@@ -186,10 +189,34 @@ int main(void)
         for (guard = 0; smp.state == SM_ERASE && guard < 1000u; guard++) smp_service();
         for (k = 0; k < 300u; k++) { packet(0.5); smp_service(); }
         uai.alt = 0;
-        for (guard = 0; smp.state != SM_IDLE && guard < 1000u; guard++) smp_service();
+        for (guard = 0; guard < 100u; guard++) { uai.polls += 2u; smp_service(); }   /* 0.1 s: a pause, not the end */
+        check(smp.state == SM_REC, "the host pauses 0.1 s: the take goes on");
+        for (guard = 0; smp.state != SM_IDLE && guard < 4000u; guard++) { uai.polls += 2u; smp_service(); }
         k = zu_dir.s[3].n;
         printf("sampler: the host stopped at %u samples (%.2f s at 26 kHz)\n", k, k / 26040.0);
         check(smp.state == SM_IDLE && k > 7000u && k < 8300u && !bad_write, "the host stops playing: the take is what came (~0.3 s)");
+    }
+    /* the room full: REC on a pad with its own sample (on no other pad) replaces it in place */
+    {
+        uint32_t k, gen = zu_dir.gen, off0 = zu_dir.s[1].off;
+        uai.alt = 1;
+        smp.rate = 0; smp.len10 = 99; smp.thr = 0;       /* (as long as it goes: every room filled, pad by pad) */
+        for (k = 9; k < 16u; k++) {
+            ui.sel = (uint8_t)k;
+            sp_sound[k].wave = 0;
+            said[0] = 0;
+            smp_press();
+            if (smp.state == SM_IDLE) break;
+            for (guard = 0; smp.state != SM_IDLE && guard < 40000u; guard++) { if (smp.state != SM_ERASE) packet(0.5); smp_service(); }
+        }
+        printf("sampler: %u more takes filled the rooms\n", k - 9u);
+        check(smp.state == SM_IDLE && !strncmp(said, "NO ROOM", 7), "the rooms full: a pad without a sample of its own gets NO ROOM");
+        ui.sel = 2;                                       /* A03 plays SMP02 (and no other pad does) */
+        smp_press();
+        check(smp.state == SM_ERASE && smp.slot == 1u && smp.off == off0, "REC on A03: its SMP02 replaced, in its own place");
+        for (guard = 0; smp.state != SM_IDLE && guard < 20000u; guard++) { if (smp.state != SM_ERASE) packet(0.5); smp_service(); }
+        check(smp.state == SM_IDLE && !bad_write && zu_dir.gen > gen && zu_dir.s[1].off == off0 && sp_sound[2].wave == KIT_NWAVE + 1u,
+              "replaced: same slot, same place, written into erased flash");
     }
     printf(bad ? "SAMPLER TEST FAILED\n" : "sampler test passed\n");
     return bad != 0;

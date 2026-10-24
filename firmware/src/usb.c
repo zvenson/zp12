@@ -51,7 +51,14 @@ static struct {
     volatile uint32_t pkts;                      /* packets taken (the sampler writes flash just after one) */
     volatile uint32_t peak;                      /* the loudest |sample| since the sampler last looked */
     volatile uint32_t polls;                     /* 2 kHz: the sampler's clock for "the host stopped playing" */
+    volatile uint32_t last_poll;                 /* polls at the last packet */
+    volatile int16_t vol;                        /* feature unit 3: the computer's slider, 1/256 dB (-60 .. 0 dB) */
+    volatile uint8_t mute;
+    uint8_t e0_what;                             /* SET_CUR data stage: 1 sampling rate, 2 volume, 3 mute */
 } uai;
+/* the host plays: its stream is open, or a packet came in the last 1.5 s (PipeWire closes it in a pause and opens
+ * it again: the sampler does not flicker with it) */
+#define UAI_LIVE() (uai.alt || (uint32_t)(uai.polls - uai.last_poll) < 3000u)
 #endif
 static uint8_t ep1tx[64] __attribute__((aligned(4)));
 static uint8_t ep1rx[64 + 4] __attribute__((aligned(4)));
@@ -162,7 +169,7 @@ static void midi_out_event(uint32_t pkt)            /* from the audio ISR */
  * bcdDevice: 3.00 MIDI, +0.01 CDC, +0.10 the audio input (hosts cache descriptors per version) */
 #define CDC_IF (2 + FELUCCA_UAC)
 #define UAC_AS_IF 2u
-#define CFG_LEN (101 + 74 * FELUCCA_CDC + 74 * FELUCCA_UAC + 74 * FELUCCA_UAI)
+#define CFG_LEN (101 + 74 * FELUCCA_CDC + 74 * FELUCCA_UAC + 84 * FELUCCA_UAI)
 #define USB_NIF (2 + FELUCCA_UAC + FELUCCA_UAI + 2 * FELUCCA_CDC)
 #if FELUCCA_CDC
 static const uint8_t DEV_DESC[18] = {18, 1, 0x00, 0x02, 0xEF, 0x02, 0x01, 64, 0x09, 0x12, 0x01, 0x00,
@@ -186,9 +193,12 @@ static const uint8_t CFG_DESC[] = {
     12, 0x24, 2, 1, 0x03, 0x06, 0, 2, 0x03, 0x00, 0, 0, /* input terminal 1: line, 2 ch (L R) */
     9, 0x24, 3, 2, 0x01, 0x01, 0, 1, 0,                 /* output terminal 2: USB streaming, from 1 */
 #elif FELUCCA_UAI
-    10, 0x24, 1, 0x00, 0x01, 31, 0, 2, 1, UAI_AS_IF,    /* AC header 1.00: MIDI + audio streaming */
+    10, 0x24, 1, 0x00, 0x01, 41, 0, 2, 1, UAI_AS_IF,    /* AC header 1.00: MIDI + audio streaming */
     12, 0x24, 2, 1, 0x01, 0x01, 0, 2, 0x03, 0x00, 0, 0, /* input terminal 1: USB streaming, 2 ch (L R) */
-    9, 0x24, 3, 2, 0x01, 0x03, 0, 1, 0,                 /* output terminal 2: a speaker, from 1 */
+    10, 0x24, 6, 3, 1, 1, 0x03, 0, 0, 0,                /* feature unit 3, from 1: master mute + volume: the computer's
+                                                         * slider comes here instead of scaling the stream (the
+                                                         * sampler always gets it whole; the slider sets MON's level) */
+    9, 0x24, 3, 2, 0x01, 0x03, 0, 3, 0,                 /* output terminal 2: a speaker, from 3 */
 #else
     9, 0x24, 1, 0x00, 0x01, 9, 0, 1, 1,
 #endif
@@ -480,8 +490,14 @@ static void ep0_service(void)
     }
 #endif
 #if FELUCCA_UAI
-    if (uai.e0_rx) {                                    /* SET_CUR sampling frequency: 44100 it is */
+    if (uai.e0_rx) {                                    /* SET_CUR data: the rate (44100 it is), volume, mute */
         uai.e0_rx = 0;
+        if (uai.e0_what == 2u) {
+            int32_t v = (int16_t)(ep0buf[0] | ep0buf[1] << 8);
+            uai.vol = (int16_t)(v < -15360 ? -15360 : v > 0 ? 0 : v);
+        } else if (uai.e0_what == 3u) {
+            uai.mute = ep0buf[0] & 1u;
+        }
         goto ack;
     }
 #endif
@@ -641,11 +657,42 @@ static void ep0_service(void)
     }
 #endif
 #if FELUCCA_UAI
+    case 0x2101:                                        /* SET_CUR, interface 0 / feature unit 3: mute (1), volume (2) */
+        if (s[5] != 3u || (s[3] != 1u && s[3] != 2u))
+            goto stall;
+        if (wlength) {
+            uai.e0_rx = 1;
+            uai.e0_what = s[3] == 2u ? 2u : 3u;          /* (2 volume, 3 mute)  */
+            sie_wr(S_INDEX, 0);
+            sie_wr(S_CSR0, 0x40);
+            return;
+        }
+        goto ack;
+    case 0xA181:                                        /* GET_CUR / MIN / MAX / RES of the feature unit */
+    case 0xA182:
+    case 0xA183:
+    case 0xA184: {
+        static uint8_t r[2];
+        int32_t v = s[1] == 0x81u ? uai.vol : s[1] == 0x82u ? -15360 : s[1] == 0x83u ? 0 : 256;
+        if (s[5] != 3u || (s[3] != 1u && s[3] != 2u))
+            goto stall;
+        if (s[3] == 1u) {                               /* mute: one byte, only CUR */
+            if (s[1] != 0x81u) goto stall;
+            r[0] = uai.mute;
+            e0_send(r, 1, wlength);
+            return;
+        }
+        r[0] = (uint8_t)v;
+        r[1] = (uint8_t)((uint32_t)v >> 8);
+        e0_send(r, 2, wlength);
+        return;
+    }
     case 0x2201:                                        /* SET_CUR, endpoint: sampling frequency */
         if (s[4] != 0x02u || s[3] != 1u)
             goto stall;
         if (wlength) {
             uai.e0_rx = 1;
+            uai.e0_what = 1;
             sie_wr(S_INDEX, 0);
             sie_wr(S_CSR0, 0x40);                       /* the 3 bytes follow */
             return;
@@ -831,6 +878,7 @@ static void uai_rx(void)                                /* an isochronous packet
             w++;
         }
     uai.peak = pk;
+    if (uai.alt) uai.last_poll = uai.polls;
     RING_PUBLISH();
     uai_w = w;
     uai.pkts++;

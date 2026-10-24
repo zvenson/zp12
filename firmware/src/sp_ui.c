@@ -54,7 +54,7 @@ static struct {
     uint16_t len10;                              /* TIME, tenths of a second */
     uint32_t off, end, erased, n, want;          /* the run [off, end), erased up to; samples taken, wanted */
     uint32_t peak;                               /* the input meter (falls slowly) */
-} smp = {0, 0, 0, 80, 0, 20, 0, 0, 0, 0, 0, 0};
+} smp = {0, 0, 0, 80, 0, 10, 0, 0, 0, 0, 0, 0};
 static void smp_press(void);
 static uint32_t smp_room_samples(void);
 #endif
@@ -385,8 +385,8 @@ static void draw_lcd(void)                      /* the LCD: big the state, below
             *p++ = '.';
             p = num(p, (int32_t)(t10 % 10u), 1, 0);
             cat(p, "S");
-        } else if (!uai.alt) {
-            cat(big, "NO USB AUDIO");
+        } else if (!UAI_LIVE()) {
+            cat(big, "PLAY INTO USB");
         } else {
             p = cat(big, "SAMPLE ");
             pad_label(p, ui.sel);
@@ -594,7 +594,7 @@ static void ui_draw(void)
         uai.peak = 0;
         smp.peak = pk > smp.peak ? pk : smp.peak - smp.peak / 8u;
         s ^= (smp.peak / 512u + 1u) * 2246822519u ^ smp.state * 977u ^ (smp.erased >> 12) * 31u ^ (smp.n / 4000u) * 7919u ^
-             uai.alt * 3u ^ smp.mon * 5u ^ smp.len10 * 13u ^ smp.rate * 17u ^ smp.thr * 19u;
+             (uint32_t)UAI_LIVE() * 3u ^ smp.mon * 5u ^ smp.len10 * 13u ^ smp.rate * 17u ^ smp.thr * 19u;
     }
 #endif
     if (s != ui.sig_lcd || ui.force) { ui.sig_lcd = s; draw_lcd(); }

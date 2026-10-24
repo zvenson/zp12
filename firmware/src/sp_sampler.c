@@ -30,8 +30,20 @@ static uint32_t smp_rooms(uint32_t r[4][2])
     return n;
 }
 
+static int smp_reuse = -1;                       /* the slot the take replaces (the pad's own sample, on no other pad) */
 static uint32_t smp_slot_bytes(uint32_t i) { return (zu_dir.s[i].n + 1u) / 2u * 3u; }
-static int smp_slot_used(uint32_t i) { return zu_dir.magic == ZU_MAGIC && zu_dir.s[i].off && zu_dir.s[i].n; }
+static int smp_slot_used(uint32_t i) { return zu_dir.magic == ZU_MAGIC && zu_dir.s[i].off && zu_dir.s[i].n && (int)i != smp_reuse; }
+
+/* the pad's own sample, if only this pad plays it: a new take may take its place (-1: none) */
+static int smp_replaceable(uint32_t pad)
+{
+    uint32_t w = sp_sound[pad % SP_NSOUND].wave, k;
+    if (w < KIT_NWAVE || w >= KIT_NWAVE + SP_NUSER || zu_dir.magic != ZU_MAGIC || !zu_dir.s[w - KIT_NWAVE].off)
+        return -1;
+    for (k = 0; k < SP_NSOUND; k++)
+        if (k != pad % SP_NSOUND && sp_sound[k].wave == w) return -1;
+    return (int)(w - KIT_NWAVE);
+}
 
 /* the largest free run, in whole 4 KiB sectors (an erase must not touch a sample beside it) */
 static void smp_find(uint32_t *off, uint32_t *end)
@@ -70,13 +82,16 @@ static int smp_free_slot(void)
 static uint32_t smp_room_samples(void)
 {
     uint32_t off, end;
+    smp_reuse = smp_replaceable(ui.sel);         /* (the pad's own sample counts as room: the take replaces it) */
     smp_find(&off, &end);
+    smp_reuse = -1;
     return (end - off) / 3u * 2u;
 }
 
 static void smp_stop(const char *why)
 {
     smp.state = SM_IDLE;
+    smp_reuse = -1;
     if (why) ui_say(why);
     ui.force = 1;
 }
@@ -89,15 +104,22 @@ static void smp_press(void)
     if (smp.state == SM_REC) { smp.want = smp.n + smp_has_hold; return; }   /* (it ends with what is in hand) */
     if (smp.state != SM_IDLE) { smp_stop("SAMPLE OFF"); return; }
     if (!flash_ok) { ui_say("NO FLASH"); return; }
-    if (!uai.alt) { ui_say("NO USB AUDIO"); return; }
-    slot = smp_free_slot();
+    if (!UAI_LIVE()) { ui_say("PLAY INTO USB"); return; }
+    smp_reuse = smp_replaceable(ui.sel);         /* REC on a pad with its own sample: that one is replaced */
+    slot = smp_reuse >= 0 ? smp_reuse : smp_free_slot();
     if (slot < 0) { ui_say("24 SAMPLES: FULL"); return; }
     smp_find(&smp.off, &smp.end);
     want = (uint32_t)smp.len10 * rate / 10u;
     if (want > (smp.end - smp.off) / 3u * 2u) want = (smp.end - smp.off) / 3u * 2u;
-    if (want < rate / 10u) { ui_say("NO ROOM"); return; }
+    if (want < rate / 10u) { smp_reuse = -1; ui_say("NO ROOM: EDITOR"); return; }
     smp.slot = (uint8_t)slot;
     smp.want = want;
+    if (smp_reuse >= 0) {                        /* the sample replaced: gone from the pads before its flash is */
+        uint32_t k;
+        sp_wave[KIT_NWAVE + (uint32_t)smp_reuse].n = 0;
+        for (k = 0; k < SP_NCH; k++)
+            if (sp_ch[k].w == &sp_wave[KIT_NWAVE + (uint32_t)smp_reuse]) sp_ch[k].on = 0;
+    }
     smp.n = 0;
     smp.erased = smp.off;
     smp.state = SM_ERASE;
@@ -172,7 +194,7 @@ static void smp_service(void)
     uint32_t t0 = fm1_ms;
     if (smp.state == SM_IDLE)
         return;
-    if (!uai.alt && smp.state != SM_ERASE) {      /* the host stopped playing */
+    if (!UAI_LIVE() && smp.state != SM_ERASE) {   /* the host stopped playing (1.5 s without a packet) */
         if (smp.state == SM_REC && smp.n >= 2u) smp.want = smp.n + smp_has_hold;
         else { smp_stop("NO INPUT"); return; }
     }
@@ -214,7 +236,7 @@ static void smp_service(void)
             smp_pk_last = uai.pkts;
             if (fl_write(smp.off + smp_qr * 256u, smp_q[smp_qr % SMP_NQ], 256u)) { smp_stop("WRITE ERROR"); return; }
             smp_qr++;
-        } else if (smp_qr != smp_qw && !uai.alt) {           /* (no packets any more: write the rest now) */
+        } else if (smp_qr != smp_qw && !UAI_LIVE()) {        /* (no packets any more: write the rest now) */
             if (fl_write(smp.off + smp_qr * 256u, smp_q[smp_qr % SMP_NQ], 256u)) { smp_stop("WRITE ERROR"); return; }
             smp_qr++;
         }
@@ -234,6 +256,7 @@ static void smp_service(void)
             for (k = 0; k < 8u && ui_uname[smp.slot][k]; k++) *p++ = ui_uname[smp.slot][k];
             *p = 0;
             smp.state = SM_IDLE;
+            smp_reuse = -1;
             ui.save_req = 1;                      /* (the pad's new sound into the save) */
             ui_say(m);
             ui.force = 1;
@@ -252,7 +275,10 @@ static uint32_t smp_mr, smp_mlast;
 static void smp_monitor(int32_t *o, uint32_t n)
 {
     uint32_t i, w = uai_w, g = smp.mon;
-    if (!uai.alt || !g) { smp_mr = w; return; }
+    if (uai.mute) g = 0;
+    else if (uai.vol < 0)                        /* the computer's slider: 6 dB a halving, roughly (it sets what you hear) */
+        g = g * (uint32_t)(256 + (uai.vol % 1536) / 12) >> 8 >> (uint32_t)(-uai.vol / 1536);
+    if (!UAI_LIVE() || !g) { smp_mr = w; return; }
     if ((uint32_t)(w - smp_mr) > 1024u)           /* far behind (a stall, a new stream): close up, a little in hand */
         smp_mr = w - 192u;
     for (i = 0; i < n; i++) {
