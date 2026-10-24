@@ -27,6 +27,7 @@ static volatile uint32_t fm1_ms;
 #define FELUCCA_OTA 1
 #define FELUCCA_CDC 0
 #define FELUCCA_UAC 0
+#define FELUCCA_PRODUCT_NAME 1                 /* the USB name: usb.c STR2 */
 #define FELUCCA_UAI 1                          /* the FM-1 as the computer's speaker: sampling on the machine (sp_sampler.c) */
 #define FELUCCA_UART 1                         /* the TRS MIDI IN jack (midi_uart.c, sloopDX's) */
 #ifndef FELUCCA_ID
