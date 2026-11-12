@@ -45,6 +45,14 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
   Pages return after 6 s. White keys 1-8/9-16 = banks A/B (OCT+ C/D), ARP = MULTI PITCH (last pad over 27 keys,
   semis recorded), LFO held + pad = erase, ENV = tap tempo. Version text from FELUCCA_ID[7].
 
+## The VIBE FM version (native, vibe/)
+
+- `vibe/`: ZP12 3.0 for VIBE FM, built with the VIBE FM SDK (`~/VibeFMmk1/vibe-sdk/firmware/zp12n` links here, id `zp12n`):
+  the same `sp_core.c` / `sp_fx.c` / `sp_seq.c` with host switches (SP_FS, SP_WIDE 16-bit waves, SP_NWAVE, SP_TR, SP_POOL,
+  SQ_TICKS_K) – their FM-1 defaults keep the FM-1 bit for bit (host tests). See vibe/README.md.
+- Published: play.thefirmwarehub.com (?fw=zp12n), the VST zip /fw/vibe/zp12-native-vibe.zip (with SOURCE.tar.gz), the hub's
+  /platform/ card; the converted FM-1 build is no longer offered for the VIBE.
+
 ## Build, test, release
 
 - `./build.sh --release X.Y` -> `build/zp12-X.Y.fwsc`, identity `FM-1_97Y` (zp12 = 97N; sloopDX 9XY, Doom 98N).

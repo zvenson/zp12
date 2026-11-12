@@ -8,6 +8,12 @@
  * original's dynamic buttons), semitones (MULTI PITCH), and SKIP: recorded ahead of the playhead (quantised
  * forward) and already heard live, so not played again this pass. LK: the hit has its own TUNE / DECAY / CUT
  * (sq_lk, beside it): recorded while those knobs were turned, so a sweep played in stays in the loop. */
+#ifndef SP_POOL
+#define SP_POOL __attribute__((section(".pool")))
+#endif
+#ifndef SQ_TICKS_K
+#define SQ_TICKS_K 76087u                       /* ticks Q16 a block per 0.1 BPM, x 10000 (44.1 kHz; the VIBE: its rate's) */
+#endif
 #define SQ_PPQ 96u
 #define SQ_BAR (SQ_PPQ * 4u)
 #define SQ_NSEG 16u
@@ -26,10 +32,10 @@ typedef struct {
 } sq_ev_t;
 typedef struct { uint8_t bars, rsv; uint16_t n; sq_ev_t ev[SQ_MAXEV]; } sq_seg_t;   /* bars 0: AUTO; ev by t */
 
-static sq_seg_t sq_seg[SQ_NSEG] __attribute__((section(".pool")));
-static uint32_t sq_lk[SQ_NSEG][SQ_MAXEV] __attribute__((section(".pool")));   /* the hits' locks (sp_lock_of) */
-static sq_seg_t sq_undo __attribute__((section(".pool")));                    /* a segment before CLEAR / ERASE / COPY */
-static uint32_t sq_undo_lk[SQ_MAXEV] __attribute__((section(".pool")));
+static sq_seg_t sq_seg[SQ_NSEG] SP_POOL;
+static uint32_t sq_lk[SQ_NSEG][SQ_MAXEV] SP_POOL;   /* the hits' locks (sp_lock_of) */
+static sq_seg_t sq_undo SP_POOL;                    /* a segment before CLEAR / ERASE / COPY */
+static uint32_t sq_undo_lk[SQ_MAXEV] SP_POOL;
 static uint8_t sq_undo_of = 0xFF;                                             /* its segment (0xFF: nothing to undo) */
 #define SQ_LK(s) (sq_lk[(s) - sq_seg])
 #define SQ_SONGS 4u
@@ -373,7 +379,7 @@ static void sq_block(void)
     if (!sq.playing)
         return;
     s = &sq_seg[sq.seg % SQ_NSEG];
-    d = (uint32_t)sq.bpm10 * 76087u / 10000u;   /* ticks Q16 a block: bpm10 * 96 * 32 * 65536 / (600 * 44100) */
+    d = (uint32_t)sq.bpm10 * SQ_TICKS_K / 10000u;   /* ticks Q16 a block: bpm10 * 96 * 32 * 65536 / (600 * 44100) */
     if (sq.countin > 0) {                        /* the count-in: its bars of clicks, whatever CLICK is */
         uint32_t c0 = sq.cin_len - (uint32_t)(sq.countin >> 16), c1, b;
         sq.countin -= (int32_t)d;

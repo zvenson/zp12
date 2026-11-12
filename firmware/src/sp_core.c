@@ -17,14 +17,29 @@
 
 #define SP_NCH 8
 #define SP_NSOUND 32
+/* the output rate: 44.1 kHz on the FM-1; a host may set SP_FS to its own (the VIBE: a variable, the host's rate) */
+#ifndef SP_FS
 #define SP_FS 44100
+#endif
+#ifndef SP_NWAVE
+#define SP_NWAVE 64                     /* waves (the kit's + own samples) */
+#endif
+#ifndef SP_TR
+#define SP_TR 1000u                     /* START / END in 1/SP_TR of the wave (the VIBE: 60000, its samples are long) */
+#endif
 #define SP_BLK 32                       /* the envelope and the filter cutoff move once a block */
 
 typedef struct {                        /* a wave: where its packed samples are */
     const uint8_t *d;                   /* (flash, XIP) */
     uint32_t n;                         /* samples */
     uint16_t rate;                      /* Hz it was recorded at: 26040 or 27500 */
+#ifdef SP_WIDE
+    uint8_t fmt;                        /* SP_WIDE (the VIBE): SPW_12 packed (the kit), SPW_16AT12 int16 played at 12 bits, SPW_16 */
+#endif
 } sp_wave_t;
+#ifdef SP_WIDE
+enum { SPW_12, SPW_16AT12, SPW_16 };
+#endif
 
 enum { SPF_REVERSE = 1, SPF_33 = 2 };   /* SPF_33: stored at 45 rpm, played at 33 1/3 (rate x 33/45) */
 /* CHOP group 1-8 in flags bits 2-5 (0: none): a hit cuts the pads of its group on the other channels too, so the
@@ -41,7 +56,7 @@ typedef struct {                        /* a sound (a pad) */
     int8_t pan;                         /* -64..63 */
     uint8_t chan;                       /* 0..7 */
     uint8_t flags;                      /* SPF_* */
-    uint16_t start, end;                /* truncate, 0..1000 of the wave (end 1000 = its end) */
+    uint16_t start, end;                /* truncate, 0..SP_TR of the wave (end SP_TR = its end) */
     uint8_t cut, reso;                  /* channels 1-2: cutoff 0..127, resonance 0..127 */
     uint8_t drive;                      /* 0..127: the channel's input driven into a soft clip */
     uint8_t send[3];                    /* chorus, delay, reverb sends 0..127 (sp_fx.c) */
@@ -65,7 +80,7 @@ typedef struct {
     int32_t quiet;                      /* MUTE / SOLO: how far down, Q12 (0 heard, 4096 silent), ramped */
 } sp_ch_t;
 
-static sp_wave_t sp_wave[64];
+static sp_wave_t sp_wave[SP_NWAVE];
 static sp_sound_t sp_sound[SP_NSOUND];
 static sp_ch_t sp_ch[SP_NCH];
 #define SP_CH_OF(k) ((k) % SP_NCH)       /* the pad's channel: its position (2.1; sp_sound_t.chan only kept for the saves) */
@@ -87,6 +102,17 @@ static inline int32_t sp_sample(const uint8_t *d, uint32_t i)
     int32_t v = (i & 1u) ? (p[1] >> 4) | (p[2] << 4) : p[0] | ((p[1] & 15) << 8);
     return (v ^ 0x800) - 0x800;
 }
+/* sample i of wave w in Q15 */
+#ifdef SP_WIDE
+static inline int32_t sp_sample_w(const sp_wave_t *w, uint32_t i)
+{
+    if (w->fmt == SPW_12) return sp_sample(w->d, i) << 4;
+    int32_t v = ((const int16_t *)(const void *)w->d)[i];
+    return w->fmt == SPW_16 ? v : v & ~15;          /* (at 12 bits: the low four dropped, as the kit's packing does) */
+}
+#else
+#define sp_sample_w(w, i) (sp_sample((w)->d, (i)) << 4)
+#endif
 
 /* pack n 16-bit samples (already 12-bit: the low 4 bits are dropped) into 12-bit pairs; d holds
  * (n + 1) / 2 * 3 bytes */
@@ -135,7 +161,7 @@ static int32_t sp_decay_mul(uint32_t d)
  * (eight squarings in Q30: within 0.3 % up to 20 kHz) */
 static int32_t sp_onepole(uint32_t hz)
 {
-    int64_t x = (int64_t)hz * 152982;              /* 2 pi f / fs in Q30 (2^30 * 2 pi / 44100; no 64-bit division) */
+    int64_t x = (int64_t)hz * ((int64_t)6746518852LL / SP_FS);   /* 2 pi f / fs in Q30 (2^30 * 2 pi / fs = 152982 at 44.1 kHz, folded) */
     int64_t y = (1LL << 30) - (x >> 8);
     uint32_t i;
     for (i = 0; i < 8u; i++)
@@ -173,7 +199,7 @@ static void sp_trigger_lk(uint32_t k, uint32_t vel, int32_t semis, uint32_t lk)
     const sp_wave_t *w;
     uint32_t a, b, rate;
     int32_t cents, lv;
-    if (s->wave >= 64u || !sp_wave[s->wave].n)
+    if (s->wave >= SP_NWAVE || !sp_wave[s->wave].n)
         return;
     w = &sp_wave[s->wave];
     c = &sp_ch[SP_CH_OF(k)];
@@ -185,8 +211,8 @@ static void sp_trigger_lk(uint32_t k, uint32_t vel, int32_t semis, uint32_t lk)
                 sp_ch[ch].jump = 1;                  /* (SMOOTH bridges the cut, the filter rings out) */
             }
     }
-    a = w->n / 1000u * s->start + w->n % 1000u * s->start / 1000u;   /* (32 bits, no 64-bit division) */
-    b = s->end ? w->n / 1000u * s->end + w->n % 1000u * s->end / 1000u : w->n;
+    a = w->n / SP_TR * s->start + w->n % SP_TR * s->start / SP_TR;   /* (32 bits, no 64-bit division) */
+    b = s->end ? w->n / SP_TR * s->end + w->n % SP_TR * s->end / SP_TR : w->n;
     if (b > w->n) b = w->n;
     if (b <= a + 1u)
         return;
@@ -215,7 +241,7 @@ static void sp_trigger_lk(uint32_t k, uint32_t vel, int32_t semis, uint32_t lk)
     c->tail = 8;
     /* SMOOTH only where it clicks: a sound still sounding cut, or a start inside the wave (TRUNC); a sample from
      * its own beginning keeps its attack */
-    c->jump = (uint8_t)(c->on || ((s->flags & SPF_REVERSE) ? s->end < 1000u && s->end : s->start > 0u));
+    c->jump = (uint8_t)(c->on || ((s->flags & SPF_REVERSE) ? s->end < SP_TR && s->end : s->start > 0u));
     if (!c->jump) c->dc = 0;
     c->on = 1;
     c->pad = (uint8_t)(k % SP_NSOUND);
@@ -251,7 +277,7 @@ static void sp_channel(uint32_t ch, int32_t *out)
     }
     for (i = 0; i < SP_BLK; i++) {
         if (c->on) {
-            x = sp_sample(c->w->d, c->pos) << 4;      /* Q15 */
+            x = sp_sample_w(c->w, c->pos);            /* Q15 */
             c->frac += c->step;                       /* zero-order hold: the sample now, no interpolation */
             while (c->frac >= 65536u) {
                 c->frac -= 65536u;
@@ -334,7 +360,7 @@ static inline int32_t sp_out(int32_t v)
 static struct { uint32_t ph, inc; int32_t env; } sp_clk;
 static void sp_click(int accent)
 {
-    sp_clk.inc = (accent ? 1760u : 1175u) * 97391u;   /* 2^32 / 44100 = 97391.5 */
+    sp_clk.inc = (accent ? 1760u : 1175u) * (uint32_t)(4294967296ULL / SP_FS);   /* 2^32 / 44100 = 97391.5 */
     sp_clk.ph = 0;
     sp_clk.env = 9000;
 }

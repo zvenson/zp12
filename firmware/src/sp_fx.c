@@ -3,20 +3,23 @@
 /* zp12's modern side: sloopDX's three send buses (fx.c fx_buses, unchanged but for where its settings live):
  * a stereo chorus, a tempo delay with a low-passed feedback, and a feedback-delay-network reverb with a
  * pre-delay. Every channel sends to them (its sound's CHO / DLY / REV); the wet comes back in stereo. */
+#ifndef SP_POOL
+#define SP_POOL __attribute__((section(".pool")))   /* (the FM-1's spare RAM; a host without it: -DSP_POOL=) */
+#endif
 #define DLY_LEN 65536u           /* 1.49 s: 1/4 at 40 BPM fits */
 #define CHO_LEN 2048u
-static int16_t dly_buf[DLY_LEN] __attribute__((section(".pool")));
-static int16_t cho_buf[CHO_LEN] __attribute__((section(".pool")));
+static int16_t dly_buf[DLY_LEN] SP_POOL;
+static int16_t cho_buf[CHO_LEN] SP_POOL;
 /* the reverb: two input diffusers, then four delay lines mixed by a Hadamard matrix (a feedback delay
  * network: every echo feeds all four, so it thickens instead of ringing like a comb), damped in the
  * loop, one line slowly modulated (no metallic tone on long tails); left and right take different lines */
 #define REV_MOD 12               /* samples the modulated line moves (+-) */
 static const uint16_t REV_LINE[4] = {1559, 1931, 2389, 2791};   /* 35..63 ms, coprime */
 static const uint16_t REV_AP[2] = {556, 441};
-static int16_t rev_line[1559 + 1931 + 2389 + 2791 + REV_MOD + 2] __attribute__((section(".pool")));
-static int16_t rev_ap[556 + 441] __attribute__((section(".pool")));
+static int16_t rev_line[1559 + 1931 + 2389 + 2791 + REV_MOD + 2] SP_POOL;
+static int16_t rev_ap[556 + 441] SP_POOL;
 #define PRE_LEN 4096u            /* the reverb's pre-delay (REV page PRE): 93 ms; 90 used */
-static int16_t pre_buf[PRE_LEN] __attribute__((section(".pool")));
+static int16_t pre_buf[PRE_LEN] SP_POOL;
 static struct {
     uint32_t dly_w, cho_w, cho_ph, rev_ph, pre_w;
     int32_t dly_lp;
@@ -43,7 +46,7 @@ static int32_t fx_sine(uint32_t ph)
 static uint32_t fx_lfo_inc(int32_t r)
 {
     uint32_t mhz = (uint32_t)(50u * sp_pow2_cents(r * 9600 / 127) >> 16);   /* 8 octaves */
-    return mhz * 3117u;                            /* 2^32 * 32 / 44100 / 1000 = 3116.6 */
+    return mhz * (uint32_t)((137438953472ULL / SP_FS + 500u) / 1000u);   /* 2^32 * 32 / 44100 / 1000 = 3116.6: 3117 */
 }
 static uint32_t fx_delay_samples(void)
 {

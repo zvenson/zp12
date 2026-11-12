@@ -1,0 +1,1 @@
+{ "name": "ZP12", "version": "3.0", "author": "zvenson", "description": "12-bit sampling drums in the spirit of the 80s · 32 sounds on 8 channels with their filters · sample from IN 1/2 or the computer over USB · 12 or 16 bit · loops and songs", "license": "GPL-3.0", "order": 50, "memory_mb": 96 }

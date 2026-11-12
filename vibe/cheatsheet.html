@@ -1,0 +1,26 @@
+<!-- ZP12 cheat sheet: an HTML fragment the emulator shows right of the device. -->
+<h2>ZP12 <small>3.0 · 12-Bit-Sampling-Drums</small></h2>
+<p class="dim">32 Sounds auf 8 Kanälen · Tonhöhe über die Abspielrate ohne Interpolation · PLAY spielt sofort Loop 1</p>
+
+<h3>K1–K6 = Seiten <span class="dim">(dieselbe Taste nochmal = nächste Unterseite)</span></h3>
+<table>
+  <tr><td><span class="k c" style="background:#C82E32">SAMPLE</span></td><td><b>REC</b> = aufs gewählte Pad sampeln · SOURCE LINE / MIC / HI-Z / IN 1+2 / USB · GAIN · THRESH (wartet auf den Klang) · MONITOR · F2 26 / 27,5 kHz · F3 12 / 16 Bit · F4 LOAD (WAV von Karte / Stick)</td></tr>
+  <tr><td><span class="k c" style="background:#C82E32">EDIT</span></td><td>SOUND (TUNE FINE DECAY LEVEL) → TRUNC (START END, Richtung, 45 &gt; 33) → OUT (CHOP PAN CUT RESO) → SENDS · F1 12 / 16 Bit · F2 COPY · F3 DELETE (2×)</td></tr>
+  <tr><td><span class="k c" style="background:#C82E32">MIX</span></td><td>8 Kanal-Fader (1–4 / 5–8) → <b>SENDS</b>: was jedes Pad der Bank an CHORUS / DELAY / REVERB schickt (Encoder 1–4 = CHO DLY REV DRIVE des gewählten Pads) · F1 MUTE · F2 SOLO (tippen = Kanal des Pads, halten + Pads) · F3 alles hörbar</td></tr>
+  <tr><td><span class="k c" style="background:#C82E32">FX</span></td><td>CHORUS → DELAY → REVERB (wie sie klingen; wie viel jedes Pad hinschickt: MIX → SENDS) → FILTER (DJ-Filter auf die Summe)</td></tr>
+  <tr><td><span class="k c" style="background:#C82E32">SEQ</span></td><td>LOOP (LOOP BARS QUANTIZE SWING) → STEPS (Pads = 16 Schritte, ◀ ▶ Takt) · F1 CLEAR (2×) · F2 halten + Pads = ERASE · F3 COPY · F4 UNDO</td></tr>
+  <tr><td><span class="k c" style="background:#C82E32">SONG</span></td><td>SONG 1–4 · STEP · LOOP (auf END = anhängen) · REPEAT · F1 INSERT · F2 DELETE · F3 SONG an / aus</td></tr>
+</table>
+
+<h3>Überall</h3>
+<table>
+  <tr><td><span class="k">PADS</span></td><td>Bank A + B · <b>MENU</b> = C + D · ein Pad wählt auch den Sound</td></tr>
+  <tr><td><span class="k">SHIFT + K1–K6</span></td><td>spielt Pad 1–6 – SHIFT halten oder antippen (dann 1,5 s, gelber Strich)</td></tr>
+  <tr><td><span class="k">ENCODER DRÜCKEN</span></td><td>Encoder 1–4 spielen die Reihe des Pads, das DATA gewählt hat (gelber Balken am Pad-Raster)</td></tr>
+  <tr><td><span class="k">TASTEN</span></td><td>der gewählte Sound chromatisch (OCT − / +) – wird mit aufgenommen</td></tr>
+  <tr><td><span class="k">A · B · DATA</span></td><td>Tempo (SHIFT 0,1) · Loop · Sound</td></tr>
+  <tr><td><span class="k">PLAY · STOP · REC</span></td><td>Loop / Song · Stop · Hits aufnehmen (gestoppt: scharf, PLAY zählt ein; laufend: Overdub)</td></tr>
+  <tr><td><span class="k">F5 · F6</span></td><td>SAVE (speichert auch selbst) · SETUP: CLICK, COUNT-IN, OVERDUB, SAMPLE TIME (10 s / 30 s / 2 min / 5 min), SMOOTH</td></tr>
+  <tr><td><span class="k">HOME</span></td><td>die Belegung dieser Seite</td></tr>
+</table>
+<p class="dim">Ein Pad spielt auf dem Kanal seiner Position (Pad 3 jeder Bank = Kanal 3): ein neuer Schlag schneidet den alten ab. Kanal 1–2 haben das resonante Filter, 3–6 einen festen Tiefpass, 7–8 keinen. 16 Bit kostet ein Viertel mehr Sample-Zeit.</p>
