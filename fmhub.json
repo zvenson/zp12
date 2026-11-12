@@ -1,6 +1,6 @@
 {
   "what": "A 12-bit sampler after the E-mu SP-1200: sample on the FM-1 itself (a computer or phone plays into it over USB) or in the browser (mic, line-in or a file), and it plays on its own. Gritty and unsmoothed, with loops and songs.",
   "kinds": ["drums"],
-  "play": "https://thefirmwarehub.com/play/zp12/",
+  "play": "https://play.thefirmwarehub.com/?fw=zp12n",
   "editor": "https://zp12.designburgapps.com/editor/"
 }
