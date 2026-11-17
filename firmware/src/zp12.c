@@ -438,7 +438,7 @@ void fm1_cstart(void)
     fm1_boot.p3_rst = (uint8_t)p3;
     if (boot_mode == BOOT_RECOVERY || recovery_key())
         recovery_main();                        /* OCT- at power-on: the USB rescue */
-    flash_ok = FL_FAR(fl_jedec_ram)() == 0x856014u;
+    flash_ok = fl_jedec_known(FL_FAR(fl_jedec_ram)());   /* P25Q80H or UC25HQ80 */
     if (flash_ok)
         fl_plain_window_init();                 /* flash above 0x93000 reads plain through XIP: the own samples */
     ota_boot_cleanup();
