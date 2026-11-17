@@ -8,6 +8,7 @@
 #pragma once
 #include <stdint.h>
 #include "fm1_xip.h"
+#include "../../firmware/hal/fm1_flash_id.h"
 #define FL_XIP(off)     FM1_XIP(off)
 #define FL_DATA_LO      0x00097000u
 #define FL_DATA_HI      0x000E0000u

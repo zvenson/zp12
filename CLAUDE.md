@@ -11,6 +11,8 @@ Sister project: sloopDX in `../sloopdx` (its installer and effects are reused he
 - Keep the SLOOP / Felucca credits. "Only an SP-12": no other synth engines.
 - Target: JieLi AC791N, no FPU, no libgcc: **no 64-bit division** (link fails on __udivdi3), integer DSP only.
   `tools/build.py check()` fails on any constant in 0xFFC00000-0xFFD00000 (ROM range; e.g. -32767<<7). RAM ≤ 96 KB.
+- Flash: Puya P25Q80H (0x856014) or, on later units, UCUN UC25HQ80 (0xB36014); the one list is
+  `firmware/hal/fm1_flash_id.h` `fl_jedec_known()` (loader, app, rescue, sim; after SLOOP #241), test tests/flash_id_test.c.
 
 ## Where things are (firmware/src)
 
